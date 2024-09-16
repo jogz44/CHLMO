@@ -1,30 +1,25 @@
-@extends('layouts.admin')
+@extends('layouts.editor')
 
 @section('sidebar')
-@include('prototype-codes.admin.components.sidebar')
+@include('prototype-codes.editor.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.admin.components.header')
+@include('prototype-codes.editor.components.header')
 @endsection
 
 @section('content')
 <div class="flex bg-gray-100 text-[12px]">
     <div x-data="{ isEditable: false }" class="flex-1 ml-[17%] mt-[50px] p-6 overflow-auto">
-        <div x-data="{ openModalBlacklist: false }" class="bg-white rounded shadow mb-4 flex items-center justify-between relative p-3">
+        <div class="bg-white rounded shadow mb-4 flex items-center justify-between relative p-3">
             <div class="flex items-center">
-                <a href="{{ route('transaction-walkin') }}"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
+                <a href="{{ route('transaction-request') }}"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg></a>
-                <h2 class="text-[13px] ml-2 items-center text-gray-700">Awardee Personal Information</h2>
+                <h2 class="text-[13px] ml-2 items-center text-gray-700">Applicant Details</h2>
             </div>
-            <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-10  0 z-0">
+            <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
             <div x-data="{ saved: false }" class="flex space-x-2 z-0">
-                <button
-                    class="bg-custom-dark-green text-white text-xs font-medium px-6 py-2 rounded"
-                    @click="openModalBlacklist = true">
-                    BLACKLIST
-                </button>
                 <button
                     :disabled="!isEditable || saved"
                     class="bg-custom-yellow text-white text-xs font-medium px-6 py-2 rounded"
@@ -38,40 +33,6 @@
                     EDIT
                 </button>
             </div>
-
-            <div x-show="openModalBlacklist" x-cloak class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-40">
-                <!-- Modal -->
-                <div class="bg-white rounded-lg shadow-lg w-[400px] p-6 relative z-50" @click.away="openModal = false">
-                    <!-- Modal Header -->
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-md font-semibold text-black " style="font-family:'Poppins', sans-serif;">BLACKLIST AWARDEE</h3>
-                        <button @click="openModalBlacklist = false" class="text-red-500 hover:text-red-700 font-bold text-sm">&times;</button>
-                    </div>
-
-                    <form>
-                        <!-- Reason Field -->
-                        <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-gray-700" for="reason">REASON BEING BLACKLISTED</label>
-                            <textarea id="reason" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Enter reason..."></textarea>
-                        </div>
-
-                        <!-- Updated By Field -->
-                        <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-gray-700" for="updated-by">UPDATED BY</label>
-                            <input type="text" id="updated-by" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Updated by...">
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="flex justify-between items-center">
-                            <!-- Blacklist Button -->
-                            <button type="submit" class="px-4 py-2 bg-red-600 text-[12px] text-white rounded-lg hover:bg-red-700">BLACKLIST</button>
-                            <!-- Cancel Button -->
-                            <button type="button" @click="openModalBlacklist = false" class="px-4 py-2 bg-gray-500 text-[12px] text-white rounded-lg hover:bg-gray-600">CANCEL</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
         </div>
 
 

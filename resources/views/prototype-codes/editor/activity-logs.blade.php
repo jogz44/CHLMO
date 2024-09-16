@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.editor')
 
 @section('sidebar')
-@include('prototype-codes.admin.components.sidebar')
+@include('prototype-codes.editor.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.admin.components.header')
+@include('prototype-codes.editor.components.header')
 @endsection
 
 @section('content')

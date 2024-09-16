@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.editor')
 
 @section('sidebar')
-@include('prototype-codes.admin.components.sidebar')
+@include('prototype-codes.editor.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.admin.components.header')
+@include('prototype-codes.editor.components.header')
 @endsection
 
 @section('content')
@@ -101,7 +101,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-applicant-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                             </td>
                         </tr>
@@ -116,7 +116,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-applicant-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                             </td>
                         </tr>
@@ -131,7 +131,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-applicant-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                             </td>
                         </tr>
@@ -146,7 +146,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-applicant-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                             </td>
                         </tr>
@@ -161,7 +161,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-applicant-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                             </td>
                         </tr>

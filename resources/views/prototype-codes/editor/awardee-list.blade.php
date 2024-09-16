@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.editor')
 
 @section('sidebar')
-@include('prototype-codes.admin.components.sidebar')
+@include('prototype-codes.editor.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.admin.components.header')
+@include('prototype-codes.editor.components.header')
 @endsection
 
 @section('content')
@@ -91,7 +91,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-awardee-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                                 <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
                             </td>
@@ -104,7 +104,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-awardee-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                                 <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
                             </td>
@@ -117,7 +117,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-awardee-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                                 <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
                             </td>
@@ -130,7 +130,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-awardee-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                                 <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
                             </td>
@@ -143,7 +143,7 @@
                             <td class="py-4 px-2 text-center border-b">11/23/2023</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
+                                    @click="window.location.href = '{{ route('editor-awardee-details') }}'"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                                 <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
                             </td>

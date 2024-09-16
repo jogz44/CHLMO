@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.editor')
 
 @section('sidebar')
-@include('prototype-codes.admin.components.sidebar')
+@include('prototype-codes.editor.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.admin.components.header')
+@include('prototype-codes.editor.components.header')
 @endsection
 
 @section('content')
@@ -18,12 +18,16 @@
 
     <!-- Main Content -->
     <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
-        <div class="bg-white rounded shadow mb-4 mt-[60px] flex items-center justify-between">
-            <h2 class="text-[13px] ml-5 text-gray-700">SHELTER ASSISTANCE GRANTEES</h2>
+        <!-- Container for the Title -->
+        <div class="bg-white rounded shadow mb-4 mt-[50px] flex items-center justify-between">
+            <h2 class="text-[13px] ml-5 text-gray-700">WALK IN APPLICANTS</h2>
             <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="h-full object-cover">
         </div>
 
+
+        <!-- Container for the Buttons, Search bar, Filters, and Table -->
         <div class="bg-white p-6 rounded shadow">
+            <!-- Page Header with buttons, search bar, and filters -->
             <div class="flex justify-between items-center mb-4">
                 <div class="flex space-x-2">
                     <!-- Search -->
@@ -37,36 +41,40 @@
                 </div>
 
                 <!-- filters and button -->
-                <div x-data="{ openModal: false}" class="flex space-x-2">
+                <div x-data class="flex space-x-2">
                     <label for="start-date" class="text-[13px] py-2 font-medium">Date Range:</label>
                     <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
                     <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
                     <button class="bg-custom-yellow text-white px-4 py-2 rounded">Filter</button>
+                    <button
+                        @click="window.location.href = '{{ route('editor-add-new-request') }}'"
+                        class="bg-custom-red text-white px-4 py-2 rounded">
+                        Add Occupant
+                    </button>
                     <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
-
                 </div>
             </div>
 
             <!-- Table with transaction requests -->
-            <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}" class="overflow-x-auto">
+            <div x-data="{openModalRelocate: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}" class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2  text-center font-medium">Name</th>
                             <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Living Situation</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Occupation</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Monthly Income</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Applied</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Grant</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Monthly income</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Status</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td class="py-2 px-2 text-center  border-b"></td>
-                            <td class="py-2 px-2 border-gray-800 text-center font-medium">
+                            <td class="py-2 px-2 border-b text-center font-medium">
                                 <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm" style="padding: 2px 4px;">
                                     <option value="">Purok</option>
                                     <option value="purok1">Purok 1</option>
@@ -74,7 +82,7 @@
                                     <option value="purok3">Purok 3</option>
                                 </select>
                             </td>
-                            <td class="py-2 px-2 border-gray-800 text-center font-medium">
+                            <td class="py-2 px-2 border-b text-center font-medium">
                                 <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm" style="padding: 2px 4px;">
                                     <option value="">Barangay</option>
                                     <option value="barangay1">Barangay 1</option>
@@ -82,11 +90,32 @@
                                     <option value="barangay3">Barangay 3</option>
                                 </select>
                             </td>
+                            <td class="py-2 px-2 border-b text-center font-medium">
+                                <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm" style="padding: 2px 4px;">
+                                    <option value="">Situation</option>
+                                    <option value="barangay1">Barangay 1</option>
+                                    <option value="barangay2">Barangay 2</option>
+                                    <option value="barangay3">Barangay 3</option>
+                                </select>
+                            </td>
                             <td class="py-2 px-2 text-center border-b"></td>
+                            <td class="py-2 px-2 border-b text-center font-medium">
+                                <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm" style="padding: 2px 4px;">
+                                    <option value="">Occupation </option>
+                                    <option value="barangay1">Barangay 1</option>
+                                    <option value="barangay2">Barangay 2</option>
+                                    <option value="barangay3">Barangay 3</option>
+                                </select>
+                            </td>
                             <td class="py-2 px-2 text-center border-b"></td>
-                            <td class="py-2 px-2 text-center border-b"></td>
-                            <td class="py-2 px-2 text-center border-b"></td>
-                            <td class="py-2 px-2 text-center border-b"></td>
+                            <td class="py-2 px-2 border-b text-center font-medium">
+                                <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm" style="padding: 2px 4px;">
+                                    <option value="">Status</option>
+                                    <option value="barangay1">Barangay 1</option>
+                                    <option value="barangay2">Barangay 2</option>
+                                    <option value="barangay3">Barangay 3</option>
+                                </select>
+                            </td>
                             <td class="py-2 px-2 text-center border-b space-x-2">
                             </td>
                         </tr>
@@ -94,136 +123,131 @@
                             <td class="py-4 px-2 text-center  border-b">John Doe</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
+                            <td class="py-4 px-2 text-center border-b">Notice to Vacate</td>
                             <td class="py-4 px-2 text-center border-b">09637894863</td>
                             <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">10,000</td>
+                            <td class="py-4 px-2 text-center border-b">Pending</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button 
+                                @click="window.location.href = '{{ route('editor-request-applicant-details') }}'"
+                                class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button @click="openModalTag = true" class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
+                                <button @click="openModalRelocate = true" class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
                             </td>
                         </tr>
                         <tr>
                             <td class="py-4 px-2 text-center  border-b">John Doe</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
+                            <td class="py-4 px-2 text-center border-b">Notice to Vacate</td>
                             <td class="py-4 px-2 text-center border-b">09637894863</td>
                             <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">10,000</td>
+                            <td class="py-4 px-2 text-center border-b">Pending</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
+                                <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
                             </td>
                         </tr>
                         <tr>
                             <td class="py-4 px-2 text-center  border-b">John Doe</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
+                            <td class="py-4 px-2 text-center border-b">Notice to Vacate</td>
                             <td class="py-4 px-2 text-center border-b">09637894863</td>
                             <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">10,000</td>
+                            <td class="py-4 px-2 text-center border-b">Pending</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
+                                <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
                             </td>
                         </tr>
                         <tr>
                             <td class="py-4 px-2 text-center  border-b">John Doe</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
+                            <td class="py-4 px-2 text-center border-b">Notice to Vacate</td>
                             <td class="py-4 px-2 text-center border-b">09637894863</td>
                             <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">10,000</td>
+                            <td class="py-4 px-2 text-center border-b">Pending</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
+                                <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
                             </td>
                         </tr>
                         <tr>
                             <td class="py-4 px-2 text-center  border-b">John Doe</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
+                            <td class="py-4 px-2 text-center border-b">Notice to Vacate</td>
                             <td class="py-4 px-2 text-center border-b">09637894863</td>
                             <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">10,000</td>
+                            <td class="py-4 px-2 text-center border-b">Pending</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                    @click="window.location.href = '{{ route('applicant-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
+                                <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
                             </td>
                         </tr>
-                        
+
                     </tbody>
                 </table>
 
-                <!-- Award Applicant Modal -->
-                <div x-show="openModalAward" class="fixed inset-0 flex z-50 items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                    x-cloak style="font-family: 'Poppins', sans-serif;">
+                <!-- Modal Background -->
+                <div x-show="openModalRelocate" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak style="font-family: 'Poppins', sans-serif;">
+                    <!-- Modal -->
                     <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
                         <!-- Modal Header -->
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-black">AWARD APPLICANT</h3>
-                            <button @click="openModalAward = false" class="text-gray-400 hover:text-gray-200">&times;</button>
+                            <h3 class="text-md font-semibold text-black">RELOCATE AFFECTED APPLICANT</h3>
+                            <button @click="openModalRelocate = false" class="text-gray-400 hover:text-gray-200">&times;</button>
                         </div>
 
                         <!-- Form -->
                         <form>
-                            <!-- Award Date Field -->
+                            <!-- Grant Date Field -->
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">AWARD DATE</label>
-                                <input type="date" id="award-date" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Award Date">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">GRANT DATE</label>
+                                <input type="date" id="grant-date" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Award Date">
                             </div>
 
-
                             <!-- Main Fields -->
-
                             <!-- Barangay Field -->
                             <div class="mb-4">
                                 <br>
                                 <label class="block text-sm font-medium mb-2 text-black" for="barangay">LOT ALLOCATED</label>
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>
-                                <input type="text" id="barangay" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Barangay">
+                                <input type="text" id="barangay" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Barangay">
                             </div>
 
                             <!-- Purok Field -->
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK</label>
-                                <input type="text" id="purok" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Purok">
+                                <input type="text" id="purok" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Purok">
                             </div>
 
-                            <!-- Contact Number Field -->
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="contact number">CONTACT NUMBER</label>
-                                <input type="text" id="contact-number" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Contact Number">
-                            </div>
-
-                            <!-- Interviewer Field -->
+                            <!-- Lot Size Allocated Field -->
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">LOT SIZE ALLOCATED</label>
-                                <input type="text" id="lot-size-allocated" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Lot Size Allocated">
+                                <input type="text" id="lot-size-allocated" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Lot Size Allocated">
                             </div>
                             <br>
                             <div class="grid grid-cols-2 gap-4 mb-4">
-                                <button type="submit"
-                                    class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg">
-                                    AWARD
+                                <!-- Add Product Button -->
+                                <button type="submit" class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-[12px]">RELOCATE</span>
                                 </button>
-                                <button type="button" @click="openModalAward = false"
-                                    class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
-                                    CANCEL
+
+                                <!-- Cancel Button -->
+                                <button type="submit" class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-[12px]">CANCEL</span>
                                 </button>
                             </div>
                         </form>
@@ -326,7 +350,6 @@
                     </div>
                 </div>
 
-
             </div>
         </div>
         <!-- Pagination controls -->
@@ -352,11 +375,9 @@
                 Next
             </button>
         </div>
-
-
     </div>
 </div>
-
+</div>
 
 <script>
     function pagination() {

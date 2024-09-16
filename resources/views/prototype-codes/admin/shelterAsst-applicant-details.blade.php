@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
 @section('sidebar')
-@include('prototype-codes.components.sidebar')
+@include('prototype-codes.admin.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.components.header')
+@include('prototype-codes.admin.components.header')
 @endsection
 
 @section('content')
@@ -18,7 +18,7 @@
                     </svg></a>
                 <h2 class="text-[13px] ml-2 items-center text-gray-700">Grantee's Personal Information</h2>
             </div>
-            <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-40 z-0">
+            <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
             <div x-data="{ saved: false }" class="flex space-x-2 z-0">
                 <button
                     :disabled="!isEditable || saved"
