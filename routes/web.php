@@ -22,3 +22,4 @@ Route::middleware([
 });
 
 
+require __DIR__ . '/prototype/admin.php';
