@@ -61,3 +61,23 @@ Route::get('/prototype-codes/admin/lot-list', function () {
 Route::get('/prototype-codes/admin/blacklist', function () {
     return view('prototype-codes.admin.blacklist');
 })->name('blacklist');
+
+Route::get('/prototype-codes/admin/activity-logs', function () {
+    return view('prototype-codes.admin.activity-logs');
+})->name('activity-logs');
+
+Route::get('/prototype-codes/admin/user-settings', function () {
+    return view('prototype-codes.admin.user-settings');
+})->name('user-settings');
+
+Route::get('/prototype-codes/admin/reports-summary-informal-settlers', function () {
+    return view('prototype-codes.admin.reports-summary-informal-settlers');
+})->name('reports-summary-informal-settlers');
+
+Route::get('/prototype-codes/admin/reports-summary-relocation-applicants', function () {
+    return view('prototype-codes.admin.reports-summary-relocation-applicants');
+})->name('reports-summary-relocation-applicants');
+
+Route::get('/prototype-codes/admin/profile', function () {
+    return view('prototype-codes.admin.profile');
+})->name('profile');

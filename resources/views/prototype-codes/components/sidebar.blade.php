@@ -3,7 +3,7 @@
     <div class="flex h-[100vh] ">
         <!-- Sidebar -->
         <aside :class="open ? 'block' : 'hidden md:block'" class="fixed w-[17%] bg-[#ffffff] max-h-screen  py-3 pl-4 pr-2 md:block mr-2 pb-[8px] shadow-lg ">
-            <div class="text-20 font-bold mb-6 ml-1 mt-4 flex items-center ">
+            <div class="text-20 font-bold mb-0 ml-1 mt-4 flex items-center ">
                 <div class="w-[85%] h-auto inline-block">
                     <img src="{{ asset('storage/halmsAssets/logo.png') }}" class="h-auto w-42 ml-1.5" class="" alt="">
                 </div>
@@ -108,7 +108,7 @@
                     </svg>
                     <p class="ml-2">Reports</p>
                 </a>
-                <a href=""
+                <a href="{{ route('activity-logs') }}"
                     @click="activeLink = 'activity'; activeChildLink = ''; localStorage.setItem('activeLink', 'activity'); localStorage.setItem('activeChildLink', '')"
                     :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'activity' }"
                     class="mx-2 flex items-center block py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
@@ -117,7 +117,7 @@
                     </svg>
                     <p class="ml-2">Activity Logs</p>
                 </a>
-                <a href=""
+                <a href="{{ route('user-settings') }}"
                     @click="activeLink = 'UserSettings'; activeChildLink = ''; localStorage.setItem('activeLink', 'UserSettings'); localStorage.setItem('activeChildLink', '')"
                     :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'UserSettings' }"
                     class="mx-2 flex items-center block py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
