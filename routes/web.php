@@ -23,3 +23,4 @@ Route::middleware([
 
 
 require __DIR__ . '/prototype/admin.php';
+require __DIR__ . '/prototype/editor.php';

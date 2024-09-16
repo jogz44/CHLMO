@@ -1,11 +1,11 @@
-@extends('layouts.admin')
+@extends('layouts.editor')
 
 @section('sidebar')
-@include('prototype-codes.admin.components.sidebar')
+@include('prototype-codes.editor.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.admin.components.header')
+@include('prototype-codes.editor.components.header')
 @endsection
 
 @section('content')
@@ -19,11 +19,11 @@
     <!-- Main Content -->
     <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
         <div class="bg-white rounded shadow mb-4 mt-[60px] flex items-center justify-between">
-            <h2 class="text-[13px] ml-5 text-gray-700">AWARDEE LIST</h2>
+            <h2 class="text-[13px] ml-5 text-gray-700">LOT LIST</h2>
             <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="h-full object-cover">
         </div>
 
-        <div x-data="fileUpload()"  class="bg-white p-6 rounded shadow">
+        <div x-data="fileUpload()" class="bg-white p-6 rounded shadow">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex space-x-2">
                     <!-- Search -->
@@ -37,26 +37,63 @@
                 </div>
 
                 <!-- filters and button -->
-                <div x-data="{ openModal: false}" class="flex space-x-2">
-                    <label for="start-date" class="text-[13px] py-2 font-medium">Date Range:</label>
-                    <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
-                    <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
-                    <button class="bg-custom-yellow text-white px-4 py-2 rounded">Filter</button>
+                <div x-data="{ openModalLot: false}" class="flex space-x-2">
+                    <button @click="openModalLot = true" class="bg-custom-yellow text-white px-4 py-2 rounded">Add Lot</button>
                     <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
+
+                    <div x-show="openModalLot" class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50" x-cloak style="font-family: 'Poppins', sans-serif;">
+                        <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-md font-semibold text-black">ADD LOT</h3>
+                                <button @click="openModalLot = false" class="text-gray-400 hover:text-gray-200">&times;</button>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">LOT/RELOCATION NAME</label>
+                                <input type="text" id="lotname" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Barangay">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>
+                                <input type="text" id="barangay" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Barangay">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK</label>
+                                <input type="text" id="purok" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Purok">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL LOT SIZE</label>
+                                <input type="text" id="total-lotsize" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Total Lot Size">
+                            </div>
+                            <br>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <button type="submit" class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-[12px]">AWARD</span>
+                                </button>
+                                <!-- Cancel Button -->
+                                <button type="submit" class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span @click="openModalLot = false" class="text-[12px]">CANCEL</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Table with transaction requests -->
-            <div x-data="{openModalTransfer: false, openPreviewModal: false}" class="overflow-x-auto">
+            <div x-data="{openModalEditLot: false}" class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2  text-center font-medium">Name</th>
                             <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Awarded</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Status</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">No. of Awardees</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size</th>
+                            <th class="py-2 px-2 border-b text-center font-medium"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,74 +117,77 @@
                             </td>
                             <td class="py-2 px-2 text-center border-b"></td>
                             <td class="py-2 px-2 text-center border-b"></td>
+                            <td class="py-2 px-2 text-center border-b"></td>
                             <td class="py-2 px-2 text-center border-b space-x-2">
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
+                            <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">Full</td>
+                            <td class="py-4 px-2 text-center border-b">60</td>
+                            <td class="py-2 px-2 text-center border-b">80ha</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
+                                    @click="openModalEditLot = true"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
+                            <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">Available</td>
+                            <td class="py-4 px-2 text-center border-b">60</td>
+                            <td class="py-2 px-2 text-center border-b">100ha</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
+                                    @click="openModalEditLot = true"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
+                            <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">Full</td>
+                            <td class="py-4 px-2 text-center border-b">60</td>
+                            <td class="py-2 px-2 text-center border-b">80ha</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
+                                    @click="openModalEditLot = true"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
+                            <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">Full</td>
+                            <td class="py-4 px-2 text-center border-b">60</td>
+                            <td class="py-2 px-2 text-center border-b">80ha</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
+                                    @click="openModalEditLot = true"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                             </td>
                         </tr>
                         <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
+                            <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
                             <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
                             <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
+                            <td class="py-4 px-2 text-center border-b">Full</td>
+                            <td class="py-4 px-2 text-center border-b">60</td>
+                            <td class="py-2 px-2 text-center border-b">80ha</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 <button
-                                    @click="window.location.href = '{{ route('awardee-details') }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                <button @click="openModalTransfer = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer</button>
+                                    @click="openModalEditLot = true"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                             </td>
                         </tr>
+
+
                     </tbody>
                 </table>
 
@@ -323,87 +363,132 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div x-show="openModalEditLot" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak style="font-family: 'Poppins', sans-serif;">
+                    <!-- Modal -->
+                    <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                        <!-- Modal Header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-md font-semibold text-black">ADD LOT</h3>
+                            <button @click="openModalEditLot = false" class="text-gray-400 hover:text-gray-200">&times;</button>
+                        </div>
+
+                        <!-- Barangay Field -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>
+                            <input type="text" id="barangay" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Barangay">
+                        </div>
+
+                        <!-- Purok Field -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK</label>
+                            <input type="text" id="purok" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Purok">
+                        </div>
+
+                        <!-- Total Lot Size Field -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL LOT SIZE</label>
+                            <input type="text" id="total-lotsize" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Total Lot Size">
+                        </div>
+
+                        <!-- Status Field -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="status">STATUS</label>
+                            <input type="text" id="status" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Status">
+                        </div>
+                        <br>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <!-- Add Product Button -->
+                            <button type="submit" class="w-full py-2 bg-yellow-500 hover:bg-yellow-400 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                <span class="text-[12px]">SAVE</span>
+                            </button>
+                            <!-- Cancel Button -->
+                            <button type="submit" class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                <span class="text-[12px]">CANCEL</span>
+                            </button>
+                        </div>
 
 
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Pagination controls -->
-        <div class="flex justify-end text-[12px] mt-4">
-            <button
-                @click="prevPage"
-                :disabled="currentPage === 1"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
-                Prev
-            </button>
-            <template x-for="page in totalPages" :key="page">
+            <!-- Pagination controls -->
+            <div class="flex justify-end text-[12px] mt-4">
                 <button
-                    @click="goToPage(page)"
-                    :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"
-                    class="px-4 py-2 mx-1 rounded">
-                    <span x-text="page"></span>
+                    @click="prevPage"
+                    :disabled="currentPage === 1"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
+                    Prev
                 </button>
-            </template>
-            <button
-                @click="nextPage"
-                :disabled="currentPage === totalPages"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
-                Next
-            </button>
-        </div>
-        <script>
-            function fileUpload() {
-                return {
-                    files: [],
-                    selectedFile: null,
-                    openPreviewModal: false,
-                    addFiles(fileList) {
-                        for (let i = 0; i < fileList.length; i++) {
-                            const file = fileList[i];
-                            this.files.push({
-                                file,
-                                displayName: file.name
-                            });
-                        }
-                    },
-                    removeFile(fileWrapper) {
-                        this.files = this.files.filter(f => f !== fileWrapper);
-                    },
-                    renameFile() {
-                        if (this.selectedFile) {
-                            const newName = prompt('Rename File', this.selectedFile.displayName);
-                            if (newName) {
-                                this.selectedFile.displayName = newName;
-                                const fileIndex = this.files.findIndex(f => f === this.selectedFile);
-                                if (fileIndex > -1) {
-                                    this.files[fileIndex].displayName = newName;
-                                }
+                <template x-for="page in totalPages" :key="page">
+                    <button
+                        @click="goToPage(page)"
+                        :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"
+                        class="px-4 py-2 mx-1 rounded">
+                        <span x-text="page"></span>
+                    </button>
+                </template>
+                <button
+                    @click="nextPage"
+                    :disabled="currentPage === totalPages"
+                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
+                    Next
+                </button>
+            </div>
+            <script>
+                function fileUpload() {
+                    return {
+                        files: [],
+                        selectedFile: null,
+                        openPreviewModal: false,
+                        addFiles(fileList) {
+                            for (let i = 0; i < fileList.length; i++) {
+                                const file = fileList[i];
+                                this.files.push({
+                                    file,
+                                    displayName: file.name
+                                });
+                            }
+                        },
+                        removeFile(fileWrapper) {
+                            this.files = this.files.filter(f => f !== fileWrapper);
+                        },
+                        renameFile() {
+                            if (this.selectedFile) {
+                                const newName = prompt('Rename File', this.selectedFile.displayName);
+                                if (newName) {
+                                    this.selectedFile.displayName = newName;
+                                    const fileIndex = this.files.findIndex(f => f === this.selectedFile);
+                                    if (fileIndex > -1) {
+                                        this.files[fileIndex].displayName = newName;
+                                    }
 
+                                }
                             }
                         }
                     }
                 }
-            }
-        </script>
-        <script>
-            function pagination() {
-                return {
-                    currentPage: 1,
-                    totalPages: 3, // Set this to the total number of pages you have
+            </script>
+            <script>
+                function pagination() {
+                    return {
+                        currentPage: 1,
+                        totalPages: 3, // Set this to the total number of pages you have
 
-                    prevPage() {
-                        if (this.currentPage > 1) this.currentPage--;
-                    },
-                    nextPage() {
-                        if (this.currentPage < this.totalPages) this.currentPage++;
-                    },
-                    goToPage(page) {
-                        this.currentPage = page;
+                        prevPage() {
+                            if (this.currentPage > 1) this.currentPage--;
+                        },
+                        nextPage() {
+                            if (this.currentPage < this.totalPages) this.currentPage++;
+                        },
+                        goToPage(page) {
+                            this.currentPage = page;
+                        }
                     }
                 }
-            }
-        </script>
+            </script>
+        </div>
     </div>
-</div>
 
-@endsection
+    @endsection

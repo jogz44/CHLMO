@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
 @section('sidebar')
-@include('prototype-codes.components.sidebar')
+@include('prototype-codes.admin.components.sidebar')
 @endsection
 
 @section('header')
-@include('prototype-codes.components.header')
+@include('prototype-codes.admin.components.header')
 @endsection
 
 @section('content')
@@ -164,7 +164,7 @@
                                 <button
                                     @click="openModalEditUser = true"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
-                                <button @click="openModalDisable = true" class="bg-custom-red text-white px-4 py-2 rounded">Disable</button>
+                                <button @click="openModalDisable = true" class="bg-custom-dark-green text-white px-4 py-2 rounded">Disable</button>
                             </td>
                         </tr>
                         <tr>
@@ -179,7 +179,7 @@
                                 <button
                                     @click="openModalEditUser = true"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
-                                <button @click="openModalDisable = true" class="bg-custom-red text-white px-4 py-2 rounded">Disable</button>
+                                <button @click="openModalDisable = true" class="bg-custom-dark-green text-white px-4 py-2 rounded">Disable</button>
                             </td>
                         </tr>
                         <tr>
@@ -194,7 +194,7 @@
                                 <button
                                     @click="openModalEditUser = true"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
-                                <button @click="openModalDisable = true" class="bg-custom-red text-white px-4 py-2 rounded">Disable</button>
+                                <button @click="openModalDisable = true" class="bg-custom-dark-green text-white px-4 py-2 rounded">Disable</button>
                             </td>
                         </tr>
                         <tr>
@@ -209,7 +209,7 @@
                                 <button
                                     @click="openModalEditUser = true"
                                     class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
-                                <button  @click="openModalDisable = true" class="bg-custom-red text-white px-4 py-2 rounded">Disable</button>
+                                <button @click="openModalDisable = true" class="bg-custom-dark-green text-white px-4 py-2 rounded">Disable</button>
                             </td>
                         </tr>
 
