@@ -20,7 +20,7 @@
     <!-- Styles -->
     @livewireStyles
 </head>
-<body class="font-sans antialiased">
+<body class="font-sans antialiased bg-gray-100">
     <!-- Sidebar -->
     <x-sidebar/>
 
