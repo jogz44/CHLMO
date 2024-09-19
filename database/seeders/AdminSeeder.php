@@ -25,6 +25,17 @@ class AdminSeeder extends Seeder
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
             'current_team_id' => null,
-        ])->assignRole('editor', 'admin');
+        ])->assignRole('admin', 'admin');
+
+        User::create([
+            'name' => 'Sydney Ang',
+            'email' => 'user@example.com',
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'profile_photo_path' => null,
+            'current_team_id' => null,
+        ])->assignRole('editor');
     }
 }
