@@ -26,7 +26,7 @@ export default {
                 'custom-green': '#2B7A0B',
                 'custom-yellow': '#FFBF00',
                 'iroad-green': '#6AA76F',
-                'iroad-orange': '#F8A15E',
+                'iroad-orange': '#FF9100',
             },
             fontSize: {
                 xxs: [
