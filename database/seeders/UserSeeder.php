@@ -17,7 +17,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Admin',
+            'username' => 'admin_1',
+            'first_name' => 'Sheldon',
+            'middle_name' => 'Shelly',
+            'last_name' => 'Cooper',
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -27,7 +30,10 @@ class UserSeeder extends Seeder
         ])->assignRole('Admin');
 
         User::create([
-            'name' => 'Sydney',
+            'username' => 'editor_1',
+            'first_name' => 'Missy',
+            'middle_name' => 'Sissy',
+            'last_name' => 'Cooper',
             'email' => 'user@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
