@@ -1,18 +1,18 @@
 models:
-  User:
-    username: string:255:unique
-    first_name: string:50
-    middle_name: string:50
-    last_name: string:50
-    name_suffix: string:25
-    email: string:50:unique
-    phone: string:20
-    designation_id: bigint:foreign:Designations
-    password: string:255
-    timestamps: true
-    relationships:
-      hasOne:
-      hasMany:
+#  User:
+#    username: string:255:unique
+#    first_name: string:50
+#    middle_name: string:50
+#    last_name: string:50
+#    name_suffix: string:25
+#    email: string:50:unique
+#    phone: string:20
+#    designation_id: bigint:foreign:Designations
+#    password: string:255
+#    timestamps: true
+#    relationships:
+#      hasOne:
+#      hasMany:
 
   Permission:
     permission_name: string:100:unique

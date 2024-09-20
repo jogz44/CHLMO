@@ -1,0 +1,110 @@
+created:
+    - database/factories/PermissionFactory.php
+    - database/factories/UserPermissionFactory.php
+    - database/factories/DesignationFactory.php
+    - database/factories/ApplicantFactory.php
+    - database/factories/AwardeeFactory.php
+    - database/factories/TransactionFactory.php
+    - database/factories/TransactionTypeFactory.php
+    - database/factories/CivilStatusFactory.php
+    - database/factories/SpouseFactory.php
+    - database/factories/OccupationFactory.php
+    - database/factories/LivingStatusFactory.php
+    - database/factories/LivingSituationFactory.php
+    - database/factories/TribeFactory.php
+    - database/factories/ApplicantTribeFactory.php
+    - database/factories/CaseSpecificationFactory.php
+    - database/factories/ReligionFactory.php
+    - database/factories/AddressFactory.php
+    - database/factories/CountryFactory.php
+    - database/factories/StateFactory.php
+    - database/factories/CityFactory.php
+    - database/factories/DependentFactory.php
+    - database/factories/TransferredAwardeeFactory.php
+    - database/factories/LotFactory.php
+    - database/factories/BlacklistFactory.php
+    - database/factories/RoofTypeFactory.php
+    - database/factories/WallTypeFactory.php
+    - database/factories/ShelterMaterialFactory.php
+    - database/migrations/2024_09_20_032814_create_permissions_table.php
+    - database/migrations/2024_09_20_032815_create_user_permissions_table.php
+    - database/migrations/2024_09_20_032816_create_designations_table.php
+    - database/migrations/2024_09_20_032817_create_applicants_table.php
+    - database/migrations/2024_09_20_032818_create_awardees_table.php
+    - database/migrations/2024_09_20_032819_create_transactions_table.php
+    - database/migrations/2024_09_20_032820_create_transaction_types_table.php
+    - database/migrations/2024_09_20_032821_create_civil_statuses_table.php
+    - database/migrations/2024_09_20_032822_create_spouses_table.php
+    - database/migrations/2024_09_20_032823_create_occupations_table.php
+    - database/migrations/2024_09_20_032824_create_living_statuses_table.php
+    - database/migrations/2024_09_20_032825_create_living_situations_table.php
+    - database/migrations/2024_09_20_032826_create_tribes_table.php
+    - database/migrations/2024_09_20_032827_create_applicant_tribes_table.php
+    - database/migrations/2024_09_20_032828_create_case_specifications_table.php
+    - database/migrations/2024_09_20_032829_create_religions_table.php
+    - database/migrations/2024_09_20_032830_create_addresses_table.php
+    - database/migrations/2024_09_20_032831_create_countries_table.php
+    - database/migrations/2024_09_20_032832_create_states_table.php
+    - database/migrations/2024_09_20_032833_create_cities_table.php
+    - database/migrations/2024_09_20_032834_create_dependents_table.php
+    - database/migrations/2024_09_20_032835_create_transferred_awardees_table.php
+    - database/migrations/2024_09_20_032836_create_lots_table.php
+    - database/migrations/2024_09_20_032837_create_blacklists_table.php
+    - database/migrations/2024_09_20_032838_create_roof_types_table.php
+    - database/migrations/2024_09_20_032839_create_wall_types_table.php
+    - database/migrations/2024_09_20_032840_create_shelter_materials_table.php
+    - app/Models/Permission.php
+    - app/Models/UserPermission.php
+    - app/Models/Designation.php
+    - app/Models/Applicant.php
+    - app/Models/Awardee.php
+    - app/Models/Transaction.php
+    - app/Models/TransactionType.php
+    - app/Models/CivilStatus.php
+    - app/Models/Spouse.php
+    - app/Models/Occupation.php
+    - app/Models/LivingStatus.php
+    - app/Models/LivingSituation.php
+    - app/Models/Tribe.php
+    - app/Models/ApplicantTribe.php
+    - app/Models/CaseSpecification.php
+    - app/Models/Religion.php
+    - app/Models/Address.php
+    - app/Models/Country.php
+    - app/Models/State.php
+    - app/Models/City.php
+    - app/Models/Dependent.php
+    - app/Models/TransferredAwardee.php
+    - app/Models/Lot.php
+    - app/Models/Blacklist.php
+    - app/Models/RoofType.php
+    - app/Models/WallType.php
+    - app/Models/ShelterMaterial.php
+models:
+    Permission: { permission_name: 'string:100:unique', permission_description: text, timestamps: timestamps, relationships: { hasMany: UserPermission } }
+    UserPermission: { user_id: 'bigint:foreign:User', permission_id: 'bigint:foreign:Permission', timestamps: timestamps, relationships: { belongsTo: 'User, Permission' } }
+    Designation: { designation_name: 'string:255:unique', timestamps: timestamps, relationships: { hasMany: User } }
+    Applicant: { user_id: 'bigint:foreign:User', transaction_type_id: 'bigint:foreign:TransactionType', civil_status_id: 'bigint:foreign:CivilStatus', tribe_id: 'bigint:foreign:Tribe', spouse_id: 'bigint:foreign:Spouse', first_name: 'string:50', middle_name: 'string:50', last_name: 'string:50', age: integer, phone: 'string:15', gender: 'string:50', occupation: 'string:255', income: integer, date_applied: datetime, initially_interviewed_by: 'string:100', status: 'string:50', tagger_name: 'string:100', tagging_date: datetime, awarded_by: 'string:100', awarding_date: datetime, photo: 'string:255', timestamps: timestamps, relationships: { belongsTo: 'User, TransactionType, CivilStatus, Tribe, Spouse', hasMany: 'Awardee, Dependent, TransferredAwardee, ApplicantTribe, Address' } }
+    Awardee: { applicant_id: 'bigint:foreign:Applicant', lot_size_allocated: 'string:255', letter_of_intent_photo: 'string:255', voters_id_photo: 'string:255', valid_id_photo: 'string:255', certificate_of_no_land_holding_photo: 'string:255', marriage_certificate_photo: 'string:255', birth_certificate_photo: 'string:255', timestamps: timestamps, relationships: { belongsTo: Applicant } }
+    Transaction: { applicant_id: 'bigint:foreign:Applicant', transaction_type_id: 'bigint:foreign:TransactionType', start_admin_id: 'bigint:foreign:User', end_admin_id: 'bigint:foreign:User', start_time: timestamp, end_time: timestamp, timestamps: timestamps, relationships: { belongsTo: 'Applicant, TransactionType, User' } }
+    TransactionType: { type_name: 'string:255', description: text, timestamps: timestamps, relationships: { hasMany: 'Transaction, Applicant' } }
+    CivilStatus: { civil_status: 'string:50', timestamps: timestamps, relationships: { hasMany: Applicant } }
+    Spouse: { applicant_id: 'bigint:foreign:Applicant', occupation_id: 'bigint:foreign:Occupation', first_name: 'string:50', middle_name: 'string:50', last_name: 'string:50', income: integer, timestamps: timestamps, relationships: { belongsTo: 'Applicant, Occupation' } }
+    Occupation: { occupation_name: 'string:255', timestamps: timestamps, relationships: { hasMany: 'Spouse, Dependent' } }
+    LivingStatus: { living_status_name: 'string:50', timestamps: timestamps }
+    LivingSituation: { living_situation_description: text, timestamps: timestamps }
+    Tribe: { tribe_name: 'string:255', timestamps: timestamps, relationships: { hasMany: 'Applicant, ApplicantTribe' } }
+    ApplicantTribe: { applicant_id: 'bigint:foreign:Applicant', tribe_id: 'bigint:foreign:Tribe', timestamps: timestamps, relationships: { belongsTo: 'Applicant, Tribe' } }
+    CaseSpecification: { case_specification_name: 'string:255', timestamps: timestamps }
+    Religion: { religion_name: 'string:255', timestamps: timestamps }
+    Address: { applicant_id: 'bigint:foreign:Applicant', city_id: 'bigint:foreign:City', state_id: 'bigint:foreign:State', country_id: 'bigint:foreign:Country', street_address: 'string:255', city: 'string:100', state_name: 'string:100', postal_code: 'string:50', country: 'string:100', latitude: 'decimal:10,7', longitude: 'decimal:10,7', full_address: text, timestamps: timestamps, relationships: { belongsTo: 'Applicant, City, State, Country' } }
+    Country: { country_name: 'string:100', timestamps: timestamps, relationships: { hasMany: State } }
+    State: { country_id: 'bigint:foreign:Country', state_name: 'string:100', timestamps: timestamps, relationships: { belongsTo: Country, hasMany: City } }
+    City: { state_id: 'bigint:foreign:State', city_name: 'string:100', timestamps: timestamps, relationships: { belongsTo: State, hasMany: Address } }
+    Dependent: { applicant_id: 'bigint:foreign:Applicant', occupation_id: 'bigint:foreign:Occupation', relationship: 'string:255', income: integer, timestamps: timestamps, relationships: { belongsTo: 'Applicant, Occupation' } }
+    TransferredAwardee: { applicant_id: 'bigint:foreign:Applicant', dependent_id: 'bigint:foreign:Dependent', death_certificate_photo: 'string:255', voters_id_photo: 'string:255', valid_id_photo: 'string:255', marriage_certificate_photo: 'string:255', birth_certificate_photo: 'string:255', certificate_of_no_land_holding_photo: 'string:255', timestamps: timestamps, relationships: { belongsTo: 'Applicant, Dependent' } }
+    Lot: { lot_name: 'string:255', lot_size: 'string:255', status: 'string:255', timestamps: timestamps }
+    Blacklist: { applicant_id: 'bigint:foreign:Applicant', user_id: 'bigint:foreign:User', date_blacklisted: datetime, blacklist_reason_description: text, updated_by: 'string:255', timestamps: timestamps, relationships: { belongsTo: 'Applicant, User' } }
+    RoofType: { roof_type_name: 'string:255', timestamps: timestamps, relationships: { hasMany: ShelterMaterial } }
+    WallType: { wall_type_name: 'string:255', timestamps: timestamps, relationships: { hasMany: ShelterMaterial } }
+    ShelterMaterial: { wall_type_id: 'bigint:foreign:WallType', roof_type_id: 'bigint:foreign:RoofType', other_materials: 'string:255', timestamps: timestamps, relationships: { belongsTo: 'WallType, RoofType' } }

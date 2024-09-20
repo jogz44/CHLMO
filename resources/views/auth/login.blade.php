@@ -14,7 +14,6 @@
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
-
             <div class="mb-5 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 mt-5 flex items-center pointer-events-none">
                     <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -27,8 +26,8 @@
                         </defs>
                     </svg>
                 </div>
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="Email"/>
+                <x-label for="username" value="{{ __('Username') }}" />
+                <x-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required autofocus placeholder="Username"/>
             </div>
 
             <div class="mt-4 mb-5 relative">
