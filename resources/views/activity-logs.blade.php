@@ -5,7 +5,7 @@
             <div x-data="pagination()" class="flex-1 p-6 overflow-auto">
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                     <div class="flex items-center">
-                        <h2 class="text-[13px] ml-5 text-gray-700">AWARDEE LIST</h2>
+                        <h2 class="text-[13px] ml-5 text-gray-700">ACTIVITY LOGS</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                     <div x-data class="relative z-0">

@@ -149,24 +149,6 @@
                         <tbody>
                             <tr>
                                 <td class="py-2 px-2 text-center  border-b"></td>
-                                <td class="py-2 px-2 border-gray-800 text-center font-medium">
-                                    <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm"
-                                        style="padding: 2px 4px;">
-                                        <option value="">Purok</option>
-                                        <option value="purok1">Purok 1</option>
-                                        <option value="purok2">Purok 2</option>
-                                        <option value="purok3">Purok 3</option>
-                                    </select>
-                                </td>
-                                <td class="py-2 px-2 border-gray-800 text-center font-medium">
-                                    <select class="block text-[11px] mt-1 w-full border-gray-300 rounded-md shadow-sm"
-                                        style="padding: 2px 4px;">
-                                        <option value="">Barangay</option>
-                                        <option value="barangay1">Barangay 1</option>
-                                        <option value="barangay2">Barangay 2</option>
-                                        <option value="barangay3">Barangay 3</option>
-                                    </select>
-                                </td>
                                 <td class="py-2 px-2 text-center border-b"></td>
                                 <td class="py-2 px-2 text-center border-b"></td>
                                 <td class="py-2 px-2 text-center border-b"></td>
