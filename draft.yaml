@@ -1,0 +1,242 @@
+models:
+  User:
+    username: string:255:unique
+    first_name: string:50
+    middle_name: string:50
+    last_name: string:50
+    name_suffix: string:25
+    email: string:50:unique
+    phone: string:20
+    designation_id: bigint:foreign:Designations
+    password: string:255
+    timestamps: true
+    relationships:
+      hasOne:
+      hasMany:
+
+  Permission:
+    permission_name: string:100:unique
+    permission_description: text
+    timestamps: true
+    relationships:
+      hasMany: UserPermission
+
+  UserPermission:
+    user_id: bigint:foreign:User
+    permission_id: bigint:foreign:Permission
+    timestamps: true
+    relationships:
+      belongsTo: User, Permission
+
+  Designation:
+    designation_name: string:255:unique
+    timestamps: true
+    relationships:
+      hasMany: User
+
+  Applicant:
+    user_id: bigint:foreign:User
+    transaction_type_id: bigint:foreign:TransactionType
+    civil_status_id: bigint:foreign:CivilStatus
+    tribe_id: bigint:foreign:Tribe
+    spouse_id: bigint:foreign:Spouse
+    first_name: string:50
+    middle_name: string:50
+    last_name: string:50
+    age: integer
+    phone: string:15
+    gender: string:50
+    occupation: string:255
+    income: integer
+    date_applied: datetime
+    initially_interviewed_by: string:100
+    status: string:50
+    tagger_name: string:100
+    tagging_date: datetime
+    awarded_by: string:100
+    awarding_date: datetime
+    photo: string:255
+    timestamps: true
+    relationships:
+      belongsTo: User, TransactionType, CivilStatus, Tribe, Spouse
+      hasMany: Awardee, Dependent, TransferredAwardee, ApplicantTribe, Address
+
+  Awardee:
+    applicant_id: bigint:foreign:Applicant
+    lot_size_allocated: string:255
+    letter_of_intent_photo: string:255
+    voters_id_photo: string:255
+    valid_id_photo: string:255
+    certificate_of_no_land_holding_photo: string:255
+    marriage_certificate_photo: string:255
+    birth_certificate_photo: string:255
+    timestamps: true
+    relationships:
+      belongsTo: Applicant
+
+  Transaction:
+    applicant_id: bigint:foreign:Applicant
+    transaction_type_id: bigint:foreign:TransactionType
+    start_admin_id: bigint:foreign:User
+    end_admin_id: bigint:foreign:User
+    start_time: timestamp
+    end_time: timestamp
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, TransactionType, User
+
+  TransactionType:
+    type_name: string:255
+    description: text
+    timestamps: true
+    relationships:
+      hasMany: Transaction, Applicant
+
+  CivilStatus:
+    civil_status: string:50
+    timestamps: true
+    relationships:
+      hasMany: Applicant
+
+  Spouse:
+    applicant_id: bigint:foreign:Applicant
+    occupation_id: bigint:foreign:Occupation
+    first_name: string:50
+    middle_name: string:50
+    last_name: string:50
+    income: integer
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, Occupation
+
+  Occupation:
+    occupation_name: string:255
+    timestamps: true
+    relationships:
+      hasMany: Spouse, Dependent
+
+  LivingStatus:
+    living_status_name: string:50
+    timestamps: true
+
+  LivingSituation:
+    living_situation_description: text
+    timestamps: true
+
+  Tribe:
+    tribe_name: string:255
+    timestamps: true
+    relationships:
+      hasMany: Applicant, ApplicantTribe
+
+  ApplicantTribe:
+    applicant_id: bigint:foreign:Applicant
+    tribe_id: bigint:foreign:Tribe
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, Tribe
+
+  CaseSpecification:
+    case_specification_name: string:255
+    timestamps: true
+
+  Religion:
+    religion_name: string:255
+    timestamps: true
+
+  Address:
+    applicant_id: bigint:foreign:Applicant
+    city_id: bigint:foreign:City
+    state_id: bigint:foreign:State
+    country_id: bigint:foreign:Country
+    street_address: string:255
+    city: string:100
+    state_name: string:100
+    postal_code: string:50
+    country: string:100
+    latitude: decimal:10,7
+    longitude: decimal:10,7
+    full_address: text
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, City, State, Country
+
+  Country:
+    country_name: string:100
+    timestamps: true
+    relationships:
+      hasMany: State
+
+  State:
+    country_id: bigint:foreign:Country
+    state_name: string:100
+    timestamps: true
+    relationships:
+      belongsTo: Country
+      hasMany: City
+
+  City:
+    state_id: bigint:foreign:State
+    city_name: string:100
+    timestamps: true
+    relationships:
+      belongsTo: State
+      hasMany: Address
+
+  Dependent:
+    applicant_id: bigint:foreign:Applicant
+    occupation_id: bigint:foreign:Occupation
+    relationship: string:255
+    income: integer
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, Occupation
+
+  TransferredAwardee:
+    applicant_id: bigint:foreign:Applicant
+    dependent_id: bigint:foreign:Dependent
+    death_certificate_photo: string:255
+    voters_id_photo: string:255
+    valid_id_photo: string:255
+    marriage_certificate_photo: string:255
+    birth_certificate_photo: string:255
+    certificate_of_no_land_holding_photo: string:255
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, Dependent
+
+  Lot:
+    lot_name: string:255
+    lot_size: string:255
+    status: string:255
+    timestamps: true
+
+  Blacklist:
+    applicant_id: bigint:foreign:Applicant
+    user_id: bigint:foreign:User
+    date_blacklisted: datetime
+    blacklist_reason_description: text
+    updated_by: string:255
+    timestamps: true
+    relationships:
+      belongsTo: Applicant, User
+
+  RoofType:
+    roof_type_name: string:255
+    timestamps: true
+    relationships:
+      hasMany: ShelterMaterial
+
+  WallType:
+    wall_type_name: string:255
+    timestamps: true
+    relationships:
+      hasMany: ShelterMaterial
+
+  ShelterMaterial:
+    wall_type_id: bigint:foreign:WallType
+    roof_type_id: bigint:foreign:RoofType
+    other_materials: string:255
+    timestamps: true
+    relationships:
+      belongsTo: WallType, RoofType

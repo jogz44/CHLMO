@@ -27,7 +27,6 @@ Route::get('/', function () {
 // Routes for authenticated web users
 Route::middleware([
     'auth:web', // Session-based authentication via web guard
-    'role:editor', // Combined role check for 'editor' or 'member'
     'verified', // Ensures the user has verified their email
 ])->group(function () {
     Route::get('/dashboard', function () {
@@ -114,7 +113,7 @@ Route::middleware([
 // Admin routes
 Route::middleware([
     'auth:web', // Session-based authentication via web guard
-    'role:admin', // Spatie permission middleware to check if the user has the 'admin' role
+    'role:Admin', // Spatie permission middleware to check if the user has the 'admin' role
     'verified', // Ensures the user has verified their email
 ])->name('admin.')->prefix('admin')->group(function () {
     Route::get('/', [IndexController::class, 'index'])->name('index');

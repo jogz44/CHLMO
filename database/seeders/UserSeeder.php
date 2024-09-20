@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 
-class AdminSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     protected static ?string $password;
     /**
@@ -17,25 +17,23 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'admin',
+            'name' => 'Admin',
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
-            'current_team_id' => null,
-        ])->assignRole('admin', 'admin');
+        ])->assignRole('Admin');
 
         User::create([
-            'name' => 'Sydney Ang',
+            'name' => 'Sydney',
             'email' => 'user@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
-            'current_team_id' => null,
-        ])->assignRole('editor');
+        ])->assignRole('Editor');
     }
 }
