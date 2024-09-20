@@ -33,7 +33,7 @@
                         <td class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                             <div class="flex justify-end">
                                 <div class="flex space-x-2">
-                                    <a href="{{ route('admin.users.show', $user->id) }}" class="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md">Roles</a>
+                                    <a href="{{ route('admin.users.show', $user->id) }}" class="px-4 py-2 bg-custom-yellow text-white rounded-md">Roles</a>
                                     {{--                                                <a href="#" class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md">Delete</a>--}}
                                     <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}" onsubmit="return confirm('Are you sure?');" class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md">
                                         @csrf
