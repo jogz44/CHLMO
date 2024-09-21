@@ -21,3 +21,4 @@ yarn-error.log
 /.zed
 '/draft.yaml' 
 '/.blueprint' 
+!/database/seeders/
