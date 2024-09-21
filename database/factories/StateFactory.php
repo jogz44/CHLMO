@@ -23,7 +23,8 @@ class StateFactory extends Factory
     {
         return [
             'country_id' => Country::factory(),
-            'state_name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'state_name' => $this->faker->state(), // Generates a realistic state or region name
         ];
     }
+
 }

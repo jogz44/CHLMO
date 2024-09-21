@@ -21,9 +21,14 @@ class LotFactory extends Factory
     public function definition(): array
     {
         return [
-            'lot_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'lot_size' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'status' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+            'lot_name' => $this->faker->streetName, // Generates a plausible name for a lot
+            'lot_size' => $this->faker->numberBetween(100, 10000) . ' sqm', // Generates a realistic lot size in square meters
+            'status' => $this->faker->randomElement([
+                'Available',
+                'Occupied',
+                'Pending',
+                'Under Construction']), // Generates a realistic lot status
         ];
     }
+
 }

@@ -21,7 +21,7 @@ class LivingSituationFactory extends Factory
     public function definition(): array
     {
         return [
-            'living_situation_description' => $this->faker->text(),
+//            'living_situation_description' => $this->faker->text(),
         ];
     }
 }

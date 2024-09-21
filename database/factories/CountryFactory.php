@@ -21,7 +21,7 @@ class CountryFactory extends Factory
     public function definition(): array
     {
         return [
-            'country_name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'country_name' => $this->faker->country(),
         ];
     }
 }

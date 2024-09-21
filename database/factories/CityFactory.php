@@ -23,7 +23,8 @@ class CityFactory extends Factory
     {
         return [
             'state_id' => State::factory(),
-            'city_name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'city_name' => $this->faker->city(), // Generates a realistic city name
         ];
     }
+
 }

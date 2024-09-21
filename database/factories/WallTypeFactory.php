@@ -21,7 +21,7 @@ class WallTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'wall_type_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+//            'wall_type_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
         ];
     }
 }

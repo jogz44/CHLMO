@@ -21,7 +21,7 @@ class PermissionFactory extends Factory
     public function definition(): array
     {
         return [
-            'permission_name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
+            'name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
         ];
     }
 }

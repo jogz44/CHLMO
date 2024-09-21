@@ -21,7 +21,7 @@ class ReligionFactory extends Factory
     public function definition(): array
     {
         return [
-            'religion_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+//            'religion_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
         ];
     }
 }

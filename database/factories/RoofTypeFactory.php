@@ -21,7 +21,7 @@ class RoofTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'roof_type_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+//            'roof_type_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
         ];
     }
 }
