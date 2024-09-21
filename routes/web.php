@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\IndexController;
 use App\Http\Controllers\Admin\PermissionCOntroller;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ApplicantController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', function () {
@@ -32,6 +34,10 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+
+    // GET Requests
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 
     Route::get('/activity-logs', function () {
         return view('activity-logs');
@@ -136,6 +142,3 @@ Route::middleware([
     Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
     Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
 });
-
-require __DIR__ . '/prototype/admin.php';
-require __DIR__ . '/prototype/editor.php';
