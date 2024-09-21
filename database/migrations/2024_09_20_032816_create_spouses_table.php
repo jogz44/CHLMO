@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('spouses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('applicant_id')->constrained()->onDelete('cascade');
-            $table->foreignId('occupation_id')->constrained()->onDelete('cascade');
+            $table->string('occupation');
             $table->string('first_name', 50);
             $table->string('middle_name', 50)->nullable();
             $table->string('last_name', 50);

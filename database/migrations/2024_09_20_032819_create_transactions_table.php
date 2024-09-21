@@ -15,11 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('applicant_id')->constrained()->onDelete('cascade');
             $table->foreignId('transaction_type_id')->constrained()->onDelete('cascade');
-            $table->string('start_admin_id');
-            $table->string('end_admin_id');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamp('start_time');
             $table->timestamp('end_time');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
