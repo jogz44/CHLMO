@@ -27,7 +27,7 @@ class Applicant extends Model
         'last_name',
         'age',
         'phone',
-        'gender',
+        'sex',
         'occupation',
         'income',
         'date_applied',

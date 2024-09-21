@@ -18,11 +18,9 @@ class Transaction extends Model
     protected $fillable = [
         'applicant_id',
         'transaction_type_id',
-        'start_admin_id',
-        'end_admin_id',
+        'user_id',
         'start_time',
         'end_time',
-        'user_id',
     ];
 
     /**
