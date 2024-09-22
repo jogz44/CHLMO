@@ -20,8 +20,15 @@ class LivingStatusFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            'living_status_name' => $this->faker->regexify('[A-Za-z0-9]{50}'),
+        return ['living_status_name' => $this->faker->randomElement([
+                'Resident',
+                'Non-Resident',
+                'Transient',
+                'Permanent',
+                'Temporary',
+                'Homeless'
+            ]),
         ];
     }
+
 }

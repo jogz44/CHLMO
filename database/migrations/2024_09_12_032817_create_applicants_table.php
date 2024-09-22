@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('middle_name', 50)->nullable();
             $table->string('last_name', 50);
             $table->integer('age');
-            $table->string('phone', 15)->nullable();
-            $table->string('gender', 50);
+            $table->string('phone', 20)->nullable();
+            $table->string('sex', 50);
             $table->string('occupation', 255);
             $table->integer('income');
             $table->dateTime('date_applied');

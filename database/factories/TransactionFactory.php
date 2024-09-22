@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\CivilStatus;
 use App\Models\TransactionType;
+use App\Models\Tribe;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Applicant;
@@ -23,14 +25,17 @@ class TransactionFactory extends Factory
      */
     public function definition(): array
     {
+        $applicantIds = Applicant::pluck('id')->toArray();
+        $transactionTypeIds = TransactionType::pluck('id')->toArray();
+        $userIds = User::pluck('id')->toArray();
+
         return [
-            'applicant_id' => Applicant::factory(),
-            'transaction_type_id' => TransactionType::factory(),
-            'start_admin_id' => $this->faker->word(),
-            'end_admin_id' => $this->faker->word(),
+            'applicant_id' => fake()->randomElement($applicantIds),
+            'transaction_type_id' => fake()->randomElement($transactionTypeIds),
+            'user_id' => fake()->randomElement($userIds),
             'start_time' => $this->faker->dateTime(),
             'end_time' => $this->faker->dateTime(),
-            'user_id' => User::factory(),
         ];
     }
+
 }

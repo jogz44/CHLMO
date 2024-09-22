@@ -25,28 +25,33 @@ class ApplicantFactory extends Factory
      */
     public function definition(): array
     {
+        $userIds = User::pluck('id')->toArray();
+        $transactionTypeIds = TransactionType::pluck('id')->toArray();
+        $civilStatusIds = CivilStatus::pluck('id')->toArray();
+        $tribeIds = Tribe::pluck('id')->toArray();
+
         return [
-            'user_id' => User::factory(),
-            'transaction_type_id' => TransactionType::factory(),
-            'civil_status_id' => CivilStatus::factory(),
-            'tribe_id' => Tribe::factory(),
-            'spouse_id' => Spouse::factory(),
+            'user_id' => fake()->randomElement($userIds),
+            'transaction_type_id' => fake()->randomElement($transactionTypeIds),
+            'civil_status_id' => fake()->randomElement($civilStatusIds),
+            'tribe_id' => fake()->randomElement($tribeIds),
             'first_name' => $this->faker->firstName(),
-            'middle_name' => $this->faker->regexify('[A-Za-z0-9]{50}'),
+            'middle_name' => $this->faker->optional()->firstName(), // Optional middle name
             'last_name' => $this->faker->lastName(),
-            'age' => $this->faker->numberBetween(-10000, 10000),
+            'age' => $this->faker->numberBetween(18, 100), // Reasonable age range
             'phone' => $this->faker->phoneNumber(),
-            'gender' => $this->faker->regexify('[A-Za-z0-9]{50}'),
-            'occupation' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'income' => $this->faker->numberBetween(-10000, 10000),
-            'date_applied' => $this->faker->dateTime(),
-            'initially_interviewed_by' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'status' => $this->faker->regexify('[A-Za-z0-9]{50}'),
-            'tagger_name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'tagging_date' => $this->faker->dateTime(),
-            'awarded_by' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'awarding_date' => $this->faker->dateTime(),
-            'photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+            'sex' => $this->faker->randomElement(['male', 'female']), // More realistic gender options
+            'occupation' => $this->faker->jobTitle(), // Generates a random job title
+            'income' => $this->faker->numberBetween(20000, 200000), // Reasonable income range
+            'date_applied' => $this->faker->dateTimeBetween('-1 years', 'now'), // Date within the last year
+            'initially_interviewed_by' => $this->faker->name(), // Realistic name for the interviewer
+            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']), // Fixed status options
+            'tagger_name' => $this->faker->name(), // Realistic name for tagger
+            'tagging_date' => $this->faker->dateTimeBetween('-1 months', 'now'), // Recent tagging date
+            'awarded_by' => $this->faker->name(), // Realistic name for who awarded
+            'awarding_date' => $this->faker->dateTimeBetween('now', '+1 year'), // Future awarding date
+            'photo' => $this->faker->imageUrl(640, 480, 'people'), // Realistic image URL for a photo
         ];
     }
+
 }

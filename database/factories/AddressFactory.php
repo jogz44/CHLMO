@@ -29,14 +29,15 @@ class AddressFactory extends Factory
             'city_id' => City::factory(),
             'state_id' => State::factory(),
             'country_id' => Country::factory(),
-            'street_address' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'city' => $this->faker->city(),
-            'state_name' => $this->faker->regexify('[A-Za-z0-9]{100}'),
-            'postal_code' => $this->faker->postcode(),
-            'country' => $this->faker->country(),
-            'latitude' => $this->faker->latitude(),
-            'longitude' => $this->faker->longitude(),
-            'full_address' => $this->faker->text(),
+            'street_address' => $this->faker->streetAddress(), // More realistic street address
+            'city' => $this->faker->city(), // Generates a random city name
+            'state_name' => $this->faker->state(), // Generates a random state name
+            'postal_code' => $this->faker->postcode(), // Generates a random postal code
+            'country' => $this->faker->country(), // Generates a random country name
+            'latitude' => $this->faker->latitude(), // Generates a random latitude
+            'longitude' => $this->faker->longitude(), // Generates a random longitude
+            'full_address' => $this->faker->address(), // Generates a complete address
         ];
     }
+
 }

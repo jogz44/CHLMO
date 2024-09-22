@@ -22,11 +22,14 @@ class DependentFactory extends Factory
      */
     public function definition(): array
     {
+        $applicantIds = Applicant::pluck('id')->toArray();
+
         return [
-            'applicant_id' => Applicant::factory(),
-            'occupation_id' => Occupation::factory(),
-            'relationship' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'income' => $this->faker->numberBetween(-10000, 10000),
+            'applicant_id' => fake()->randomElement($applicantIds),
+            'occupation' => $this->faker->jobTitle(),
+            'relationship' => $this->faker->randomElement(['Parent', 'Sibling', 'Spouse', 'Child', 'Relative', 'Friend']),
+            'income' => $this->faker->numberBetween(10000, 100000), // Assuming a realistic positive income range
         ];
     }
+
 }

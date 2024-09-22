@@ -22,10 +22,24 @@ class ShelterMaterialFactory extends Factory
      */
     public function definition(): array
     {
+        $wallTypeIds = WallType::pluck('id')->toArray();
+        $roofTypeIds = RoofType::pluck('id')->toArray();
+
         return [
-            'wall_type_id' => WallType::factory(),
-            'roof_type_id' => RoofType::factory(),
-            'other_materials' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+            'wall_type_id' => fake()->randomElement($wallTypeIds),
+            'roof_type_id' => fake()->randomElement($roofTypeIds),
+            'other_materials' => $this->faker->randomElement([
+                'Bricks',
+                'Concrete',
+                'Steel',
+                'Wood',
+                'Glass',
+                'Stone',
+                'Aluminum',
+                'Vinyl',
+                'Stucco',
+                'Fiber Cement'
+            ]),
         ];
     }
 }

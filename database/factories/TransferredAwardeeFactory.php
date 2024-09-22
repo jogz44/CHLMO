@@ -22,15 +22,26 @@ class TransferredAwardeeFactory extends Factory
      */
     public function definition(): array
     {
+        static $applicantIds; // Use static to persist the array across multiple calls
+        if (!$applicantIds) {
+            $applicantIds = Applicant::pluck('id')->shuffle()->toArray(); // Shuffle and convert to array
+        }
+
+        static $dependentIds; // Use static to persist the array across multiple calls
+        if (!$dependentIds) {
+            $dependentIds = Dependent::pluck('id')->shuffle()->toArray(); // Shuffle and convert to array
+        }
+
         return [
-            'applicant_id' => Applicant::factory(),
-            'dependent_id' => Dependent::factory(),
-            'death_certificate_photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'voters_id_photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'valid_id_photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'marriage_certificate_photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'birth_certificate_photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-            'certificate_of_no_land_holding_photo' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+            'applicant_id' => array_pop($applicantIds),
+            'dependent_id' => array_pop($dependentIds),
+            'death_certificate_photo' => $this->faker->imageUrl(640, 480, 'documents', true, 'death_certificate'),
+            'voters_id_photo' => $this->faker->imageUrl(640, 480, 'documents', true, 'voters_id'),
+            'valid_id_photo' => $this->faker->imageUrl(640, 480, 'documents', true, 'valid_id'),
+            'marriage_certificate_photo' => $this->faker->imageUrl(640, 480, 'documents', true, 'marriage_certificate'),
+            'birth_certificate_photo' => $this->faker->imageUrl(640, 480, 'documents', true, 'birth_certificate'),
+            'certificate_of_no_land_holding_photo' => $this->faker->imageUrl(640, 480, 'documents', true, 'certificate_no_land'),
         ];
     }
+
 }

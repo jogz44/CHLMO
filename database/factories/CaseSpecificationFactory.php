@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Database\Seeders\CaseSpecificationSeeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\CaseSpecification;
@@ -20,8 +21,9 @@ class CaseSpecificationFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            'case_specification_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
-        ];
+//        return [
+//            'case_specification_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
+//        ];
+        CaseSpecificationSeeder::class;
     }
 }

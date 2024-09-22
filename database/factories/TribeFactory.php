@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\CivilStatus;
+use App\Models\TransactionType;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Tribe;
@@ -24,4 +27,5 @@ class TribeFactory extends Factory
             'tribe_name' => $this->faker->regexify('[A-Za-z0-9]{255}'),
         ];
     }
+
 }
