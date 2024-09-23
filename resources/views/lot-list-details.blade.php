@@ -1,16 +1,21 @@
 <x-app-layout>
     <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
         <div class="flex bg-gray-100 text-[12px]">
-            <!-- Main Content -->
-            <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-50 relative p-3">
+            <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-50">
                     <div class="flex items-center">
-                        <h2 class="text-[13px] ml-5 text-gray-700">LOT LIST</h2>
+                        <a href="{{ route('transaction-walkin') }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </a>
+                        <h2 class="text-[13px] ml-2 items-center text-gray-700">Lot Details</h2>
                     </div>
-                    <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div x-data="{ openModalLot: false}" class="relative z-0">
-                        <button @click="openModalLot = true" class="bg-custom-yellow text-white px-4 py-2 rounded">Add Lot
-                        </button>
+                    <img src="{{ asset('storage/images/design.png') }}" alt="Design"
+                        class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+                    <div x-data="{ openModalLot: false}" class="flex space-x-2 z-0">
+                        <button @click="openModalLot = true" class="bg-custom-yellow text-white px-4 py-2 rounded">Add Lot</button>
                         <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
 
                         <div x-show="openModalLot"
@@ -25,35 +30,18 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">LOT/RELOCATION
-                                        NAME</label>
-                                    <input type="text" id="lotname"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Barangay">
-                                </div>
-
-                                <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="barangay">BARANGAY</label>
+                                        for="barangay">LOT NUMBER</label>
                                     <input type="text" id="barangay"
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Barangay">
+                                        placeholder="Lot Number">
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="purok">PUROK</label>
-                                    <input type="text" id="purok"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Purok">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL
-                                        LOT SIZE</label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">LOT SIZE</label>
                                     <input type="text" id="total-lotsize"
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Total Lot Size">
+                                        placeholder="Lot Size">
                                 </div>
                                 <br>
                                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -70,6 +58,11 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="flex flex-col p-3 rounded mt-5">
+                    <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">CANOCOTAN RELOCATION SITE</h2>
+                    <p class="text-[12px] ml-2 items-center text-gray-700">Purok 2-A Tandang Sora, Canocotan, Tagum City</p>
                 </div>
 
                 <div class="bg-white p-6 rounded shadow">
@@ -137,142 +130,138 @@
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="py-2 px-2  text-center font-medium">Name</th>
-                                <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
-                                <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
+                                <th class="py-2 px-2  text-center font-medium">Lot Number</th>
+                                <th class="py-2 px-2 border-b text-center  font-medium">Occupant</th>
+                                <th class="py-2 px-2 border-b text-center font-medium">Lot Size</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">Status</th>
-                                <th class="py-2 px-2 border-b text-center font-medium">No. of Awardees</th>
-                                <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size</th>
                                 <th class="py-2 px-2 border-b text-center font-medium"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="py-2 px-2 text-center  border-b"></td>
-                                <td class="py-2 px-2 text-center border-b"></td>
-                                <td class="py-2 px-2 text-center border-b"></td>
-                                <td class="py-2 px-2 text-center border-b"></td>
-                                <td class="py-2 px-2 text-center border-b space-x-2">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
-                                <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                                <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                                <td class="py-4 px-2 text-center border-b">Full</td>
-                                <td class="py-4 px-2 text-center border-b">60</td>
-                                <td class="py-2 px-2 text-center border-b">80ha</td>
+                                <td class="py-4 px-2 text-center  border-b">Lot 1</td>
+                                <td class="py-4 px-2 text-center border-b">April Boy Regino</td>
+                                <td class="py-4 px-2 text-center border-b">60 sqm.</td>
+                                <td class="py-4 px-2 text-center border-b">Occupied</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button
-                                        @click="window.location.href = '{{ route('lot-list-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                        @click="openModalEditLot = true"
+                                        class="text-custom-red text-bold underline px-4 py-1.5">Edit
                                     </button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
-                                <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                                <td class="py-4 px-2 text-center border-b">Magugpo North</td>
+                                <td class="py-4 px-2 text-center  border-b">Lot 2</td>
+                                <td class="py-4 px-2 text-center border-b">n/a</td>
+                                <td class="py-4 px-2 text-center border-b">60 sqm.</td>
                                 <td class="py-4 px-2 text-center border-b">Available</td>
-                                <td class="py-4 px-2 text-center border-b">60</td>
-                                <td class="py-2 px-2 text-center border-b">100ha</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button
-                                        @click="window.location.href = '{{ route('lot-list-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                        @click="openModalEditLot = true"
+                                        class="text-custom-red text-bold underline px-4 py-1.5">Edit
                                     </button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
-                                <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                                <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                                <td class="py-4 px-2 text-center border-b">Full</td>
-                                <td class="py-4 px-2 text-center border-b">60</td>
-                                <td class="py-2 px-2 text-center border-b">80ha</td>
+                                <td class="py-4 px-2 text-center  border-b">Lot 3</td>
+                                <td class="py-4 px-2 text-center border-b">n/a</td>
+                                <td class="py-4 px-2 text-center border-b">60 sqm.</td>
+                                <td class="py-4 px-2 text-center border-b">Available</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button
-                                        @click="window.location.href = '{{ route('lot-list-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                        @click="openModalEditLot = true"
+                                        class="text-custom-red text-bold underline px-4 py-1.5">Edit
                                     </button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
-                                <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                                <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                                <td class="py-4 px-2 text-center border-b">Full</td>
-                                <td class="py-4 px-2 text-center border-b">60</td>
-                                <td class="py-2 px-2 text-center border-b">80ha</td>
+                                <td class="py-4 px-2 text-center  border-b">Lot 4</td>
+                                <td class="py-4 px-2 text-center border-b">Hannagene Daluro</td>
+                                <td class="py-4 px-2 text-center border-b">60 sqm.</td>
+                                <td class="py-4 px-2 text-center border-b">Occupied</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button
-                                        @click="window.location.href = '{{ route('lot-list-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                        @click="openModalEditLot = true"
+                                        class="text-custom-red text-bold underline px-4 py-1.5">Edit
                                     </button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="py-4 px-2 text-center  border-b">Canocotan Relocation Site</td>
-                                <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                                <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                                <td class="py-4 px-2 text-center border-b">Full</td>
-                                <td class="py-4 px-2 text-center border-b">60</td>
-                                <td class="py-2 px-2 text-center border-b">80ha</td>
+                                <td class="py-4 px-2 text-center  border-b">Lot 5</td>
+                                <td class="py-4 px-2 text-center border-b">Nova Grace Palmes</td>
+                                <td class="py-4 px-2 text-center border-b">60 sqm.</td>
+                                <td class="py-4 px-2 text-center border-b">Occupied</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button
-                                        @click="window.location.href = '{{ route('lot-list-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                        @click="openModalEditLot = true"
+                                        class="text-custom-red text-bold underline px-4 py-1.5">Edit
                                     </button>
                                 </td>
                             </tr>
-
-
                         </tbody>
                     </table>
-                </div>
-                <!-- Pagination controls -->
-                <div class="flex justify-end text-[12px] mt-4">
-                    <button
-                        @click="prevPage"
-                        :disabled="currentPage === 1"
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
-                        Prev
-                    </button>
-                    <template x-for="page in totalPages" :key="page">
-                        <button
-                            @click="goToPage(page)"
-                            :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"
-                            class="px-4 py-2 mx-1 rounded">
-                            <span x-text="page"></span>
-                        </button>
-                    </template>
-                    <button
-                        @click="nextPage"
-                        :disabled="currentPage === totalPages"
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
-                        Next
-                    </button>
-                </div>
-                <script>
-                    function pagination() {
-                        return {
-                            currentPage: 1,
-                            totalPages: 3, // Set this to the total number of pages you have
 
-                            prevPage() {
-                                if (this.currentPage > 1) this.currentPage--;
-                            },
-                            nextPage() {
-                                if (this.currentPage < this.totalPages) this.currentPage++;
-                            },
-                            goToPage(page) {
-                                this.currentPage = page;
-                            }
-                        }
-                    }
-                </script>
+                    <div x-show="openModalEditLot"
+                        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak
+                        style="font-family: 'Poppins', sans-serif;">
+                        <!-- Modal -->
+                        <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                            <!-- Modal Header -->
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-md font-semibold text-black">EDIT LOT</h3>
+                                <button @click="openModalEditLot = false" class="text-gray-400 hover:text-gray-200">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black"
+                                    for="barangay">LOT NUMBER</label>
+                                <input type="text" id="barangay"
+                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                                    placeholder="Barangay">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="purok">OCCUPANT</label>
+                                <input type="text" id="purok"
+                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                                    placeholder="Purok">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">LOT SIZE</label>
+                                <input type="text" id="total-lotsize"
+                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                                    placeholder="Total Lot Size">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="status">STATUS</label>
+                                <select class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Status">
+                                    <option value="occupied">OCCUPIED</option>
+                                    <option value="vacant">VACANT</option>
+                                </select>       
+                            </div>
+
+                            <br>
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <button type="submit"
+                                    class="w-full py-2 bg-yellow-500 hover:bg-yellow-400 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-[12px]">SAVE</span>
+                                </button>
+                                <!-- Cancel Button -->
+                                <button type="submit"
+                                    class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-[12px]">CANCEL</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
             </div>
         </div>
-    </div>
-    </div>
+
 </x-app-layout>
