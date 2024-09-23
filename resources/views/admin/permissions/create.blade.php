@@ -1,6 +1,6 @@
 <x-admin-wow-layout>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="p-10 h-screen ml-[17%] mt-[60px]">
+        <div class="grid grid-cols-1 gap-10 mb-6">
             <div class="px-4 sm:px-6 lg:px-8">
                 <div class="sm:flex sm:items-center">
                     <div class="sm:flex-auto">

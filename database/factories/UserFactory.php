@@ -27,7 +27,10 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'username' => fake()->unique()->userName(),
+            'first_name' => fake()->firstName(),           // Generates a random first name
+            'middle_name' => fake()->firstName(),          // Generates a distinct middle name
+            'last_name' => fake()->lastName(),             // Generates a random last name
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -38,6 +41,7 @@ class UserFactory extends Factory
             'current_team_id' => null,
         ];
     }
+
 
     /**
      * Indicate that the model's email address should be unverified.

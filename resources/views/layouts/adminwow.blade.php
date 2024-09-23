@@ -18,7 +18,6 @@
     @livewireStyles
 </head>
 <body class="font-sans antialiased">
-{{--        <x-banner />--}}
 @if (Session::has('message'))
     <!-- This example requires Tailwind CSS v2.0+ -->
     <div class="bg-indigo-600" x-data="{open: true}" x-show="open">
@@ -53,37 +52,16 @@
         </div>
     </div>
 @endif
-{{--        @livewire('navigation-menu')--}}
-<div class="flex-col w-full md:flex md:flex-row md:min-h-screen">
-    {{--            <!-- Sidebar -->--}}
-    <x-sidebar-for-admin/>
+<!-- Sidebar -->
+<x-sidebar-for-admin/>
 
-    {{--            <div class="flex-1 w-full">--}}
-    {{--                <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">--}}
-    {{--                    <!-- Primary Navigation Menu -->--}}
-    {{--                    @livewire('header')--}}
-    {{--                    <x-header-for-admin/>--}}
-    {{--                </nav>--}}
+<!-- Header -->
+<x-header/>
 
-    {{--                <!-- Page Content -->--}}
-    {{--                <main>--}}
-    {{--                    {{ $slot }}--}}
-    {{--                </main>--}}
-    {{--            </div>--}}
-    {{--        </div>--}}
-    <div class="flex-1 w-full">
-        <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-            <!-- Primary Navigation Menu -->
-            {{--                                        @livewire('header')--}}
-            <x-header/>
-        </nav>
-
-        <!-- Page Content -->
-        <main>
-            {{ $slot }}
-        </main>
-    </div>
-</div>
+<!-- Page Content -->
+<main>
+    {{ $slot }}
+</main>
 
 @stack('modals')
 
