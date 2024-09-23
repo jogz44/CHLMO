@@ -67,6 +67,10 @@ Route::middleware([
         return view('lot-list');
     })->name('lot-list');
 
+    Route::get('/lot-list-details', function () {
+        return view('lot-list-details');
+    })->name('lot-list-details');
+
     Route::get('/masterlist-applicant-details', function () {
         return view('masterlist-applicant-details');
     })->name('masterlist-applicant-details');
