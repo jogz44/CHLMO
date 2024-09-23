@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Applicant;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Laravel\Prompts\Key;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
 use PowerComponents\LivewirePowerGrid\Exportable;
@@ -20,6 +22,23 @@ final class WalkinApplicantsTable extends PowerGridComponent
 {
     use WithExport;
 
+    public bool $showFilters = true;
+
+    public function boot(): void
+    {
+        config(['livewire-powergrid.filter' => 'outside']);
+    }
+
+    public function filters(): array
+    {
+        return [
+//            Filter::select('category_name', 'category_id')
+//                ->dataSource(Category::all())
+//                ->optionLabel('name')
+//                ->optionValue('id'),
+        ];
+    }
+
     public function setUp(): array
     {
         $this->showCheckBox();
@@ -30,7 +49,7 @@ final class WalkinApplicantsTable extends PowerGridComponent
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             Header::make()->showSearchInput(),
             Footer::make()
-                ->showPerPage()
+                ->showPerPage(perPage: 8, perPageValues: [0, 50, 100, 500])
                 ->showRecordCount(),
         ];
     }
@@ -56,10 +75,12 @@ final class WalkinApplicantsTable extends PowerGridComponent
             ->add('first_name')
             ->add('middle_name')
             ->add('last_name')
-//            ->add('age')
+            // Add a virtual field for the combined full name
+            ->add('full_name', fn (Applicant $model) => $model->first_name . ' ' . $model->middle_name . ' ' . $model->last_name)
+
             ->add('phone')
 //            ->add('sex')
-//            ->add('occupation')
+            ->add('occupation')
 //            ->add('income')
             ->add('date_applied_formatted', fn (Applicant $model) => Carbon::parse($model->date_applied)->format('d/m/Y H:i:s'))
 //            ->add('initially_interviewed_by')
@@ -75,107 +96,90 @@ final class WalkinApplicantsTable extends PowerGridComponent
     public function columns(): array
     {
         return [
-//            Column::make('Id', 'id'),
-//            Column::make('User id', 'user_id'),
-//            Column::make('Transaction type id', 'transaction_type_id'),
-//            Column::make('Civil status id', 'civil_status_id'),
-//            Column::make('Tribe id', 'tribe_id'),
-            Column::make('First name', 'first_name')
+            // Use the 'full_name' field to display the concatenated names
+                Column::make('FULL NAME', 'full_name')
+                    ->sortable()
+                    ->searchable(),
+
+            Column::make('FIRST NAME', 'first_name')
+                ->hidden()
+                ->sortable()
+                ->searchable()
+                ->editOnClick(),
+
+            Column::make('MIDDLE NAME', 'middle_name')
+                ->hidden()
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Middle name', 'middle_name')
+            Column::make('LAST NAME', 'last_name')
+                ->hidden()
                 ->sortable()
                 ->searchable(),
 
-            Column::make('Last name', 'last_name')
+            Column::make('PHONE', 'phone')
                 ->sortable()
                 ->searchable(),
 
-//            Column::make('Age', 'age')
-//                ->sortable()
-//                ->searchable(),
-
-            Column::make('Phone', 'phone')
+            Column::make('OCCUPATION', 'occupation')
                 ->sortable()
                 ->searchable(),
 
-//            Column::make('Sex', 'sex')
-//                ->sortable()
-//                ->searchable(),
-
-//            Column::make('Occupation', 'occupation')
-//                ->sortable()
-//                ->searchable(),
-//
-//            Column::make('Income', 'income')
-//                ->sortable()
-//                ->searchable(),
-
-            Column::make('Date applied', 'date_applied_formatted', 'date_applied')
+            Column::make('DATE APPLIED', 'date_applied_formatted', 'date_applied')
                 ->sortable(),
 
-//            Column::make('Initially interviewed by', 'initially_interviewed_by')
-//                ->sortable()
-//                ->searchable(),
-
-            Column::make('Status', 'status')
+            Column::make('STATUS', 'status')
                 ->sortable()
                 ->searchable(),
 
-//            Column::make('Tagger name', 'tagger_name')
-//                ->sortable()
-//                ->searchable(),
-//
-//            Column::make('Tagging date', 'tagging_date_formatted', 'tagging_date')
-//                ->sortable(),
-//
-//            Column::make('Awarded by', 'awarded_by')
-//                ->sortable()
-//                ->searchable(),
-//
-//            Column::make('Awarding date', 'awarding_date_formatted', 'awarding_date')
-//                ->sortable(),
-//
-//            Column::make('Photo', 'photo')
-//                ->sortable()
-//                ->searchable(),
-//
-//            Column::make('Created at', 'created_at_formatted', 'created_at')
-//                ->sortable(),
-//
-//            Column::make('Created at', 'created_at')
-//                ->sortable()
-//                ->searchable(),
-
-            Column::action('Action')
-        ];
-    }
-
-    public function filters(): array
-    {
-        return [
-//            Filter::datetimepicker('date_applied'),
-//            Filter::datetimepicker('tagging_date'),
-//            Filter::datetimepicker('awarding_date'),
+            Column::action('ACTION')
         ];
     }
 
     #[\Livewire\Attributes\On('edit')]
     public function edit($rowId): void
     {
-        $this->js('alert('.$rowId.')');
+        $this->js('alert(' . $rowId.')');
     }
 
     public function actions(Applicant $row): array
     {
         return [
-            Button::add('edit')
-                ->slot('Edit: '.$row->id)
-                ->id()
-                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
-                ->dispatch('edit', ['rowId' => $row->id])
+//            Button::add('edit')
+//                ->slot('Edit: '.$row->id)
+//                ->id()
+//                ->class('pg-btn-white dark:ring-pg-primary-600 dark:border-pg-primary-600 dark:hover:bg-pg-primary-700 dark:ring-offset-pg-primary-800 dark:text-pg-primary-300 dark:bg-pg-primary-700')
+//                ->dispatch('edit', ['rowId' => $row->id]),
+
+            Button::add('details')
+                ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['id' => $row->id]).'\'" class="text-custom-red text-bold underline px-4 py-1.5">Details</button>')
+                ->class(''),
+
+            Button::add('tag')
+                ->slot('<button @click="openModalTag = true" class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>')
+                ->class(''),
+
+            Button::add('award')
+                ->slot('<button @click="openModalAward = true" class="bg-custom-green text-white px-8 py-1.5 rounded-full">Award</button>')
+                ->class(''),
         ];
+    }
+
+    public function update(array $data):bool
+    {
+        try {
+            $updated = Applicant::query()->find($data['id'])->update([
+                $data['field'] => $data['value']
+            ]);
+        } catch (QueryException $exception){
+            $updated = false;
+        }
+        return $updated;
+    }
+
+    public function updateMessages(string $status, string $field = '_default_message')
+    {
+
     }
 
     /*
