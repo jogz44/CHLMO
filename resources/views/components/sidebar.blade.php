@@ -37,14 +37,14 @@
                         </svg>
                     </a>
                     <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="bg-none ml-4 mt-2 rounded mx-2" x-transition>
-                        <a href="{{ route('transaction-walkin') }}" @click="activeChildLink = 'admin-transactions-walkin'; localStorage.setItem('activeChildLink', 'admin-transactions-walkin')"
-                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'admin-transactions-walkin' }"
+                        <a href="{{ route('transaction-walkin') }}" @click="activeChildLink = 'transactions-walkin'; localStorage.setItem('activeChildLink', 'transactions-walkin')"
+                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'transactions-walkin' }"
                            class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100]"> Walkin</a>
-                        <a href="{{ route('transaction-request') }}" @click="activeChildLink = 'admin-transactions-request'; localStorage.setItem('activeChildLink', 'admin-transactions-request')"
-                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'admin-transactions-request' }"
+                        <a href="{{ route('transaction-request') }}" @click="activeChildLink = 'transactions-request'; localStorage.setItem('activeChildLink', 'transactions-request')"
+                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'transactions-request' }"
                            class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100]"> Request </a>
-                        <a href="{{ route('transaction-shelter-assistance') }}" @click="activeChildLink = 'admin-transactions-shelterAsst'; localStorage.setItem('activeChildLink', 'admin-transactions-shelterAsst')"
-                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'admin-transactions-shelterAsst' }"
+                        <a href="{{ route('transaction-shelter-assistance') }}" @click="activeChildLink = 'transactions-shelterAsst'; localStorage.setItem('activeChildLink', 'transactions-shelterAsst')"
+                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'transactions-shelterAsst' }"
                            class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100] hover:text-[12px]"> Shelter Assistance </a>
                     </div>
                 </div>
@@ -162,14 +162,14 @@
 {{--                        </svg>--}}
 {{--                    </a>--}}
 {{--                    <div x-show="dropdownOpen" @click.away="dropdownOpen = false" class="bg-none ml-4 mt-2 rounded mx-2" x-transition>--}}
-{{--                        <a href="{{ route('transaction-walkin') }}" @click="activeChildLink = 'admin-transactions-walkin'; localStorage.setItem('activeChildLink', 'admin-transactions-walkin')"--}}
-{{--                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'admin-transactions-walkin' }"--}}
+{{--                        <a href="{{ route('transaction-walkin') }}" @click="activeChildLink = 'transactions-walkin'; localStorage.setItem('activeChildLink', 'transactions-walkin')"--}}
+{{--                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'transactions-walkin' }"--}}
 {{--                           class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100]"> Walkin</a>--}}
-{{--                        <a href="{{ route('transaction-request') }}" @click="activeChildLink = 'admin-transactions-request'; localStorage.setItem('activeChildLink', 'admin-transactions-request')"--}}
-{{--                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'admin-transactions-request' }"--}}
+{{--                        <a href="{{ route('transaction-request') }}" @click="activeChildLink = 'transactions-request'; localStorage.setItem('activeChildLink', 'transactions-request')"--}}
+{{--                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'transactions-request' }"--}}
 {{--                           class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100]"> Request </a>--}}
-{{--                        <a href="{{ route('transaction-shelter-assistance') }}" @click="activeChildLink = 'admin-transactions-shelterAsst'; localStorage.setItem('activeChildLink', 'admin-transactions-shelterAsst')"--}}
-{{--                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'admin-transactions-shelterAsst' }"--}}
+{{--                        <a href="{{ route('transaction-shelter-assistance') }}" @click="activeChildLink = 'transactions-shelterAsst'; localStorage.setItem('activeChildLink', 'transactions-shelterAsst')"--}}
+{{--                           :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'transactions-shelterAsst' }"--}}
 {{--                           class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100] hover:text-[12px]"> Shelter Assistance </a>--}}
 {{--                    </div>--}}
 {{--                </div>--}}
