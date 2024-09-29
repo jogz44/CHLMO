@@ -41,5 +41,18 @@ class UserSeeder extends Seeder
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
         ])->assignRole('Editor');
+
+        User::create([
+            'username' => 'shelterAdmin_1',
+            'first_name' => 'Sheila',
+            'middle_name' => 'Allea',
+            'last_name' => 'Cooper',
+            'email' => 'shelter@example.com',
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'profile_photo_path' => null,
+        ])->assignRole('ShelterAdmin');
     }
 }
