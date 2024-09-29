@@ -6,6 +6,11 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ApplicantsController;
+use App\Http\Controllers\PurokController;
+
+use App\Livewire\ApplicantDetails;
+use App\Livewire\TransactionWalkin;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', function () {
@@ -37,7 +42,7 @@ Route::middleware([
 
     // GET Requests
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    Route::get('/get-puroks/{barangay}', [PurokController::class, 'getPuroks']);
 
     Route::get('/activity-logs', function () {
         return view('activity-logs');
@@ -47,9 +52,10 @@ Route::middleware([
         return view('add-new-request');
     })->name('add-new-request');
 
-    Route::get('/applicant-details', function () {
-        return view('applicant-details');
-    })->name('applicant-details');
+//    Route::get('/applicant-details', function () {
+//        return view('applicant-details');
+//    })->name('applicant-details');
+    Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 
     Route::get('/awardee-details', function () {
         return view('awardee-details');
@@ -114,6 +120,7 @@ Route::middleware([
     Route::get('/transaction-walkin', function () {
         return view('transaction-walkin');
     })->name('transaction-walkin');
+//    Route::get('/transaction-walkin', TransactionWalkin::class)->name('transaction-walkin');
 
     Route::get('/user-settings', function () {
         return view('user-settings');
