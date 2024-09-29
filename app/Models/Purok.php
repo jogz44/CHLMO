@@ -25,12 +25,17 @@ class Purok extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',          // Casts id as an integer
-        'barangay_id' => 'integer', // Casts barangay_id as an integer
+        'id' => 'integer',
+        'name' => 'string',
+        'barangay_id' => 'integer',
     ];
 
     public function barangay()
     {
         return $this->belongsTo(Barangay::class);
+    }
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
     }
 }

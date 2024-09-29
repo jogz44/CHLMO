@@ -37,4 +37,8 @@ class Tribe extends Model
     {
         return $this->hasMany(ApplicantTribe::class);
     }
+    public function taggedAndValidatedApplicants()
+    {
+        return $this->hasMany(TaggedAndValidatedApplicant::class);
+    }
 }

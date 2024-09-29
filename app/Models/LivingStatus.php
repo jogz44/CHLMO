@@ -26,4 +26,9 @@ class LivingStatus extends Model
     protected $casts = [
         'id' => 'integer',
     ];
+
+    public function taggedAndValidatedApplicants()
+    {
+        return $this->hasMany(TaggedAndValidatedApplicant::class);
+    }
 }

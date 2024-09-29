@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Applicant extends Model
 {
@@ -19,25 +20,14 @@ class Applicant extends Model
     protected $fillable = [
         'user_id',
         'transaction_type_id',
-        'civil_status_id',
-        'tribe_id',
-        'spouse_id',
         'first_name',
         'middle_name',
         'last_name',
-        'age',
+        'suffix_name',
         'phone',
-        'sex',
-        'occupation',
-        'income',
         'date_applied',
         'initially_interviewed_by',
-        'status',
-        'tagger_name',
-        'tagging_date',
-        'awarded_by',
-        'awarding_date',
-        'photo',
+        'address_id',
     ];
 
     /**
@@ -49,61 +39,31 @@ class Applicant extends Model
         'id' => 'integer',
         'user_id' => 'integer',
         'transaction_type_id' => 'integer',
-        'civil_status_id' => 'integer',
-        'tribe_id' => 'integer',
-        'spouse_id' => 'integer',
-        'date_applied' => 'datetime',
-        'tagging_date' => 'datetime',
-        'awarding_date' => 'datetime',
+        'date_applied' => 'date',
     ];
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function transactionType(): BelongsTo
+    public function transactionType()
     {
         return $this->belongsTo(TransactionType::class);
     }
 
-    public function civilStatus(): BelongsTo
-    {
-        return $this->belongsTo(CivilStatus::class);
-    }
-
-    public function tribe(): BelongsTo
-    {
-        return $this->belongsTo(Tribe::class);
-    }
-
-    public function spouse(): BelongsTo
+    public function spouse()
     {
         return $this->belongsTo(Spouse::class);
     }
 
-    public function awardees(): HasMany
+    public function address()
     {
-        return $this->hasMany(Awardee::class);
+        return $this->belongsTo(Address::class);
     }
 
-    public function dependents(): HasMany
+    public function taggedAndValidatedApplicant(): HasOne
     {
-        return $this->hasMany(Dependent::class);
-    }
-
-    public function transferredAwardees(): HasMany
-    {
-        return $this->hasMany(TransferredAwardee::class);
-    }
-
-    public function applicantTribes(): HasMany
-    {
-        return $this->hasMany(ApplicantTribe::class);
-    }
-
-    public function addresses(): HasMany
-    {
-        return $this->hasMany(Address::class);
+        return $this->hasOne(TaggedAndValidatedApplicant::class);
     }
 }
