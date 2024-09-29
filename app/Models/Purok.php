@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Country extends Model
+class Purok extends Model
 {
     use HasFactory;
 
@@ -16,7 +15,8 @@ class Country extends Model
      * @var array
      */
     protected $fillable = [
-        'country_name',
+        'name',
+        'barangay_id',
     ];
 
     /**
@@ -25,11 +25,12 @@ class Country extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
+        'id' => 'integer',          // Casts id as an integer
+        'barangay_id' => 'integer', // Casts barangay_id as an integer
     ];
 
-    public function states(): HasMany
+    public function barangay()
     {
-        return $this->hasMany(State::class);
+        return $this->belongsTo(Barangay::class);
     }
 }

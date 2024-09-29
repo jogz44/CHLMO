@@ -1,5 +1,5 @@
 <!-- Main Content -->
-<div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
+<div class="flex-1 h-screen p-6 overflow-auto">
     <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-50 relative p-3">
         <div class="flex items-center">
             <h2 class="text-[13px] ml-5 text-gray-700">WALK IN APPLICANTS</h2>
@@ -18,74 +18,119 @@
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
                         <button @click="openModal = false" class="text-gray-400 hover:text-gray-200">
-                            &times;
+                           &times;
                         </button>
                     </div>
 
                     <!-- Form -->
-                    <form>
+                    <form wire:submit.prevent="createNewApplicant">
+                        <!--DATE APPLIED FIELD-->
                         <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE
-                                APPLIED</label>
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE APPLIED</label>
                             <input type="date" id="date-applied"
                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                   placeholder="Date Applied">
+                                   wire:model="date_applied">
                         </div>
+                        <!--script for default present date-->
+                        <script>
+                            // JavaScript to set today's date as the default value
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const dateInput = document.getElementById('date-applied');
+                                if (!dateInput.value) {  // If no date has been selected by the user yet
+                                    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+                                    dateInput.value = today;
+                                }
+                            });
+                        </script>
+
                         <!-- Main Fields -->
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <!-- First Name Field -->
                             <div>
-                                <label class="block  text-[12px] font-medium mb-2 text-black"
-                                       for="first-name">FIRST NAME</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME</label>
                                 <input type="text" id="first-name"
-                                       class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                       placeholder="First Name">
+                                       class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                                       placeholder="First Name" wire:model="first_name">
                             </div>
 
                             <!-- Middle Name Field -->
                             <div>
-                                <label class="block  text-[12px] font-medium mb-2 text-black"
-                                       for="middle-name">MIDDLE NAME</label>
+                                <label class="block  text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE NAME</label>
                                 <input type="text" id="middle-name"
                                        class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                       placeholder="Middle Name">
+                                       placeholder="Middle Name" wire:model="middle_name">
                             </div>
 
                             <!-- Last Name Field -->
                             <div>
-                                <label class="block  text-[12px] font-medium mb-2 text-black"
-                                       for="last-name">LAST NAME</label>
+                                <label class="block  text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME</label>
                                 <input type="text" id="last-name"
                                        class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                       placeholder="Last Name">
+                                       placeholder="Last Name" wire:model="last_name">
                             </div>
 
                             <!-- Suffix Name Field -->
                             <div>
-                                <label class="block  text-[12px] font-medium mb-2 text-black"
-                                       for="suffix-name">SUFFIX NAME</label>
+                                <label class="block  text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
                                 <input type="text" id="suffix-name"
                                        class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                       placeholder="Suffix Name">
+                                       placeholder="Suffix Name" wire:model="suffix_name">
                             </div>
                         </div>
 
                         <!-- Barangay Field -->
-                        <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>
-                            <input type="text" id="barangay"
-                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                   placeholder="Barangay">
+{{--                        <div class="mb-4">--}}
+{{--                            <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>--}}
+{{--                            <input type="text" id="barangay"--}}
+{{--                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"--}}
+{{--                                   placeholder="Barangay">--}}
+{{--                        </div>--}}
+
+{{--                        <!-- Purok Field -->--}}
+{{--                        <div class="mb-4">--}}
+{{--                            <label class="block text-[12px] font-medium mb-2 text-black"--}}
+{{--                                   for="purok">PUROK</label>--}}
+{{--                            <input type="text" id="purok"--}}
+{{--                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"--}}
+{{--                                   placeholder="Purok">--}}
+{{--                        </div>--}}
+
+                        <!-- REGION Field -->
+                        <div class="mb-4">--}}
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="region">REGION</label>--}}
+                            <select name="region" id="region" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg text-gray-800 text-[12px]">
+                                <option selected disabled>Choose Region</option>
+                            </select>
+                            <input type="hidden" id="region-text" wire:model="region_text" name="region_text">
                         </div>
 
-                        <!-- Purok Field -->
-                        <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-black"
-                                   for="purok">PUROK</label>
-                            <input type="text" id="purok"
-                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                   placeholder="Purok">
+                        <!-- PROVINCE Field -->
+                        <div class="mb-4">--}}
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="province">PROVINCE</label>--}}
+                            <select name="province" id="province" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg text-gray-800 text-[12px]">
+                                <option selected disabled>Choose Province</option>
+                            </select>
+                            <input type="hidden" id="province-text" wire:model="province_text" name="province_text">
                         </div>
+
+                        <!-- City / Municipality Field -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="city">City / Municipality</label>
+                            <select id="city" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg text-gray-800 text-[12px]">
+                                <option selected disabled>Choose City/Municipality</option>
+                            </select>
+                            <input type="hidden" id="city-text" wire:model="city_text" name="city_text">
+                        </div>
+
+                        <!-- Barangay Field -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">Barangay</label>
+                            <select id="barangay" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg text-gray-800 text-[12px]">
+                                <option selected disabled>Choose Barangay</option>
+                            </select>
+                            <input type="hidden" id="barangay-text" wire:model="barangay_text" name="barangay_text">
+                        </div>
+
 
                         <!-- Contact Number Field -->
                         <div class="mb-4">
@@ -113,95 +158,94 @@
                             </button>
 
                             <!-- Cancel Button -->
-                            <button type="submit"
+                            <button type="button" @click="openModal = false"
                                     class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                 <span class="text-[12px]">CANCEL</span>
                             </button>
                         </div>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded shadow">
-        <div class="flex justify-between items-center">
-            <div class="flex space-x-2">
-                <button @click="openFilters = !openFilters" class="flex space-x-2 items-center hover:bg-yellow-500 py-2 px-4 rounded bg-iroad-orange">
-                    <div class="text-white">
-                        <!-- Filter Icon (You can use an icon from any library) -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.447.894l-4 2.5A1 1 0 017 21V13.414L3.293 6.707A1 1 0 013 6V4z" />
-                        </svg>
-                    </div>
-                    <div class="text-[13px] text-white font-medium">
-                        Filter
-                    </div>
-                </button>
+{{--    <div class="bg-white p-6 rounded shadow">--}}
+{{--        <div class="flex justify-between items-center">--}}
+{{--            <div class="flex space-x-2">--}}
+{{--                <button @click="openFilters = !openFilters" class="flex space-x-2 items-center hover:bg-yellow-500 py-2 px-4 rounded bg-iroad-orange">--}}
+{{--                    <div class="text-white">--}}
+{{--                        <!-- Filter Icon (You can use an icon from any library) -->--}}
+{{--                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">--}}
+{{--                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.447.894l-4 2.5A1 1 0 017 21V13.414L3.293 6.707A1 1 0 013 6V4z" />--}}
+{{--                        </svg>--}}
+{{--                    </div>--}}
+{{--                    <div class="text-[13px] text-white font-medium">--}}
+{{--                        Filter--}}
+{{--                    </div>--}}
+{{--                </button>--}}
                 <!-- Search -->
-                <div class="relative hidden md:block border-gray-300">
-                    <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21"
-                         fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z"
-                              stroke="#787C7F" stroke-width="1.75" stroke-linecap="round"
-                              stroke-linejoin="round" />
-                        <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75"
-                              stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <input type="search" name="search" id="search"
-                           class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
-                           placeholder="Search">
-                </div>
-            </div>
-        </div>
+{{--                <div class="relative hidden md:block border-gray-300">--}}
+{{--                    <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21"--}}
+{{--                         fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+{{--                        <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z"--}}
+{{--                              stroke="#787C7F" stroke-width="1.75" stroke-linecap="round"--}}
+{{--                              stroke-linejoin="round" />--}}
+{{--                        <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75"--}}
+{{--                              stroke-linecap="round" stroke-linejoin="round" />--}}
+{{--                    </svg>--}}
+{{--                    <input type="search" name="search" id="search"--}}
+{{--                           class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"--}}
+{{--                           placeholder="Search">--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        </div>--}}
 
 
-        <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-            <label class="text-center mt-2">Date From:</label>
-            <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
-            <label class="text-center mt-2">To:</label>
-            <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
-            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                <option value="">Purok</option>
-                <option value="purok1">Purok 1</option>
-                <option value="purok2">Purok 2</option>
-                <option value="purok3">Purok 3</option>
-            </select>
-            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                <option value="">Barangay</option>
-                <option value="barangay1">Barangay 1</option>
-                <option value="barangay2">Barangay 2</option>
-                <option value="barangay3">Barangay 3</option>
-            </select>
-            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                <option value="">Situation</option>
-                <option value="barangay1">Barangay 1</option>
-                <option value="barangay2">Barangay 2</option>
-                <option value="barangay3">Barangay 3</option>
-            </select>
-            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                <option value="">Occupation</option>
-                <option value="barangay1">Barangay 1</option>
-                <option value="barangay2">Barangay 2</option>
-                <option value="barangay3">Barangay 3</option>
-            </select>
-            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                <option value="">Status</option>
-                <option value="barangay1">Barangay 1</option>
-                <option value="barangay2">Barangay 2</option>
-                <option value="barangay3">Barangay 3</option>
-            </select>
+{{--        <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">--}}
+{{--            <label class="text-center mt-2">Date From:</label>--}}
+{{--            <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">--}}
+{{--            <label class="text-center mt-2">To:</label>--}}
+{{--            <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">--}}
+{{--            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                <option value="">Purok</option>--}}
+{{--                <option value="purok1">Purok 1</option>--}}
+{{--                <option value="purok2">Purok 2</option>--}}
+{{--                <option value="purok3">Purok 3</option>--}}
+{{--            </select>--}}
+{{--            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                <option value="">Barangay</option>--}}
+{{--                <option value="barangay1">Barangay 1</option>--}}
+{{--                <option value="barangay2">Barangay 2</option>--}}
+{{--                <option value="barangay3">Barangay 3</option>--}}
+{{--            </select>--}}
+{{--            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                <option value="">Situation</option>--}}
+{{--                <option value="barangay1">Barangay 1</option>--}}
+{{--                <option value="barangay2">Barangay 2</option>--}}
+{{--                <option value="barangay3">Barangay 3</option>--}}
+{{--            </select>--}}
+{{--            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                <option value="">Occupation</option>--}}
+{{--                <option value="barangay1">Barangay 1</option>--}}
+{{--                <option value="barangay2">Barangay 2</option>--}}
+{{--                <option value="barangay3">Barangay 3</option>--}}
+{{--            </select>--}}
+{{--            <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                <option value="">Status</option>--}}
+{{--                <option value="barangay1">Barangay 1</option>--}}
+{{--                <option value="barangay2">Barangay 2</option>--}}
+{{--                <option value="barangay3">Barangay 3</option>--}}
+{{--            </select>--}}
 
-            <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>
-        </div>
-    </div>
+{{--            <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
 
 
     <!-- Table with transaction requests -->
     <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
-         class="overflow-x-auto">
+         class="overflow-x-auto p-2">
 {{--        <table class="min-w-full bg-white border border-gray-200">--}}
 {{--            <thead class="bg-gray-100">--}}
 {{--            <tr>--}}
@@ -504,31 +548,173 @@
                 </div>
             </div>
         </div>
-
-
     </div>
+    <script src="{{ asset('js/ph-address-selector.js') }}"></script>
+    <script>
+        document.addEventListener('livewire:load', function () {
+            // Reinitialize address selector on Livewire component mount
+            initializePhilippineAddressSelector();
+        });
 
-    <!-- Pagination controls -->
-    <div class="flex justify-end text-[12px] mt-4">
-        <button
-                @click="prevPage"
-                :disabled="currentPage === 1"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
-            Prev
-        </button>
-        <template x-for="page in totalPages" :key="page">
-            <button
-                    @click="goToPage(page)"
-                    :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"
-                    class="px-4 py-2 mx-1 rounded">
-                <span x-text="page"></span>
-            </button>
-        </template>
-        <button
-                @click="nextPage"
-                :disabled="currentPage === totalPages"
-                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
-            Next
-        </button>
-    </div>
+        function initializePhilippineAddressSelector() {
+            var my_handlers = {
+                // fill province
+                fill_provinces: function() {
+                    //selected region
+                    var region_code = $(this).val();
+
+                    // set selected text to input
+                    var region_text = $(this).find("option:selected").text();
+                    let region_input = $('#region-text');
+                    region_input.val(region_text);
+                    //clear province & city & barangay input
+                    $('#province-text').val('');
+                    $('#city-text').val('');
+                    $('#barangay-text').val('');
+
+                    //province
+                    let dropdown = $('#province');
+                    dropdown.empty();
+                    dropdown.append('<option selected="true" disabled>Choose State/Province</option>');
+                    dropdown.prop('selectedIndex', 0);
+
+                    //city
+                    let city = $('#city');
+                    city.empty();
+                    city.append('<option selected="true" disabled></option>');
+                    city.prop('selectedIndex', 0);
+
+                    //barangay
+                    let barangay = $('#barangay');
+                    barangay.empty();
+                    barangay.append('<option selected="true" disabled></option>');
+                    barangay.prop('selectedIndex', 0);
+
+                    // filter & fill
+                    var url = '/storage/ph-json/province.json';
+                    $.getJSON(url, function(data) {
+                        var result = data.filter(function(value) {
+                            return value.region_code == region_code;
+                        });
+
+                        result.sort(function(a, b) {
+                            return a.province_name.localeCompare(b.province_name);
+                        });
+
+                        $.each(result, function(key, entry) {
+                            dropdown.append($('<option></option>').attr('value', entry.province_code).text(entry.province_name));
+                        })
+
+                    });
+                },
+                // fill city
+                fill_cities: function() {
+                    //selected province
+                    var province_code = $(this).val();
+
+                    // set selected text to input
+                    var province_text = $(this).find("option:selected").text();
+                    let province_input = $('#province-text');
+                    province_input.val(province_text);
+                    //clear city & barangay input
+                    $('#city-text').val('');
+                    $('#barangay-text').val('');
+
+                    //city
+                    let dropdown = $('#city');
+                    dropdown.empty();
+                    dropdown.append('<option selected="true" disabled>Choose city/municipality</option>');
+                    dropdown.prop('selectedIndex', 0);
+
+                    //barangay
+                    let barangay = $('#barangay');
+                    barangay.empty();
+                    barangay.append('<option selected="true" disabled></option>');
+                    barangay.prop('selectedIndex', 0);
+
+                    // filter & fill
+                    var url = '/storage/ph-json/city.json';
+                    $.getJSON(url, function(data) {
+                        var result = data.filter(function(value) {
+                            return value.province_code == province_code;
+                        });
+
+                        result.sort(function(a, b) {
+                            return a.city_name.localeCompare(b.city_name);
+                        });
+
+                        $.each(result, function(key, entry) {
+                            dropdown.append($('<option></option>').attr('value', entry.city_code).text(entry.city_name));
+                        })
+
+                    });
+                },
+                // fill barangay
+                fill_barangays: function() {
+                    // selected barangay
+                    var city_code = $(this).val();
+
+                    // set selected text to input
+                    var city_text = $(this).find("option:selected").text();
+                    let city_input = $('#city-text');
+                    city_input.val(city_text);
+                    //clear barangay input
+                    $('#barangay-text').val('');
+
+                    // barangay
+                    let dropdown = $('#barangay');
+                    dropdown.empty();
+                    dropdown.append('<option selected="true" disabled>Choose barangay</option>');
+                    dropdown.prop('selectedIndex', 0);
+
+                    // filter & Fill
+                    var url = '/storage/ph-json/barangay.json';
+                    $.getJSON(url, function(data) {
+                        var result = data.filter(function(value) {
+                            return value.city_code == city_code;
+                        });
+
+                        result.sort(function(a, b) {
+                            return a.brgy_name.localeCompare(b.brgy_name);
+                        });
+
+                        $.each(result, function(key, entry) {
+                            dropdown.append($('<option></option>').attr('value', entry.brgy_code).text(entry.brgy_name));
+                        })
+
+                    });
+                },
+
+                onchange_barangay: function() {
+                    // set selected text to input
+                    var barangay_text = $(this).find("option:selected").text();
+                    let barangay_input = $('#barangay-text');
+                    barangay_input.val(barangay_text);
+                },
+
+            };
+
+            $(function() {
+                // events
+                $('#region').on('change', my_handlers.fill_provinces);
+                $('#province').on('change', my_handlers.fill_cities);
+                $('#city').on('change', my_handlers.fill_barangays);
+                $('#barangay').on('change', my_handlers.onchange_barangay);
+
+                // load region
+                let dropdown = $('#region');
+                dropdown.empty();
+                dropdown.append('<option selected="true" disabled>Choose Region</option>');
+                dropdown.prop('selectedIndex', 0);
+                const url = '/storage/ph-json/region.json';
+                // Populate dropdown with list of regions
+                $.getJSON(url, function(data) {
+                    $.each(data, function(key, entry) {
+                        dropdown.append($('<option></option>').attr('value', entry.region_code).text(entry.region_name));
+                    })
+                });
+
+            });
+        }
+    </script>
 </div>

@@ -16,18 +16,14 @@ class Address extends Model
      * @var array
      */
     protected $fillable = [
-        'applicant_id',
+        'region_id',
+        'province_id',
         'city_id',
-        'state_id',
-        'country_id',
-        'street_address',
-        'city',
-        'state_name',
-        'postal_code',
-        'country',
-        'latitude',
-        'longitude',
-        'full_address',
+        'barangay_id',
+        'street',
+        'purok',
+        'lot',
+        'block'
     ];
 
     /**
@@ -36,32 +32,26 @@ class Address extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'applicant_id' => 'integer',
-        'city_id' => 'integer',
-        'state_id' => 'integer',
-        'country_id' => 'integer',
-        'latitude' => 'decimal:7',
-        'longitude' => 'decimal:7',
+
     ];
 
-    public function applicant(): BelongsTo
+    public function region()
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(Region::class);
     }
 
-    public function city(): BelongsTo
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function city()
     {
         return $this->belongsTo(City::class);
     }
 
-    public function state(): BelongsTo
+    public function barangay()
     {
-        return $this->belongsTo(State::class);
-    }
-
-    public function country(): BelongsTo
-    {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(Barangay::class);
     }
 }
