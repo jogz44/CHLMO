@@ -2,9 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Barangay;
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Purok;
 use App\Models\State;
+use App\Models\TransactionType;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Address;
@@ -24,19 +28,22 @@ class AddressFactory extends Factory
      */
     public function definition(): array
     {
+
+        static $purokIds; // Use static to persist the array across multiple calls
+        if (!$purokIds) {
+            $purokIds = Purok::pluck('id')->shuffle()->toArray(); // Fetch and shuffle the user IDs once
+        }
+
+        static $barangayIds;
+        if (!$barangayIds) {
+            $barangayIds = Barangay::pluck('id')->shuffle()->toArray();
+        }
+
         return [
-            'applicant_id' => Applicant::factory(),
-            'city_id' => City::factory(),
-            'state_id' => State::factory(),
-            'country_id' => Country::factory(),
-            'street_address' => $this->faker->streetAddress(), // More realistic street address
-            'city' => $this->faker->city(), // Generates a random city name
-            'state_name' => $this->faker->state(), // Generates a random state name
-            'postal_code' => $this->faker->postcode(), // Generates a random postal code
-            'country' => $this->faker->country(), // Generates a random country name
-            'latitude' => $this->faker->latitude(), // Generates a random latitude
-            'longitude' => $this->faker->longitude(), // Generates a random longitude
-            'full_address' => $this->faker->address(), // Generates a complete address
+            'purok_id' => fake()->randomElement($purokIds),
+            'barangay_id' => fake()->randomElement($barangayIds),
+            'street' => $this->faker->streetAddress(),
+            'house_number' => $this->faker->buildingNumber(),
         ];
     }
 

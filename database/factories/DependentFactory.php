@@ -26,9 +26,13 @@ class DependentFactory extends Factory
 
         return [
             'applicant_id' => fake()->randomElement($applicantIds),
-            'occupation' => $this->faker->jobTitle(),
+            'first_name' => $this->faker->firstName(),
+            'middle_name' => $this->faker->optional()->firstName(), // Optional middle name
+            'last_name' => $this->faker->lastName(),
+            'date_of_birth' => $this->faker->dateTimeBetween('-100 years', '-18 years')->format('Y-m-d'),
             'relationship' => $this->faker->randomElement(['Parent', 'Sibling', 'Spouse', 'Child', 'Relative', 'Friend']),
-            'income' => $this->faker->numberBetween(10000, 100000), // Assuming a realistic positive income range
+            'occupation' => $this->faker->jobTitle(),
+            'monthly_income' => $this->faker->numberBetween(10000, 100000), // Assuming a realistic positive income range
         ];
     }
 

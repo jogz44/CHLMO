@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Address;
 use App\Models\Applicant;
 use App\Models\Awardee;
 use App\Models\Blacklist;
@@ -38,6 +39,10 @@ class DatabaseSeeder extends Seeder
 
         if (Lot::count() == 0){
             $this->call(LotSeeder::class);
+        }
+
+        if (Address::count() == 0){
+            $this->call(AddressSeeder::class);
         }
 
         if (Applicant::count() == 0){
