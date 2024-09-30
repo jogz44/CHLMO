@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Address extends Model
 {
@@ -39,15 +40,15 @@ class Address extends Model
     /**
      * Get the purok associated with this address.
      */
-    public function barangay()
+    public function barangay(): BelongsTo
     {
         return $this->belongsTo(Barangay::class);
     }
-    public function purok()
+    public function purok(): BelongsTo
     {
         return $this->belongsTo(Purok::class);
     }
-    public function applicants()
+    public function applicants(): HasMany
     {
         return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }

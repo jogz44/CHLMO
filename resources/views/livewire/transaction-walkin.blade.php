@@ -174,6 +174,7 @@
             <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
                  class="overflow-x-auto p-2">
                 <livewire:walkin-applicants-table/>
+{{--                <livewire:applicants-table tableName="ApplicantsTable" />--}}
 
                 <!-- Award Applicant Modal -->
                 <div x-show="openModalAward"

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Purok extends Model
 {
@@ -30,11 +32,11 @@ class Purok extends Model
         'barangay_id' => 'integer',
     ];
 
-    public function barangay()
+    public function barangay(): BelongsTo
     {
         return $this->belongsTo(Barangay::class);
     }
-    public function addresses()
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
