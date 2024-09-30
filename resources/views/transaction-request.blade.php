@@ -6,7 +6,7 @@
                 <!-- Container for the Title -->
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                     <div class="flex items-center">
-                        <h2 class="text-[13px] ml-5 text-gray-700">REQUEST FOR RELOCATION APPLICANTS</h2>
+                        <h2 class="text-[13px] ml-5 text-gray-700">TAGGED AND VALIDATED</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                     <div x-data class="relative z-0">
@@ -104,6 +104,7 @@
                                 <th class="py-2 px-2 border-b text-center font-medium">Occupation</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">Monthly income</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">Status</th>
+                                <th class="py-2 px-2 border-b text-center font-medium">Applicant Type</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
                             </tr>
                         </thead>
@@ -117,16 +118,14 @@
                                 <td class="py-4 px-2 text-center border-b">Carpenter</td>
                                 <td class="py-4 px-2 text-center border-b">10,000</td>
                                 <td class="py-4 px-2 text-center border-b">Pending</td>
+                                <td class="py-4 px-2 text-center border-b">Walk-in</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button
                                         @click="window.location.href = '{{ route('request-applicant-details') }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
-                                    <button @click="openModalTag = true"
-                                        class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag
-                                    </button>
                                     <button @click="openModalRelocate = true"
-                                        class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate
+                                        class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award
                                     </button>
                                 </td>
                             </tr>
@@ -139,10 +138,10 @@
                                 <td class="py-4 px-2 text-center border-b">Carpenter</td>
                                 <td class="py-4 px-2 text-center border-b">10,000</td>
                                 <td class="py-4 px-2 text-center border-b">Pending</td>
+                                <td class="py-4 px-2 text-center border-b">Request</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
+                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
                             <tr>
@@ -154,10 +153,10 @@
                                 <td class="py-4 px-2 text-center border-b">Carpenter</td>
                                 <td class="py-4 px-2 text-center border-b">10,000</td>
                                 <td class="py-4 px-2 text-center border-b">Pending</td>
+                                <td class="py-4 px-2 text-center border-b">Walk-in</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
+                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
                             <tr>
@@ -169,10 +168,10 @@
                                 <td class="py-4 px-2 text-center border-b">Carpenter</td>
                                 <td class="py-4 px-2 text-center border-b">10,000</td>
                                 <td class="py-4 px-2 text-center border-b">Pending</td>
+                                <td class="py-4 px-2 text-center border-b">Request</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
+                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
                             <tr>
@@ -184,10 +183,10 @@
                                 <td class="py-4 px-2 text-center border-b">Carpenter</td>
                                 <td class="py-4 px-2 text-center border-b">10,000</td>
                                 <td class="py-4 px-2 text-center border-b">Pending</td>
+                                <td class="py-4 px-2 text-center border-b">Walk-in</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Relocate</button>
+                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
 
