@@ -71,7 +71,7 @@
                         </div>
 
                         <div class="flex flex-wrap -mx-2">
-                            <div class="w-full md:w-1/3 px-2 mb-4">
+                            <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="barangay"
                                        class="block text-[13px] font-medium text-gray-700 mb-1">BARANGAY</label>
                                 <select id="barangay" name="barangay" :disabled="!isEditable"
@@ -82,7 +82,7 @@
                                     <option value="barangay3">Barangay 3</option>
                                 </select>
                             </div>
-                            <div class="w-full md:w-1/3 px-2 mb-4">
+                            <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">PUROK</label>
                                 <select id="purok" name="purok" :disabled="!isEditable"
                                         class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
@@ -92,11 +92,19 @@
                                     <option value="purok3">Purok 3</option>
                                 </select>
                             </div>
-                            <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="landmark"
-                                       class="block text-[13px] font-medium text-gray-700 mb-1">LANDMARK</label>
-                                <input type="text" id="landmark" name="landmark" :disabled="!isEditable"
-                                       class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="specificaddress" class="block text-[13px] font-medium text-gray-700 mb-1">SPECIFIC ADDRESS</label>
+                                <input type="text" id="specificaddress" name="specificaddress" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="civilstatus" class="block text-[13px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
+                                <select id="civilstatus" name="civilstatus"
+                                        class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select Status</option>
+                                    <option value="single">Single</option>
+                                    <option value="married">Married</option>
+                                    <option value="widow">Widow</option>
+                                </select>
                             </div>
                         </div>
 
@@ -167,13 +175,23 @@
                             </div>
                         </div>
 
+                        <hr class="mt-2 mb-2 ">
+                        <h2 class="block text-[13px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="spousename" class="block text-[13px] font-medium text-gray-700 mb-1">SPOUSE
-                                    NAME</label>
-                                <input type="text" id="spousename" name="spousename"
-                                       :disabled="!isEditable"
-                                       class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <label for="spousefirstname" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    FIRST NAME</label>
+                                <input type="text" id="spousefirstname" name="spousefirstname" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spousemiddlename" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    MIDDLE NAME</label>
+                                <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spouselastname" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    LAST NAME</label>
+                                <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="spouse-occupation" class="block text-[13px] font-medium text-gray-700 mb-1">OCCUPATION</label>
@@ -241,7 +259,13 @@
                                 </tr>
                                 </tbody>
                             </table>
-
+                            <div class="flex justify-end mt-2">
+                                <button @click="addRow()" class="bg-green-500 text-white p-2 rounded-full shadow-lg hover:bg-green-600 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
 
                     </form>
@@ -360,7 +384,7 @@
                 </div>
 
                 <div class="p-3 rounded">
-                    <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">UPLOAD DOCUMENTS</h2>
+                    <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">UPLOADED DOCUMENTS</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured requirements submitted
                         by the qualified applicants.</p>
                 </div>
