@@ -26,21 +26,6 @@ return new class extends Migration
             ['type_name' => 'Shelter Assistance', 'description' => 'Shelter assistance applicants may go to the office directly to request shelter materials.'],
         ]);
 
-        // insert tribes
-        $tribes = [
-            'Mansaka',
-            'Lumad',
-            'Badjao',
-        ];
-
-        foreach ($tribes as $tribe) {
-            DB::table('tribes')->insert([
-                'tribe_name' => $tribe,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-        }
-
         Schema::enableForeignKeyConstraints();
     }
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c83a1b6b7e4ef0d1d059451ee203a8a6",
+    "content-hash": "ebcf06b0c64e5a15aa51bc1192a8a8da",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2904,16 +2904,16 @@
         },
         {
             "name": "power-components/livewire-powergrid",
-            "version": "v5.10.5",
+            "version": "v5.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Power-Components/livewire-powergrid.git",
-                "reference": "c9a575fcbe73b137b03fc00bdb02d0e2ec0b5c53"
+                "reference": "36fa962c8a84ce09ea690e7b6ffad2234e96f4b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Power-Components/livewire-powergrid/zipball/c9a575fcbe73b137b03fc00bdb02d0e2ec0b5c53",
-                "reference": "c9a575fcbe73b137b03fc00bdb02d0e2ec0b5c53",
+                "url": "https://api.github.com/repos/Power-Components/livewire-powergrid/zipball/36fa962c8a84ce09ea690e7b6ffad2234e96f4b1",
+                "reference": "36fa962c8a84ce09ea690e7b6ffad2234e96f4b1",
                 "shasum": ""
             },
             "require": {
@@ -2973,7 +2973,7 @@
             "homepage": "https://github.com/power-components/livewire-powergrid",
             "support": {
                 "issues": "https://github.com/Power-Components/livewire-powergrid/issues",
-                "source": "https://github.com/Power-Components/livewire-powergrid/tree/v5.10.5"
+                "source": "https://github.com/Power-Components/livewire-powergrid/tree/v5.10.6"
             },
             "funding": [
                 {
@@ -2981,7 +2981,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-08T15:30:14+00:00"
+            "time": "2024-09-17T12:20:04+00:00"
         },
         {
             "name": "pragmarx/google2fa",

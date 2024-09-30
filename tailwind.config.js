@@ -14,6 +14,20 @@ export default {
 
     theme: {
         extend: {
+            keyframes: {
+                'fade-in': {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
+                },
+                'fade-out': {
+                    '0%': { opacity: '1' },
+                    '100%': { opacity: '0' },
+                },
+            },
+            animation: {
+                'fade-in': 'fade-in 0.5s ease-in-out forwards',
+                'fade-out': 'fade-out 0.5s ease-in-out forwards 2.5s', // 2.5s delay
+            },
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
                 poppins: ["Poppins", ...defaultTheme.fontFamily.sans],
@@ -27,6 +41,7 @@ export default {
                 'custom-yellow': '#FFBF00',
                 'iroad-green': '#6AA76F',
                 'iroad-orange': '#FF9100',
+                'custom-green-light': 'rgba(163, 214, 163, 0.5)'
             },
             fontSize: {
                 xxs: [

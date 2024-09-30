@@ -21,7 +21,7 @@ class Spouse extends Model
         'first_name',
         'middle_name',
         'last_name',
-        'income',
+        'monthly_income',
     ];
 
     /**
@@ -40,8 +40,8 @@ class Spouse extends Model
         return $this->belongsTo(Applicant::class);
     }
 
-    public function occupation(): BelongsTo
+    public function taggedAndValidatedApplicants()
     {
-        return $this->belongsTo(Occupation::class);
+        return $this->hasMany(TaggedAndValidatedApplicant::class);
     }
 }

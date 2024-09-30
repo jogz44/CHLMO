@@ -16,19 +16,12 @@ class Address extends Model
      * @var array
      */
     protected $fillable = [
-        'applicant_id',
-        'city_id',
-        'state_id',
-        'country_id',
-        'street_address',
-        'city',
-        'state_name',
-        'postal_code',
-        'country',
-        'latitude',
-        'longitude',
-        'full_address',
+        'barangay_id',
+        'purok_id',
+        'street',
+        'house_number',
     ];
+
 
     /**
      * The attributes that should be cast to native types.
@@ -37,31 +30,29 @@ class Address extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'applicant_id' => 'integer',
-        'city_id' => 'integer',
-        'state_id' => 'integer',
-        'country_id' => 'integer',
-        'latitude' => 'decimal:7',
-        'longitude' => 'decimal:7',
+        'barangay_id' => 'integer',
+        'purok_id' => 'integer',
+        'street' => 'string',
+        'house_number' => 'string',
     ];
 
-    public function applicant(): BelongsTo
+    /**
+     * Get the purok associated with this address.
+     */
+    public function barangay()
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(Barangay::class);
     }
-
-    public function city(): BelongsTo
+    public function purok()
     {
-        return $this->belongsTo(City::class);
+        return $this->belongsTo(Purok::class);
     }
-
-    public function state(): BelongsTo
+    public function applicants()
     {
-        return $this->belongsTo(State::class);
+        return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }
-
-    public function country(): BelongsTo
+    public function taggedAndValidatedApplicants()
     {
-        return $this->belongsTo(Country::class);
+        return $this->hasMany(TaggedAndValidatedApplicant::class);
     }
 }

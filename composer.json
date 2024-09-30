@@ -10,7 +10,7 @@
         "laravel/jetstream": "^5.2",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "livewire/livewire": "^3.0",
+        "livewire/livewire": "^3.5",
         "power-components/livewire-powergrid": "^5.10",
         "spatie/laravel-permission": "^6.9"
     },

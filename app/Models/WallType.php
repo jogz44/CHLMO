@@ -32,4 +32,9 @@ class WallType extends Model
     {
         return $this->hasMany(ShelterMaterial::class);
     }
+
+    public function taggedAndValidatedApplicants()
+    {
+        return $this->hasMany(TaggedAndValidatedApplicant::class);
+    }
 }

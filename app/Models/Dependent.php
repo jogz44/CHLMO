@@ -42,4 +42,9 @@ class Dependent extends Model
     {
         return $this->belongsTo(Occupation::class);
     }
+
+    public function taggedAndValidatedApplicants()
+    {
+        return $this->hasMany(TaggedAndValidatedApplicant::class);
+    }
 }

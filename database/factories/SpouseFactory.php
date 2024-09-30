@@ -33,7 +33,7 @@ class SpouseFactory extends Factory
             'first_name' => $this->faker->firstName(),
             'middle_name' => $this->faker->optional()->firstName(), // Use an optional middle name, which may be null
             'last_name' => $this->faker->lastName(),
-            'income' => $this->faker->numberBetween(0, 100000), // Generates a realistic positive income
+            'monthly_income' => $this->faker->numberBetween(0, 100000), // Generates a realistic positive income
         ];
 
     }

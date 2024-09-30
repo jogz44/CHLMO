@@ -2,46 +2,52 @@
     <!-- Header for large screens -->
     <header class="fixed top-0 left-0 bg-[#ffffff] p-3 hidden md:flex w-full justify-between items-center z-10" style="width: calc(100% - 17%); left: 17%; max-width: calc(100% - 17%);">
         <!-- Navigation Links -->
+         
         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
             <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('HOUSING') }}
             </x-nav-link>
+            @role('ShelterAdmin')
+            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">
+                {{ __('SHELTER ASSISTANCE') }}
+            </x-nav-link>
+            @endrole
             @role('Admin')
             <x-nav-link href="{{ route('admin.index') }}" :active="request()->routeIs('admin.index')">
-                {{ __('Admin') }}
+                {{ __('ADMIN') }}
             </x-nav-link>
             @endrole
         </div>
 
-        <!-- Right-aligned container for Search and Profile -->
-        <div class="flex items-center ml-auto space-x-4">
+        <!-- Right-aligned container for         and Profile -->
+        <div class="flex items-center ml-auto space-x-2">
             <!-- Search -->
-            <div class="relative hidden md:block">
+            <div class="relative hidden md:block mr-2">
                 <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
                     <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <input type="search" name="search" id="search" class="rounded-full px-12 py-2 placeholder:text-[13px] outline-none border-none z-10 bg-[#f7f7f9] hover:ring-[#BA2C2C] focus:ring-[#BA2C2C]" placeholder="Search Anything">
+                <input type="search" name="search" id="search" class="rounded-full px-12 py-2 placeholder:text-[13px] outline-none border-none bg-[#f7f7f9] hover:ring-[#BA2C2C] focus:ring-[#BA2C2C]" placeholder="Search Anything">
             </div>
 
             <!-- Profile Section -->
-            <div x-data="{ showProfile: false }" class="relative">
+            <div x-data="{ showProfile: false }" class="relative rounded-full py-[-4px] px-2">
                 <!-- Toggle Button for Profile Menu -->
-                <button @click="showProfile = !showProfile" class="flex items-center gap-3">
+                <button @click="showProfile = !showProfile" class="flex items-center w-30">
                     <!-- User Image (SVG) -->
                     <svg class="w-8 h-8 rounded-full bg-gray-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM12 14c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5z" />
                     </svg>
                     <!-- User Name -->
                     <div class="flex flex-col">
-                        <p class="text-[13px] font-medium">{{ Auth::user()->first_name }}</p>
-                        <p class="text-[12px] -ml-7 font-light text-gray-500">Editor</p>
+                        <p class="text-[13px] ml-2 font-medium">{{ Auth::user()->first_name }}</p>
+                        <p class="text-[12px] ml-2 font-light text-gray-500">{{ Auth::user()->getRoleNames()->first() }}</p>
                     </div>
 
                 </button>
 
                 <!-- Dropdown Menu -->
-                <div x-cloak x-show="showProfile" class="absolute bg-white rounded-lg shadow-md right-0 top-12 w-56 z-10 transition duration-300 ease-in-out transform origin-top" :class="{ 'scale-y-100': showProfile, 'scale-y-0': !showProfile }">
+                <div x-cloak x-show="showProfile" class="absolute bg-white rounded-lg shadfow-md right-0 top-12 w-56 z-50 transition duration-300 ease-in-out transform origin-top" :class="{ 'scale-y-100': showProfile, 'scale-y-0': !showProfile }">
                     <ul class="block text-sm divide-y py-1 text-[#4F6065]">
                         <!-- User Profile -->
                         <li>
@@ -119,7 +125,7 @@
 {{--                        <form method="POST" action="{{ route('logout') }}">--}}
 {{--                            @csrf--}}
 {{--                            <x-dropdown-link href="{{ route('logout') }}"--}}
-{{--                                             onclick="event.preventDefault();--}}
+{{--                                             onclick="event.preventDefault(); --}}
 {{--                                                        this.closest('form').submit();">--}}
 {{--                                {{ __('Log Out') }}--}}
 {{--                            </x-dropdown-link>--}}

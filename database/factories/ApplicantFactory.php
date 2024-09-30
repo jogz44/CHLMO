@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Address;
+use App\Models\Barangay;
 use App\Models\CivilStatus;
+use App\Models\Purok;
 use App\Models\Spouse;
 use App\Models\TransactionType;
 use App\Models\Tribe;
@@ -27,30 +30,23 @@ class ApplicantFactory extends Factory
     {
         $userIds = User::pluck('id')->toArray();
         $transactionTypeIds = TransactionType::pluck('id')->toArray();
-        $civilStatusIds = CivilStatus::pluck('id')->toArray();
-        $tribeIds = Tribe::pluck('id')->toArray();
+
+        static $addressIds; // Use static to persist the array across multiple calls
+        if (!$addressIds) {
+            $addressIds = Address::pluck('id')->shuffle()->toArray(); // Fetch and shuffle the user IDs once
+        }
 
         return [
             'user_id' => fake()->randomElement($userIds),
             'transaction_type_id' => fake()->randomElement($transactionTypeIds),
-            'civil_status_id' => fake()->randomElement($civilStatusIds),
-            'tribe_id' => fake()->randomElement($tribeIds),
+            'address_id' => fake()->randomElement($addressIds),
             'first_name' => $this->faker->firstName(),
             'middle_name' => $this->faker->optional()->firstName(), // Optional middle name
             'last_name' => $this->faker->lastName(),
-            'age' => $this->faker->numberBetween(18, 100), // Reasonable age range
+            'suffix_name' => fake()->optional()->suffix(),
             'phone' => $this->faker->phoneNumber(),
-            'sex' => $this->faker->randomElement(['male', 'female']), // More realistic gender options
-            'occupation' => $this->faker->jobTitle(), // Generates a random job title
-            'income' => $this->faker->numberBetween(20000, 200000), // Reasonable income range
-            'date_applied' => $this->faker->dateTimeBetween('-1 years', 'now'), // Date within the last year
+            'date_applied' => $this->faker->date(),
             'initially_interviewed_by' => $this->faker->name(), // Realistic name for the interviewer
-            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']), // Fixed status options
-            'tagger_name' => $this->faker->name(), // Realistic name for tagger
-            'tagging_date' => $this->faker->dateTimeBetween('-1 months', 'now'), // Recent tagging date
-            'awarded_by' => $this->faker->name(), // Realistic name for who awarded
-            'awarding_date' => $this->faker->dateTimeBetween('now', '+1 year'), // Future awarding date
-            'photo' => $this->faker->imageUrl(640, 480, 'people'), // Realistic image URL for a photo
         ];
     }
 
