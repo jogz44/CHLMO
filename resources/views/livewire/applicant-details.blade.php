@@ -80,25 +80,33 @@
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="barangay"
                                    class="block text-[13px] font-medium text-gray-700 mb-1">BARANGAY</label>
                             <input id="barangay" name="barangay" wire:model="barangay"
                                    :disabled="!isEditable"
                                     class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">PUROK</label>
                             <input id="purok" name="purok" wire:model="purok"
                                    :disabled="!isEditable"
                                     class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="landmark"
-                                   class="block text-[13px] font-medium text-gray-700 mb-1">LANDMARK</label>
-                            <input type="text" id="landmark" name="landmark" :disabled="!isEditable"
-                                   class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                        </div>
+                        <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="specificaddress" class="block text-[13px] font-medium text-gray-700 mb-1">SPECIFIC ADDRESS</label>
+                                <input type="text" id="specificaddress" name="specificaddress" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="civilstatus" class="block text-[13px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
+                                <select id="civilstatus" name="civilstatus"
+                                        class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select Status</option>
+                                    <option value="single">Single</option>
+                                    <option value="married">Married</option>
+                                    <option value="widow">Widow</option>
+                                </select>
+                            </div>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
@@ -167,15 +175,25 @@
                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                     </div>
-
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spousename" class="block text-[13px] font-medium text-gray-700 mb-1">SPOUSE
-                                NAME</label>
-                            <input type="text" id="spousename" name="spousename"
-                                   :disabled="!isEditable"
-                                   class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                        </div>
+                    <hr class="mt-2 mb-2 ">
+                        <h2 class="block text-[13px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spousefirstname" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    FIRST NAME</label>
+                                <input type="text" id="spousefirstname" name="spousefirstname" class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spousemiddlename" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    MIDDLE NAME</label>
+                                <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spouselastname" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    LAST NAME</label>
+                                <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                    
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="spouse-occupation" class="block text-[13px] font-medium text-gray-700 mb-1">OCCUPATION</label>
                             <input type="text" id="spouse-occupation" name="spouse-occupation"
@@ -242,8 +260,28 @@
                             </tr>
                             </tbody>
                         </table>
+                        <!-- Add Row Button -->
+                        <div class="flex justify-end mb-4 mt-4">
+                                <button @click.prevent="addRow()" type="button"
+                                    class="text-white bg-green-500 hover:bg-green-600 text-[13px] px-2 py-2 rounded-md flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor" class="w-5 h-5 mr-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Add Row
+                                </button>
+                            </div>
 
+                            <!-- Save Button -->
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="w-[94px] py-2 bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    SAVE
+                                </button>
+                            </div>
                     </div>
+                    
 
                 </form>
             </div>
