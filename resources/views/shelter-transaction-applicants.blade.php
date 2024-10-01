@@ -188,17 +188,17 @@
 
                             <!-- Form -->
                             <form>
-                                <div>
+                                <div class="mb-3">
                                     <label class="block  text-[12px] font-medium mb-2 text-black"
                                         for="profile-no">PROFILE FORM NO.</label>
                                     <input type="text" id="profile-no"
-                                        class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                                        class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                                         placeholder="Profile Form No" value="2022-00002	">
                                 </div>
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE OF REQUEST</label>
                                     <input type="date" id="date-applied"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
                                         placeholder="Date Applied" value="2023-11-23">
                                 </div>
                                 <!-- Main Fields -->
@@ -208,7 +208,7 @@
                                         <label class="block  text-[12px] font-medium mb-2 text-black"
                                             for="first-name">FIRST NAME</label>
                                         <input type="text" id="first-name"
-                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                                             placeholder="First Name" value="Jane">
                                     </div>
 
@@ -217,7 +217,7 @@
                                         <label class="block  text-[12px] font-medium mb-2 text-black"
                                             for="middle-name">MIDDLE NAME</label>
                                         <input type="text" id="middle-name"
-                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                                             placeholder="Middle Name" value="Dove">
                                     </div>
 
@@ -226,7 +226,7 @@
                                         <label class="block  text-[12px] font-medium mb-2 text-black"
                                             for="last-name">LAST NAME</label>
                                         <input type="text" id="last-name"
-                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                                             placeholder="Last Name" value="Doe">
                                     </div>
 
@@ -235,7 +235,7 @@
                                         <label class="block  text-[12px] font-medium mb-2 text-black"
                                             for="suffix-name">SUFFIX NAME</label>
                                         <input type="text" id="suffix-name"
-                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px] "
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px] "
                                             placeholder="Suffix Name">
                                     </div>
                                 </div>
@@ -243,7 +243,7 @@
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">ORIGIN OF REQUEST</label>
                                     <input type="text" id="origin-of-request"
-                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                                         placeholder="Select Origin of Request" value="CMO">
                                 </div>
 
@@ -307,17 +307,17 @@
 
                 <!-- Form -->
                 <form>
-                    <div>
+                    <div class="mb-3">
                         <label class="block  text-[12px] font-medium mb-2 text-black"
                             for="profile-no">PROFILE FORM NO.</label>
                         <input type="text" id="profile-no"
-                            class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                            class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                             placeholder="Profile Form No">
                     </div>
                     <div class="mb-4">
                         <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE OF REQUEST</label>
                         <input type="date" id="date-applied"
-                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
                             placeholder="Date Applied">
                     </div>
                     <!-- Main Fields -->
@@ -327,7 +327,7 @@
                             <label class="block  text-[12px] font-medium mb-2 text-black"
                                 for="first-name">FIRST NAME</label>
                             <input type="text" id="first-name"
-                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px] "
+                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px] "
                                 placeholder="First Name">
                         </div>
 
@@ -336,7 +336,7 @@
                             <label class="block  text-[12px] font-medium mb-2 text-black"
                                 for="middle-name">MIDDLE NAME</label>
                             <input type="text" id="middle-name"
-                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px] "
+                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px] "
                                 placeholder="Middle Name">
                         </div>
 
@@ -345,7 +345,7 @@
                             <label class="block  text-[12px] font-medium mb-2 text-black"
                                 for="last-name">LAST NAME</label>
                             <input type="text" id="last-name"
-                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px] "
+                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px] "
                                 placeholder="Last Name">
                         </div>
 
@@ -354,14 +354,14 @@
                             <label class="block  text-[12px] font-medium mb-2 text-black"
                                 for="suffix-name">SUFFIX NAME</label>
                             <input type="text" id="suffix-name"
-                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px] "
+                                class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px] "
                                 placeholder="Suffix Name">
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">ORIGIN OF REQUEST</label>
-                            <select  class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-custom-red text-[12px]"
+                            <select  class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none text-[12px]"
                             placeholder="Select Origin of Request">
                                 <option value="">Select Origin of Request</option>
                                 <option value="">CMO</option>

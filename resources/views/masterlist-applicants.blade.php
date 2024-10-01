@@ -14,7 +14,7 @@
                     <div x-data class="relative z-0">
                         <button
                             @click="openModal = !openModal"
-                            class="bg-[#5BB318] text-white px-4 py-2 rounded">
+                            class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
                             Add Applicant
                         </button>
                         <button class="bg-[#2B7A0B] text-white px-4 py-2 rounded">Export</button>
@@ -180,7 +180,7 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <!-- Award Button -->
                                 <button type="submit"
-                                    class="w-full py-2 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    class="w-full py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                     <span class="text-sm"> + ADD APPLICANT</span>
                                 </button>
 
