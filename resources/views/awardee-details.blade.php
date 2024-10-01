@@ -453,19 +453,19 @@
                         by the qualified applicants.</p>
                 </div>
                 <div x-data="fileUpload()" class="bg-white p-6 rounded shadow mb-6">
-                <div x-data="{ open: false, imgSrc: '' }" class="w-full lg:w-1/2 pl-4 mt-[10%]">
+                <div x-data="{ open: false, imgSrc: '' }" class="w-full lg:w-1/2 pl-4 mt-4">
                                 <label class="block text-[12px] font-medium text-gray-700 mb-2">UPLOADED PHOTOS</label>
                                 <div class="flex space-x-4">
                                     <!-- Image 1 -->
                                     <div @click="open = true; imgSrc = '{{ asset('storage/images/designDasboard.png') }}';" class="relative w-1/2 border border-bg-gray-700">
                                         <img src="{{ asset('storage/images/designDasboard.png') }}" alt="House Situation" class="w-full h-auto rounded-md cursor-pointer">
-                                        <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation.jpeg</span>
+                                        <span class="absolute bottom-0 left-0 bg-gray-700 bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation.jpeg</span>
                                     </div>
 
                                     <!-- Image 2 -->
                                     <div @click="open = true; imgSrc = '{{ asset('storage/images/designDasboard.png') }}';" class="relative w-1/2 border border-bg-gray-700">
                                         <img src="{{ asset('storage/images/designDasboard.png') }}" alt="House Situation 2" class="w-full h-auto rounded-md cursor-pointer">
-                                        <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation2.jpeg</span>
+                                        <span class="absolute bottom-0 left-0 bg-gray-700 bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation2.jpeg</span>
                                     </div>
                                 </div>
 

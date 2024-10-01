@@ -43,7 +43,7 @@
 
             <!-- Table with transaction requests -->
             <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
-                class="px-3 py-6 z-5 bg-white">
+                class="px-3 py-6 z-5 bg-white"> 
                 <livewire:walkin-applicants-table />
                 {{-- <livewire:applicants-table tableName="ApplicantsTable" />--}}
 
@@ -265,7 +265,7 @@
                         <!-- Date Applied Field -->
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <div>
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="date_applied">APPLICATION DATE</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="date_applied">APPLICATION DATE <span class="text-red-500">*</span></label>
                                 <input type="date" id="date_applied" wire:model="date_applied" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none ">
                                 @error('date_applied') <span class="error">{{ $message }}</span> @enderror
                             </div>
@@ -288,21 +288,21 @@
                         <div class="grid grid-cols-2 gap-3 mb-3">
                             <!-- First Name Field -->
                             <div>
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">FIRST NAME</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">FIRST NAME <span class="text-red-500">*</span> </label>
                                 <input type="text" wire:model="first_name" id="first_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                 @error('first_name') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Middle Name Field -->
                             <div>
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="middle_name">MIDDLE NAME</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="middle_name">MIDDLE NAME <span class="text-red-500">*</span> </label>
                                 <input type="text" wire:model="middle_name" id="middle_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                 @error('middle_name') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Last Name Field -->
                             <div>
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="last_name">LAST NAME</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="last_name">LAST NAME <span class="text-red-500">*</span> </label>
                                 <input type="text" wire:model="last_name" id="last_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                 @error('last_name') <span class="error">{{ $message }}</span> @enderror
                             </div>
@@ -318,7 +318,7 @@
 
                         <!-- Barangay Field -->
                         <div class="mb-3">
-                            <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY <span class="text-red-500">*</span> </label>
                             <select id="barangay" wire:model.live="barangay_id" class="w-full px-3 py-1 text-[12px] select2-barangay bg-white-700 border border-gray-600 rounded-lg text-gray-800 uppercase" required>
                                 <option value="">Select Barangay</option>
                                 @foreach($barangays as $barangay)
@@ -330,7 +330,7 @@
 
                         <!-- Purok Field -->
                         <div class="mb-3">
-                            <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK</label>
+                            <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK <span class="text-red-500">*</span> </label>
                             <select id="purok" wire:model.live="purok_id" class="w-full px-3 py-1 text-[12px] select2-purok bg-white-700 border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
                                 <option value="">Select Purok</option>
                                 @foreach($puroks as $purok)
