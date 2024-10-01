@@ -271,9 +271,17 @@
                             </div>
 
                             <!-- Transaction Type Field -->
+{{--                            <div>--}}
+{{--                                <label class="block text-[12px] font-medium mb-2 text-black" for="transaction_type">TRANSACTION TYPE</label>--}}
+{{--                                <input type="text" wire:model="transaction-type-id" id="transaction-type-id" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>--}}
+{{--                            </div>--}}
                             <div>
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="transaction_type">TRANSACTION TYPE</label>
-                                <input type="text" wire:model="transaction-type-id" id="transaction-type-id" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
+                                <select wire:model="transaction_type_id" id="transaction_type_id" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg text-gray-800 focus:outline-none text-[12px] uppercase" required>
+                                    @foreach ($transactionTypes as $type)
+                                        <option value="{{ $type->id }}" {{ $type->type_name == 'Walk-in' ? 'selected' : '' }}>{{ $type->type_name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <!-- Main Fields -->

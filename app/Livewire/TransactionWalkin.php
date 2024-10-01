@@ -8,6 +8,7 @@ use App\Models\Applicant;
 use App\Models\Barangay;
 use App\Models\Purok;
 use App\Models\TransactionType;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -32,7 +33,6 @@ class TransactionWalkin extends Component
 
     public $barangays = []; // Initialize as an empty array
 
-
     public function mount()
     {
         // Set today's date as the default value for date_applied
@@ -41,6 +41,14 @@ class TransactionWalkin extends Component
         // Initialize dropdowns
         $this->barangays = Barangay::all();
         $this->transactionTypes = TransactionType::all();
+
+        // Set default transaction type to 'Walk-in'
+        $walkIn = TransactionType::where('type_name', 'Walk-in')->first();
+        if ($walkIn) {
+            $this->transaction_type_id = $walkIn->id;
+        }
+
+        // Set interviewer
         $this->interviewer = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
     }
 
@@ -84,6 +92,9 @@ class TransactionWalkin extends Component
             'purok_id' => $this->purok_id,
         ]);
 
+        // Generate the unique applicant ID
+        $applicantId = Applicant::generateApplicantId();
+
         // Create the new applicant record and get the ID of the newly created applicant
         $applicant = Applicant::create([
             'user_id' => Auth::id(),
@@ -96,6 +107,7 @@ class TransactionWalkin extends Component
             'phone' => $this->contact_number,
             'initially_interviewed_by' => $this->interviewer,
             'address_id' => $address->id,
+            'applicant_id' => $applicantId,
         ]);
 
         $this->resetForm();
