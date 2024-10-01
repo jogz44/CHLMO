@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 class Applicant extends Model
 {
@@ -28,6 +29,7 @@ class Applicant extends Model
         'date_applied',
         'initially_interviewed_by',
         'address_id',
+        'applicant_id',
     ];
 
     /**
@@ -41,6 +43,31 @@ class Applicant extends Model
         'transaction_type_id' => 'integer',
         'date_applied' => 'date',
     ];
+
+    /**
+     * Generate a unique applicant ID for the current year.
+     *
+     * @return string
+     */
+    public static function generateApplicantId()
+    {
+        $currentYear = Carbon::now()->year;
+
+        // Increment the count for the current year
+        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+
+        // Format the ID: "YYYY-000XXX"
+        $applicantId = sprintf('%d-%06d', $currentYear, $countForYear);
+
+        // Log the generated values for debugging
+        logger()->info('Generating applicant ID', [
+            'year' => $currentYear,
+            'count' => $countForYear
+        ]);
+
+        return $applicantId;
+    }
+
 
     public function user()
     {

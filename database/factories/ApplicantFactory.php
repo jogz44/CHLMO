@@ -33,7 +33,7 @@ class ApplicantFactory extends Factory
 
         static $addressIds; // Use static to persist the array across multiple calls
         if (!$addressIds) {
-            $addressIds = Address::pluck('id')->shuffle()->toArray(); // Fetch and shuffle the user IDs once
+            $addressIds = Address::pluck('id')->shuffle()->toArray(); // Fetch and shuffle the address IDs once
         }
 
         return [
@@ -49,5 +49,4 @@ class ApplicantFactory extends Factory
             'initially_interviewed_by' => $this->faker->name(), // Realistic name for the interviewer
         ];
     }
-
 }
