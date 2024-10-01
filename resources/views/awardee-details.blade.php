@@ -231,16 +231,23 @@
                                     class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
-
                         <hr class="mt-2 mb-2 ">
                         <h2 class="block text-[13px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="spousename" class="block text-[13px] font-medium text-gray-700 mb-1">SPOUSE
-                                    NAME</label>
-                                <input type="text" id="spousename" name="spousename"
-                                       :disabled="!isEditable"
-                                       class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <label for="spousefirstname" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    FIRST NAME</label>
+                                <input type="text" id="spousefirstname" name="spousefirstname" class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spousemiddlename" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    MIDDLE NAME</label>
+                                <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spouselastname" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    LAST NAME</label>
+                                <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="spouse-occupation" class="block text-[13px] font-medium text-gray-700 mb-1">OCCUPATION</label>
@@ -308,7 +315,26 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <!-- Add Row Button -->
+                            <div class="flex justify-end mb-4 mt-4">
+                                <button @click.prevent="addRow()" type="button"
+                                    class="text-white bg-green-500 hover:bg-green-600 text-[13px] px-2 py-2 rounded-md flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor" class="w-5 h-5 mr-1">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                    Add Row
+                                </button>
+                            </div>
 
+                            <!-- Save Button -->
+                            <div class="flex justify-end">
+                                <button type="submit"
+                                    class="w-[94px] py-2 bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    SAVE
+                                </button>
+                            </div>
                         </div>
 
                     </form>
@@ -324,6 +350,12 @@
                                     class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="taggedDate" class="block text-[13px] font-medium text-gray-700 mb-1">TAGGED
+                                    DATE</label>
+                                <input type="date" id="taggedDate" name="taggedDate"
+                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="livingSituation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
                                     SITUATION (CASE)</label>
                                 <select id="livingSituation" name="livingSituation" :disabled="!isEditable"
@@ -334,23 +366,11 @@
                                     <option value="barangay3">Barangay 3</option>
                                 </select>
                             </div>
-                            <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="caseSpecific" class="block text-[13px] font-medium text-gray-700 mb-1">CASE
-                                    SPECIFICATION</label>
-                                <select id="caseSpecific" name="caseSpecific" :disabled="!isEditable"
-                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    <option value="">Select specification</option>
-                                    <option value="purok1">Purok 1</option>
-                                    <option value="purok2">Purok 2</option>
-                                    <option value="purok3">Purok 3</option>
-                                </select>
-                            </div>
                         </div>
 
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">RECIEVED
-                                    ASSISTANCE FROM THE GOVERNMENT</label>
+                                <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR</label>
                                 <select id="govAssistance" name="govAssistance" :disabled="!isEditable"
                                     class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select type of assistance</option>
@@ -401,8 +421,9 @@
                                     <option value="purok3">Purok 3</option>
                                 </select>
                             </div>
+                            
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="livingStatus" class="block text-[13px] font-medium mt-6 text-gray-700 mb-1">STATUS</label>
+                                <label for="livingStatus" class="block text-[13px] font-medium mt-6 text-gray-700 mb-1">CASE SPECIFICATION</label>
                                 <select id="livingStatus" name="livingStatus" :disabled="!isEditable"
                                     class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select status</option>
@@ -432,127 +453,31 @@
                         by the qualified applicants.</p>
                 </div>
                 <div x-data="fileUpload()" class="bg-white p-6 rounded shadow mb-6">
-                    <!-- Form -->
-                    <form @submit.prevent>
-                        <div class="grid grid-cols-2 gap-2">
-                            <!-- Drag and Drop Area -->
-                            <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
-                                <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                                </svg>
-                                <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                                <p class="text-gray-500 text-xs">or</p>
-                                <button type="button"
-                                    class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                    @click="$refs.fileInput.click()">BROWSE FILES
-                                </button>
-
-                                <!-- Hidden File Input for Multiple Files -->
-                                <input type="file" x-ref="fileInput" @change="addFiles($refs.fileInput.files)" multiple
-                                    class="hidden" />
-                            </div>
-
-                            <!-- Show selected files and progress bars -->
-                            <div class="w-full grid grid-cols-1 gap-2 border-2 border-dashed border-green-500 rounded-lg p-2">
-                                <template x-for="(fileWrapper, index) in files" :key="index">
-                                    <div @click="openPreviewModal = true; selectedFile = fileWrapper"
-                                        class="bg-white p-2 shadow border-2 border-green-500 rounded-lg">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <div class="flex items-center space-x-2">
-                                                <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M7 3v6h4l1 1h4V3H7z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M5 8v10h14V8H5z" />
-                                                </svg>
-                                                <span class="text-xs font-medium text-gray-700"
-                                                    x-text="fileWrapper.displayName, selectedFile.displayName"></span>
-                                            </div>
-                                            <!-- Status -->
-                                            <span class="text-xs text-green-500 font-medium">100%</span>
-                                        </div>
-                                        <!-- Progress Bar -->
-                                        <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                            <div class="w-full h-full bg-green-500"></div>
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-
-                            <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
-                            <div x-show="openPreviewModal"
-                                class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                                x-cloak>
-                                <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                                    <!-- Modal Header with File Name -->
-                                    <div class="flex justify-between items-center mb-4">
-                                        <input type="text" x-model="selectedFile.displayName"
-                                            class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                                        <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename
-                                            File
-                                        </button>
-                                        <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
-                                            &times;
-                                        </button>
+                <div x-data="{ open: false, imgSrc: '' }" class="w-full lg:w-1/2 pl-4 mt-[10%]">
+                                <label class="block text-[12px] font-medium text-gray-700 mb-2">UPLOADED PHOTOS</label>
+                                <div class="flex space-x-4">
+                                    <!-- Image 1 -->
+                                    <div @click="open = true; imgSrc = '{{ asset('storage/images/designDasboard.png') }}';" class="relative w-1/2 border border-bg-gray-700">
+                                        <img src="{{ asset('storage/images/designDasboard.png') }}" alt="House Situation" class="w-full h-auto rounded-md cursor-pointer">
+                                        <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation.jpeg</span>
                                     </div>
 
-                                    <!-- Display Image -->
-                                    <div class="flex justify-center mb-4">
-                                        <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
-                                            alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
+                                    <!-- Image 2 -->
+                                    <div @click="open = true; imgSrc = '{{ asset('storage/images/designDasboard.png') }}';" class="relative w-1/2 border border-bg-gray-700">
+                                        <img src="{{ asset('storage/images/designDasboard.png') }}" alt="House Situation 2" class="w-full h-auto rounded-md cursor-pointer">
+                                        <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation2.jpeg</span>
                                     </div>
-                                    <!-- Modal Buttons -->
-                                    <div class="flex justify-between mt-4">
-                                        <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                            @click="openPreviewModal = false">CONFIRM
-                                        </button>
-                                        <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                            @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
-                                        </button>
+                                </div>
+
+                                <!-- Modal -->
+                                <div x-show="open" x-cloak class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+                                <div @click.away="open = false" class="relative w-auto h-auto max-w-[90%] max-h-[90%] p-2 rounded-md">
+                                <img :src="imgSrc" alt="Preview" class="w-auto h-auto max-w-full max-h-[80vh] object-cover rounded-md">
+                                        
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
 
-                <script>
-                    function fileUpload() {
-                        return {
-                            files: [],
-                            selectedFile: null,
-                            openPreviewModal: false,
-                            addFiles(fileList) {
-                                for (let i = 0; i < fileList.length; i++) {
-                                    const file = fileList[i];
-                                    this.files.push({
-                                        file,
-                                        displayName: file.name
-                                    });
-                                }
-                            },
-                            removeFile(fileWrapper) {
-                                this.files = this.files.filter(f => f !== fileWrapper);
-                            },
-                            renameFile() {
-                                if (this.selectedFile) {
-                                    const newName = prompt('Rename File', this.selectedFile.displayName);
-                                    if (newName) {
-                                        this.selectedFile.displayName = newName;
-                                        const fileIndex = this.files.findIndex(f => f === this.selectedFile);
-                                        if (fileIndex > -1) {
-                                            this.files[fileIndex].displayName = newName;
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                </script>
             </div>
         </div>
     </div>
