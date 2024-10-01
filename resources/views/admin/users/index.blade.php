@@ -10,6 +10,7 @@
             <table class="min-w-full divide-y divide-gray-300">
                 <thead>
                 <tr>
+                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-gray-900 sm:pl-0">USERNAME</th>
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-gray-900 sm:pl-0">NAME</th>
                     <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-bold text-gray-900 sm:pl-0">EMAIL</th>
                 </tr>
@@ -19,7 +20,12 @@
                     <tr>
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                             <div class="flex items-center">
-                                {{ $user->name }}
+                                {{ $user->username }}
+                            </div>
+                        </td>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
+                            <div class="flex items-center">
+                                {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}
                             </div>
                         </td>
                         <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">

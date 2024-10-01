@@ -52,12 +52,12 @@ class Applicant extends Model
         return $this->belongsTo(TransactionType::class);
     }
 
-    public function spouse()
+    public function spouse(): BelongsTo
     {
         return $this->belongsTo(Spouse::class);
     }
 
-    public function address()
+    public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }

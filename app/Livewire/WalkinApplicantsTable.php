@@ -8,6 +8,7 @@ use App\Models\Purok;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 use Laravel\Prompts\Key;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
@@ -24,7 +25,7 @@ final class WalkinApplicantsTable extends PowerGridComponent
 {
     use WithExport;
 
-    public bool $showFilters = true;
+    public bool $showFilters = false;
 
     public function boot(): void
     {
@@ -39,94 +40,75 @@ final class WalkinApplicantsTable extends PowerGridComponent
             Exportable::make('export')
                 ->striped()
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-            Header::make()->showSearchInput(),
+            Header::make()
+                ->showSearchInput()
+                ->showToggleColumns(),
             Footer::make()
                 ->showPerPage(perPage: 8, perPageValues: [0, 50, 100, 500])
-                ->showRecordCount(),
+                ->showRecordCount()
         ];
     }
 
-    public function datasource()
+    public function datasource(): Builder
     {
+        // Logging filters for debugging
+        Log::info('Filters:', $this->filters);
+
+        // Querying applicants with eager loading of address relationship
         $query = Applicant::query();
 
-        // Always eager load the address relationship as it's needed for both barangay and purok
-        $eagerLoad = ['address'];
-
-        // Check if barangay filter is applied
-        if (isset($this->filters['select']['address.barangay_id'])) {
-            $eagerLoad[] = 'address.barangay';
-        }
-
-        // Check if purok filter is applied (assuming you have a purok filter)
-        if (isset($this->filters['select']['address.purok_id'])) {
-            $eagerLoad[] = 'address.purok';
-        }
-
-        // Apply eager loading
-        $query->with($eagerLoad);
+        // Join with the addresses table
+        $query->join('addresses', 'applicants.address_id', '=', 'addresses.id');
 
         // Apply barangay filter if set
-        if (isset($this->filters['select']['address.barangay_id'])) {
-            $barangayId = $this->filters['select']['address.barangay_id'];
-            $query->whereHas('address', function ($q) use ($barangayId) {
-                $q->where('barangay_id', $barangayId);
-            });
+        if (isset($this->filters['select']['barangay'])) {
+            $barangayId = $this->filters['select']['barangay'];
+            $query->where('addresses.barangay_id', $barangayId);
         }
 
-        // Apply purok filter if set (assuming you have a purok filter)
-        if (isset($this->filters['select']['address.purok_id'])) {
-            $purokId = $this->filters['select']['address.purok_id'];
-            $query->whereHas('address', function ($q) use ($purokId) {
-                $q->where('purok_id', $purokId);
-            });
+        // Apply purok filter if set
+        if (isset($this->filters['select']['purok'])) {
+            $purokId = $this->filters['select']['purok'];
+            $query->where('addresses.purok_id', $purokId);
         }
 
-        return $query->get();
+        // Eager load the relationships
+        $query->with(['address.barangay', 'address.purok']);
+
+        // Select specific columns to avoid ambiguity
+        $query->select('applicants.*', 'addresses.barangay_id', 'addresses.purok_id');
+
+        return $query;
     }
 
-    public function filters(): array
-    {
-        return [
-            Filter::select('barangay', 'address.barangay_id.name')
-                ->dataSource(Barangay::all())
-                ->optionLabel('name')
-                ->optionValue('id'),
-
-            Filter::select('purok', 'address.purok_id.name')
-                ->dataSource(Purok::all())
-                ->optionLabel('name')
-                ->optionValue('id'),
-        ];
-    }
 
     public function relationSearch(): array
     {
-        return [
-            'address' => [
-                'barangay' => ['name']  // Enables searching by Barangay name
-            ]
-        ];
+        return [];
     }
 
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
+            ->add('transaction_type', fn(Applicant $model) => $model->transactionType->type_name)
             ->add('first_name')
             ->add('middle_name')
             ->add('last_name')
-            ->add('full_name', fn (Applicant $model) => $model->first_name . ' ' . $model->middle_name . ' ' . $model->last_name)
+            ->add('full_name', fn(Applicant $model) => $model->first_name . ' ' . $model->middle_name . ' ' . $model->last_name)
             ->add('phone')
-            ->add('date_applied_formatted', fn (Applicant $model) => Carbon::parse($model->date_applied)->format('d/m/Y'))
+            ->add('date_applied_formatted', fn(Applicant $model) => Carbon::parse($model->date_applied)->format('m/d/Y'))
             ->add('initially_interviewed_by')
-            ->add('barangay', fn (Applicant $model) => $model->address->barangay->name ?? 'N/A')
-            ->add('purok', fn (Applicant $model) => $model->address->purok->name ?? 'N/A');
+            ->add('barangay', fn(Applicant $model) => $model->address->barangay->name ?? 'N/A')
+            ->add('purok', fn(Applicant $model) => $model->address->purok->name ?? 'N/A');
     }
 
     public function columns(): array
     {
         return [
-            // Use the 'full_name' field to display the concatenated names
+//            Column::make('TRANSACTION TYPE', 'transaction_type')
+//                ->sortable()
+//                ->searchable(),
+
             Column::make('FULL NAME', 'full_name')
                 ->sortable()
                 ->searchable(),
@@ -135,17 +117,20 @@ final class WalkinApplicantsTable extends PowerGridComponent
                 ->hidden()
                 ->sortable()
                 ->searchable()
-                ->editOnClick(),
+                ->editOnClick()
+                ->visibleInExport(visible: true),
 
             Column::make('MIDDLE NAME', 'middle_name')
                 ->hidden()
                 ->sortable()
-                ->searchable(),
+                ->searchable()
+                ->visibleInExport(visible: true),
 
             Column::make('LAST NAME', 'last_name')
                 ->hidden()
                 ->sortable()
-                ->searchable(),
+                ->searchable()
+                ->visibleInExport(visible: true),
 
             Column::make('PHONE', 'phone')
                 ->sortable()
@@ -169,40 +154,48 @@ final class WalkinApplicantsTable extends PowerGridComponent
             Column::action('ACTION')
         ];
     }
-
-    #[\Livewire\Attributes\On('edit')]
-    public function edit($rowId): void
-    {
-        $this->js('alert(' . $rowId.')');
-    }
+//    #[\Livewire\Attributes\On('edit')]
+//    public function edit($rowId): void
+//    {
+//        $this->js('alert(' . $rowId.')');
+//    }
 
     public function actions(Applicant $row): array
     {
         return [
-            Button::add('edit')
-                ->slot('<button @click="openModalTag = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>')
-                ->class(''),
-                // Button::add('details')
-                // ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>')
-                // ->class(''),
-
             Button::add('tag')
                 ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>')
                 ->class(''),
         ];
     }
 
-    public function update(array $data):bool
+    public function filters(): array
     {
-        try {
-            $updated = Applicant::query()->find($data['id'])->update([
-                $data['field'] => $data['value']
-            ]);
-        } catch (QueryException $exception){
-            $updated = false;
-        }
-        return $updated;
+        return [
+            Filter::select('barangay', 'addresses.barangay_id')
+                ->dataSource(Barangay::all())
+                ->optionLabel('name')
+                ->optionValue('id'),
+
+            Filter::select('purok', 'addresses.purok_id')
+                ->dataSource(Purok::all())  // Assuming you have a Purok model
+                ->optionLabel('name')
+                ->optionValue('id'),
+        ];
     }
+}
+
+//    public function update(array $data):bool
+//    {
+//        try {
+//            $updated = Applicant::query()->find($data['id'])->update([
+//                $data['field'] => $data['value']
+//            ]);
+//        } catch (QueryException $exception){
+//            $updated = false;
+//        }
+//        return $updated;
+//    }
 
 //    public function updateMessages(string $status, string $field = '_default_message')
 //    {
@@ -220,4 +213,3 @@ final class WalkinApplicantsTable extends PowerGridComponent
         ];
     }
     */
-}

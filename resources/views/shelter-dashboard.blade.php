@@ -100,25 +100,25 @@
         <!-- Monthly Report Section -->
         <div class="grid grid-cols-2 gap-6">
             <div class="bg-white shadow rounded-lg p-6">
-                <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation Lot Applicants</h4>
+                <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Shelter Assistance Applicants</h4>
                 <div>
-                    <canvas id="relocationLotChart"></canvas>
+                    <canvas id="shelterAsstChart"></canvas>
                 </div>
             </div>
 
             <div class="bg-white shadow rounded-lg p-6">
-                <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation Lot Applicants</h4>
+                <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Request and Delivered Materials</h4>
                 <div class="w-full ml-[65%] md:w-1/3 px-2 mb-3">
                 </div>
                 <div>
-                    <canvas id="housingApplicantsChart"></canvas>
+                    <canvas id="RequestDlvrChart"></canvas>
                 </div>
             </div>
         </div>
         <script>
             document.addEventListener('alpine:init', () => {
                 // Relocation Lot Applicants Bar Chart
-                const ctx1 = document.getElementById('relocationLotChart').getContext('2d');
+                const ctx1 = document.getElementById('shelterAsstChart').getContext('2d');
                 new Chart(ctx1, {
                     type: 'bar',
                     data: {
@@ -136,7 +136,7 @@
                             borderColor: 'rgba(0, 113, 45, 100)',
                             borderWidth: 1
                         }, {
-                            label: 'Informal Settlers',
+                            label: 'Granted',
                             data: [2, 3, 20, 5, 1, 4, 7, 5, 6, 8, 9, 12],
                             backgroundColor: 'rgba(138, 25, 49, 100)',
                             borderColor: 'rgba(138, 25, 49, 100)',
@@ -158,25 +158,25 @@
                 });
 
                 // Housing Applicants Line Chart
-                const ctx2 = document.getElementById('housingApplicantsChart').getContext('2d');
+                const ctx2 = document.getElementById('RequestDlvrChart').getContext('2d');
                 new Chart(ctx2, {
                     type: 'line',
                     data: {
                         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         datasets: [{
-                            label: 'Applicants',
+                            label: 'No. of Request',
                             data: [12, 19, 3, 5, 2, 3, 4, 6, 8, 10, 12, 14],
                             backgroundColor: 'rgba(255, 145, 0, 100)',
                             borderColor: 'rgba(255, 145, 0, 100)',
                             borderWidth: 2
                         }, {
-                            label: 'Tagged Validated',
+                            label: 'No. of Requests, Tagged and Validated',
                             data: [2, 3, 20, 5, 1, 4, 8, 6, 4, 7, 8, 9],
                             backgroundColor: 'rgba(0, 113, 45, 100)',
                             borderColor: 'rgba(0, 113, 45, 100)',
                             borderWidth: 2
                         }, {
-                            label: 'Awarded',
+                            label: 'No. of Request Delivered',
                             data: [2, 3, 20, 5, 6, 4, 7, 5, 6, 8, 9, 12],
                             backgroundColor: 'rgba(138, 25, 49, 100)',
                             borderColor: 'rgba(138, 25, 49, 100)',

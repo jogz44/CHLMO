@@ -11,6 +11,10 @@ export default {
         "./storage/framework/views/*.php",
         "./resources/views/**/*.blade.php",
     ],
+    presets: [
+        "./vendor/wireui/wireui/tailwind.config.js",
+        "./vendor/power-components/livewire-powergrid/tailwind.config.js",
+    ],
 
     theme: {
         extend: {
