@@ -42,8 +42,7 @@ final class WalkinApplicantsTable extends PowerGridComponent
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
             Header::make()
                 ->showSearchInput()
-                ->showToggleColumns()
-                ->showSoftDeletes(showMessage: true),
+                ->showToggleColumns(),
             Footer::make()
                 ->showPerPage(perPage: 8, perPageValues: [0, 50, 100, 500])
                 ->showRecordCount()
@@ -85,31 +84,31 @@ final class WalkinApplicantsTable extends PowerGridComponent
 
     public function relationSearch(): array
     {
-        return [
-            'address' => [
-                'barangay' => ['name'],
-                'purok' => ['name'],
-            ]
-        ];
+        return [];
     }
 
     public function fields(): PowerGridFields
     {
         return PowerGrid::fields()
+            ->add('transaction_type', fn(Applicant $model) => $model->transactionType->type_name)
             ->add('first_name')
             ->add('middle_name')
             ->add('last_name')
-            ->add('full_name', fn (Applicant $model) => $model->first_name . ' ' . $model->middle_name . ' ' . $model->last_name)
+            ->add('full_name', fn(Applicant $model) => $model->first_name . ' ' . $model->middle_name . ' ' . $model->last_name)
             ->add('phone')
-            ->add('date_applied_formatted', fn (Applicant $model) => Carbon::parse($model->date_applied)->format('d/m/Y'))
+            ->add('date_applied_formatted', fn(Applicant $model) => Carbon::parse($model->date_applied)->format('m/d/Y'))
             ->add('initially_interviewed_by')
-            ->add('barangay', fn (Applicant $model) => $model->address->barangay->name ?? 'N/A')
-            ->add('purok', fn (Applicant $model) => $model->address->purok->name ?? 'N/A');
+            ->add('barangay', fn(Applicant $model) => $model->address->barangay->name ?? 'N/A')
+            ->add('purok', fn(Applicant $model) => $model->address->purok->name ?? 'N/A');
     }
 
     public function columns(): array
     {
         return [
+//            Column::make('TRANSACTION TYPE', 'transaction_type')
+//                ->sortable()
+//                ->searchable(),
+
             Column::make('FULL NAME', 'full_name')
                 ->sortable()
                 ->searchable(),
@@ -165,7 +164,7 @@ final class WalkinApplicantsTable extends PowerGridComponent
     {
         return [
             Button::add('details')
-                ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="text-custom-red text-bold underline px-4 py-1.5">Details</button>')
+                ->slot('<button onclick="window.location.href=\'' . route('applicant-details', ['applicantId' => $row->id]) . '\'" class="text-custom-red text-bold underline px-4 py-1.5">Details</button>')
                 ->class(''),
 
             Button::add('tag')
@@ -192,6 +191,7 @@ final class WalkinApplicantsTable extends PowerGridComponent
                 ->optionValue('id'),
         ];
     }
+}
 
 //    public function update(array $data):bool
 //    {
@@ -221,4 +221,3 @@ final class WalkinApplicantsTable extends PowerGridComponent
         ];
     }
     */
-}
