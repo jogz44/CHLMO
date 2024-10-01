@@ -17,12 +17,12 @@
                 {{ __('SHELTER ASSISTANCE') }}
             </x-nav-link>
             <x-nav-link href="{{ route('admin.index') }}" :active="request()->routeIs('admin.index')">
-                {{ __('ADMIN') }}
+                {{ __('USER MANAGEMENT') }}
             </x-nav-link>
             @endrole
         </div>
 
-        <!-- Right-aligned container for         and Profile -->
+        <!-- Right-aligned container for and Profile -->
         <div class="flex items-center ml-auto space-x-2">
             <!-- Search -->
             <div class="relative hidden md:block mr-2">
