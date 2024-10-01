@@ -164,7 +164,7 @@ final class WalkinApplicantsTable extends PowerGridComponent
     {
         return [
             Button::add('tag')
-                ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>')
+                ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">Tag</button>')
                 ->class(''),
         ];
     }
