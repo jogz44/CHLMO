@@ -12,7 +12,7 @@
                     <div x-data class="relative z-0">
                         <button
                             @click="window.location.href = '{{ route('add-new-request') }}'"
-                            class="bg-custom-red text-white px-4 py-2 rounded">
+                            class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
                             Add Occupant
                         </button>
                         <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
@@ -125,7 +125,7 @@
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
                                     <button @click="openModalRelocate = true"
-                                        class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award
+                                        class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Award
                                     </button>
                                 </td>
                             </tr>
@@ -141,7 +141,7 @@
                                 <td class="py-4 px-2 text-center border-b">Request</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
+                                    <button class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
                             <tr>
@@ -156,7 +156,7 @@
                                 <td class="py-4 px-2 text-center border-b">Walk-in</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
+                                    <button class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
                             <tr>
@@ -171,7 +171,7 @@
                                 <td class="py-4 px-2 text-center border-b">Request</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
+                                    <button class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
                             <tr>
@@ -186,7 +186,7 @@
                                 <td class="py-4 px-2 text-center border-b">Walk-in</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2">
                                     <button class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                    <button class="bg-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
+                                    <button class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Award</button>
                                 </td>
                             </tr>
 
@@ -210,11 +210,11 @@
                             <!-- Form -->
                             <form>
                                 <!-- Grant Date Field -->
-                                <div class="mb-4">
+                                <div class="mb-3">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">GRANT
                                         DATE</label>
                                     <input type="date" id="grant-date"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
                                         placeholder="Award Date">
                                 </div>
 
@@ -226,33 +226,56 @@
                                         ALLOCATED</label>
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="barangay">BARANGAY</label>
-                                    <input type="text" id="barangay"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                        placeholder="Barangay">
+                                        <select id="barangay" name="barangay" :disabled="!isEditable"
+                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                        <option value="">Select barangay</option>
+                                        <option value="barangay1">Lot 1</option>
+                                        <option value="barangay2">Lot 1</option>
+                                        <option value="barangay3">Lot 1</option>
+                                        <option value="barangay3">Lot 1</option>
+                                    </select>
                                 </div>
 
                                 <!-- Purok Field -->
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="purok">PUROK</label>
-                                    <input type="text" id="purok"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                        placeholder="Purok">
+                                        <select id="purok" name="purok" :disabled="!isEditable"
+                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                        <option value="">Select Purok</option>
+                                        <option value="purok1">Lot 1</option>
+                                        <option value="purok2">Lot 1</option>
+                                        <option value="purok3">Lot 1</option>
+                                        <option value="purok3">Lot 1</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-[12px] font-medium mb-2 text-black"
+                                        for="lot-number">LOT NUMBER</label>
+                                    <select id="lot-number" name="lot-number" :disabled="!isEditable"
+                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                        <option value="">Select Available Lot No.</option>
+                                        <option value="lot-number1">Lot 1</option>
+                                        <option value="lot-number2">Lot 1</option>
+                                        <option value="lot-number3">Lot 1</option>
+                                        <option value="lot-number3">Lot 1</option>
+                                    </select>
                                 </div>
 
                                 <!-- Lot Size Allocated Field -->
                                 <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">LOT
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="lot-size">LOT
                                         SIZE ALLOCATED</label>
                                     <input type="text" id="lot-size-allocated"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
                                         placeholder="Lot Size Allocated">
                                 </div>
                                 <br>
                                 <div class="grid grid-cols-2 gap-4 mb-4">
                                     <!-- Add Product Button -->
                                     <button type="submit"
-                                        class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                         <span class="text-[12px]">RELOCATE</span>
                                     </button>
 
@@ -286,7 +309,7 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="tagging-validation-date">TAGGING AND VALIDATION DATE</label>
                                     <input type="date" id="tagging-validation-date"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]">
                                 </div>
 
                                 <!-- Validator's Name Field -->
@@ -294,7 +317,7 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="validator-name">VALIDATOR'S
                                         NAME</label>
                                     <input type="text" id="validator-name"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
                                         placeholder="Validator's Name">
                                 </div>
 

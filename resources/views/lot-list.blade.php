@@ -1,74 +1,18 @@
 <x-app-layout>
     <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
-        <div class="flex bg-gray-100 text-[12px]">
+        <div x-data="{ openModalLot: false}" class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
             <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-50 relative p-3">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between relative p-3 z-0">
                     <div class="flex items-center">
                         <h2 class="text-[13px] ml-5 text-gray-700">LOT LIST</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div x-data="{ openModalLot: false}" class="relative z-0">
-                        <button @click="openModalLot = true" class="bg-custom-yellow text-white px-4 py-2 rounded">Add Lot
+                    <div class="relative z-0">
+                        <button @click="openModalLot = true" class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">Add Relocation Site
                         </button>
                         <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
 
-                        <div x-show="openModalLot"
-                            class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50" x-cloak
-                            style="font-family: 'Poppins', sans-serif;">
-                            <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-md font-semibold text-black">ADD LOT</h3>
-                                    <button @click="openModalLot = false" class="text-gray-400 hover:text-gray-200">
-                                        &times;
-                                    </button>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">LOT/RELOCATION
-                                        NAME</label>
-                                    <input type="text" id="lotname"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Barangay">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="barangay">BARANGAY</label>
-                                    <input type="text" id="barangay"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Barangay">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="purok">PUROK</label>
-                                    <input type="text" id="purok"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Purok">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL
-                                        LOT SIZE</label>
-                                    <input type="text" id="total-lotsize"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Total Lot Size">
-                                </div>
-                                <br>
-                                <div class="grid grid-cols-2 gap-4 mb-4">
-                                    <button type="submit"
-                                        class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                        <span class="text-[12px]">ADD</span>
-                                    </button>
-                                    <!-- Cancel Button -->
-                                    <button type="submit"
-                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                        <span @click="openModalLot = false" class="text-[12px]">CANCEL</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -271,6 +215,64 @@
                         }
                     }
                 </script>
+            </div>
+
+
+            <div x-show="openModalLot"
+                class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50" x-cloak
+                style="font-family: 'Poppins', sans-serif;">
+                <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-md font-semibold text-black">ADD RELOCATION SITE</h3>
+                        <button @click="openModalLot = false" class="text-gray-400 hover:text-gray-200">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">LOT/RELOCATION
+                            NAME</label>
+                        <input type="text" id="lotname"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                            placeholder="Barangay">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-medium mb-2 text-black"
+                            for="barangay">BARANGAY</label>
+                        <input type="text" id="barangay"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                            placeholder="Barangay">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-medium mb-2 text-black"
+                            for="purok">PUROK</label>
+                        <input type="text" id="purok"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                            placeholder="Purok">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL
+                            LOT SIZE</label>
+                        <input type="text" id="total-lotsize"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                            placeholder="Total Lot Size">
+                    </div>
+                    <br>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <button type="submit"
+                            class="w-full py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                            <span class="text-[12px]">ADD</span>
+                        </button>
+                        <!-- Cancel Button -->
+                        <button type="submit"
+                            class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                            <span @click="openModalLot = false" class="text-[12px]">CANCEL</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

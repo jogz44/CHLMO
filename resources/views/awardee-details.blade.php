@@ -30,7 +30,7 @@
                         <button
                             @click="isEditable = !isEditable"
                             type="button"
-                            class="bg-custom-green text-white text-xs font-medium px-6 py-2 rounded">
+                            class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-xs font-medium px-6 py-2 rounded">
                             EDIT
                         </button>
                     </div>

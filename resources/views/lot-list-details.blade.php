@@ -1,10 +1,10 @@
 <x-app-layout>
     <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
-        <div class="flex bg-gray-100 text-[12px]">
+        <div x-data="{ openModalLot: false}" class="flex bg-gray-100 text-[12px]">
             <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-50">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-0">
                     <div class="flex items-center">
-                        <a href="{{ route('transaction-walkin') }}">
+                        <a href="{{ route('lot-list') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -14,49 +14,9 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div x-data="{ openModalLot: false}" class="flex space-x-2 z-0">
-                        <button @click="openModalLot = true" class="bg-custom-yellow text-white px-4 py-2 rounded">Add Lot</button>
+                    <div class="flex space-x-2 z-0">
+                        <button @click="openModalLot = true" class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">Add Lot</button>
                         <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
-
-                        <div x-show="openModalLot"
-                            class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50" x-cloak
-                            style="font-family: 'Poppins', sans-serif;">
-                            <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-md font-semibold text-black">ADD LOT</h3>
-                                    <button @click="openModalLot = false" class="text-gray-400 hover:text-gray-200">
-                                        &times;
-                                    </button>
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="barangay">LOT NUMBER</label>
-                                    <input type="text" id="barangay"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Lot Number">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">LOT SIZE</label>
-                                    <input type="text" id="total-lotsize"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                        placeholder="Lot Size">
-                                </div>
-                                <br>
-                                <div class="grid grid-cols-2 gap-4 mb-4">
-                                    <button type="submit"
-                                        class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                        <span class="text-[12px]">ADD</span>
-                                    </button>
-                                    <!-- Cancel Button -->
-                                    <button type="submit"
-                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                        <span @click="openModalLot = false" class="text-[12px]">CANCEL</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -241,7 +201,7 @@
                                 <select class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Status">
                                     <option value="occupied">OCCUPIED</option>
                                     <option value="vacant">VACANT</option>
-                                </select>       
+                                </select>
                             </div>
 
                             <br>
@@ -260,6 +220,46 @@
                     </div>
 
 
+                </div>
+            </div>
+
+            <div x-show="openModalLot"
+                class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50" x-cloak
+                style="font-family: 'Poppins', sans-serif;">
+                <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-md font-semibold text-black">ADD LOT</h3>
+                        <button @click="openModalLot = false" class="text-gray-400 hover:text-gray-200">
+                            &times;
+                        </button>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-medium mb-2 text-black"
+                            for="barangay">LOT NUMBER</label>
+                        <input type="text" id="barangay"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                            placeholder="Lot Number">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">LOT SIZE</label>
+                        <input type="text" id="total-lotsize"
+                            class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                            placeholder="Lot Size">
+                    </div>
+                    <br>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <button type="submit"
+                            class="w-full py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                            <span class="text-[12px]">ADD</span>
+                        </button>
+                        <!-- Cancel Button -->
+                        <button type="submit"
+                            class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                            <span @click="openModalLot = false" class="text-[12px]">CANCEL</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
