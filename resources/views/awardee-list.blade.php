@@ -99,7 +99,7 @@
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
                                     <button @click="openModalTransfer = true"
-                                        class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer
+                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
                             </tr>
@@ -115,7 +115,7 @@
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
                                     <button @click="openModalTransfer = true"
-                                        class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer
+                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
                             </tr>
@@ -131,7 +131,7 @@
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
                                     <button @click="openModalTransfer = true"
-                                        class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer
+                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
                             </tr>
@@ -147,7 +147,7 @@
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
                                     <button @click="openModalTransfer = true"
-                                        class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer
+                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
                             </tr>
@@ -163,7 +163,7 @@
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
                                     <button @click="openModalTransfer = true"
-                                        class="bg-custom-green text-white px-8 py-1.5 rounded-full">Transfer
+                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
                             </tr>
@@ -367,7 +367,7 @@
                                 <!-- Buttons -->
                                 <div class="grid grid-cols-2 gap-4 mt-4">
                                     <button type="submit"
-                                        class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg">
+                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white font-semibold rounded-lg">
                                         TAGGED & VALIDATED
                                     </button>
                                     <button type="button" @click="openModalTag = false"

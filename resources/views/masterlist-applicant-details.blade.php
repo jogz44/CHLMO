@@ -2,7 +2,7 @@
     <div class="p-10 h-screen ml-[17%] mt-[60px]">
         <div class="flex bg-gray-100 text-[12px]">
             <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
-                <div class="bg-white rounded shadow mb-4 flex justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-50">
+                <div class="bg-white rounded shadow mb-4 flex justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-0">
                     <div class="flex items-center">
                         <a href="{{ route('masterlist-applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -24,14 +24,14 @@
                         <button
                                 @click="isEditable = !isEditable"
                                 type="button"
-                                class="bg-custom-green text-white text-xs font-medium px-6 py-2 rounded">
+                                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-xs font-medium px-6 py-2 rounded">
                             EDIT
                         </button>
                     </div>
                 </div>
 
 
-                <div class="flex flex-col p-3 rounded">
+                <div class="flex flex-col p-3 rounded mt-4">
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PERSONAL INFORMATION</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Encode here the personal information of the
                         Applicant from the form.</p>
