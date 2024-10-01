@@ -163,6 +163,13 @@ final class WalkinApplicantsTable extends PowerGridComponent
     public function actions(Applicant $row): array
     {
         return [
+            Button::add('edit')
+                ->slot('<button @click="openModalTag = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>')
+                ->class(''),
+            // Button::add('details')
+            // ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>')
+            // ->class(''),
+
             Button::add('tag')
                 ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="bg-custom-yellow text-white px-8 py-1.5 rounded-full">Tag</button>')
                 ->class(''),
