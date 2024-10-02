@@ -144,20 +144,20 @@
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="occupation"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
-                            <input type="text" id="occupation" name="occupation"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                            <input type="text" id="occupation" name="occupation" wire:model="occupation"
+                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
+                            <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
                                 INCOME</label>
-                            <input type="text" id="monthlyincome" name="monthlyincome"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                            <input type="text" id="monthly_income" wire:model="monthly_income"
+                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="familyincome" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
+                            <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
                                 INCOME</label>
-                            <input type="text" id="familyincome" name="familyincome"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                            <input type="text" id="family_income" wire:model="family_income"
+                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                     </div>
                     <hr class="mt-2 mb-2 ">
