@@ -70,12 +70,12 @@ class Applicant extends Model
     }
 
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function transactionType()
+    public function transactionType(): BelongsTo
     {
         return $this->belongsTo(TransactionType::class);
     }

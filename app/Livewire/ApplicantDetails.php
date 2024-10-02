@@ -6,7 +6,9 @@ use App\Models\Applicant;
 use App\Models\Barangay;
 use App\Models\CivilStatus;
 use App\Models\Religion;
+use App\Models\TaggedAndValidatedApplicant;
 use App\Models\Tribe;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class ApplicantDetails extends Component
@@ -32,6 +34,10 @@ class ApplicantDetails extends Component
     public $tribes; // For populating the tribes dropdown
 
     public $sex;
+
+    public $occupation;
+    public $monthly_income;
+    public $family_income;
 
     public $tagged = false; // Track whether the applicant has been tagged
 
@@ -73,6 +79,39 @@ class ApplicantDetails extends Component
             // Populate the tribes based on applicant's existing data
             $this->tribe_id = $this->applicant->tribe_id ?? '';
         }
+    }
+
+    protected function rules()
+    {
+        return [
+            'date_applied' => 'required|date',
+            'transaction_type_id' => 'required|exists:transaction_types,id',
+            'first_name' => 'required|string|max:50',
+            'middle_name' => 'nullable|string|max:50',
+            'last_name' => 'required|string|max:50',
+            'suffix_name' => 'nullable|string|max:50',
+            'contact_number' => 'nullable|string|max:15',
+            'barangay_id' => 'required|exists:barangays,id',
+            'purok_id' => 'required|exists:puroks,id',
+            'sex' => 'required|in:Male,Female', // Updated to check for full words
+            'occupation' => 'nullable|string|max:255',
+            'monthly_income' => 'nullable|integer',
+            'family_income' => 'nullable|integer',
+        ];
+    }
+
+    public function store()
+    {
+        // Validate the input data
+        $this->validate();
+
+        // Create the new tagged and validated applicant record and get the ID of the newly created applicant
+        $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::create([
+            // Other fields...
+            'occupation' => $this->occupation,
+            'monthly_income' => $this->monthly_income,
+            'family_income' => $this->family_income,
+        ]);
     }
 
     public function render()
