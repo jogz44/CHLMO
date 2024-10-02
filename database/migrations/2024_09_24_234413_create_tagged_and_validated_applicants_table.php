@@ -24,9 +24,9 @@ return new class extends Migration
             $table->foreignId('case_specification_id')->constrained('case_specifications')->onDelete('cascade');
             $table->foreignId('living_status_id')->constrained('living_statuses')->onDelete('cascade');
             $table->foreignId('wall_type_id')->constrained('wall_types')->onDelete('cascade');
-            $table->text('landmark')->nullable();
-            $table->string('gender', 50)->nullable();
-            $table->date('date_of_birth')->nullable(); // Optional date_of_birth instead of age
+            $table->text('full_address')->nullable();
+            $table->char('sex', 6);
+            $table->date('date_of_birth')->nullable();
             $table->string('occupation', 255)->nullable();
             $table->integer('monthly_income')->nullable();
             $table->integer('family_income')->nullable();

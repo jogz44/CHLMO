@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('purok_id')->constrained('puroks')->onDelete('cascade');
             $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
-            $table->string('street')->nullable();
-            $table->string('house_number')->nullable();
+            $table->string('full_address')->nullable();
             $table->timestamps();
         });
     }

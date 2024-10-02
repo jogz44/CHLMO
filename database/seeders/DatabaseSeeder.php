@@ -37,45 +37,45 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
         ]);
 
-        if (Lot::count() == 0){
-            $this->call(LotSeeder::class);
-        }
-
-        if (Address::count() == 0){
-            $this->call(AddressSeeder::class);
-        }
-
-        if (Applicant::count() == 0){
-            $this->call(ApplicantSeeder::class);
-        }
-
-        if (Dependent::count() == 0){
-            $this->call(DependentSeeder::class);
-        }
-
-        if (Awardee::count() == 0){
-            $this->call(AwardeeSeeder::class);
-        }
-
-        if (TransferredAwardee::count() == 0){
-            $this->call(TransferredAwardeeSeeder::class);
-        }
-
-        if (Transaction::count() == 0){
-            $this->call(TransactionSeeder::class);
-        }
-
-        if (Blacklist::count() == 0){
-            $this->call(BlacklistSeeder::class);
-        }
-
-        if (Spouse::count() == 0){
-            $this->call(SpouseSeeder::class);
-        }
-
-        // Shelter seeder
-        if (ShelterMaterial::count() == 0){
-            $this->call(ShelterMaterialSeeder::class);
-        }
+//        if (Lot::count() == 0){
+//            $this->call(LotSeeder::class);
+//        }
+//
+//        if (Address::count() == 0){
+//            $this->call(AddressSeeder::class);
+//        }
+//
+//        if (Applicant::count() == 0){
+//            $this->call(ApplicantSeeder::class);
+//        }
+//
+//        if (Dependent::count() == 0){
+//            $this->call(DependentSeeder::class);
+//        }
+//
+//        if (Awardee::count() == 0){
+//            $this->call(AwardeeSeeder::class);
+//        }
+//
+//        if (TransferredAwardee::count() == 0){
+//            $this->call(TransferredAwardeeSeeder::class);
+//        }
+//
+//        if (Transaction::count() == 0){
+//            $this->call(TransactionSeeder::class);
+//        }
+//
+//        if (Blacklist::count() == 0){
+//            $this->call(BlacklistSeeder::class);
+//        }
+//
+//        if (Spouse::count() == 0){
+//            $this->call(SpouseSeeder::class);
+//        }
+//
+//        // Shelter seeder
+//        if (ShelterMaterial::count() == 0){
+//            $this->call(ShelterMaterialSeeder::class);
+//        }
     }
 }
