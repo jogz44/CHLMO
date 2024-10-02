@@ -75,9 +75,9 @@ class TransactionWalkin extends Component
             'middle_name' => 'nullable|string|max:50',
             'last_name' => 'required|string|max:50',
             'suffix_name' => 'nullable|string|max:50',
-            'contact_number' => 'nullable|string|max:20',
+            'contact_number' => 'nullable|string|max:15',
             'barangay_id' => 'required|exists:barangays,id',
-            'purok_id' => 'required|exists:puroks,id', // Ensure this validation works for purok
+            'purok_id' => 'required|exists:puroks,id',
         ];
     }
 
@@ -104,7 +104,7 @@ class TransactionWalkin extends Component
             'middle_name' => $this->middle_name,
             'last_name' => $this->last_name,
             'suffix_name' => $this->suffix_name,
-            'phone' => $this->contact_number,
+            'contact_number' => $this->contact_number,
             'initially_interviewed_by' => $this->interviewer,
             'address_id' => $address->id,
             'applicant_id' => $applicantId,
