@@ -39,7 +39,7 @@
                     Applicant from the form.</p>
             </div>
 
-            <div class="bg-white p-6 rounded shadow mb-6">
+            <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
                 <form>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
@@ -86,7 +86,7 @@
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="civilstatus" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
-                            <select id="civilstatus" name="civilstatus"
+                            <select x-model="civilStatus" id="civilstatus" name="civilstatus"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
                                 <option value="single">Single</option>
@@ -106,7 +106,7 @@
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="tribe"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY</label>
-                            <select id="tribe" name="tribe" 
+                            <select id="tribe" name="tribe"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select tribe/ethnicity</option>
                                 <option value="barangay1">Barangay 1</option>
@@ -116,7 +116,7 @@
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX</label>
-                            <select id="sex" name="sex" 
+                            <select id="sex" name="sex"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select Sex</option>
                                 <option value="purok1">Male</option>
@@ -156,37 +156,42 @@
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                     </div>
-                    <hr class="mt-2 mb-2 ">
-                    <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spousefirstname" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                FIRST NAME</label>
-                            <input type="text" id="spousefirstname" name="spousefirstname" class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spousemiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                MIDDLE NAME</label>
-                            <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spouselastname" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                LAST NAME</label>
-                            <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
 
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spouse-occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
-                            <input type="text" id="spouse-occupation" name="spouse-occupation"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                    <template x-if="civilStatus === 'married'">
+                        <div>
+                            <hr class="mt-2 mb-2 ">
+                            <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
+                            <div class="flex flex-wrap -mx-2">
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spousefirstname" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        FIRST NAME</label>
+                                    <input type="text" id="spousefirstname" name="spousefirstname" class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spousemiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        MIDDLE NAME</label>
+                                    <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spouselastname" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        LAST NAME</label>
+                                    <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                </div>
+
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spouse-occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
+                                    <input type="text" id="spouse-occupation" name="spouse-occupation"
+                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spouse-monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
+                                        INCOME</label>
+                                    <input type="text" id="spouse-monthlyincome" name="spouse-monthlyincome"
+                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                </div>
+                            </div>
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spouse-monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                INCOME</label>
-                            <input type="text" id="spouse-monthlyincome" name="spouse-monthlyincome"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                        </div>
-                    </div>
+                    </template>
 
                     <div x-data="{ 
                             rows: [
@@ -269,7 +274,7 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="livingSituation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
                                 SITUATION (CASE)</label>
-                            <select id="livingSituation" name="livingSituation" 
+                            <select id="livingSituation" name="livingSituation"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select situation</option>
                                 <option value="barangay1">Barangay 1</option>
@@ -280,7 +285,7 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="caseSpecific" class="block text-[13px] font-medium text-gray-700 mb-1">CASE
                                 SPECIFICATION</label>
-                            <select id="caseSpecific" name="caseSpecific" 
+                            <select id="caseSpecific" name="caseSpecific"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select specification</option>
                                 <option value="purok1">Purok 1</option>
@@ -294,7 +299,7 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">RECIEVED
                                 ASSISTANCE FROM THE GOVERNMENT</label>
-                            <select id="govAssistance" name="govAssistance" 
+                            <select id="govAssistance" name="govAssistance"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of assistance</option>
                                 <option value="barangay1">Barangay 1</option>
@@ -305,7 +310,7 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="livingStatus" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
                                 STATUS</label>
-                            <select id="livingStatus" name="livingStatus" 
+                            <select id="livingStatus" name="livingStatus"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select status</option>
                                 <option value="purok1">Purok 1</option>
@@ -325,7 +330,7 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label class="block text-[13px] font-medium text-gray-700 mt-1 mb-1">HOUSE MATERIALS</label>
                             <label for="roof" class="block text-[13px] font-medium text-gray-700 mb-1">ROOF</label>
-                            <select id="roof" name="roof" 
+                            <select id="roof" name="roof"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of roof</option>
                                 <option value="barangay1">Barangay 1</option>
@@ -335,7 +340,7 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="wall" class="block text-[13px] font-medium text-gray-700 mt-6 mb-1">WALL</label>
-                            <select id="wall" name="wall" 
+                            <select id="wall" name="wall"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of wall</option>
                                 <option value="purok1">Purok 1</option>
@@ -345,7 +350,7 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="livingStatus" class="block text-[13px] font-medium mt-6 text-gray-700 mb-1">STATUS</label>
-                            <select id="livingStatus" name="livingStatus" 
+                            <select id="livingStatus" name="livingStatus"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select status</option>
                                 <option value="purok1">Purok 1</option>
