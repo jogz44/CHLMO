@@ -25,11 +25,12 @@ class Applicant extends Model
         'middle_name',
         'last_name',
         'suffix_name',
-        'phone',
+        'contact_number',
         'date_applied',
         'initially_interviewed_by',
         'address_id',
         'applicant_id',
+        'tagged',
     ];
 
     /**

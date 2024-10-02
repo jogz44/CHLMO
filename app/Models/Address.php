@@ -19,8 +19,7 @@ class Address extends Model
     protected $fillable = [
         'barangay_id',
         'purok_id',
-        'street',
-        'house_number',
+        'full_address',
     ];
 
 
@@ -33,8 +32,7 @@ class Address extends Model
         'id' => 'integer',
         'barangay_id' => 'integer',
         'purok_id' => 'integer',
-        'street' => 'string',
-        'house_number' => 'string',
+        'full_address' => 'string',
     ];
 
     /**
