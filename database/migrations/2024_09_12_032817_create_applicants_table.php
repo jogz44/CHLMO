@@ -21,9 +21,10 @@ return new class extends Migration
             $table->string('middle_name', 50)->nullable();
             $table->string('last_name', 50);
             $table->string('suffix_name', 50)->nullable();
-            $table->string('phone', 20)->nullable();
+            $table->string('contact_number', 15)->nullable();
             $table->date('date_applied');
             $table->string('initially_interviewed_by', 100);
+            $table->boolean('tagged')->default(false);
             $table->timestamps();
         });
     }

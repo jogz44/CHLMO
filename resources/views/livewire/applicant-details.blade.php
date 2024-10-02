@@ -22,15 +22,9 @@
                 </div>
             </div>
 
-            {{-- <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-50">--}}
-            {{-- <h1>{{ $applicant->last_name }}, {{ $applicant->first_name }}--}}
-            {{-- @if($applicant->middle_name) {{ $applicant->middle_name }} @endif--}}
-            {{-- </h1>--}}
-            {{-- </div>--}}
-
-
-            <div class="flex flex-col p-3 rounded mt-8">
-                <h1 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline mb-3">
+            <div class="flex flex-col p-3 rounded mt-12">
+                <h2 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
+                <h1 class="text-[25px] ml-2 items-center font-bold text-gray-700 mb-3">
                     {{ $applicant->last_name }}, {{ $applicant->first_name }}
                     @if($applicant->middle_name) {{ $applicant->middle_name }} @endif
                 </h1>
@@ -46,25 +40,25 @@
                             <label for="first-name" class="block text-[12px] font-medium text-gray-700 mb-1">FIRST
                                 NAME</label>
                             <input type="text" id="first-name" name="first-name" wire:model="first_name"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="middle-name" class="block text-[12px] font-medium text-gray-700 mb-1">MIDDLE
                                 NAME</label>
                             <input type="text" id="middle-name" name="middle-name" wire:model="middle_name"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="last-name" class="block text-[12px] font-medium text-gray-700 mb-1">LAST
                                 NAME</label>
                             <input type="text" id="last-name" name="last-name" wire:model="last_name"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="name-suffix" class="block text-[12px] font-medium text-gray-700 mb-1">NAME
                                 SUFFIX</label>
                             <input type="text" id="name-suffix" name="name-suffix" wire:model="suffix_name"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                     </div>
 
@@ -73,50 +67,51 @@
                             <label for="barangay"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY</label>
                             <input id="barangay" name="barangay" wire:model="barangay"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK</label>
                             <input id="purok" name="purok" wire:model="purok"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="specificaddress" class="block text-[12px] font-medium text-gray-700 mb-1">SPECIFIC ADDRESS</label>
-                            <input type="text" id="specificaddress" name="specificaddress" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="full_address" class="block text-[12px] font-medium text-gray-700 mb-1">SPECIFIC ADDRESS</label>
+                            <input type="text" id="full_address" name="full_address" wire:model="full_address"
+                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="civilstatus" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
-                            <select x-model="civilStatus" id="civilstatus" name="civilstatus"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
+                            <select x-model="civilStatus" id="civil_status" name="civilstatus" wire:model="civil_status_id"
+                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
-                                <option value="single">Single</option>
-                                <option value="married">Married</option>
-                                <option value="widow">Widow</option>
+                                @foreach($civil_statuses as $status)
+                                    <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="contactNo" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT
+                            <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT
                                 NUMBER</label>
-                            <input type="number" id="contactNo" name="contactNo"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                            <input type="text" id="contact_number" name="contact_number" wire:model="contact_number"
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="tribe"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY</label>
                             <select id="tribe" name="tribe"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                                <option value="">Select tribe/ethnicity</option>
-                                <option value="barangay1">Barangay 1</option>
-                                <option value="barangay2">Barangay 2</option>
-                                <option value="barangay3">Barangay 3</option>
+                                <option value="">Select Tribe/Ethnicity</option>
+                                @foreach($tribes as $tribe)
+                                    <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX</label>
-                            <select id="sex" name="sex"
+                            <select id="sex" name="sex" 
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select Sex</option>
                                 <option value="purok1">Male</option>
@@ -124,18 +119,22 @@
                             </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="age" class="block text-[12px] font-medium text-gray-700 mb-1">AGE</label>
-                            <input type="number" id="age" name="age"
+                            <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">DATE OF BIRTH</label>
+                            <input type="date" id="date_of_birth" name="date_of_birth"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="religion"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
-                            <input type="text" id="religion" name="religion"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                            <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
+                            <select id="religion" name="religion" wire:model="religion_id"
+                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select Religion</option>
+                                @foreach($religions as $religion)
+                                    <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="occupation"

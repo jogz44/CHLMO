@@ -44,8 +44,9 @@
             <!-- Table with transaction requests -->
             <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
                 class="px-3 py-6 z-5 bg-white"> 
-                <livewire:walkin-applicants-table />
+{{--                <livewire:walkin-applicants-table />--}}
                 {{-- <livewire:applicants-table tableName="ApplicantsTable" />--}}
+                <livewire:walkin-applicants-table-v2/>
 
                 <!-- Award Applicant Modal -->
                 <div x-show="openModalAward"
@@ -262,6 +263,7 @@
 
                     <!-- Livewire Form -->
                     <form wire:submit.prevent="store">
+                        <x-validation-errors class="mb-4" />
                         <!-- Date Applied Field -->
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <div>
@@ -344,7 +346,7 @@
                         <!-- Contact Number Field -->
                         <div class="mb-3">
                             <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">CONTACT NUMBER</label>
-                            <input type="text" wire:model="contact_number" id="contact_number" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 focus:outline-none text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
+                            <input type="text" wire:model="contact_number" id="contact_number" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
                             @error('contact_number') <span class="error">{{ $message }}</span> @enderror
                         </div>
 

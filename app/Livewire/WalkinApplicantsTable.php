@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Applicant;
 use App\Models\Barangay;
 use App\Models\Purok;
+use App\Models\TaggedAndValidatedApplicant;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -166,9 +167,6 @@ final class WalkinApplicantsTable extends PowerGridComponent
             Button::add('edit')
                 ->slot('<button @click="openModalTag = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>')
                 ->class(''),
-            // Button::add('details')
-            // ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>')
-            // ->class(''),
 
             Button::add('tag')
                 ->slot('<button onclick="window.location.href=\''.route('applicant-details', ['applicantId' => $row->id]).'\'" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">Tag</button>')
@@ -191,32 +189,3 @@ final class WalkinApplicantsTable extends PowerGridComponent
         ];
     }
 }
-
-//    public function update(array $data):bool
-//    {
-//        try {
-//            $updated = Applicant::query()->find($data['id'])->update([
-//                $data['field'] => $data['value']
-//            ]);
-//        } catch (QueryException $exception){
-//            $updated = false;
-//        }
-//        return $updated;
-//    }
-
-//    public function updateMessages(string $status, string $field = '_default_message')
-//    {
-//
-//    }
-
-    /*
-    public function actionRules($row): array
-    {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
-        ];
-    }
-    */

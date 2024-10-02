@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TaggedAndValidatedApplicant extends Model
 {
@@ -27,7 +28,7 @@ class TaggedAndValidatedApplicant extends Model
         'living_status_id',
         'wall_type_id',
         'landmark',
-        'gender',
+        'sex',
         'date_of_birth',
         'occupation',
         'monthly_income',
@@ -60,67 +61,67 @@ class TaggedAndValidatedApplicant extends Model
      */
 
     // Relationship with Applicant
-    public function applicant()
+    public function applicant(): BelongsTo
     {
         return $this->belongsTo(Applicant::class);
     }
 
     // Relationship with CivilStatus
-    public function civilStatus()
+    public function civilStatus(): BelongsTo
     {
         return $this->belongsTo(CivilStatus::class);
     }
 
     // Relationship with Tribe
-    public function tribe()
+    public function tribe(): BelongsTo
     {
         return $this->belongsTo(Tribe::class);
     }
 
     // Relationship with Address
-    public function address()
+    public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
 
     // Relationship with Religion
-    public function religion()
+    public function religion(): BelongsTo
     {
         return $this->belongsTo(Religion::class);
     }
 
     // Relationship with Spouse
-    public function spouse()
+    public function spouse(): BelongsTo
     {
         return $this->belongsTo(Spouse::class);
     }
 
     // Relationship with Dependent
-    public function dependent()
+    public function dependent(): BelongsTo
     {
         return $this->belongsTo(Dependent::class);
     }
 
     // Relationship with LivingSituation
-    public function livingSituation()
+    public function livingSituation(): BelongsTo
     {
         return $this->belongsTo(LivingSituation::class);
     }
 
     // Relationship with CaseSpecification
-    public function caseSpecification()
+    public function caseSpecification(): BelongsTo
     {
         return $this->belongsTo(CaseSpecification::class);
     }
 
     // Relationship with LivingStatus
-    public function livingStatus()
+    public function livingStatus(): BelongsTo
     {
         return $this->belongsTo(LivingStatus::class);
     }
 
     // Relationship with WallType
-    public function wallType()
+    public function wallType(): BelongsTo
     {
         return $this->belongsTo(WallType::class);
     }
