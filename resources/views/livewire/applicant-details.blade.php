@@ -156,7 +156,7 @@
                         </div>
                     </div>
 
-                    <template x-if="civilStatus === 'married'">
+                    <template x-if="civilStatus === 'Married'">
                         <div>
                             <hr class="mt-2 mb-2 ">
                             <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
