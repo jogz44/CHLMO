@@ -18,6 +18,7 @@
     "dependencies": {
         "alpinejs": "^3.14.1",
         "apexcharts": "^3.53.0",
+        "inputmask": "^5.0.9",
         "tailwind-scrollbar": "^3.1.0"
     }
 }
