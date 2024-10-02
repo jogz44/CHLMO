@@ -77,15 +77,15 @@
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="full_address" class="block text-[12px] font-medium text-gray-700 mb-1">SPECIFIC ADDRESS</label>
                             <input type="text" id="full_address" name="full_address" wire:model="full_address"
-                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
                             <select x-model="civilStatus" id="civil_status" name="civilstatus" wire:model="civil_status_id"
-                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
                                 @foreach($civil_statuses as $status)
-                                    <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -105,13 +105,13 @@
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select Tribe/Ethnicity</option>
                                 @foreach($tribes as $tribe)
-                                    <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
+                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX</label>
-                            <select id="sex" name="sex" 
+                            <select id="sex" name="sex"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select Sex</option>
                                 <option value="purok1">Male</option>
@@ -129,10 +129,10 @@
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
                             <select id="religion" name="religion" wire:model="religion_id"
-                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Religion</option>
                                 @foreach($religions as $religion)
-                                    <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -194,10 +194,10 @@
 
                     <div x-data="{ 
                             rows: [
-                                { name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '' },
+                                { name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' },
                             ], 
                             addRow() {
-                                this.rows.push({ name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '' });
+                                this.rows.push({ name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' });
                             } 
                         }" class="mt-6">
 
@@ -210,6 +210,7 @@
                                     <th class="p-2 border-b">Age</th>
                                     <th class="p-2 border-b">Occupation</th>
                                     <th class="p-2 border-b">Monthly Income</th>
+                                    <th class="p-2 border-b">Relationship</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -233,6 +234,10 @@
                                         </td>
                                         <td class="border px-4 py-2">
                                             <input type="text" x-model="row.monthlyIncome"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="text" x-model="row.relationship"
                                                 class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">

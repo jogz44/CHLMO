@@ -37,17 +37,17 @@
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="first-name" class="block text-[13px] font-medium text-gray-700 mb-1">FIRST
-                                    NAME</label>
+                                    NAME <span class="text-red-500">*</span></label>
                                 <input type="text" id="first-name" name="first-name" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:ring-1 focus:ring-custom-red">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="middle-name" class="block text-[13px] font-medium text-gray-700 mb-1">MIDDLE
-                                    NAME</label>
+                                    NAME <span class="text-red-500">*</span></label>
                                 <input type="text" id="middle-name" name="middle-name" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="last-name" class="block text-[13px] font-medium text-gray-700 mb-1">LAST
-                                    NAME</label>
+                                    NAME <span class="text-red-500">*</span></label>
                                 <input type="text" id="last-name" name="last-name" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -60,7 +60,7 @@
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="barangay"
-                                       class="block text-[13px] font-medium text-gray-700 mb-1">BARANGAY</label>
+                                       class="block text-[13px] font-medium text-gray-700 mb-1">BARANGAY <span class="text-red-500">*</span> </label>
                                 <select id="barangay" name="barangay" :disabled="!isEditable"
                                         class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Barangay</option>
@@ -70,7 +70,7 @@
                                 </select>
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">PUROK</label>
+                                <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">PUROK <span class="text-red-500">*</span> </label>
                                 <select id="purok" name="purok"
                                         class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Purok</option>
