@@ -381,16 +381,6 @@
                                     <option value="purok3">Purok 3</option>
                                 </select>
                             </div>
-                            <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="livingStatus" class="block text-[12px] font-medium mt-6 text-gray-700 mb-1">STATUS</label>
-                                <select id="livingStatus" name="livingStatus" :disabled="!isEditable"
-                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    <option value="">Select status</option>
-                                    <option value="purok1">Purok 1</option>
-                                    <option value="purok2">Purok 2</option>
-                                    <option value="purok3">Purok 3</option>
-                                </select>
-                            </div>
                         </div>
 
                         <div class="flex flex-wrap -mx-2">

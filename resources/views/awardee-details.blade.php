@@ -461,7 +461,7 @@
                         <!-- Reason Field -->
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-gray-700" for="reason">REASON
-                                BEING BLACKLISTED</label>
+                                BEING BLACKLISTED <span class="text-red-500">*</span></label>
                             <textarea id="reason" rows="4"
                                 class="uppercase w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
                                 placeholder="Enter reason..."></textarea>

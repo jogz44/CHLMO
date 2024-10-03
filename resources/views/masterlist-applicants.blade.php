@@ -110,7 +110,7 @@
                             </div>
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">TYPE
-                                    OF APPLICANT</label>
+                                    OF APPLICANT <span class="text-red-500">*</span></label>
                                 <select class="block text-[12px] w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600"
                                     style="padding: 2px 4px;">
                                     <option value="">TYPE OF APPLICANT</option>
@@ -122,21 +122,21 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label class="block  text-[12px] font-medium mb-2 text-black"
-                                        for="first-name">FIRST NAME</label>
+                                        for="first-name">FIRST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="first-name"
                                         class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
                                         placeholder="First Name">
                                 </div>
                                 <div>
                                     <label class="block  text-[12px] font-medium mb-2 text-black"
-                                        for="middle-name">MIDDLE NAME</label>
+                                        for="middle-name">MIDDLE NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="middle-name"
                                         class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
                                         placeholder="Middle Name">
                                 </div>
                                 <div>
                                     <label class="block  text-[12px] font-medium mb-2 text-black"
-                                        for="last-name">LAST NAME</label>
+                                        for="last-name">LAST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="last-name"
                                         class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
                                         placeholder="Last Name">
@@ -150,21 +150,21 @@
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY <span class="text-red-500">*</span></label>
                                 <input type="text" id="barangay"
                                     class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
                                     placeholder="Barangay">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black"
-                                    for="purok">PUROK</label>
+                                    for="purok">PUROK <span class="text-red-500">*</span></label>
                                 <input type="text" id="purok"
                                     class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
                                     placeholder="Purok">
                             </div>
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black"
-                                    for="contact number">CONTACT NUMBER</label>
+                                    for="contact number">CONTACT NUMBER <span class="text-red-500">*</span></label>
                                 <input type="text" id="contact-number"
                                     class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
                                     placeholder="Contact Number">

@@ -212,7 +212,7 @@
                                 <!-- Grant Date Field -->
                                 <div class="mb-3">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">GRANT
-                                        DATE</label>
+                                        DATE <span class="text-red-500">*</span></label>
                                     <input type="date" id="grant-date"
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
                                         placeholder="Award Date">
@@ -225,7 +225,7 @@
                                     <label class="block text-sm font-medium mb-2 text-black" for="barangay">LOT
                                         ALLOCATED</label>
                                     <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="barangay">BARANGAY</label>
+                                        for="barangay">BARANGAY <span class="text-red-500">*</span></label>
                                         <select id="barangay" name="barangay" :disabled="!isEditable"
                                         class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
                                         <option value="">Select barangay</option>
@@ -239,10 +239,10 @@
                                 <!-- Purok Field -->
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="purok">PUROK</label>
+                                        for="purok">PUROK <span class="text-red-500">*</span></label>
                                         <select id="purok" name="purok" :disabled="!isEditable"
                                         class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                        <option value="">Select Purok</option>
+                                        <option value="">Select Purok </option>
                                         <option value="purok1">Lot 1</option>
                                         <option value="purok2">Lot 1</option>
                                         <option value="purok3">Lot 1</option>
@@ -252,10 +252,10 @@
 
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="lot-number">LOT NUMBER</label>
+                                        for="lot-number">LOT NUMBER <span class="text-red-500">*</span></label>
                                     <select id="lot-number" name="lot-number" :disabled="!isEditable"
                                         class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                        <option value="">Select Available Lot No.</option>
+                                        <option value="">Select Available Lot No. </option>
                                         <option value="lot-number1">Lot 1</option>
                                         <option value="lot-number2">Lot 1</option>
                                         <option value="lot-number3">Lot 1</option>
@@ -266,7 +266,7 @@
                                 <!-- Lot Size Allocated Field -->
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="lot-size">LOT
-                                        SIZE ALLOCATED</label>
+                                        SIZE ALLOCATED <span class="text-red-500">*</span></label>
                                     <input type="text" id="lot-size-allocated"
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
                                         placeholder="Lot Size Allocated">

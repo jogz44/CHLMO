@@ -38,19 +38,19 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="first-name" class="block text-[12px] font-medium text-gray-700 mb-1">FIRST
-                                NAME</label>
+                                NAME  <span class="text-red-500">*</span></label>
                             <input type="text" id="first-name" name="first-name" wire:model="first_name"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="middle-name" class="block text-[12px] font-medium text-gray-700 mb-1">MIDDLE
-                                NAME</label>
+                                NAME <span class="text-red-500">*</span></label>
                             <input type="text" id="middle-name" name="middle-name" wire:model="middle_name"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="last-name" class="block text-[12px] font-medium text-gray-700 mb-1">LAST
-                                NAME</label>
+                                NAME <span class="text-red-500">*</span></label>
                             <input type="text" id="last-name" name="last-name" wire:model="last_name"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
@@ -65,12 +65,12 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="barangay"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY</label>
+                                class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY <span class="text-red-500">*</span></label>
                             <input id="barangay" name="barangay" wire:model="barangay"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK</label>
+                            <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK <span class="text-red-500">*</span></label>
                             <input id="purok" name="purok" wire:model="purok"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
@@ -80,12 +80,12 @@
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
+                            <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
                             <select x-model="civilStatus" id="civil_status" name="civilstatus" wire:model="civil_status_id"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
                                 @foreach($civil_statuses as $status)
-                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                <option value="{{ $status->civil_status }}">{{ $status->civil_status }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -94,13 +94,13 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT
-                                NUMBER</label>
+                                NUMBER<span class="text-red-500">*</span></label>
                             <input type="text" id="contact_number" name="contact_number" wire:model="contact_number"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="tribe"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY</label>
+                                class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
                             <select id="tribe" name="tribe"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select Tribe/Ethnicity</option>
@@ -110,7 +110,7 @@
                             </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX</label>
+                            <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX <span class="text-red-500">*</span></label>
                             <select id="sex" name="sex"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 <option value="">Select Sex</option>
@@ -119,7 +119,7 @@
                             </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">DATE OF BIRTH</label>
+                            <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">DATE OF BIRTH <span class="text-red-500">*</span></label>
                             <input type="date" id="date_of_birth" name="date_of_birth"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
@@ -127,7 +127,7 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
+                            <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION <span class="text-red-500">*</span></label>
                             <select id="religion" name="religion" wire:model="religion_id"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Religion</option>
@@ -138,19 +138,19 @@
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="occupation"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
+                                class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
                             <input type="text" id="occupation" name="occupation" wire:model="occupation"
                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                INCOME</label>
+                                INCOME <span class="text-red-500">*</span></label>
                             <input type="text" id="monthly_income" wire:model="monthly_income"
                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
-                                INCOME</label>
+                                INCOME <span class="text-red-500">*</span></label>
                             <input type="text" id="family_income" wire:model="family_income"
                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
@@ -163,28 +163,28 @@
                             <div class="flex flex-wrap -mx-2">
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="spousefirstname" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        FIRST NAME</label>
+                                        FIRST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spousefirstname" name="spousefirstname" class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="spousemiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME</label>
+                                        MIDDLE NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="spouselastname" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        LAST NAME</label>
+                                        LAST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </div>
 
                                 <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse-occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
+                                    <label for="spouse-occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
                                     <input type="text" id="spouse-occupation" name="spouse-occupation"
                                         class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="spouse-monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                        INCOME</label>
+                                        INCOME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spouse-monthlyincome" name="spouse-monthlyincome"
                                         class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 </div>
@@ -271,13 +271,13 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="awardDate" class="block text-[13px] font-medium text-gray-700 mb-1">TAGGED
-                                DATE</label>
+                                DATE <span class="text-red-500">*</span></label>
                             <input type="date" id="awardDate" name="awardDate"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="livingSituation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
-                                SITUATION (CASE)</label>
+                                SITUATION (CASE) <span class="text-red-500">*</span></label>
                             <select id="livingSituation" name="livingSituation"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select situation</option>
@@ -288,7 +288,7 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="caseSpecific" class="block text-[13px] font-medium text-gray-700 mb-1">CASE
-                                SPECIFICATION</label>
+                                SPECIFICATION <span class="text-red-500">*</span></label>
                             <select id="caseSpecific" name="caseSpecific"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select specification</option>
@@ -301,11 +301,10 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">RECIEVED
-                                ASSISTANCE FROM THE GOVERNMENT</label>
-                            <select id="govAssistance" name="govAssistance"
+                            <label for="socialWelfare" class="block text-[13px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR <span class="text-red-500">*</span> </label>
+                            <select id="socialWelfare" name="socialWelfare"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select type of assistance</option>
+                                <option value="">Select type of Social Welfare Sector</option>
                                 <option value="barangay1">Barangay 1</option>
                                 <option value="barangay2">Barangay 2</option>
                                 <option value="barangay3">Barangay 3</option>
@@ -313,7 +312,7 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="livingStatus" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
-                                STATUS</label>
+                                STATUS <span class="text-red-500">*</span></label>
                             <select id="livingStatus" name="livingStatus"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select status</option>
@@ -347,16 +346,6 @@
                             <select id="wall" name="wall"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of wall</option>
-                                <option value="purok1">Purok 1</option>
-                                <option value="purok2">Purok 2</option>
-                                <option value="purok3">Purok 3</option>
-                            </select>
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="livingStatus" class="block text-[13px] font-medium mt-6 text-gray-700 mb-1">STATUS</label>
-                            <select id="livingStatus" name="livingStatus"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select status</option>
                                 <option value="purok1">Purok 1</option>
                                 <option value="purok2">Purok 2</option>
                                 <option value="purok3">Purok 3</option>
