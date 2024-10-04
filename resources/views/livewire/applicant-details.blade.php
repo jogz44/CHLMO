@@ -38,7 +38,7 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="first-name" class="block text-[12px] font-medium text-gray-700 mb-1">FIRST
-                                NAME  <span class="text-red-500">*</span></label>
+                                NAME <span class="text-red-500">*</span></label>
                             <input type="text" id="first-name" name="first-name" wire:model="first_name"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
@@ -85,7 +85,7 @@
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
                                 @foreach($civil_statuses as $status)
-                                <option value="{{ $status->civil_status }}">{{ $status->civil_status }}</option>
+                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -140,53 +140,47 @@
                             <label for="occupation"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
                             <input type="text" id="occupation" name="occupation" wire:model="occupation"
-                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
                                 INCOME <span class="text-red-500">*</span></label>
                             <input type="text" id="monthly_income" wire:model="monthly_income"
-                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
                                 INCOME <span class="text-red-500">*</span></label>
                             <input type="text" id="family_income" wire:model="family_income"
-                                   class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                         </div>
                     </div>
 
-                    <template x-if="civilStatus === 'Married'">
+                    <template x-if="civilStatus === '2'">
                         <div>
                             <hr class="mt-2 mb-2 ">
                             <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
                             <div class="flex flex-wrap -mx-2">
                                 <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spousefirstname" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        FIRST NAME <span class="text-red-500">*</span></label>
+                                    <label for="spousefirstname" class="block text-[12px] font-medium text-gray-700 mb-1">FIRST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spousefirstname" name="spousefirstname" class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spousemiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME <span class="text-red-500">*</span></label>
+                                    <label for="spousemiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">MIDDLE NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spousemiddlename" name="spousemiddlename" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouselastname" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        LAST NAME <span class="text-red-500">*</span></label>
+                                    <label for="spouselastname" class="block text-[12px] font-medium text-gray-700 mb-1">LAST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="spouselastname" name="spouselastname" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </div>
 
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="spouse-occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse-occupation" name="spouse-occupation"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                    <input type="text" id="spouse-occupation" name="spouse-occupation" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse-monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                        INCOME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse-monthlyincome" name="spouse-monthlyincome"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
+                                    <label for="spouse-monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY INCOME <span class="text-red-500">*</span></label>
+                                    <input type="text" id="spouse-monthlyincome" name="spouse-monthlyincome" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
                                 </div>
                             </div>
                         </div>
