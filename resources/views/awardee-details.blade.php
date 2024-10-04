@@ -5,7 +5,7 @@
 
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-5">
                     <div class="flex items-center">
-                        <a href="{{ route('transaction-walkin') }}">
+                        <a href="{{ route('awardee-list') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -299,7 +299,45 @@
 
                     </form>
                 </div>
+                <div class="bg-white p-6 rounded shadow mb-6">
+                    <form>
 
+                        <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PREVIOUS AWARDEE NAME</h2>
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="prevfirstname" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    FIRST NAME</label>
+                                <input type="text" id="prevfirstname" name="prevfirstname"
+                                    :disabled="!isEditable"
+                                    class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="prevmiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    MIDDLE NAME</label>
+                                <input type="text" id="prevmiddlename" name="prevmiddlename"
+                                    :disabled="!isEditable"
+                                    class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="prevlastname" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    LAST NAME</label>
+                                <input type="text" id="prevlastname" name="prevlastname"
+                                    :disabled="!isEditable"
+                                    class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+
+                        </div>
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="taggedDate" class="block text-[12px] font-medium text-gray-700 mb-1">TRANSFERED
+                                    DATE</label>
+                                <input type="date" id="taggedDate" name="taggedDate"
+                                    :disabled="!isEditable"
+                                    class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <div class="bg-white p-6 rounded shadow mb-6">
                     <form>
                         <div class="flex flex-wrap -mx-2">
