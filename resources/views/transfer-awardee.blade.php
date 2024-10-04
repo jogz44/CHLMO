@@ -1,15 +1,16 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<x-app-layout>
+    <div class="p-10 h-screen ml-[17%] mt-[60px]">
     <div class="flex bg-gray-100 text-[12px]">
         <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-0">
                 <div class="flex items-center">
-                    <a href="{{ route('transaction-walkin') }}">
+                    <a href="{{ route('awardee-list') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
                     </a>
-                    <h2 class="text-[13px] ml-2 items-center text-gray-700">Tag Applicant</h2>
+                    <h2 class="text-[13px] ml-2 items-center text-gray-700">Transfer of Award</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
@@ -22,12 +23,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col p-3 rounded mt-12">
-                <h2 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
-                <h1 class="text-[25px] ml-2 items-center font-bold text-gray-700 mb-3">
-                    {{ $applicant->last_name }}, {{ $applicant->first_name }}
-                    @if($applicant->middle_name) {{ $applicant->middle_name }} @endif
-                </h1>
+            <div class="flex flex-col p-3 rounded mt-4">
                 <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PERSONAL INFORMATION</h2>
                 <p class="text-[12px] ml-2 items-center text-gray-700">Encode here the personal information of the
                     Applicant from the form.</p>
@@ -80,15 +76,15 @@
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
-                            <select x-model="civilStatus" id="civil_status" name="civilstatus" wire:model="civil_status_id"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Status</option>
-                                @foreach($civil_statuses as $status)
-                                <option value="{{ $status->civil_status }}">{{ $status->civil_status }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                                <label for="civilstatus" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
+                                <select id="civilstatus" name="civilstatus"
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select Status</option>
+                                    <option value="single">Single</option>
+                                    <option value="married">Married</option>
+                                    <option value="widow">Widow</option>
+                                </select>
+                            </div>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
@@ -99,15 +95,15 @@
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="tribe"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                            <select id="tribe" name="tribe"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                                <option value="">Select Tribe/Ethnicity</option>
-                                @foreach($tribes as $tribe)
-                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                @endforeach
-                            </select>
+                        <label for="tribe"
+                                       class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY</label>
+                                <select id="tribe" name="tribe" 
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select tribe/ethnicity</option>
+                                    <option value="barangay1">Barangay 1</option>
+                                    <option value="barangay2">Barangay 2</option>
+                                    <option value="barangay3">Barangay 3</option>
+                                </select>
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX <span class="text-red-500">*</span></label>
@@ -126,16 +122,13 @@
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION <span class="text-red-500">*</span></label>
-                            <select id="religion" name="religion" wire:model="religion_id"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Religion</option>
-                                @foreach($religions as $religion)
-                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="religion"
+                                       class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION <span class="text-red-500">*</span></label>
+                                <input type="text" id="religion" name="religion"
+            
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="occupation"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
@@ -270,32 +263,9 @@
                 <form>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="awardDate" class="block text-[13px] font-medium text-gray-700 mb-1">TAGGED
-                                DATE <span class="text-red-500">*</span></label>
+                            <label for="awardDate" class="block text-[13px] font-medium text-gray-700 mb-1">DATE UPDATED <span class="text-red-500">*</span></label>
                             <input type="date" id="awardDate" name="awardDate"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="livingSituation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
-                                SITUATION (CASE) <span class="text-red-500">*</span></label>
-                            <select id="livingSituation" name="livingSituation"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select situation</option>
-                                <option value="barangay1">Barangay 1</option>
-                                <option value="barangay2">Barangay 2</option>
-                                <option value="barangay3">Barangay 3</option>
-                            </select>
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="caseSpecific" class="block text-[13px] font-medium text-gray-700 mb-1">CASE
-                                SPECIFICATION <span class="text-red-500">*</span></label>
-                            <select id="caseSpecific" name="caseSpecific"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select specification</option>
-                                <option value="purok1">Purok 1</option>
-                                <option value="purok2">Purok 2</option>
-                                <option value="purok3">Purok 3</option>
-                            </select>
                         </div>
                     </div>
 
@@ -326,30 +296,6 @@
                             <input type="number" id="rent" name="rent"
                                 placeholder="How much monthly?"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label class="block text-[13px] font-medium text-gray-700 mt-1 mb-1">HOUSE MATERIALS</label>
-                            <label for="roof" class="block text-[13px] font-medium text-gray-700 mb-1">ROOF</label>
-                            <select id="roof" name="roof"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select type of roof</option>
-                                <option value="barangay1">Barangay 1</option>
-                                <option value="barangay2">Barangay 2</option>
-                                <option value="barangay3">Barangay 3</option>
-                            </select>
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="wall" class="block text-[13px] font-medium text-gray-700 mt-6 mb-1">WALL</label>
-                            <select id="wall" name="wall"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select type of wall</option>
-                                <option value="purok1">Purok 1</option>
-                                <option value="purok2">Purok 2</option>
-                                <option value="purok3">Purok 3</option>
-                            </select>
                         </div>
                     </div>
 
@@ -495,3 +441,4 @@
         </div>
     </div>
 </div>
+</x-app-layout>
