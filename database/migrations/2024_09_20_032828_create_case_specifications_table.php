@@ -19,6 +19,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        Schema::enableForeignKeyConstraints();
+
         // Insert initial data
         DB::table('case_specifications')->insert([
             ['case_specification_name' => 'Creekside'],
@@ -27,8 +29,6 @@ return new class extends Migration
             ['case_specification_name' => 'Landslide Prone Area'],
             ['case_specification_name' => 'Identified Flood Prone Area'],
         ]);
-
-        Schema::enableForeignKeyConstraints();
     }
 
     /**

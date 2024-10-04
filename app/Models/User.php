@@ -67,4 +67,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    /**
+     * Get the full name of the user.
+     *
+     * @return string
+     */
+    public function full_name()
+    {
+        // Concatenate the name fields to create the full name
+        return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
+    }
 }

@@ -19,27 +19,25 @@ class TaggedAndValidatedApplicant extends Model
         'applicant_id',
         'civil_status_id',
         'tribe_id',
-        'address_id',
         'religion_id',
-        'spouse_id',
-        'dependent_id',
         'living_situation_id',
         'case_specification_id',
+        'government_program_id',
         'living_status_id',
+        'roof_type_id',
         'wall_type_id',
-        'landmark',
+        'full_address',
         'sex',
         'date_of_birth',
         'occupation',
         'monthly_income',
         'family_income',
-        'awarding_date',
-        'rent_fee',
-        'status',
-        'tagger_name',
         'tagging_date',
-        'awarded_by',
-        'photo',
+        'rent_fee',
+        'tagger_name',
+        'remarks',
+        'photos',
+        'tagged'
     ];
 
     /**
@@ -49,8 +47,7 @@ class TaggedAndValidatedApplicant extends Model
      */
     protected $casts = [
         'date_of_birth' => 'date',
-        'awarding_date' => 'datetime',
-        'tagging_date'  => 'datetime',
+        'tagged_date'  => 'datetime',
         'monthly_income' => 'integer',
         'family_income'  => 'integer',
         'rent_fee'       => 'integer',
@@ -114,10 +111,22 @@ class TaggedAndValidatedApplicant extends Model
         return $this->belongsTo(CaseSpecification::class);
     }
 
+    // Relationship with CaseSpecification
+    public function governmentProgram(): BelongsTo
+    {
+        return $this->belongsTo(GovernmentProgram::class);
+    }
+
     // Relationship with LivingStatus
     public function livingStatus(): BelongsTo
     {
         return $this->belongsTo(LivingStatus::class);
+    }
+
+    // Relationship with RoofType
+    public function roofType(): BelongsTo
+    {
+        return $this->belongsTo(RoofType::class);
     }
 
     // Relationship with WallType
