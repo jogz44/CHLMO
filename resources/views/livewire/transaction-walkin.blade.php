@@ -10,25 +10,6 @@
                 </div>
                 @endif
             </div>
-            {{-- <div x-data="{ show: true }"--}}
-            {{-- x-init="setTimeout(() => show = false, 3000)"--}}
-            {{-- x-show="show"--}}
-            {{-- x-transition:leave="transition ease-in duration-1000"--}}
-            {{-- class="relative z-0 mb-2">--}}
-            {{-- @if (session()->has('message'))--}}
-            {{-- <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">--}}
-            {{-- <strong class="font-bold">Success!</strong>--}}
-            {{-- <span class="block sm:inline">{{ session('message') }}</span>--}}
-
-            {{-- <!-- Progress Bar -->--}}
-            {{-- <div class="h-1 bg-green-500 absolute bottom-0 left-0 right-0">--}}
-            {{-- <div x-bind:style="'width: ' + (show ? '100%' : '0%')"--}}
-            {{-- class="h-full bg-green-700 transition-all duration-3000"></div>--}}
-            {{-- </div>--}}
-            {{-- </div>--}}
-            {{-- @endif--}}
-            {{-- </div>--}}
-
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-5 relative p-3">
                 <div class="flex items-center">
                     <h2 class="text-[13px] ml-5 text-gray-700">WALK IN APPLICANTS</h2>
