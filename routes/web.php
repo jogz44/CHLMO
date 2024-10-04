@@ -175,6 +175,10 @@ Route::middleware([
     Route::get('/shelter-reports-distribution-list', function () {
         return view('shelter-reports-distribution-list');
     })->name('shelter-reports-distribution-list');
+
+    Route::get('/transfer-awardee', function () {
+        return view('transfer-awardee');
+    })->name('transfer-awardee');
 });
 
 

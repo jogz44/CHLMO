@@ -98,7 +98,7 @@
                                         @click="window.location.href = '{{ route('awardee-details') }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
-                                    <button @click="openModalTransfer = true"
+                                    <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
                                         class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
@@ -114,7 +114,7 @@
                                         @click="window.location.href = '{{ route('awardee-details') }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
-                                    <button @click="openModalTransfer = true"
+                                    <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
                                         class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
@@ -130,7 +130,7 @@
                                         @click="window.location.href = '{{ route('awardee-details') }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
-                                    <button @click="openModalTransfer = true"
+                                    <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
                                         class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
@@ -146,7 +146,7 @@
                                         @click="window.location.href = '{{ route('awardee-details') }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
-                                    <button @click="openModalTransfer = true"
+                                    <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
                                         class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
@@ -162,7 +162,7 @@
                                         @click="window.location.href = '{{ route('awardee-details') }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">Details
                                     </button>
-                                    <button @click="openModalTransfer = true"
+                                    <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
                                         class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
                                     </button>
                                 </td>
