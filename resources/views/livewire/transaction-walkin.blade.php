@@ -104,130 +104,6 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- Tagging/Validation Modal -->
-                <div x-show="openModalTag"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                    x-cloak style="font-family: 'Poppins', sans-serif;">
-                    <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                        <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-black">TAGGED/VALIDATED</h3>
-                            <button @click="openModalTag = false" class="text-gray-400 hover:text-gray-200">
-                                &times;
-                            </button>
-                        </div>
-
-                        <!-- Form -->
-                        <form @submit.prevent>
-                            <!-- Tagging and Validation Date Field -->
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                    for="tagging-validation-date">TAGGING AND VALIDATION DATE</label>
-                                <input type="date" id="tagging-validation-date"
-                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
-                            </div>
-
-                            <!-- Validator's Name Field -->
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="validator-name">VALIDATOR'S
-                                    NAME</label>
-                                <input type="text" id="validator-name"
-                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                    placeholder="Validator's Name">
-                            </div>
-
-                            <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD HOUSE SITUATION</h2>
-
-                            <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
-                                <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                                </svg>
-                                <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                                <p class="text-gray-500 text-xs">or</p>
-                                <button type="button"
-                                    class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                    @click="$refs.fileInput.click()">BROWSE FILES
-                                </button>
-
-                                <input type="file" x-ref="fileInput"
-                                    @change="selectedFile = $refs.fileInput.files[0]; fileName = selectedFile.name"
-                                    class="hidden" />
-                            </div>
-
-                            <template x-if="selectedFile">
-                                <div @click="openPreviewModal = true" class="mt-4 bg-white p-2 rounded-lg shadow">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center space-x-2">
-                                            <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2" d="M7 3v6h4l1 1h4V3H7z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2" d="M5 8v10h14V8H5z" />
-                                            </svg>
-                                            <span class="text-xs font-medium text-gray-700"
-                                                x-text="fileName"></span>
-
-                                        </div>
-                                        <span class="text-xs text-green-500 font-medium">100%</span>
-                                    </div>
-                                    <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                        <div class="w-full h-full bg-green-500"></div>
-                                    </div>
-                                </div>
-                            </template>
-
-                            <!-- Buttons -->
-                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                <button type="submit"
-                                    class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg">
-                                    TAGGED & VALIDATED
-                                </button>
-                                <button type="button" @click="openModalTag = false"
-                                    class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
-                                    CANCEL
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Preview Modal (Triggered by Clicking the Progress Bar) -->
-                <div x-show="openPreviewModal"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                    x-cloak>
-                    <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                        <!-- Modal Header with File Name -->
-                        <div class="flex justify-between items-center mb-4">
-                            <input type="text" x-model="fileName"
-                                class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                            <button class="text-orange-500 underline text-sm"
-                                @click="fileName = prompt('Rename File', fileName) || fileName">Rename File
-                            </button>
-                            <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
-                                &times;
-                            </button>
-                        </div>
-
-                        <!-- Display Image -->
-                        <div class="flex justify-center mb-4">
-                            <img :src="selectedFile ? URL.createObjectURL(selectedFile) : '/path/to/default/image.jpg'"
-                                alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                        </div>
-                        <!-- Modal Buttons -->
-                        <div class="flex justify-between mt-4">
-                            <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                @click="openPreviewModal = false">CONFIRM
-                            </button>
-                            <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                @click="selectedFile = null; openPreviewModal = false">REMOVE
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- ADD APPLICANT MODAL -->
@@ -325,16 +201,10 @@
 
 
                         <!-- Contact Number Field -->
-                        <div class="mb-3">
+                        <div class="mb-6">
                             <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">CONTACT NUMBER</label>
                             <input type="text" wire:model="contact_number" id="contact_number" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
                             @error('contact_number') <span class="error">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Interviewer Field -->
-                        <div class="mb-6">
-                            <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">INITIALLY INTERVIEWED BY</label>
-                            <input type="text" id="interviewer" wire:model="interviewer" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" readonly>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 mb-4">

@@ -262,31 +262,44 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded shadow mb-6">
+                <div x-data="{  
+                livingStatus: @entangle('living_status_id'), 
+                livingSituation: @entangle('living_situation_id') }"
+                    class="bg-white p-6 rounded shadow mb-6">
+
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/4 px-2 mb-4">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="tagging_date" class="block text-[12px] font-medium text-gray-700 mb-1">TAGGING DATE <span class="text-red-500">*</span></label>
                             <input wire:model="tagging_date" type="date" id="tagging_date" name="tagging_date" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase"
                                 max="{{ date('Y-m-d') }}">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION (CASE) <span class="text-red-500">*</span></label>
-                            <select wire:model="living_situation_id" id="living_situation" name="living_situation" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select x-model.number="livingSituation" wire:model="living_situation_id" id="living_situation" name="living_situation" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select situation</option>
                                 @foreach($livingSituations as $livingSituation)
                                 <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">CASE SPECIFICATION <span class="text-red-500">*</span></label>
-                            <select wire:model="case_specification_id" id="case_specification" name="case_specification" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select specification</option>
-                                @foreach($caseSpecifications as $caseSpecification)
-                                <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <template x-if="livingSituation >= 1 && livingSituation <= 7  || livingSituation === 9">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="case_input" class="block text-[13px] font-medium text-gray-700 mb-1">CASE SPECIFICATION <span class="text-red-500">*</span></label>
+                                <input wire:model="case_input" type="text" id="case_input" name="case_input" placeholder="Enter case details"
+                                    class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                        </template>
+                        <template x-if="livingSituation == 8">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">CASE SPECIFICATION <span class="text-red-500">*</span></label>
+                                <select wire:model="case_specification_id" id="case_specification" name="case_specification" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select specification</option>
+                                    @foreach($caseSpecifications as $caseSpecification)
+                                    <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </template>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
@@ -302,21 +315,40 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_status" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING STATUS <span class="text-red-500">*</span></label>
-                            <select wire:model="living_status_id" id="living_status" name="living_status" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select x-model.number="livingStatus" wire:model="living_status_id" id="living_status" name="living_status" required
+                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select status</option>
                                 @foreach($livingStatuses as $livingStatus)
                                 <option value="{{ $livingStatus->id }}">{{ $livingStatus->living_status_name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="rent_fee" class="block text-[13px] font-medium text-gray-700 mb-1">RENT FEE (if rent)</label>
-                            <input wire:model="rent_fee" type="number" id="rent_fee" name="rent_fee" placeholder="How much monthly?"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                min="0"
-                                step="0.01">
-                        </div>
                     </div>
+                    <template x-if="livingStatus === 1">
+                        <div class="flex flex-wrap -mx-2 ml-[33%]">
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="rent_fee" class="block text-[13px] font-medium text-gray-700 mb-1">RENT FEE <span class="text-red-500">*</span></label>
+                                <input wire:model="rent_fee" type="number" id="rent_fee" name="rent_fee" placeholder="How much monthly?"
+                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                    min="0" step="0.01">
+                            </div>
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="landlord" class="block text-[13px] font-medium text-gray-700 mb-1">LANDLORD <span class="text-red-500">*</span></label>
+                                <input wire:model="landlord" type="text" id="landlord" name="landlord" placeholder="LANDLORD"
+                                    class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="livingStatus === 5">
+                        <div class="flex flex-wrap -mx-2 ml-[33%]">
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="landlord" class="block text-[13px] font-medium text-gray-700 mb-1">HOUSE OWNER NAME <span class="text-red-500">*</span></label>
+                                <input wire:model="landlord" type="text" id="landlord" name="landlord" placeholder="LANDLORD"
+                                    class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                        </div>
+                    </template>
+
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
