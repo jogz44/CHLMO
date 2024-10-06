@@ -30,7 +30,7 @@ class Applicant extends Model
         'initially_interviewed_by',
         'address_id',
         'applicant_id',
-        'tagged',
+        'is_tagged',
     ];
 
     /**
@@ -90,8 +90,8 @@ class Applicant extends Model
         return $this->belongsTo(Address::class);
     }
 
-    public function taggedAndValidatedApplicant(): HasOne
+    public function taggedAndValidated(): HasOne
     {
-        return $this->hasOne(TaggedAndValidatedApplicant::class);
+        return $this->hasOne(TaggedAndValidatedApplicant::class, 'applicant_id', 'id');
     }
 }
