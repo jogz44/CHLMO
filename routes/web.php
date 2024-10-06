@@ -118,9 +118,9 @@ Route::middleware([
         return view('transaction-shelter-assistance');
     })->name('transaction-shelter-assistance');
 
-    Route::get('/transaction-walkin', function () {
-        return view('transaction-walkin');
-    })->name('transaction-walkin');
+    Route::get('/applicants', function () {
+        return view('applicants');
+    })->name('applicants');
 //    Route::get('/transaction-walkin', TransactionWalkin::class)->name('transaction-walkin');
 
     Route::get('/user-settings', function () {
