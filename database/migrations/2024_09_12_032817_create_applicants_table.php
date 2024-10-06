@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('contact_number', 15)->nullable();
             $table->date('date_applied');
             $table->string('initially_interviewed_by', 100);
-            $table->boolean('tagged')->default(false);
+            $table->boolean('is_tagged')->default(false);
             $table->timestamps();
         });
     }

@@ -34,7 +34,7 @@ return new class extends Migration
             $table->string('tagger_name', 100)->nullable();
             $table->text('remarks')->nullable();
             $table->json('photos')->nullable();
-            $table->boolean('tagged')->default(false);
+            $table->boolean('is_tagged')->default(false);
             $table->timestamps();
         });
     }
