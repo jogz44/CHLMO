@@ -169,7 +169,7 @@ class ApplicantDetails extends Component
             $photoPaths[] = $path; // Store the path in the array
         }
 
-        \Log::info('Creating tagged applicant', ['tagged' => true]);
+        \Log::info('Creating tagged applicant', ['is_tagged' => true]);
 
         // Attempt to create the new tagged and validated applicant record
         try {
@@ -195,9 +195,13 @@ class ApplicantDetails extends Component
                 'remarks' => $this->remarks ?: 'N/A',
                 'photo' => !empty($photoPaths) ? json_encode($photoPaths) : 'N/A', // Store as JSON array
                 // These two are auto-generated
-                'tagged' => true,
+                'is_tagged' => true,
                 'tagger_name' => $this->tagger_name,
             ]);
+
+            // Find the applicant by ID and update the 'tagged' field
+            $applicant = Applicant::findOrFail($this->applicantId);
+            $applicant->update(['is_tagged' => true]);
 
             // Flash success message
             session()->flash('message', 'Applicant has been successfully tagged and validated.');
@@ -210,7 +214,7 @@ class ApplicantDetails extends Component
 //                'roof_type_id', 'wall_type_id', 'remarks',
 //
 //            ]);
-            return redirect()->route('transaction-walkin', ['applicantId' => $this->applicantId]);
+            return redirect()->route('applicants');
         } catch (QueryException $e) {
             // Log the error for debugging
             \Log::error('Error tagging applicant: ' . $e->getMessage());
