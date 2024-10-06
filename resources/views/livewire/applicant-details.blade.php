@@ -4,7 +4,7 @@
             <form wire:submit.prevent="store">
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-0">
                     <div class="flex items-center">
-                        <a href="{{ route('transaction-walkin') }}">
+                        <a href="{{ route('applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                  stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -444,7 +444,20 @@
                         </div>
                     </div>
                 </div>
-
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(function() {
+                            var flashMessage = document.getElementById('flash-message');
+                            if (flashMessage) {
+                                flashMessage.style.transition = 'opacity 0.5s ease';  // Smooth fade-out effect
+                                flashMessage.style.opacity = '0';  // Start fading out
+                                setTimeout(function() {
+                                    flashMessage.remove();  // Remove the element from the DOM after the fade-out
+                                }, 500);  // Wait for the fade-out transition to complete (0.5s)
+                            }
+                        }, 3000);  // Delay before the fade-out starts (3 seconds)
+                    });
+                </script>
                 <script>
                     function fileUpload() {
                         return {

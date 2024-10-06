@@ -12,7 +12,7 @@
             </div>
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-5 relative p-3">
                 <div class="flex items-center">
-                    <h2 class="text-[13px] ml-5 text-gray-700">WALK IN APPLICANTS</h2>
+                    <h2 class="text-[13px] ml-5 text-gray-700">APPLICANTS</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative z-0">
@@ -24,11 +24,99 @@
 
             <!-- Table with transaction requests -->
             <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
-                class="px-3 py-6 z-5 bg-white"> 
-{{--                <livewire:walkin-applicants-table />--}}
-                {{-- <livewire:applicants-table tableName="ApplicantsTable" />--}}
-                <livewire:walkin-applicants-table-v2/>
+                class="px-3 py-6 bg-white">
+{{--                <livewire:walkin-applicants-table-v2/>--}}
+                <div class="p-4">
+                    <!-- Search Input -->
+                    <div>
+                        <input type="search" wire:model.debounce.300ms="search" placeholder="Search..." class="input input-bordered w-full mb-4">
+                        <div>Search term: {{ $search }}</div>
+                    </div>
+                    <!-- Filters: Barangay and Purok -->
+                    <div class="flex space-x-4 mb-4">
+                        <div>
+                            <select wire:model="barangay" class="select select-bordered">
+                                <option value="">All Barangays</option>
+                                @foreach ($barangays as $barangay)
+                                    <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
 
+                        <div>
+                            <select wire:model="purok" class="select select-bordered">
+                                <option value="">All Puroks</option>
+                                @foreach ($puroks as $purok)
+                                    <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <button wire:click="resetFilters" class="btn btn-outline w-full">Reset Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Applicants Table -->
+                    <div class="overflow-x-auto">
+                        <table class="table w-full">
+                            <thead>
+                            <tr>
+                                <th>Applicant ID</th>
+                                <th>First Name</th>
+                                <th>Contact Number</th>
+                                <th>Barangay</th>
+                                <th>Purok</th>
+                                <th>Date Applied</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @forelse($applicants as $applicant)
+                                <tr>
+                                    <td>{{ $applicant->applicant_id }}</td>
+                                    <td>{{ $applicant->first_name }}</td>
+                                    <td>{{ $applicant->contact_number }}</td>
+                                    <td>{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                    <td>{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
+                                    <td>
+                                        <!-- Edit Button -->
+                                        <button class="bg-custom-red text-white px-4 py-2 rounded" wire:click="edit({{ $applicant->id }})">Edit</button>
+                                        <!-- Tag Button -->
+                                        @if ($applicant->taggedAndValidated)
+                                            <span class="bg-gray-500 text-white px-4 py-2 rounded cursor-not-allowed">Tagged</span>
+                                        @else
+                                            <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                    class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
+                                                Tag
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">No applicants found.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        setTimeout(function() {
+                            var flashMessage = document.getElementById('flash-message');
+                            if (flashMessage) {
+                                flashMessage.style.transition = 'opacity 0.5s ease';  // Smooth fade-out effect
+                                flashMessage.style.opacity = '0';  // Start fading out
+                                setTimeout(function() {
+                                    flashMessage.remove();  // Remove the element from the DOM after the fade-out
+                                }, 500);  // Wait for the fade-out transition to complete (0.5s)
+                            }
+                        }, 3000);  // Delay before the fade-out starts (3 seconds)
+                    });
+                </script>
                 <!-- Award Applicant Modal -->
                 <div x-show="openModalAward"
                     class="fixed inset-0 flex z-50 items-center justify-center bg-black bg-opacity-50 shadow-lg"
@@ -298,7 +386,6 @@
                             </div>
                         </div>
 
-
                         <!-- Barangay Field -->
                         <div class="mb-3">
                             <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY <span class="text-red-500">*</span> </label>
@@ -355,71 +442,19 @@
             </div>
             @endif
             <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    Livewire.on('applicant-added', () => {
-                        alert('Applicant added successfully!');
-                    });
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(function() {
+                        var flashMessage = document.getElementById('flash-message');
+                        if (flashMessage) {
+                            flashMessage.style.transition = 'opacity 0.5s ease';  // Smooth fade-out effect
+                            flashMessage.style.opacity = '0';  // Start fading out
+                            setTimeout(function() {
+                                flashMessage.remove();  // Remove the element from the DOM after the fade-out
+                            }, 500);  // Wait for the fade-out transition to complete (0.5s)
+                        }
+                    }, 3000);  // Delay before the fade-out starts (3 seconds)
                 });
             </script>
         </div>
     </div>
-    {{-- <script>--}}
-    {{-- $(document).ready(function () {--}}
-    {{-- // Function to initialize Select2 for searchable dropdowns--}}
-    {{-- function initializeSelect2() {--}}
-    {{-- $('#barangay').select2({--}}
-    {{-- placeholder: 'Select Barangay',--}}
-    {{-- allowClear: true,--}}
-    {{-- width: '100%'--}}
-    {{-- });--}}
-
-    {{-- $('#purok').select2({--}}
-    {{-- placeholder: 'Select Purok',--}}
-    {{-- allowClear: true,--}}
-    {{-- width: '100%'--}}
-    {{-- });--}}
-    {{-- }--}}
-
-    {{-- // Initialize Select2 on page load--}}
-    {{-- initializeSelect2();--}}
-
-    {{-- // Call this function on modal open    --}}
-    {{-- $(document).on('shown.bs.modal', function () {--}}
-    {{-- initializeSelect2();--}}
-    {{-- });--}}
-
-    {{-- // When Barangay dropdown changes--}}
-    {{-- $('#barangay').on('change', function () {--}}
-    {{-- var barangayId = $(this).val();--}}
-
-    {{-- if (barangayId) {--}}
-    {{-- $.ajax({--}}
-    {{-- url: '/get-puroks/' + barangayId,--}}
-    {{-- type: 'GET',--}}
-    {{-- success: function (response) {--}}
-    {{-- // Clear and repopulate the Purok dropdown--}}
-    {{-- $('#purok').empty();--}}
-    {{-- $('#purok').append('<option value="">Select Purok</option>');--}}
-
-    {{-- $.each(response.puroks, function (key, purok) {--}}
-    {{-- $('#purok').append('<option value="' + purok.id + '">' + purok.name + '</option>');--}}
-    {{-- });--}}
-
-    {{-- // Reinitialize Select2 for the new Purok dropdown options--}}
-    {{-- $('#purok').select2({--}}
-    {{-- placeholder: 'Select Purok',--}}
-    {{-- allowClear: true,--}}
-    {{-- width: '100%'--}}
-    {{-- });--}}
-    {{-- }--}}
-    {{-- });--}}
-    {{-- } else {--}}
-    {{-- // If no barangay selected, reset Purok dropdown--}}
-    {{-- $('#purok').empty();--}}
-    {{-- $('#purok').append('<option value="">Select Purok</option>');--}}
-    {{-- $('#purok').trigger('change');--}}
-    {{-- }--}}
-    {{-- });--}}
-    {{-- });--}}
-    {{-- </script>--}}
 </div>
