@@ -37,7 +37,7 @@ class TaggedAndValidatedApplicant extends Model
         'tagger_name',
         'remarks',
         'photos',
-        'tagged'
+        'is_tagged'
     ];
 
     /**
