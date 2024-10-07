@@ -2,12 +2,14 @@
 
 namespace App\Livewire;
 
+use AllowDynamicProperties;
 use App\Models\Address;
 use App\Models\Applicant;
 use App\Models\Barangay;
 use App\Models\Purok;
 use App\Models\TransactionType;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -32,16 +34,37 @@ class Applicants extends Component
     public $interviewer;
 
     public $barangays = []; // Initialize as an empty array
-
-    // Filter properties
-    public $barangay;
-    public $purok;
+    // Filter properties:
+    public $applicantId;
+    public $startDate, $endDate, $selectedPurok, $selectedBarangay, $selectedTaggingStatus;
+    // Properties to hold filter options
+    public $purokFilter = null, $barangayFilter = null, $taggingStatuses;
     protected $paginationTheme = 'tailwind';
     public function updatingSearch(): void
     {
         // This ensures that the search query is updated dynamically as the user types
         $this->resetPage();
     }
+    public function clearSearch()
+    {
+        $this->search = ''; // Clear the search input
+    }
+
+    public function resetFilters(): void
+    {
+        $this->startDate = null;
+        $this->endDate = null;
+        $this->selectedPurok = null;
+        $this->selectedBarangay = null;
+        $this->purokFilter = null;
+        $this->barangayFilter = null;
+        $this->selectedTaggingStatus = null;
+
+        // Reset pagination and any search terms
+        $this->resetPage();
+        $this->search = '';
+    }
+
 
     public function mount()
     {
@@ -52,6 +75,7 @@ class Applicants extends Component
 
         // Initialize dropdowns
         $this->barangays = Barangay::all();
+        $this->puroks = Purok::all();
         $this->transactionTypes = TransactionType::all();
 
         // Set default transaction type to 'Walk-in'
@@ -62,7 +86,17 @@ class Applicants extends Component
 
         // Set interviewer
         $this->interviewer = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
+
+        // Initialize filter options
+        $this->puroks = Cache::remember('puroks', 60*60, function() {
+            return Purok::all();
+        });
+        $this->barangays = Cache::remember('barangays', 60*60, function() {
+            return Barangay::all();
+        });
+        $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
     }
+
     public function updatingBarangay()
     {
         $this->resetPage();
@@ -82,6 +116,7 @@ class Applicants extends Component
             'puroks' => $this->puroks
         ]);
     }
+
 
     protected function rules()
     {
@@ -141,7 +176,7 @@ class Applicants extends Component
     {
         $this->reset([
             'date_applied', 'transaction_type_id', 'first_name', 'middle_name', 'last_name',
-            'suffix_name', 'barangay_id', 'purok_id', 'contact_number', 'interviewer',
+            'suffix_name', 'barangay_id', 'purok_id', 'contact_number',
         ]);
     }
     public function tagApplicant($applicantId)
@@ -154,44 +189,50 @@ class Applicants extends Component
         // Optionally, show a success message
         session()->flash('message', 'Applicant tagged successfully.');
     }
+
     public function render()
     {
-        $applicants = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated'])
-            ->where('applicant_id', 'like', '%'.$this->search.'%')
-            ->orWhere('first_name', 'like', '%'.$this->search.'%')
-            ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-            ->orWhere('last_name', 'like', '%'.$this->search.'%')
-            ->orWhere('contact_number', 'like', '%'.$this->search.'%')
-            ->orWhereHas('address.purok', function ($query) {
-                $query->where('name', 'like', '%'.$this->search.'%');
-            })
-            ->orWhereHas('address.barangay', function ($query) {
-                $query->where('name', 'like', '%'.$this->search.'%');
-            })
-            ->paginate(10); // Pagination, optional
+        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated'])
+            ->where(function($query) {
+                $query->where('applicant_id', 'like', '%'.$this->search.'%')
+                    ->orWhere('first_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('contact_number', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('address.purok', function ($query) {
+                        $query->where('name', 'like', '%'.$this->search.'%');
+                    })
+                    ->orWhereHas('address.barangay', function ($query) {
+                        $query->where('name', 'like', '%'.$this->search.'%');
+                    });
+            });
+
+        // Apply filters
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('date_applied', [$this->startDate, $this->endDate]);
+        }
+
+        if ($this->selectedPurok) {
+            $query->whereHas('address', function ($q) {
+                $q->where('purok_id', $this->selectedPurok);
+            });
+        }
+
+        if ($this->selectedBarangay) {
+            $query->whereHas('address', function ($q) {
+                $q->where('barangay_id', $this->selectedBarangay);
+            });
+        }
+
+        if ($this->selectedTaggingStatus !== null) {
+            $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
+        }
+
+        $applicants = $query->paginate(5); // Apply pagination after filtering
 
         return view('livewire.applicants', [
+            'puroks' => $this->puroks,
             'applicants' => $applicants
         ]);
     }
-
 }
-
-//namespace App\Livewire;
-//
-//
-//use App\Models\Applicant;
-//use Livewire\Component;
-//
-//class Applicants extends Component
-//{
-//    public $search = '';
-//
-//    public function render()
-//    {
-//        // Assuming you have a model to filter based on the search input
-//        $applicants = Applicant::where('first_name', 'like', '%'.$this->search.'%')->get();
-//        return view('livewire.applicants', compact('applicants'));
-//    }
-//}
-

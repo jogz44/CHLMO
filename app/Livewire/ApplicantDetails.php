@@ -9,6 +9,7 @@ use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\LivingStatus;
+use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\TaggedAndValidatedApplicant;
@@ -64,7 +65,6 @@ class ApplicantDetails extends Component
     public $tagger_name;
     public $remarks;
     public $photos = [];
-
     public function mount($applicantId)
     {
         $this->applicantId = $applicantId;
@@ -123,7 +123,6 @@ class ApplicantDetails extends Component
         // Set interviewer
         $this->tagger_name = Auth::user()->full_name();
     }
-
     protected function rules()
     {
         return [
@@ -155,9 +154,6 @@ class ApplicantDetails extends Component
 
     public function store()
     {
-        // Debugging request data
-//        dd($this->all());
-
         // Validate the input data
         $this->validate();
 
@@ -203,27 +199,11 @@ class ApplicantDetails extends Component
             $applicant = Applicant::findOrFail($this->applicantId);
             $applicant->update(['is_tagged' => true]);
 
-            // Flash success message
             session()->flash('message', 'Applicant has been successfully tagged and validated.');
 
-            // Reset form fields
-//            $this->reset([
-//                'full_address', 'civil_status_id', 'tribe_id', 'sex', 'date_of_birth', 'religion_id',
-//                'occupation', 'monthly_income', 'family_income','tagging_date', 'living_situation_id',
-//                'case_specification_id', 'government_program_id', 'living_status_id', 'rent_fee',
-//                'roof_type_id', 'wall_type_id', 'remarks',
-//
-//            ]);
             return redirect()->route('applicants');
         } catch (QueryException $e) {
-            // Log the error for debugging
-            \Log::error('Error tagging applicant: ' . $e->getMessage());
-
-            // Flash error message
             session()->flash('error', 'An error occurred while tagging the applicant. Please try again.');
-
-            // Optionally, redirect back to the form or keep the user on the same page
-//            return redirect()->back()->withErrors(['error' => 'An error occurred while tagging the applicant.']);
         }
     }
 

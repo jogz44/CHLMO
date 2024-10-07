@@ -24,7 +24,7 @@
                     <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
                 </div>
             </div>
-
+            <!-- Search and Filters -->
             <div class="bg-white p-6 rounded shadow">
                 <div class="flex justify-between items-center">
                     <div class="flex space-x-2">
@@ -52,8 +52,48 @@
                             <input wire:model.live.debounce.300ms="search" type="search" name="search"
                                    class="rounded-md px-12 py-2 placeholder:text-[13px] z-60 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
                                    placeholder="Search">
+                            <!-- Clear Button -->
+                            <button wire:click="clearSearch" class="absolute bottom-1 right-4 text-2xl text-gray-500">
+                                &times; <!-- This is the "x" symbol -->
+                            </button>
                         </div>
                     </div>
+                </div>
+
+                <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
+                    <input type="date" id="start-date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1">
+                    <input type="date" id="end-date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1">
+                    <select wire:model.live="selectedPurok" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Purok</option>
+                        @foreach($puroks as $purok)
+                            <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                        @endforeach
+                    </select>
+{{--                    <select wire:model.live="purokFilter" id="purokFilter" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                        <option value="">All Puroks</option>--}}
+{{--                        @foreach($puroks as $purok)--}}
+{{--                            <option value="{{ $purok->id }}">{{ $purok->name }}</option>--}}
+{{--                        @endforeach--}}
+{{--                    </select>--}}
+                    <select wire:model.live="selectedBarangay" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Barangay</option>
+                        @foreach($barangays as $barangay)
+                            <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                        @endforeach
+                    </select>
+{{--                    <select wire:model.live="barangayFilter" id="barangayFilter" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">--}}
+{{--                        <option value="">All Barangays</option>--}}
+{{--                        @foreach($barangays as $barangay)--}}
+{{--                            <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>--}}
+{{--                        @endforeach--}}
+{{--                    </select>--}}
+                    <select wire:model.live="selectedTaggingStatus" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Status</option>
+                        @foreach($taggingStatuses as $status)
+                            <option value="{{ $status }}">{{ $status }}</option>
+                        @endforeach
+                    </select>
+                    <button wire:click="resetFilters" class="text-gray-600 hover:text-gray-900 mt-3 underline">Reset Filters</button>
                 </div>
             </div>
 
@@ -105,9 +145,9 @@
                     <div class="flex space-x-4 items-center mb-3">
                         <label for="">Per page</label>
                         <select name="" id="">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
+                            <option value="10">5</option>
+                            <option value="20">10</option>
+                            <option value="50">20</option>
                         </select>
                     </div>
                 </div>
@@ -137,12 +177,6 @@
                                 <input type="date" id="date_applied" wire:model="date_applied" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none ">
                                 @error('date_applied') <span class="error">{{ $message }}</span> @enderror
                             </div>
-
-                            <!-- Transaction Type Field -->
-                                                        <div>
-                                                            <label class="block text-[12px] font-medium mb-2 text-black" for="transaction_type">TRANSACTION TYPE</label>
-                                                            <input type="text" wire:model="transaction-type-id" id="transaction-type-id" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
-                                                        </div>
                             <div>
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="transaction_type">TRANSACTION TYPE</label>
                                 <select wire:model="transaction_type_id" id="transaction_type_id" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg text-gray-800 focus:outline-none text-[12px] uppercase" required>
@@ -223,7 +257,7 @@
 
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <!-- Award Button -->
-                            <button type="submit"
+                            <button type="submit" @click="isModalOpen = false"
                                     class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                 <span class="text-[12px]"> + ADD APPLICANT</span>
                             </button>
@@ -258,19 +292,3 @@
         }
     }
 </script>
-
-{{--<div class="p-10 h-screen ml-[17%] mt-[90px]">--}}
-{{--    <input--}}
-{{--            type="text"--}}
-{{--            wire:model.debounce.300ms="search"--}}
-{{--            placeholder="Search applicants..."--}}
-{{--            class="form-control"--}}
-{{--            id="search-input"--}}
-{{--    />--}}
-
-{{--    <ul>--}}
-{{--        @foreach($applicants as $applicant)--}}
-{{--            <li>{{ $applicant->first_name }}</li>--}}
-{{--        @endforeach--}}
-{{--    </ul>--}}
-{{--</div>--}}
