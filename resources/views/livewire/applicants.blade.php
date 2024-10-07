@@ -5,10 +5,10 @@
             <!-- Alert Message -->
             <div class="relative z-0 mb-2">
                 @if (session()->has('message'))
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                        <strong class="font-bold">Success!</strong>
-                        <span class="block sm:inline">{{ session('message') }}</span>
-                    </div>
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Success!</strong>
+                    <span class="block sm:inline">{{ session('message') }}</span>
+                </div>
                 @endif
             </div>
             <!-- Container for the Title -->
@@ -56,6 +56,8 @@
                             <button wire:click="clearSearch" class="absolute bottom-1 right-4 text-2xl text-gray-500">
                                 &times; <!-- This is the "x" symbol -->
                             </button>
+                                class="rounded-md px-12 py-2 placeholder:text-[13px] z-60 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
+                                placeholder="Search">
                         </div>
                     </div>
                 </div>
@@ -98,22 +100,22 @@
             </div>
 
             <!-- Table with transaction requests -->
-            <div x-data="{openPreviewModal: false, selectedFile: null, fileName: ''}"
-                 class="overflow-x-auto">
-            <table class="min-w-full bg-white border border-gray-200">
-                <thead class="bg-gray-100">
-                <tr>
-                    <th class="py-2 px-2  text-center font-medium">Applicant ID</th>
-                    <th class="py-2 px-2 border-b text-center  font-medium">Name</th>
-                    <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
-                    <th class="py-2 px-2 border-b text-center font-medium">Purok</th>
-                    <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
-                    <th class="py-2 px-2 border-b text-center font-medium">Date Applied</th>
-                    <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                    @forelse($applicants as $applicant)
+            <div x-data="{openEditModal: false}"
+                class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="py-2 px-2  text-center font-medium">Applicant ID</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Date Applied</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($applicants as $applicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $applicant->applicant_id }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ $applicant->first_name }} {{ $applicant->last_name }}</td>
@@ -122,18 +124,18 @@
                             <td class="py-4 px-2 text-center border-b">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
+                                <button @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                                 @if ($applicant->taggedAndValidated)
-                                    <span class="bg-gradient-to-r from-custom-red-dark to-custom-red-dark hover:bg-gradient-to-r hover:from-custom-red-dark hover:to-custom-red-dark text-white px-5 py-1.5 rounded-full cursor-not-allowed">Tagged</span>
+                                <span class="bg-gradient-to-r from-custom-red-dark to-custom-red-dark hover:bg-gradient-to-r hover:from-custom-red-dark hover:to-custom-red-dark text-white px-5 py-1.5 rounded-full cursor-not-allowed">Tagged</span>
                                 @else
-                                    <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
-                                            class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
-                                        Tag
-                                    </button>
+                                <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
+                                    Tag
+                                </button>
                                 @endif
                             </td>
                         </tr>
-                    @empty
+                        @empty
                         <tr>
                             <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
                         </tr>
@@ -155,17 +157,18 @@
             </div>
             </div>
 
-            <!-- ADD APPLICANT MODAL -->
-            <div x-show="isModalOpen" x-cloak class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                <div class="bg-white text-white w-[450px] rounded-lg shadow-lg p-6 relative z-50">
-                    <!-- Modal Header -->
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
-                        <!-- Close Button: Closes the Modal -->
-                        <button @click="isModalOpen = false" class="text-gray-400 hover:text-gray-200">
-                            &times;
-                        </button>
-                    </div>
+
+                <!-- ADD APPLICANT MODAL -->
+                <div x-show="isModalOpen" x-cloak class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div class="bg-white text-white w-[450px] rounded-lg shadow-lg p-6 relative z-50">
+                        <!-- Modal Header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
+                            <!-- Close Button: Closes the Modal -->
+                            <button @click="isModalOpen = false" class="text-gray-400 hover:text-gray-200">
+                                &times;
+                            </button>
+                        </div>
 
                     <!-- Livewire Form -->
                     <form wire:submit.prevent="store">
