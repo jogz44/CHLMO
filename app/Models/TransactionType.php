@@ -33,7 +33,6 @@ class TransactionType extends Model
     {
         return $this->hasMany(Transaction::class);
     }
-
     public function applicants(): HasMany
     {
         return $this->hasMany(Applicant::class);
