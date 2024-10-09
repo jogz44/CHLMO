@@ -17,11 +17,11 @@ class Spouse extends Model
      */
     protected $fillable = [
         'applicant_id',
-        'occupation_id',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'monthly_income',
+        'spouse_first_name',
+        'spouse_middle_name',
+        'spouse_last_name',
+        'spouse_occupation',
+        'spouse_monthly_income',
     ];
 
     /**
@@ -32,7 +32,6 @@ class Spouse extends Model
     protected $casts = [
         'id' => 'integer',
         'applicant_id' => 'integer',
-        'occupation_id' => 'integer',
     ];
 
     public function applicant(): BelongsTo

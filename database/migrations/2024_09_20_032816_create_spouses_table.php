@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('spouses', function (Blueprint $table) {
             $table->id();
             $table->foreignId('applicant_id')->constrained('applicants')->onDelete('cascade');
-            $table->string('occupation');
-            $table->string('first_name', 50);
-            $table->string('middle_name', 50)->nullable();
-            $table->string('last_name', 50);
-            $table->integer('monthly_income');
+            $table->string('spouse_first_name', 50);
+            $table->string('spouse_middle_name', 50)->nullable();
+            $table->string('spouse_last_name', 50);
+            $table->string('spouse_occupation');
+            $table->integer('spouse_monthly_income');
             $table->timestamps();
         });
     }
