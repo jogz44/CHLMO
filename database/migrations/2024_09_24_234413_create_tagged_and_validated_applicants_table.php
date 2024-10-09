@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('tribe_id')->constrained('tribes')->onDelete('cascade');
             $table->foreignId('religion_id')->constrained('religions')->onDelete('cascade');
             $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
-            $table->foreignId('case_specification_id')->constrained('case_specifications')->onDelete('cascade');
+            $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
+            $table->text('living_situation_case_specification')->nullable();
             $table->foreignId('government_program_id')->constrained('government_programs')->onDelete('cascade');
             $table->foreignId('living_status_id')->constrained('living_statuses')->onDelete('cascade');
             $table->foreignId('roof_type_id')->constrained('roof_types')->onDelete('cascade');
@@ -31,6 +32,8 @@ return new class extends Migration
             $table->integer('family_income');
             $table->date('tagging_date');
             $table->integer('rent_fee')->nullable();
+            $table->string('landlord', 255)->nullable();
+            $table->string('house_owner', 255)->nullable();
             $table->string('tagger_name', 100)->nullable();
             $table->text('remarks')->nullable();
             $table->json('photos')->nullable();
