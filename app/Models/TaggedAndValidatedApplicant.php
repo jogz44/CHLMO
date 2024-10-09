@@ -21,7 +21,7 @@ class TaggedAndValidatedApplicant extends Model
         'tribe_id',
         'religion_id',
         'living_situation_id',
-        'case_specification_id',
+        'living_situation_case_specification',
         'government_program_id',
         'living_status_id',
         'roof_type_id',
@@ -34,6 +34,8 @@ class TaggedAndValidatedApplicant extends Model
         'family_income',
         'tagging_date',
         'rent_fee',
+        'landlord',
+        'house_owner',
         'tagger_name',
         'remarks',
         'photos',
@@ -62,20 +64,14 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(Applicant::class);
     }
-
-    // Relationship with CivilStatus
     public function civilStatus(): BelongsTo
     {
         return $this->belongsTo(CivilStatus::class);
     }
-
-    // Relationship with Tribe
     public function tribe(): BelongsTo
     {
         return $this->belongsTo(Tribe::class);
     }
-
-    // Relationship with Address
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
