@@ -6,7 +6,7 @@ use App\Models\TaggedAndValidatedApplicant;
 use Livewire\Component;
 
 
-class RequestApplicants extends Component
+class ApplicantsViaRequest extends Component
 {
     public $taggedAndValidatedApplicants;
 
@@ -26,7 +26,7 @@ class RequestApplicants extends Component
 
     public function render()
     {
-        return view('livewire.request-applicants', [
+        return view('livewire.applicants-via-request', [
             'taggedAndValidatedApplicants' => $this->taggedAndValidatedApplicants
         ]);
     }
