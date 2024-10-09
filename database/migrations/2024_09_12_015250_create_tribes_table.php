@@ -21,6 +21,7 @@ return new class extends Migration
 
         // insert tribes
         $tribes = [
+            'N/A',
             'Mansaka',
             'Lumad',
             'Badjao',

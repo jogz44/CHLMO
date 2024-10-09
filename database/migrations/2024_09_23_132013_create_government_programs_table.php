@@ -21,6 +21,7 @@ return new class extends Migration
 
         // Insert initial data
         DB::table('government_programs')->insert([
+            ['program_name' => 'N/A'],
             ['program_name' => 'Pantawid Pamilyang Pilipino Program (4Ps)'],
             ['program_name' => 'TESDA Scholarship Programs'],
             ['program_name' => 'PhilHealth Indigent Program'],

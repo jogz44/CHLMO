@@ -4,12 +4,10 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
-class SimpleSearch extends Component
+class ApplicantsMasterlist extends Component
 {
-    public $search = '';
-
     public function render()
     {
-        return view('');
+        return view('livewire.applicants-masterlist');
     }
 }
