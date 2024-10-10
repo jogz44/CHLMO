@@ -260,6 +260,7 @@ class Applicants extends Component
                     ->orWhere('first_name', 'like', '%'.$this->search.'%')
                     ->orWhere('middle_name', 'like', '%'.$this->search.'%')
                     ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                    ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
                     ->orWhere('contact_number', 'like', '%'.$this->search.'%')
                     ->orWhereHas('address.purok', function ($query) {
                         $query->where('name', 'like', '%'.$this->search.'%');

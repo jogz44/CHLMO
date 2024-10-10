@@ -12,11 +12,6 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                     <div x-data class="relative z-0">
-                        <button
-                                @click="openModal = !openModal"
-                                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
-                            Add Applicant
-                        </button>
                         <button class="bg-[#2B7A0B] text-white px-4 py-2 rounded">Export</button>
                     </div>
                 </div>
@@ -194,7 +189,29 @@
                             </div>
                         </form>
                     </div>
+                </div>
 
+                <!-- Button to toggle dropdown -->
+                <div x-data="{ showDropdown: false }" class="relative">
+                    <button @click="showDropdown = !showDropdown" class="bg-blue-500 text-white px-4 py-2 rounded">
+                        Toggle Columns
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute bg-white shadow-lg w-56 mt-2 py-2 rounded-lg z-10">
+                        <label class="block px-4 py-2">
+                            <input type="checkbox" id="toggle-name" checked> Show Name
+                        </label>
+                        <label class="block px-4 py-2">
+                            <input type="checkbox" id="toggle-purok" checked> Show Purok
+                        </label>
+                        <label class="block px-4 py-2">
+                            <input type="checkbox" id="toggle-barangay" checked> Show Barangay
+                        </label>
+                        <label class="block px-4 py-2">
+                            <input type="checkbox" id="toggle-contact" checked> Show Contact
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Table with transaction requests -->
@@ -202,108 +219,76 @@
                      class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
-                        <tr>
-                            <th class="py-2 px-2  text-center font-medium">Name</th>
-                            <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Occupation</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Monthly Income</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Type of Applicant</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Applied</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Status</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
-                        </tr>
+                            <tr>
+                                <th class="py-2 px-2 border-b text-center font-semibold">ID</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold toggle-column name-col">NAME</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold toggle-column purok-col">PUROK</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold toggle-column barangay-col">BARANGAY</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold toggle-column contact-col">CONTACT NUMBER</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold">OCCUPATION</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold">MONTHLY INCOME</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold">TRANSACTION TYPE</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold">DATE APPLIED</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold">STATUS</th>
+                                <th class="py-2 px-2 border-b text-center font-semibold">ACTIONS</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">Request Relocation</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">Pending</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">Request Relocation</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">Pending</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">Request Relocation</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">Pending</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">Request Relocation</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">Pending</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">Carpenter</td>
-                            <td class="py-4 px-2 text-center border-b">1000</td>
-                            <td class="py-4 px-2 text-center border-b">Request Relocation</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b">Pending</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                            </td>
-                        </tr>
-
+                            @forelse($applicants as $applicant)
+                                <tr>
+                                    <td class="py-4 px-2 text-center  border-b uppercase font-semibold">{{ $applicant->applicant_id}}</td>
+                                    <td class="py-4 px-2 text-center  border-b uppercase name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase contact-col">{{ $applicant->contact_number}}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>
+{{--                                    <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>--}}
+                                    <td class="py-4 px-2 text-center border-b uppercase">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->transactionType->type_name }}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
+                                    <td class="py-4 px-2 text-center border-b uppercase">Pending</td>
+                                    <td class="py-4 px-2 text-center border-b space-x-2">
+                                        <button
+                                                @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
+                                                class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
+
+                    <!-- JavaScript for toggling columns visibility -->
+                    <script>
+                        // JavaScript to toggle columns visibility based on checkbox selection
+                        document.getElementById('toggle-name').addEventListener('change', function() {
+                            document.querySelectorAll('.name-col').forEach(function(col) {
+                                col.style.display = this.checked ? '' : 'none';
+                            }.bind(this));
+                        });
+
+                        document.getElementById('toggle-purok').addEventListener('change', function() {
+                            document.querySelectorAll('.purok-col').forEach(function(col) {
+                                col.style.display = this.checked ? '' : 'none';
+                            }.bind(this));
+                        });
+
+                        document.getElementById('toggle-barangay').addEventListener('change', function() {
+                            document.querySelectorAll('.barangay-col').forEach(function(col) {
+                                col.style.display = this.checked ? '' : 'none';
+                            }.bind(this));
+                        });
+
+                        document.getElementById('toggle-contact').addEventListener('change', function() {
+                            document.querySelectorAll('.contact-col').forEach(function(col) {
+                                col.style.display = this.checked ? '' : 'none';
+                            }.bind(this));
+                        });
+                    </script>
 
                     <!-- Award Applicant Modal -->
                     <div x-show="openModalAward"

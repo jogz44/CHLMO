@@ -1,3 +1,3 @@
 <x-app-layout>
-    <livewire:request-applicants/>
+    <livewire:applicants-via-request/>
 </x-app-layout>
