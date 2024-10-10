@@ -50,7 +50,7 @@
                 </div>
 
                 <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                    <label class="text-center mt-2">Date From:</label>
+                    <label class="text-center mt-2">Date Applied From:</label>
                     <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
                     <label class="text-center mt-2">To:</label>
                     <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">

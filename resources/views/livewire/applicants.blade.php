@@ -61,28 +61,28 @@
                 </div>
 
                 <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                    <label class="text-center mt-2" for="start_date">Date From:</label>
+                    <label class="text-center mt-2" for="start_date">Date Applied From:</label>
                     <input type="date" id="start_date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
                            max="{{ now()->toDateString() }}">
                     <label class="text-center mt-2" for="end_date">To:</label>
                     <input type="date" id="end_date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
                            max="{{ now()->toDateString() }}">
 
-                    <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                    <select wire:model.live="selectedPurok_id" class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Purok</option>
                         @foreach($puroksFilter as $purokFilter)
                             <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
                         @endforeach
                     </select>
 
-                    <select wire:model.live="selectedBarangay_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                    <select wire:model.live="selectedBarangay_id" class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Barangay</option>
                         @foreach($barangaysFilter as $barangayFilter)
                             <option value="{{ $barangayFilter->id }}">{{ $barangayFilter->name }}</option>
                         @endforeach
                     </select>
 
-                    <select wire:model.live="selectedTaggingStatus" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                    <select wire:model.live="selectedTaggingStatus" class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
                         @foreach($taggingStatuses as $status)
                             <option value="{{ $status }}">{{ $status }}</option>

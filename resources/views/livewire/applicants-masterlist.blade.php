@@ -54,7 +54,9 @@
                     </div>
 
                     <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
+                        <label class="text-center mt-2" for="start_date">Date Applied From:</label>
                         <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
+                        <label class="text-center mt-2" for="end_date">To:</label>
                         <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
                         <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                             <option value="">Purok</option>
