@@ -36,7 +36,6 @@ return new class extends Migration
             $table->string('house_owner', 255)->nullable();
             $table->string('tagger_name', 100)->nullable();
             $table->text('remarks')->nullable();
-            $table->json('photos')->nullable();
             $table->boolean('is_tagged')->default(false);
             $table->timestamps();
         });
