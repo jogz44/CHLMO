@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Shelter\ProfiledTaggedApplicant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GovernmentProgram extends Model
 {
-    use HasFactory;
+//    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -25,4 +27,9 @@ class GovernmentProgram extends Model
     protected $casts = [
         'id' => 'integer',
     ];
+
+    public function profiledTaggedApplicant(): HasMany
+    {
+        return $this->hasMany(ProfiledTaggedApplicant::class);
+    }
 }
