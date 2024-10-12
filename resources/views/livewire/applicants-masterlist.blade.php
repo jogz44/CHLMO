@@ -261,18 +261,18 @@
                         <tbody>
                             @forelse($applicants as $applicant)
                             <tr>
-                                <td class="py-4 px-2 text-center  border-b uppercase font-semibold  whitespace-nowrap">{{ $applicant->applicant_id}}</td>
-                                <td class="py-4 px-2 text-center  border-b uppercase name-col  whitespace-nowrap">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase purok-col  whitespace-nowrap">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase barangay-col  whitespace-nowrap">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase contact-col  whitespace-nowrap">{{ $applicant->contact_number}}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase  whitespace-nowrap">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>
-                                {{-- <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>--}}
-                                <td class="py-4 px-2 text-center border-b uppercase  whitespace-nowrap">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase  whitespace-nowrap">{{ $applicant->transactionType->type_name }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase  whitespace-nowrap">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase  whitespace-nowrap">1 day ago</td>
-                                <td class="py-4 px-2 text-center border-b uppercase  whitespace-nowrap">Pending</td>
+                                <td class="py-4 px-2 text-center  border-b capitalize font-semibold  whitespace-nowrap">{{ $applicant->applicant_id}}</td>
+                                <td class="py-4 px-2 text-center  border-b capitalize name-col  whitespace-nowrap">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize purok-col  whitespace-nowrap">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize barangay-col  whitespace-nowrap">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize contact-col  whitespace-nowrap">{{ $applicant->contact_number}}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize  whitespace-nowrap">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>
+                                {{-- <td class="py-4 px-2 text-center border-b capitalize">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>--}}
+                                <td class="py-4 px-2 text-center border-b capitalize  whitespace-nowrap">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize  whitespace-nowrap">{{ $applicant->transactionType->type_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize  whitespace-nowrap">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize  whitespace-nowrap">1 day ago</td>
+                                <td class="py-4 px-2 text-center border-b capitalize  whitespace-nowrap">Pending</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2  whitespace-nowrap">
                                     <button
                                         @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
