@@ -45,28 +45,28 @@
                                     NAME</label>
                                 <input type="text" id="first-name" name="first-name"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="middle-name" class="block text-[12px] font-medium text-gray-700 mb-1">MIDDLE
                                     NAME</label>
                                 <input type="text" id="middle-name" name="middle-name"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="last-name" class="block text-[12px] font-medium text-gray-700 mb-1">LAST
                                     NAME</label>
                                 <input type="text" id="last-name" name="last-name"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="name-suffix" class="block text-[12px] font-medium text-gray-700 mb-1">NAME
                                     SUFFIX</label>
                                 <input type="text" id="name-suffix" name="name-suffix"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
 
@@ -75,7 +75,7 @@
                                 <label for="barangay"
                                        class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY</label>
                                 <select id="barangay" name="barangay" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Barangay</option>
                                     <option value="barangay1">Barangay 1</option>
                                     <option value="barangay2">Barangay 2</option>
@@ -85,7 +85,7 @@
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK</label>
                                 <select id="purok" name="purok" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Purok</option>
                                     <option value="purok1">Purok 1</option>
                                     <option value="purok2">Purok 2</option>
@@ -96,13 +96,13 @@
                                 <label for="specificaddress" class="block text-[12px] font-medium text-gray-700 mb-1">SPECIFIC ADDRESS</label>
                                 <input type="text" id="specificaddress" name="specificaddress"
                                  :disabled="!isEditable"
-                                class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="civilstatus" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
                                 <select id="civilstatus" name="civilstatus"
                                         :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Status</option>
                                     <option value="single">Single</option>
                                     <option value="married">Married</option>
@@ -117,13 +117,13 @@
                                     NUMBER</label>
                                 <input type="number" id="contactNo" name="contactNo"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="tribe"
                                        class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY</label>
                                 <select id="tribe" name="tribe" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select tribe/ethnicity</option>
                                     <option value="barangay1">Barangay 1</option>
                                     <option value="barangay2">Barangay 2</option>
@@ -133,7 +133,7 @@
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX</label>
                                 <select id="sex" name="sex" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select sex</option>
                                     <option value="purok1">Male</option>
                                     <option value="purok2">Female</option>
@@ -143,7 +143,7 @@
                                 <label for="age" class="block text-[12px] font-medium text-gray-700 mb-1">AGE</label>
                                 <input type="number" id="age" name="age"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
 
@@ -153,28 +153,28 @@
                                        class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
                                 <input type="text" id="religion" name="religion"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="occupation"
                                        class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
                                 <input type="text" id="occupation" name="occupation"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
                                     INCOME</label>
                                 <input type="text" id="monthlyincome" name="monthlyincome"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="familyincome" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
                                     INCOME</label>
                                 <input type="text" id="familyincome" name="familyincome"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
 
@@ -186,116 +186,90 @@
                                     FIRST NAME</label>
                                 <input type="text" id="spousefirstname" name="spousefirstname" 
                                 :disabled="!isEditable"
-                                class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="spousemiddlename" class="block text-[12px] font-medium text-gray-700 mb-1">
                                     MIDDLE NAME</label>
                                 <input type="text" id="spousemiddlename" name="spousemiddlename" 
                                  :disabled="!isEditable"
-                                 class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                 class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="spouselastname" class="block text-[12px] font-medium text-gray-700 mb-1">
                                     LAST NAME</label>
                                 <input type="text" id="spouselastname" name="spouselastname" 
                                  :disabled="!isEditable"
-                                 class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                 class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="spouse-occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
                                 <input type="text" id="spouse-occupation" name="spouse-occupation"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)" >
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="spouse-monthlyincome" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
                                     INCOME</label>
                                 <input type="text" id="spouse-monthlyincome" name="spouse-monthlyincome"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
 
-                        <div x-data="{
-                        isEditing: false,
-                        rows: [
-                            { firstName: '', middleName: '', LastName: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' },
-                        ],
-                        addRow() {
-                            this.rows.push({ firstName: '', middleName: '', LastName: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' });
-                        },
-                    }" class="mt-6">
-                        <div class="flex justify-between">
-                            <div class="mt-4 flex justify-start">
-                                <h2 class="text-[12px] font-medium text-gray-700 mb-2">DEPENDENTS</h2>
-                            </div>
-                        </div>
+                        <div x-data="{ 
+                            rows: [
+                                { name: 'Anton Corporal', civilStatus: 'Married', age: '32', occupation: 'Medical Doctor', monthlyIncome: '20000', relationship: 'Husband' },
+                            ], 
+                            addRow() {
+                                this.rows.push({ name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' });
+                            } 
+                        }" 
+                        class="mt-6">
+
+                        <h2 class="text-[12px] font-medium text-gray-700 mb-2">DEPENDENTS</h2>
                         <table class="w-full">
                             <thead>
                                 <tr class="text-center border border-gray-700">
-                                    <th class="p-2 border-b">First Name</th>
-                                    <th class="p-2 border-b">Middle Name</th>
-                                    <th class="p-2 border-b">Last Name</th>
+                                    <th class="p-2 border-b">Name</th>
                                     <th class="p-2 border-b">Civil Status</th>
                                     <th class="p-2 border-b">Age</th>
                                     <th class="p-2 border-b">Occupation</th>
                                     <th class="p-2 border-b">Monthly Income</th>
                                     <th class="p-2 border-b">Relationship</th>
-                                    <th class="p-2 border-b"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="(row, index) in rows" :key="index">
                                     <tr class="odd:bg-custom-green-light even:bg-transparent text-center">
-                                        <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.firstName"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-show="!isEditing" x-text="row.firstName"></span>
+                                        <td class="border px-4 py-2" style="background-color: rgba(163, 214, 163, 0.5);">
+                                            <input type="text" x-model="row.name"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.middleName"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-show="!isEditing" x-text="row.middleName"></span>
+                                            <input type="text" x-model="row.civilStatus"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.lastName"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-text="row.lastName"></span>
-                                        </td>
-                                        <td class="border px-1 py-2">
-                                            <select :disabled="!isEditable" x-model="row.civilStatus"
-                                                class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                                <option value="">Select Status</option>
-                                               
-                                                <option value=""></option>
-                                               
-                                            </select>
-                                            <span x-text="row.civilStatus"></span>
+                                            <input type="text" x-model="row.age"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.age"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-text="row.age"></span>
+                                            <input type="text" x-model="row.occupation"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.occupation"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-text="row.occupation"></span>
+                                            <input type="text" x-model="row.monthlyIncome"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.monthlyIncome"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-text="row.monthlyIncome"></span>
-                                        </td>
-                                        <td class="border px-4 py-2">
-                                            <input :disabled="!isEditable" type="text" x-model="row.relationship"
-                                                class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <span x-text="row.relationship"></span>
+                                            <input type="text" x-model="row.relationship"
+                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
                                         <td class="border px-4 py-2">
                                             <button @click.prevent="rows.splice(index, 1)" type="button"
-                                                class="text-red-500 hover:text-red-700 text-[14px]" :disabled="!isEditable">
+                                                 :disabled="!isEditable"
+                                                class="text-red-500 hover:text-red-700 text-[14px]">
                                                 ✕
                                             </button>
                                         </td>
@@ -303,9 +277,10 @@
                                 </template>
                             </tbody>
                         </table>
+
                         <!-- Add Row Button -->
                         <div class="flex justify-end mb-4 mt-4">
-                            <button @click.prevent="addRow()" type="button" :disabled="!isEditable"
+                            <button @click.prevent="addRow()" type="button"  :disabled="!isEditable"
                                 class="text-white bg-green-500 hover:bg-green-600 text-[12px] px-2 py-2 rounded-md flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                     class="w-5 h-5 mr-1">
@@ -315,6 +290,7 @@
                             </button>
                         </div>
                     </div>
+
                     </form>
                 </div>
 
@@ -326,13 +302,13 @@
                                     DATE</label>
                                 <input type="date" id="taggedDate" name="taggedDate"
                                          :disabled="!isEditable"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="livingSituation" class="block text-[12px] font-medium text-gray-700 mb-1">LIVING
                                     SITUATION (CASE)</label>
                                 <select id="livingSituation" name="livingSituation" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select situation</option>
                                     <option value="barangay1">Barangay 1</option>
                                     <option value="barangay2">Barangay 2</option>
@@ -343,7 +319,7 @@
                                 <label for="caseSpecific" class="block text-[12px] font-medium text-gray-700 mb-1">CASE
                                     SPECIFICATION</label>
                                 <select id="caseSpecific" name="caseSpecific" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select specification</option>
                                     <option value="purok1">Purok 1</option>
                                     <option value="purok2">Purok 2</option>
@@ -356,7 +332,7 @@
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="govAssistance" class="block text-[12px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR</label>
                                 <select id="govAssistance" name="govAssistance" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select type of assistance</option>
                                     <option value="barangay1">Barangay 1</option>
                                     <option value="barangay2">Barangay 2</option>
@@ -367,7 +343,7 @@
                                 <label for="livingStatus" class="block text-[12px] font-medium text-gray-700 mb-1">LIVING
                                     STATUS</label>
                                 <select id="livingStatus" name="livingStatus" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select status</option>
                                     <option value="purok1">Purok 1</option>
                                     <option value="purok2">Purok 2</option>
@@ -379,7 +355,7 @@
                                 <input type="number" id="rent" name="rent"
                                        :disabled="!isEditable"
                                        placeholder="How much monthly?"
-                                       class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
 
@@ -388,7 +364,7 @@
                                 <label class="block text-[12px] font-medium text-gray-700 mt-1 mb-1">HOUSE MATERIALS</label>
                                 <label for="roof" class="block text-[12px] font-medium text-gray-700 mb-1">ROOF</label>
                                 <select id="roof" name="roof" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select type of roof</option>
                                     <option value="barangay1">Barangay 1</option>
                                     <option value="barangay2">Barangay 2</option>
@@ -398,7 +374,7 @@
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="wall" class="block text-[12px] font-medium text-gray-700 mt-6 mb-1">WALL</label>
                                 <select id="wall" name="wall" :disabled="!isEditable"
-                                        class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select type of wall</option>
                                     <option value="purok1">Purok 1</option>
                                     <option value="purok2">Purok 2</option>
@@ -413,7 +389,7 @@
                                        class="block text-[12px] font-medium text-gray-700 mb-1">REMARKS</label>
                                 <input type="text" id="remarks" name="remarks"
                                        :disabled="!isEditable"
-                                       class="capitalize w-full p-3 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-3 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
 
                         </div>
