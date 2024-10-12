@@ -44,6 +44,8 @@ class ProfileAdmin extends Component
         $user->save();
         $this->isEditing = false;
         session()->flash('message', 'Profile updated successfully.');
+
+        $this->dispatch('profileInfo-updated');
     }
 
     public function render()

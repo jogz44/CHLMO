@@ -65,3 +65,8 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('profileInfo-updated', function() {
+        window.location.reload(); // Reload the page
+    });
+</script>
