@@ -46,6 +46,85 @@
                                    class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
                                    placeholder="Search">
                         </div>
+                        <!-- Button to toggle dropdown -->
+                        <div x-data="{ showDropdown: false }" class="relative">
+                            <button @click="showDropdown = !showDropdown" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-2 rounded-md items-center">
+                                Toggle Columns
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute bg-white border border-gray-300 shadow-lg w-56 mt-2 py-2 rounded-lg z-10">
+                                <!-- Select All Option -->
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" id="toggle-all" checked> Select All
+                                </label>
+                                <hr class="my-2">
+                                <!-- Individual Column Toggles -->
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-name" checked> Name
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-purok" checked> Purok
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-barangay" checked> Barangay
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-living-situation" checked> Living Situation
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-contact" checked> Contact Number
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-occupation" checked> Occupation
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-monthly" checked> Monthly Income
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-transaction-type" checked> Transaction Type
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-actions" checked> ACTIONS
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- JavaScript for toggling columns and "Select All" -->
+                        <script>
+                            // Function to toggle visibility of columns
+                            function toggleColumn(columnClass, isVisible) {
+                                document.querySelectorAll('.' + columnClass).forEach(function(col) {
+                                    col.style.display = isVisible ? '' : 'none';
+                                });
+                            }
+
+                            // Select All functionality
+                            document.getElementById('toggle-all').addEventListener('change', function() {
+                                const isChecked = this.checked;
+                                document.querySelectorAll('.toggle-column').forEach(function(checkbox) {
+                                    checkbox.checked = isChecked;
+                                    const columnClass = checkbox.id.replace('toggle-', '') + '-col';
+                                    toggleColumn(columnClass, isChecked);
+                                });
+                            });
+
+                            // Individual column checkboxes
+                            document.querySelectorAll('.toggle-column').forEach(function(checkbox) {
+                                checkbox.addEventListener('change', function() {
+                                    const columnClass = this.id.replace('toggle-', '') + '-col';
+                                    toggleColumn(columnClass, this.checked);
+
+                                    // If any checkbox is unchecked, uncheck "Select All"
+                                    if (!this.checked) {
+                                        document.getElementById('toggle-all').checked = false;
+                                    }
+
+                                    // If all checkboxes are checked, check "Select All"
+                                    document.getElementById('toggle-all').checked = Array.from(document.querySelectorAll('.toggle-column')).every(cb => cb.checked);
+                                });
+                            });
+                        </script>
                     </div>
                 </div>
 
@@ -96,32 +175,30 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2  text-center font-semibold">ID</th>
-                            <th class="py-2 px-2  text-center font-semibold">NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">PUROK</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">BARANGAY</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">LIVING SITUATION</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">OCCUPATION</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">MONTHLY INCOME</th>
-                            {{--                        <th class="py-2 px-2 border-b text-center font-medium">Status</th>--}}
-                            <th class="py-2 px-2 border-b text-center font-semibold">TRANSACTION TYPE</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">ACTIONS</th>
+                            <th class="py-2 px-2  text-center font-semibold toggle-column name-col">NAME</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column purok-col">PUROK</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column barangay-col">BARANGAY</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column living-situation-col">LIVING SITUATION</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column contact-col">CONTACT NUMBER</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column occupation-col">OCCUPATION</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column monthly-col">MONTHLY INCOME</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column transaction-type-col">TRANSACTION TYPE</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column actions-col">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($taggedAndValidatedApplicants as $applicant)
                             <tr>
                                 <td class="py-4 px-2 text-center border-b uppercase font-semibold">{{ $applicant->applicant->applicant_id}}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->applicant->last_name }}, {{ $applicant->applicant->first_name }} {{ $applicant->applicant->middle_name }} {{ $applicant->applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->livingSituation->living_situation_description }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->applicant->contact_number }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->occupation }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->monthly_income }}</td>
-        {{--                        <td class="py-4 px-2 text-center border-b">Pending</td>--}}
-                                <td class="py-4 px-2 text-center border-b uppercase">{{ $applicant->applicant->transactionType->type_name }}</td>
-                                <td class="py-4 px-2 text-center border-b space-x-2">
+                                <td class="py-4 px-2 text-center border-b uppercase name-col">{{ $applicant->applicant->last_name }}, {{ $applicant->applicant->first_name }} {{ $applicant->applicant->middle_name }} {{ $applicant->applicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase purok-col">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase barangay-col">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase living-situation-col">{{ $applicant->livingSituation->living_situation_description }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase contact-col">{{ $applicant->applicant->contact_number }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase occupation-col">{{ $applicant->occupation }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase monthly-col">{{ $applicant->monthly_income }}</td>
+                                <td class="py-4 px-2 text-center border-b uppercase transaction-type-col">{{ $applicant->applicant->transactionType->type_name }}</td>
+                                <td class="py-4 px-2 text-center border-b space-x-2 actions-col">
                                     <button
                                             @click="window.location.href = '{{ route('request-applicant-details') }}'"
                                             class="text-custom-red text-bold underline px-4 py-1.5">Details
@@ -364,7 +441,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <!-- Pagination controls -->
@@ -392,7 +468,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 <script>
     function pagination() {
