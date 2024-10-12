@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Ramsey\Collection\Collection;
 
 class Applicants extends Component
 {
@@ -54,6 +55,11 @@ class Applicants extends Component
     public $edit_contact_number;
     public $edit_barangay_id; // Update this property name
     public $edit_purok_id; // Update this property name
+
+    // For export
+    public Collection $applicantsForExport;
+    public Collection $selectedApplicantsForExport;
+    public $designTemplate = 'tailwind';
 
     public function updatingSearch(): void
     {
@@ -187,8 +193,14 @@ class Applicants extends Component
         $this->resetForm();
         $this->isModalOpen = false; // Close the modal
 
-        // Flash a success message
-        session()->flash('message', 'Applicant successfully added.');
+        // Trigger the alert message
+        $this->dispatch('alert', [
+            'title' => 'Applicant Added!',
+            'message' => 'Applicant successfully added at <br><small>'. now()->calendar() .'</small>',
+            'type' => 'success'
+        ]);
+
+        $this->redirect('applicants');
     }
 
     public function resetForm()
@@ -237,9 +249,11 @@ class Applicants extends Component
 
         $applicant->save();
 
-        // Optional: Close the modal and show a success message
-//        $this->dispatchBrowserEvent('closeEditModal');
-        session()->flash('message', 'Applicant updated successfully!');
+        $this->dispatch('alert', [
+            'title' => 'Details Updated!',
+            'message' => 'Applicant successfully updated at <br><small>'. now()->calendar() .'</small>',
+            'type' => 'success'
+        ]);
     }
     public function tagApplicant($applicantId)
     {
@@ -248,9 +262,35 @@ class Applicants extends Component
         $applicant->is_tagged = true;
         $applicant->save();
 
-        // Optionally, show a success message
-        session()->flash('message', 'Applicant tagged successfully.');
+        $this->dispatch('alert', [
+            'title' => 'Tagging Successful!',
+            'message' => 'Applicant tagged and validated successfully at <br><small>'. now()->calendar() .'</small>',
+            'type' => 'success'
+        ]);
     }
+    public function untagged($applicantId)
+    {
+        $applicant = Applicant::find($applicantId);
+        $applicant->is_tagged = false;
+        $applicant->save();
+
+        $this->dispatch('alert', [
+            'title' => 'Untagging Successful!',
+            'message' => 'Applicant untagged successfully at <br><small>'. now()->calendar() .'</small>',
+            'type' => 'success'
+        ]);
+    }
+
+//    public function alert()
+//    {
+//        if (true){
+//            return $this->dispatch('alert', [
+//                'title' => 'Success!',
+//                'message' => 'This is alert message. <br><small>'. now()->calendar().'</small>',
+//                'type' => 'success'
+//            ]);
+//        }
+//    }
 
     public function render()
     {

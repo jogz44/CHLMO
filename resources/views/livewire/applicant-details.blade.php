@@ -18,6 +18,19 @@
                         <button type="submit"
                             class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
                             SUBMIT
+                            <div wire:loading>
+                                <svg aria-hidden="true"
+                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                            fill="currentColor" />
+                                    <path
+                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                            fill="currentFill" />
+                                </svg>
+                                <span class="sr-only">Loading...</span>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -451,44 +464,45 @@
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">UPLOAD DOCUMENTS</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured requirements submitted by the qualified applicants.</p>
                 </div>
-
+                <!-- File Uploads -->
                 <div x-data="fileUpload()" class="bg-white p-6 rounded shadow mb-6">
                     <div class="grid grid-cols-2 gap-2">
                         <!-- Drag and Drop Area -->
                         <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
                             <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
+                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
+                                      d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
                             </svg>
-                            <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                            <p class="text-gray-500 text-xs">or</p>
+{{--                                <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>--}}
+{{--                                <p class="text-gray-500 text-xs">or</p>--}}
                             <button type="button"
-                                class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                @click="$refs.fileInput.click()">BROWSE FILES
+                                    class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
+                                    @click="$refs.fileInput.click()">BROWSE FILES
                             </button>
 
                             <!-- Hidden File Input for Multiple Files -->
-                            <input wire:model="photos" type="file" x-ref="fileInput" @change="addFiles($refs.fileInput.files)" multiple
-                                class="hidden" />
+                            <input wire:model="images" type="file" id="images" name="images" x-ref="fileInput" @change="addFiles($refs.fileInput.files)" multiple
+                                   class="hidden" required/>
+                            @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Show selected files and progress bars -->
                         <div class="w-full grid grid-cols-1 gap-2 border-2 border-dashed border-green-500 rounded-lg p-2">
                             <template x-for="(fileWrapper, index) in files" :key="index">
                                 <div @click="openPreviewModal = true; selectedFile = fileWrapper"
-                                    class="bg-white p-2 shadow border-2 border-green-500 rounded-lg">
+                                     class="bg-white p-2 shadow border-2 border-green-500 rounded-lg">
                                     <div class="flex items-center justify-between mb-2">
                                         <div class="flex items-center space-x-2">
                                             <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M7 3v6h4l1 1h4V3H7z" />
+                                                      d="M7 3v6h4l1 1h4V3H7z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 8v10h14V8H5z" />
+                                                      d="M5 8v10h14V8H5z" />
                                             </svg>
                                             <span class="text-xs font-medium text-gray-700"
-                                                x-text="fileWrapper.displayName"></span>
+                                                  x-text="fileWrapper.displayName"></span>
                                         </div>
                                         <!-- Status -->
                                         <span class="text-xs text-green-500 font-medium">100%</span>
@@ -497,59 +511,46 @@
                                     <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
                                         <div class="w-full h-full bg-green-500"></div>
                                     </div>
+
+                                    <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
+                                    <div x-show="openPreviewModal"
+                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
+                                         x-cloak>
+                                        <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
+                                            <!-- Modal Header with File Name -->
+                                            <div class="flex justify-between items-center mb-4">
+                                                <!-- Only show input if selectedFile is not null -->
+                                                <template x-if="selectedFile">
+                                                    <input type="text" x-model="selectedFile.displayName"
+                                                           class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
+                                                    @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                                </template>
+                                                <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename File</button>
+                                                <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">&times;</button>
+                                            </div>
+
+                                            <!-- Display Image -->
+                                            <div class="flex justify-center mb-4">
+                                                {{-- <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"--}}
+                                                <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
+                                                     alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
+                                            </div>
+                                            <!-- Modal Buttons -->
+                                            <div class="flex justify-between mt-4">
+                                                <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
+                                                        @click="openPreviewModal = false">CONFIRM
+                                                </button>
+                                                <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
+                                                        @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </template>
                         </div>
-
-                        <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
-                        <div x-show="openPreviewModal"
-                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                            x-cloak>
-                            <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                                <!-- Modal Header with File Name -->
-                                <div class="flex justify-between items-center mb-4">
-                                    <!-- Only show input if selectedFile is not null -->
-                                    <template x-if="selectedFile">
-                                        <input type="text" x-model="selectedFile.displayName"
-                                            class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                                    </template>
-                                    <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename File</button>
-                                    <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">&times;</button>
-                                </div>
-
-                                <!-- Display Image -->
-                                <div class="flex justify-center mb-4">
-                                    {{-- <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"--}}
-                                    <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
-                                        alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                                </div>
-                                <!-- Modal Buttons -->
-                                <div class="flex justify-between mt-4">
-                                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                        @click="openPreviewModal = false">CONFIRM
-                                    </button>
-                                    <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                        @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        setTimeout(function() {
-                            var flashMessage = document.getElementById('flash-message');
-                            if (flashMessage) {
-                                flashMessage.style.transition = 'opacity 0.5s ease'; // Smooth fade-out effect
-                                flashMessage.style.opacity = '0'; // Start fading out
-                                setTimeout(function() {
-                                    flashMessage.remove(); // Remove the element from the DOM after the fade-out
-                                }, 500); // Wait for the fade-out transition to complete (0.5s)
-                            }
-                        }, 3000); // Delay before the fade-out starts (3 seconds)
-                    });
-                </script>
                 <script>
                     function fileUpload() {
                         return {
@@ -564,7 +565,7 @@
                                         displayName: file.name
                                     });
                                     // Also push to the Livewire photo array (make sure you declare this in your component)
-                                    this.$wire.set('photos', [...this.photos, file]); // Assuming this.photos holds the current array
+                                    this.$wire.set('images', [...this.images, file]);
                                 }
                             },
                             removeFile(fileWrapper) {

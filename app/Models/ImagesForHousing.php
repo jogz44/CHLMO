@@ -2,23 +2,25 @@
 
 namespace App\Models;
 
-use App\Models\Shelter\ProfiledTaggedApplicant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GovernmentProgram extends Model
+class ImagesForHousing extends Model
 {
 //    use HasFactory;
-
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'program_name',
+        'tagged_and_validated_applicant_id',
+        'image_path',
+        'display_name',
+        'order',
     ];
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -26,10 +28,11 @@ class GovernmentProgram extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'tagged_and_validated_applicant_id' => 'integer',
+        'order' => 'integer',
     ];
-
-    public function profiledTaggedApplicant(): HasMany
+    public function taggedAndValidatedApplicant(): BelongsTo
     {
-        return $this->hasMany(ProfiledTaggedApplicant::class);
+        return $this->belongsTo(TaggedAndValidatedApplicant::class);
     }
 }

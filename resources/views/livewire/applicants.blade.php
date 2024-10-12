@@ -2,15 +2,6 @@
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
         <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
-            <!-- Alert Message -->
-            <div class="relative z-0 mb-2">
-                @if (session()->has('message'))
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Success!</strong>
-                    <span class="block sm:inline">{{ session('message') }}</span>
-                </div>
-                @endif
-            </div>
             <!-- Container for the Title -->
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                 <div class="flex items-center">
@@ -57,6 +48,80 @@
                                 &times; <!-- This is the "x" symbol -->
                             </button>
                         </div>
+
+                        <!-- Button to toggle dropdown -->
+                        <div x-data="{ showDropdown: false }" class="relative">
+                            <button @click="showDropdown = !showDropdown" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-2 rounded-md items-center">
+                                Toggle Columns
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute bg-white border border-gray-300 shadow-lg w-56 mt-2 py-2 rounded-lg z-10">
+                                <!-- Select All Option -->
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" id="toggle-all" checked> Select All
+                                </label>
+                                <hr class="my-2">
+                                <!-- Individual Column Toggles -->
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-name" checked> NAME
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-suffix" checked> SUFFIX NAME
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-contact" checked> CONTACT
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-purok" checked> PUROK
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-barangay" checked> BARANGAY
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-date-applied" checked> DATE APPLIED
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-actions" checked> ACTIONS
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- JavaScript for toggling columns and "Select All" -->
+                        <script>
+                            // Function to toggle visibility of columns
+                            function toggleColumn(columnClass, isVisible) {
+                                document.querySelectorAll('.' + columnClass).forEach(function(col) {
+                                    col.style.display = isVisible ? '' : 'none';
+                                });
+                            }
+
+                            // Select All functionality
+                            document.getElementById('toggle-all').addEventListener('change', function() {
+                                const isChecked = this.checked;
+                                document.querySelectorAll('.toggle-column').forEach(function(checkbox) {
+                                    checkbox.checked = isChecked;
+                                    const columnClass = checkbox.id.replace('toggle-', '') + '-col';
+                                    toggleColumn(columnClass, isChecked);
+                                });
+                            });
+
+                            // Individual column checkboxes
+                            document.querySelectorAll('.toggle-column').forEach(function(checkbox) {
+                                checkbox.addEventListener('change', function() {
+                                    const columnClass = this.id.replace('toggle-', '') + '-col';
+                                    toggleColumn(columnClass, this.checked);
+
+                                    // If any checkbox is unchecked, uncheck "Select All"
+                                    if (!this.checked) {
+                                        document.getElementById('toggle-all').checked = false;
+                                    }
+
+                                    // If all checkboxes are checked, check "Select All"
+                                    document.getElementById('toggle-all').checked = Array.from(document.querySelectorAll('.toggle-column')).every(cb => cb.checked);
+                                });
+                            });
+                        </script>
                     </div>
                     <div class="flex justify-end">
                         <label class="text-center mt-2 mr-1" for="start_date">Date Applied From:</label>
@@ -88,16 +153,13 @@
                         <option value="">Barangay</option>
                         @foreach($barangaysFilter as $barangayFilter)
                         <option value="{{ $barangayFilter->id }}">{{ $barangayFilter->name }}</option>
-                        @endforeach
-                    </select>
 
-                    <select wire:model.live="selectedPurok_id" class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                    <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Purok</option>
                         @foreach($puroksFilter as $purokFilter)
-                        <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
+                            <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
                         @endforeach
                     </select>
-
                     <select wire:model.live="selectedTaggingStatus" class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
                         @foreach($taggingStatuses as $status)
@@ -113,38 +175,54 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
+                            <th class="py-2 px-2 border-b text-center font-semibold">
+                                <input type="checkbox">
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-semibold">ID</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">SUFFIX NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">BARANGAY</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">PUROK</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">DATE APPLIED</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">ACTIONS</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column name-col">NAME</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column suffix-col">SUFFIX NAME</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column contact-col">CONTACT NUMBER</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column purok-col">PUROK</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column barangay-col">BARANGAY</th>
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column date-applied-col">DATE APPLIED</th>
+{{--                            <th class="py-2 px-2 border-b text-center font-semibold capitalize toggle-column date-applied-col">Status</th>--}}
+                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column actions-col">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($applicants as $applicant)
-                        <tr>
-                            <td class="py-4 px-2 text-center border-b capitalize font-semibold whitespace-nowrap">{{ $applicant->applicant_id }}</td>
-                            <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }}</td>
-                            <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->suffix_name }}</td>
-                            <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->contact_number }}</td>
-                            <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
-                            <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2">
-                                <button wire:click="edit({{ $applicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
-                                @if ($applicant->taggedAndValidated)
-                                <span class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">Tagged</span>
-                                @else
-                                <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
-                                    class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
-                                    Tag
-                                </button>
-                                @endif
-                            </td>
-                        </tr>
+                            <tr>
+                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">
+                                    <input type="checkbox" wire:model="selectedApplicantsForExport.{{ $applicant->applicant_id }}">
+                                </td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap font-semibold">{{ $applicant->applicant_id }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">{{ $applicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
+{{--                                <td class="py-4 px-2 text-center border-b capitalize status-col">--}}
+{{--                                    @if ($applicant->is_tagged)--}}
+{{--                                        <span class="bg-gray-400 text-white px-3 py-1.5 rounded-full">Tagged</span>--}}
+{{--                                    @else--}}
+{{--                                        <span class="text-amber-600">Pending</span>--}}
+{{--                                    @endif--}}
+{{--                                </td>--}}
+                                <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
+                                    <button wire:click="edit({{ $applicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
+                                    @if ($applicant->taggedAndValidated)
+                                        <button class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">
+                                            Tagged
+                                        </button>
+                                    @else
+                                        <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
+                                            Tag
+                                        </button>
+                                    @endif
+                                </td>
+                            </tr>
                         @empty
                         <tr>
                             <td colspan="8" class="py-4 px-2 text-center border-b">No applicants found.</td>
@@ -152,22 +230,8 @@
                         @endforelse
                     </tbody>
                 </table>
-
-
-
-
-
+                
                 <div class="py-4 px-3">
-                    {{-- <div class="flex">--}}
-                    {{-- <div class="flex space-x-4 items-center mb-3">--}}
-                    {{-- <label for="">Per page</label>--}}
-                    {{-- <select name="" id="">--}}
-                    {{-- <option value="10">5</option>--}}
-                    {{-- <option value="20">10</option>--}}
-                    {{-- <option value="50">20</option>--}}
-                    {{-- </select>--}}
-                    {{-- </div>--}}
-                    {{-- </div>--}}
                     {{ $applicants->links() }}
                 </div>
 
@@ -264,12 +328,49 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-4 mb-4">
-                                <!-- Award Button -->
-                                <button type="submit"
-                                    class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                    <span class="text-[12px]"> + ADD APPLICANT</span>
-                                </button>
-
+                                <!-- Submit button and alert message -->
+                                <div>
+                                    <div class="alert"
+                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         x-data="{ open:false, alert:{} }"
+                                         x-show="open" x-cloak
+                                         x-transition:enter="animate-alert-show"
+                                         x-transition:leave="animate-alert-hide"
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
+                                    >
+                                        <div class="alert-wrapper">
+                                            <strong x-html="alert.title">Title</strong>
+                                            <p x-html="alert.message">Description</p>
+                                        </div>
+                                        <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                                    </div>
+                                    <!-- Add Applicant Button -->
+                                    <button type="submit" wire:click.prevent="store"
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                        <span class="text-[12px]"> + ADD APPLICANT</span>
+                                        <div wire:loading>
+                                            <svg aria-hidden="true"
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                            </svg>
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                                <script>
+                                    document.addEventListener('livewire.initialized', () => {
+                                        let obj = @json(session('alert') ?? []);
+                                        if (Object.keys(obj).length){
+                                            Livewire.dispatch('alert', [obj])
+                                        }
+                                    })
+                                </script>
                                 <!-- Cancel Button -->
                                 <button type="button" @click="isModalOpen = false"
                                     class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
@@ -293,15 +394,6 @@
                         </div>
 
                         <form wire:submit.prevent="update">
-                            <!-- Date Applied Field -->
-                            <div class="grid grid-cols-1 mb-4">
-                                <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="date_applied">APPLICATION DATE <span class="text-red-500">*</span></label>
-                                    <input type="date" id="date_applied" wire:model="date_applied" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none"
-                                        max="{{ now()->toDateString() }}">
-                                    @error('date_applied') <span class="error">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
                             <!-- Main Fields -->
                             <div class="grid grid-cols-2 gap-3 mb-3">
                                 <!-- First Name Field -->
@@ -358,12 +450,49 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-4 mb-4">
-                                <!-- SAVE Button -->
-                                <button type="submit"
-                                    class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                    <span class="text-[12px]"> SAVE </span>
-                                </button>
-
+                                <!-- Save button and alert message -->
+                                <div>
+                                    <div class="alert"
+                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         x-data="{ open:false, alert:{} }"
+                                         x-show="open" x-cloak
+                                         x-transition:enter="animate-alert-show"
+                                         x-transition:leave="animate-alert-hide"
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
+                                    >
+                                        <div class="alert-wrapper">
+                                            <strong x-html="alert.title">Title</strong>
+                                            <p x-html="alert.message">Description</p>
+                                        </div>
+                                        <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                                    </div>
+                                    <!-- SAVE Button -->
+                                    <button type="submit" wire:click.prevent="update"
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                        <span class="text-[12px]"> SAVE </span>
+                                        <div wire:loading>
+                                            <svg aria-hidden="true"
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                            </svg>
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                                <script>
+                                    document.addEventListener('livewire.initialized', () => {
+                                        let obj = @json(session('alert') ?? []);
+                                        if (Object.keys(obj).length){
+                                            Livewire.dispatch('alert', [obj])
+                                        }
+                                    })
+                                </script>
                                 <!-- Cancel Button -->
                                 <button type="button" @click="openEditModal = false"
                                     class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">

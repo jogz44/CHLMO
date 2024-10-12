@@ -38,7 +38,6 @@ class TaggedAndValidatedApplicant extends Model
         'house_owner',
         'tagger_name',
         'remarks',
-        'photos',
         'is_tagged'
     ];
 
@@ -107,7 +106,7 @@ class TaggedAndValidatedApplicant extends Model
         return $this->belongsTo(CaseSpecification::class);
     }
 
-    // Relationship with CaseSpecification
+    // Relationship with government Program
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
@@ -129,5 +128,9 @@ class TaggedAndValidatedApplicant extends Model
     public function wallType(): BelongsTo
     {
         return $this->belongsTo(WallType::class);
+    }
+    public function images()
+    {
+        return $this->hasMany(ImagesForHousing::class);
     }
 }

@@ -42,8 +42,7 @@ class AddressFactory extends Factory
         return [
             'purok_id' => fake()->randomElement($purokIds),
             'barangay_id' => fake()->randomElement($barangayIds),
-            'street' => $this->faker->streetAddress(),
-            'house_number' => $this->faker->buildingNumber(),
+            'full_address' => $this->faker->streetAddress(),
         ];
     }
 

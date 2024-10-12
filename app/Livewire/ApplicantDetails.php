@@ -7,6 +7,7 @@ use App\Models\Barangay;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
+use App\Models\ImagesForHousing;
 use App\Models\LivingSituation;
 use App\Models\LivingStatus;
 use App\Models\Purok;
@@ -20,10 +21,13 @@ use App\Models\WallType;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Livewire\Attributes\Rule;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ApplicantDetails extends Component
 {
+    use WithFileUploads;
     public $applicantId;
     public $applicant;
     public $applicantForSpouse;
@@ -79,7 +83,10 @@ class ApplicantDetails extends Component
     public $spouse_last_name;
     public $spouse_occupation;
     public $spouse_monthly_income;
-    public $photos = [];
+
+    public $images = [];
+    public $displayNames = []; // Store file names to allow renaming
+
     public function mount($applicantId)
     {
         $this->applicantId = $applicantId;
@@ -145,6 +152,7 @@ class ApplicantDetails extends Component
         // Set interviewer
         $this->tagger_name = Auth::user()->full_name();
     }
+
     protected function rules()
     {
         return [
@@ -192,7 +200,7 @@ class ApplicantDetails extends Component
             'roof_type_id' => 'required|exists:roof_types,id',
             'wall_type_id' => 'required|exists:wall_types,id',
             'remarks' => 'nullable|string|max:255',
-            'photos.*' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // Spouse details
             'spouse_first_name' => [
@@ -238,14 +246,6 @@ class ApplicantDetails extends Component
         // Validate the input data
         $this->validate();
 
-        $photoPaths = []; // Array to hold the paths of stored photos
-
-        foreach ($this->photos as $photo) {
-            // Store each photo and get the path
-            $path = $photo->store('photos', 'public');
-            $photoPaths[] = $path; // Store the path in the array
-        }
-
         \Log::info('Creating tagged applicant', ['is_tagged' => true]);
 
         // Attempt to create the new tagged and validated applicant record
@@ -274,7 +274,6 @@ class ApplicantDetails extends Component
                 'roof_type_id' => $this->roof_type_id,
                 'wall_type_id' => $this->wall_type_id,
                 'remarks' => $this->remarks ?: 'N/A',
-                'photo' => !empty($photoPaths) ? json_encode($photoPaths) : null, // Store as JSON array
                 // These two are auto-generated
                 'is_tagged' => true,
                 'tagger_name' => $this->tagger_name,
@@ -289,6 +288,21 @@ class ApplicantDetails extends Component
                     'spouse_last_name' => $this->spouse_last_name,
                     'spouse_occupation' => $this->spouse_occupation,
                     'spouse_monthly_income' => $this->spouse_monthly_income,
+                ]);
+            }
+
+            foreach ($this->images as $image) {
+                // Use the original file name
+                $displayName = $image->getClientOriginalName();
+
+                // Store the file using the original name
+                $path = $image->storeAs('images', $displayName, 'public');
+
+                // Save the file info to the database
+                ImagesForHousing::create([
+                    'tagged_and_validated_applicant_id' => $this->applicantId,
+                    'image_path' => $path,
+                    'display_name' => $displayName,
                 ]);
             }
 
