@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\TaggedAndValidatedApplicant;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 
 class ApplicantsViaRequest extends Component
