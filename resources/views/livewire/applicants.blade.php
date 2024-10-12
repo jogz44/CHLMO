@@ -48,7 +48,6 @@
                                 &times; <!-- This is the "x" symbol -->
                             </button>
                         </div>
-
                         <!-- Button to toggle dropdown -->
                         <div x-data="{ showDropdown: false }" class="relative">
                             <button @click="showDropdown = !showDropdown" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-2 rounded-md items-center">
@@ -123,30 +122,44 @@
                             });
                         </script>
                     </div>
+
+                    <div class="flex justify-end">
+                        <label class="text-center mt-2 mr-1" for="start_date">Date Applied From:</label>
+                        <input type="date" id="start_date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                               max="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 ml-2 mr-1" for="end_date">To:</label>
+                        <input type="date" id="end_date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
+                               max="{{ now()->toDateString() }}">
+
+                        <div class="relative group">
+                            <button wire:click="resetFilters" class="flex items-center justify-center border border-gray-300 bg-gray-100 rounded w-8 h-8">
+                                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 256 256" class="w-4 h-4" xml:space="preserve">
+                                    <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                        <path d="M 81.521 31.109 c -0.86 -1.73 -2.959 -2.438 -4.692 -1.575 c -1.73 0.86 -2.436 2.961 -1.575 4.692 c 2.329 4.685 3.51 9.734 3.51 15.01 C 78.764 67.854 63.617 83 45 83 S 11.236 67.854 11.236 49.236 c 0 -16.222 11.501 -29.805 26.776 -33.033 l -3.129 4.739 c -1.065 1.613 -0.62 3.784 0.992 4.85 c 0.594 0.392 1.264 0.579 1.926 0.579 c 1.136 0 2.251 -0.553 2.924 -1.571 l 7.176 -10.87 c 0.001 -0.001 0.001 -0.002 0.002 -0.003 l 0.018 -0.027 c 0.063 -0.096 0.106 -0.199 0.159 -0.299 c 0.049 -0.093 0.108 -0.181 0.149 -0.279 c 0.087 -0.207 0.152 -0.419 0.197 -0.634 c 0.009 -0.041 0.008 -0.085 0.015 -0.126 c 0.031 -0.182 0.053 -0.364 0.055 -0.547 c 0 -0.014 0.004 -0.028 0.004 -0.042 c 0 -0.066 -0.016 -0.128 -0.019 -0.193 c -0.008 -0.145 -0.018 -0.288 -0.043 -0.431 c -0.018 -0.097 -0.045 -0.189 -0.071 -0.283 c -0.032 -0.118 -0.065 -0.236 -0.109 -0.35 c -0.037 -0.095 -0.081 -0.185 -0.125 -0.276 c -0.052 -0.107 -0.107 -0.211 -0.17 -0.313 c -0.054 -0.087 -0.114 -0.168 -0.175 -0.25 c -0.07 -0.093 -0.143 -0.183 -0.223 -0.27 c -0.074 -0.08 -0.153 -0.155 -0.234 -0.228 c -0.047 -0.042 -0.085 -0.092 -0.135 -0.132 L 36.679 0.775 c -1.503 -1.213 -3.708 -0.977 -4.921 0.53 c -1.213 1.505 -0.976 3.709 0.53 4.921 l 3.972 3.2 C 17.97 13.438 4.236 29.759 4.236 49.236 C 4.236 71.714 22.522 90 45 90 s 40.764 -18.286 40.764 -40.764 C 85.764 42.87 84.337 36.772 81.521 31.109 z"
+                                              style="fill: rgb(0,0,0);"></path>
+                                    </g>
+                                </svg>
+                            </button>
+                            <p class="absolute opacity-0 w-12/12 group-hover:opacity-50 transition-opacity duration-300 rounded-md bg-gray-700 text-[11px] text-white mt-1 p-1">
+                                Reset
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                    <label class="text-center mt-2" for="start_date">Date Applied From:</label>
-                    <input type="date" id="start_date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                           max="{{ now()->toDateString() }}">
-                    <label class="text-center mt-2" for="end_date">Date Applied To:</label>
-                    <input type="date" id="end_date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                           max="{{ now()->toDateString() }}">
-
-                    <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                        <option value="">Purok</option>
-                        @foreach($puroksFilter as $purokFilter)
-                            <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
-                        @endforeach
-                    </select>
-
                     <select wire:model.live="selectedBarangay_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Barangay</option>
                         @foreach($barangaysFilter as $barangayFilter)
                             <option value="{{ $barangayFilter->id }}">{{ $barangayFilter->name }}</option>
                         @endforeach
                     </select>
-
+                    <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Purok</option>
+                        @foreach($puroksFilter as $purokFilter)
+                            <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
+                        @endforeach
+                    </select>
                     <select wire:model.live="selectedTaggingStatus" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
                         @foreach($taggingStatuses as $status)
@@ -163,41 +176,33 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="py-2 px-2 border-b text-center font-semibold">
-                                <input type="checkbox">
-                            </th>
-                            <th class="py-2 px-2 border-b text-center font-semibold">ID</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column name-col">NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column suffix-col">SUFFIX NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column contact-col">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column purok-col">PUROK</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column barangay-col">BARANGAY</th>
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column date-applied-col">DATE APPLIED</th>
-{{--                            <th class="py-2 px-2 border-b text-center font-semibold capitalize toggle-column date-applied-col">Status</th>--}}
-                            <th class="py-2 px-2 border-b text-center font-semibold toggle-column actions-col">ACTIONS</th>
+{{--                            <th class="py-2 px-2 border-b text-center font-semibold">--}}
+{{--                                <input type="checkbox">--}}
+{{--                            </th>--}}
+                            <th class="py-2 px-2 border-b text-center font-medium">ID</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">NAME</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">SUFFIX NAME</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">CONTACT NUMBER</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">PUROK</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">BARANGAY</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column date-applied-col">DATE APPLIED</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column actions-col">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($applicants as $applicant)
                             <tr>
-                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">
-                                    <input type="checkbox" wire:model="selectedApplicantsForExport.{{ $applicant->applicant_id }}">
-                                </td>
-                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">{{ $applicant->applicant_id }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase suffix-col">{{ $applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase contact-col">{{ $applicant->contact_number }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b uppercase barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
-{{--                                <td class="py-4 px-2 text-center border-b capitalize status-col">--}}
-{{--                                    @if ($applicant->is_tagged)--}}
-{{--                                        <span class="bg-gray-400 text-white px-3 py-1.5 rounded-full">Tagged</span>--}}
-{{--                                    @else--}}
-{{--                                        <span class="text-amber-600">Pending</span>--}}
-{{--                                    @endif--}}
+{{--                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">--}}
+{{--                                    <input type="checkbox" wire:model="selectedApplicantsForExport.{{ $applicant->applicant_id }}">--}}
 {{--                                </td>--}}
-                                <td class="py-4 px-2 text-center border-b space-x-2 actions-col">
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant_id }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">{{ $applicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2 actions-col">
                                     <button wire:click="edit({{ $applicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                                     @if ($applicant->taggedAndValidated)
                                         <button class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">
@@ -218,6 +223,8 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <!-- Pagination Links -->
                 <div class="py-4 px-3">
                     {{ $applicants->links() }}
                 </div>
@@ -493,21 +500,28 @@
         </div>
     </div>
 </div>
-<script>
-    function pagination() {
-        return {
-            currentPage: 1,
-            totalPages: 3, // Set this to the total number of pages you have
+{{--<script>--}}
+{{--    function pagination() {--}}
+{{--        return {--}}
+{{--            currentPage: 1,--}}
+{{--            totalPages: 3, // Set this to the total number of pages you have--}}
 
-            prevPage() {
-                if (this.currentPage > 1) this.currentPage--;
-            },
-            nextPage() {
-                if (this.currentPage < this.totalPages) this.currentPage++;
-            },
-            goToPage(page) {
-                this.currentPage = page;
-            }
-        }
+{{--            prevPage() {--}}
+{{--                if (this.currentPage > 1) this.currentPage--;--}}
+{{--            },--}}
+{{--            nextPage() {--}}
+{{--                if (this.currentPage < this.totalPages) this.currentPage++;--}}
+{{--            },--}}
+{{--            goToPage(page) {--}}
+{{--                this.currentPage = page;--}}
+{{--            }--}}
+{{--        }--}}
+{{--    }--}}
+{{--</script>--}}
+<script>
+    function capitalizeInput(input) {
+        input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
+            return char.toUpperCase();
+        });
     }
 </script>

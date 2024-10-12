@@ -36,9 +36,6 @@
                 </div>
 
                 <div class="flex flex-col p-3 rounded mt-12">
-
-{{--                    <x-validation-errors class="z-70 mb-1" />--}}
-
                     <h2 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
                     <h1 class="text-[25px] ml-2 items-center font-bold text-gray-700 mb-3">
                         {{ $applicant->last_name }}, {{ $applicant->first_name }}
@@ -49,230 +46,279 @@
                         Applicant from the form.</p>
                 </div>
 
-                <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
+                <div class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="first-name" class="block text-[12px] font-medium text-gray-700 mb-1" aria-describedby>FIRST NAME <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="first_name" type="text" id="first-name" name="first-name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
+                            <input wire:model="first_name" type="text" id="first-name" name="first-name" class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow cursor-default" readonly>
                             @error('first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">MIDDLE NAME <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="middle_name" type="text" id="middle_name" name="middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
+                            <input wire:model="middle_name" type="text" id="middle_name" name="middle_name" class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow cursor-default" readonly>
                             @error('middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="last_name" class="block text-[12px] font-medium text-gray-700 mb-1">LAST NAME <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="last_name" type="text" id="last_name" name="last-name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
+                            <input wire:model="last_name" type="text" id="last_name" name="last-name" class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow cursor-default" readonly>
                             @error('last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="suffix_name" class="block text-[12px] font-medium text-gray-700 mb-1">SUFFIX NAME <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="suffix_name" type="text" id="suffix_name" name="suffix_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
+                            <input wire:model="suffix_name" type="text" id="suffix_name" name="suffix_name" class="capitalize w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow cursor-default" readonly>
                             @error('suffix_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="barangay" class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="barangay" id="barangay" name="barangay" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
-                            @error('barangay') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="purok" id="purok" name="purok" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
-                            @error('purok') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="full_address" class="block text-[12px] font-medium text-gray-700 mb-1">FULL ADDRESS</label>
-                            <input wire:model="full_address" type="text" id="full_address" name="full_address" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @error('full_address') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
-                            <select x-model="civilStatus" id="civil_status" name="civil_status" wire:model="civil_status_id"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Status</option>
-                                @foreach($civil_statuses as $status)
-                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
-                                @endforeach
-                            </select>
-                            @error('civil_status') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT NUMBER <small class="text-red-500">(read only)</small></label>
-                            <input wire:model="contact_number" type="text" id="contact_number" name="contact_number" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase cursor-default" readonly>
-                            @error('contact_number') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="tribe" class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                            <select wire:model="tribe_id" id="tribe" name="tribe" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                                <option value="">Select Tribe/Ethnicity</option>
-                                @foreach($tribes as $tribe)
-                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX <span class="text-red-500">*</span></label>
-                            <div class="flex items-center">
-                                <div class="mr-6">
-                                    <input type="radio" wire:model="sex" value="Male" id="male" class="mr-2">
-                                    <label for="male" class="cursor-pointer">Male</label>
-                                </div>
-                                <div>
-                                    <input type="radio" wire:model="sex" value="Female" id="female" class="mr-2">
-                                    <label for="female" class="cursor-pointer">Female</label>
-                                </div>
-                                @error('sex') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                    <div x-data="{ civilStatus: '' }">
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="barangay" class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY <small class="text-red-500">(read only)</small></label>
+                                <input wire:model="barangay" id="barangay" name="barangay" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                @error('barangay') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK <small class="text-red-500">(read only)</small></label>
+                                <input wire:model="purok" id="purok" name="purok" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                @error('purok') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="full_address" class="block text-[12px] font-medium text-gray-700 mb-1">FULL ADDRESS</label>
+                                <input wire:model="full_address" type="text" id="full_address" name="full_address" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('full_address') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
+                                <select x-model="civilStatus" id="civil_status" name="civil_status" wire:model="civil_status_id"
+                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select Status</option>
+                                    @foreach($civil_statuses as $status)
+                                        <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                    @endforeach
+                                </select>
+                                @error('civil_status') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                         </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">DATE OF BIRTH <span class="text-red-500">*</span></label>
-                            <input wire:model="date_of_birth" type="date" id="date_of_birth" name="date_of_birth" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                            @error('date_of_birth') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
-                            <select wire:model="religion_id" id="religion" name="religion" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Religion</option>
-                                @foreach($religions as $religion)
-                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('religion') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="occupation"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <small>(Put N/A if none)</small> <span class="text-red-500">*</span></label>
-                            <input type="text" id="occupation" name="occupation" wire:model="occupation"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                            @error('occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                INCOME <span class="text-red-500">*</span></label>
-                            <input type="text" id="monthly_income" wire:model="monthly_income"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                            @error('monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
-                                INCOME <span class="text-red-500">*</span></label>
-                            <input type="text" id="family_income" wire:model="family_income"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                            @error('family_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
 
-                    <template x-if="civilStatus === '2'">
-                        <div>
-                            <hr class="mt-2 mb-2 ">
-                            <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
-                            <div class="flex flex-wrap -mx-2">
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        FIRST NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse_first_name" name="spouse_first_name" wire:model="spouse_first_name" class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse_middle_name" name="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        LAST NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse_last_name" name="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                </div>
-
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse_occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse_occupation" name="spouse_occupation" wire:model="spouse_occupation"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                                    @error('spouse_occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="spouse_monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                        INCOME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="spouse_monthly_income" name="spouse_monthly_income" wire:model="spouse_monthly_income"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase">
-                                    @error('spouse_monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT NUMBER <small class="text-red-500">(read only)</small></label>
+                                <input wire:model="contact_number" type="text" id="contact_number" name="contact_number" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                @error('contact_number') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="tribe" class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
+                                <select wire:model="tribe_id" id="tribe" name="tribe" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
+                                    <option value="">Select Tribe/Ethnicity</option>
+                                    @foreach($tribes as $tribe)
+                                        <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX <span class="text-red-500">*</span></label>
+                                <div class="flex items-center">
+                                    <div class="mr-6">
+                                        <input type="radio" wire:model="sex" value="Male" id="male" class="mr-2">
+                                        <label for="male" class="cursor-pointer">Male</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" wire:model="sex" value="Female" id="female" class="mr-2">
+                                        <label for="female" class="cursor-pointer">Female</label>
+                                    </div>
+                                    @error('sex') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">DATE OF BIRTH <span class="text-red-500">*</span></label>
+                                <input wire:model="date_of_birth" type="date" id="date_of_birth" name="date_of_birth" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @error('date_of_birth') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
                         </div>
-                    </template>
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
+                                <select wire:model="religion_id" id="religion" name="religion" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    <option value="">Select Religion</option>
+                                    @foreach($religions as $religion)
+                                        <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('religion') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="occupation"
+                                       class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <small>(Put N/A if none)</small> <span class="text-red-500">*</span></label>
+                                <input type="text" id="occupation" name="occupation" wire:model="occupation"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
+                                    INCOME <span class="text-red-500">*</span></label>
+                                <input type="text" id="monthly_income" wire:model="monthly_income"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
+                                    INCOME <span class="text-red-500">*</span></label>
+                                <input type="text" id="family_income" wire:model="family_income"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('family_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <template x-if="civilStatus === '2'">
+                            <div>
+                                <hr class="mt-2 mb-2 ">
+                                <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            FIRST NAME <span class="text-red-500">*</span></label>
+                                        <input type="text" id="spouse_first_name" name="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            MIDDLE NAME <span class="text-red-500">*</span></label>
+                                        <input type="text" id="spouse_middle_name" name="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            LAST NAME <span class="text-red-500">*</span></label>
+                                        <input type="text" id="spouse_last_name" name="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
+                                        <input type="text" id="spouse_occupation" name="spouse_occupation" wire:model="spouse_occupation"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
+                                            INCOME <span class="text-red-500">*</span></label>
+                                        <input type="text" id="spouse_monthly_income" name="spouse_monthly_income" wire:model="spouse_monthly_income"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
 
                     <div x-data="{
+                        isEditing: false,
                         rows: [
-                            { name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '' },
+                            { firstName: '', middleName: '', LastName: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' },
                         ],
                         addRow() {
-                            this.rows.push({ name: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '' });
+                            this.rows.push({ firstName: '', middleName: '', LastName: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' });
+                        },
+                        toggleEditMode() {
+                            this.isEditing = !this.isEditing;
                         }
                     }" class="mt-6">
-
-                        <h2 class="text-[12px] font-medium text-gray-700 mb-2">DEPENDENTS</h2>
+                        <div class="flex justify-between">
+                            <div class="mt-4 flex justify-start">
+                                <h2 class="text-[12px] font-medium text-gray-700 mb-2">DEPENDENTS</h2>
+                            </div>
+                            <div class="mt-4 flex justify-end mb-2">
+                                <!-- Toggle Edit/Cancel -->
+                                <button type="button" @click="toggleEditMode"
+                                        class="mr-4 text-[12px] px-4 py-1 bg-custom-yellow text-white hover:bg-orange-500 rounded-full">
+                                    <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
+                                </button>
+                                <!-- Show Save button only when in editing mode -->
+                                <button type="submit" x-show="isEditing" @click="toggleEditMode"
+                                        class="px-4 text-[12px] py-1 bg-green-500 text-white rounded-full hover:bg-green-600">
+                                    Save
+                                </button>
+                            </div>
+                        </div>
                         <table class="w-full">
                             <thead>
-                                <tr class="text-center border border-gray-700">
-                                    <th class="p-2 border-b">Name</th>
-                                    <th class="p-2 border-b">Civil Status</th>
-                                    <th class="p-2 border-b">Age</th>
-                                    <th class="p-2 border-b">Occupation</th>
-                                    <th class="p-2 border-b">Monthly Income</th>
-                                </tr>
+                            <tr class="text-center border border-gray-700">
+                                <th class="p-2 border-b">First Name</th>
+                                <th class="p-2 border-b">Middle Name</th>
+                                <th class="p-2 border-b">Last Name</th>
+                                <th class="p-2 border-b">Civil Status</th>
+                                <th class="p-2 border-b">Age</th>
+                                <th class="p-2 border-b">Occupation</th>
+                                <th class="p-2 border-b">Monthly Income</th>
+                                <th class="p-2 border-b">Relationship</th>
+                                <th class="p-2 border-b"></th>
+                            </tr>
                             </thead>
                             <tbody>
-                                <template x-for="(row, index) in rows" :key="index">
-                                    <tr class="odd:bg-custom-green-light even:bg-transparent text-center">
-                                        <td class="border px-4 py-2" style="background-color: rgba(163, 214, 163, 0.5);">
-                                            <input type="text" x-model="row.name"
-                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
-                                        </td>
-                                        <td class="border px-4 py-2">
-                                            <input type="text" x-model="row.civilStatus"
-                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
-                                        </td>
-                                        <td class="border px-4 py-2">
-                                            <input type="text" x-model="row.age"
-                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
-                                        </td>
-                                        <td class="border px-4 py-2">
-                                            <input type="text" x-model="row.occupation"
-                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
-                                        </td>
-                                        <td class="border px-4 py-2">
-                                            <input type="text" x-model="row.monthlyIncome"
-                                                class="uppercase w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
-                                        </td>
-                                        <td class="border px-4 py-2">
-                                            <button @click.prevent="rows.splice(index, 1)" type="button"
-                                                class="text-red-500 hover:text-red-700 text-[14px]">
-                                                ✕
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
+                            <template x-for="(row, index) in rows" :key="index">
+                                <tr class="odd:bg-custom-green-light even:bg-transparent text-center">
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.firstName"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        <span x-show="!isEditing" x-text="row.firstName"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.middleName"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        <span x-show="!isEditing" x-text="row.middleName"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.lastName"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        <span x-show="!isEditing" x-text="row.lastName"></span>
+                                    </td>
+                                    <td class="border px-1 py-2">
+                                        <select x-show="isEditing" x-model="row.civilStatus"
+                                                class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                            <option value="">Select Status</option>
+                                            @foreach($civil_statuses as $status)
+                                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                            @endforeach
+                                        </select>
+                                        <span x-show="!isEditing" x-text="row.civilStatus"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.age"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
+                                        <span x-show="!isEditing" x-text="row.age"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.occupation"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        <span x-show="!isEditing" x-text="row.occupation"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.monthlyIncome"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        <span x-show="!isEditing" x-text="row.monthlyIncome"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <input x-show="isEditing" type="text" x-model="row.relationship"
+                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        <span x-show="!isEditing" x-text="row.relationship"></span>
+                                    </td>
+                                    <td class="border px-4 py-2">
+                                        <button @click.prevent="rows.splice(index, 1)" type="button"
+                                                class="text-red-500 hover:text-red-700 text-[14px]" x-show="isEditing">
+                                            ✕
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
                             </tbody>
                         </table>
-
                         <!-- Add Row Button -->
                         <div class="flex justify-end mb-4 mt-4">
-                            <button @click.prevent="addRow()" type="button"
-                                class="text-white bg-green-500 hover:bg-green-600 text-[12px] px-2 py-2 rounded-md flex items-center">
+                            <button @click.prevent="addRow()" type="button" x-show="isEditing"
+                                    class="text-white bg-green-500 hover:bg-green-600 text-[12px] px-2 py-2 rounded-md flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                    class="w-5 h-5 mr-1">
+                                     class="w-5 h-5 mr-1">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
                                 Add Row
@@ -461,43 +507,43 @@
                                     <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
                                         <div class="w-full h-full bg-green-500"></div>
                                     </div>
-
-                                    <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
-                                    <div x-show="openPreviewModal"
-                                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                                         x-cloak>
-                                        <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                                            <!-- Modal Header with File Name -->
-                                            <div class="flex justify-between items-center mb-4">
-                                                <!-- Only show input if selectedFile is not null -->
-                                                <template x-if="selectedFile">
-                                                    <input type="text" x-model="selectedFile.displayName"
-                                                           class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                                                    @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
-                                                </template>
-                                                <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename File</button>
-                                                <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">&times;</button>
-                                            </div>
-
-                                            <!-- Display Image -->
-                                            <div class="flex justify-center mb-4">
-                                                {{-- <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"--}}
-                                                <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
-                                                     alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                                            </div>
-                                            <!-- Modal Buttons -->
-                                            <div class="flex justify-between mt-4">
-                                                <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                                        @click="openPreviewModal = false">CONFIRM
-                                                </button>
-                                                <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                                        @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </template>
+                        </div>
+
+                        <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
+                        <div x-show="openPreviewModal"
+                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
+                             x-cloak>
+                            <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
+                                <!-- Modal Header with File Name -->
+                                <div class="flex justify-between items-center mb-4">
+                                    <!-- Only show input if selectedFile is not null -->
+                                    <template x-if="selectedFile">
+                                        <input type="text" x-model="selectedFile.displayName"
+                                               class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
+                                        @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                    </template>
+                                    <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename File</button>
+                                    <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">&times;</button>
+                                </div>
+
+                                <!-- Display Image -->
+                                <div class="flex justify-center mb-4">
+                                    {{-- <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"--}}
+                                    <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
+                                         alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
+                                </div>
+                                <!-- Modal Buttons -->
+                                <div class="flex justify-between mt-4">
+                                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
+                                            @click="openPreviewModal = false">CONFIRM
+                                    </button>
+                                    <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
+                                            @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
