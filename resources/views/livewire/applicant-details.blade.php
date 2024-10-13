@@ -212,34 +212,23 @@
                         </template>
                     </div>
 
-                    <div x-data="{
-                        isEditing: false,
-                        rows: [
-                            { firstName: '', middleName: '', LastName: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' },
-                        ],
-                        addRow() {
-                            this.rows.push({ firstName: '', middleName: '', LastName: '', civilStatus: '', age: '', occupation: '', monthlyIncome: '', relationship: '' });
-                        },
-                        toggleEditMode() {
-                            this.isEditing = !this.isEditing;
-                        }
-                    }" class="mt-6">
+                    <div class="mt-6">
                         <div class="flex justify-between">
                             <div class="mt-4 flex justify-start">
                                 <h2 class="text-[12px] font-medium text-gray-700 mb-2">DEPENDENTS</h2>
                             </div>
-                            <div class="mt-4 flex justify-end mb-2">
+{{--                            <div class="mt-4 flex justify-end mb-2">--}}
                                 <!-- Toggle Edit/Cancel -->
-                                <button type="button" @click="toggleEditMode"
-                                        class="mr-4 text-[12px] px-4 py-1 bg-custom-yellow text-white hover:bg-orange-500 rounded-full">
-                                    <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>
-                                </button>
-                                <!-- Show Save button only when in editing mode -->
-                                <button type="submit" x-show="isEditing" @click="toggleEditMode"
-                                        class="px-4 text-[12px] py-1 bg-green-500 text-white rounded-full hover:bg-green-600">
-                                    Save
-                                </button>
-                            </div>
+{{--                                <button type="button"--}}
+{{--                                        class="mr-4 text-[12px] px-4 py-1 bg-custom-yellow text-white hover:bg-orange-500 rounded-full">--}}
+{{--                                    <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>--}}
+{{--                                </button>--}}
+{{--                                <!-- Show Save button only when in editing mode -->--}}
+{{--                                <button type="submit" x-show="isEditing" @click="toggleEditMode"--}}
+{{--                                        class="px-4 text-[12px] py-1 bg-green-500 text-white rounded-full hover:bg-green-600">--}}
+{{--                                    Save--}}
+{{--                                </button>--}}
+{{--                            </div>--}}
                         </div>
                         <table class="w-full">
                             <thead>
@@ -247,8 +236,9 @@
                                 <th class="p-2 border-b">First Name</th>
                                 <th class="p-2 border-b">Middle Name</th>
                                 <th class="p-2 border-b">Last Name</th>
+                                <th class="p-2 border-b">Sex</th>
                                 <th class="p-2 border-b">Civil Status</th>
-                                <th class="p-2 border-b">Age</th>
+                                <th class="p-2 border-b">Date of Birth</th>
                                 <th class="p-2 border-b">Occupation</th>
                                 <th class="p-2 border-b">Monthly Income</th>
                                 <th class="p-2 border-b">Relationship</th>
@@ -256,72 +246,84 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <template x-for="(row, index) in rows" :key="index">
-                                <tr class="odd:bg-custom-green-light even:bg-transparent text-center">
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.firstName"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                        <span x-show="!isEditing" x-text="row.firstName"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.middleName"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                        <span x-show="!isEditing" x-text="row.middleName"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.lastName"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                        <span x-show="!isEditing" x-text="row.lastName"></span>
-                                    </td>
-                                    <td class="border px-1 py-2">
-                                        <select x-show="isEditing" x-model="row.civilStatus"
-                                                class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                            <option value="">Select Status</option>
-                                            @foreach($civil_statuses as $status)
-                                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span x-show="!isEditing" x-text="row.civilStatus"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.age"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
-                                        <span x-show="!isEditing" x-text="row.age"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.occupation"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                        <span x-show="!isEditing" x-text="row.occupation"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.monthlyIncome"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                        <span x-show="!isEditing" x-text="row.monthlyIncome"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <input x-show="isEditing" type="text" x-model="row.relationship"
-                                               class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
-                                        <span x-show="!isEditing" x-text="row.relationship"></span>
-                                    </td>
-                                    <td class="border px-4 py-2">
-                                        <button @click.prevent="rows.splice(index, 1)" type="button"
-                                                class="text-red-500 hover:text-red-700 text-[14px]" x-show="isEditing">
-                                            ✕
-                                        </button>
-                                    </td>
-                                </tr>
-                            </template>
+                                @foreach($dependents as $index => $dependent)
+                                    <tr class="odd:bg-custom-green-light even:bg-transparent text-center">
+                                        <td class="border px-4 py-2">
+                                            <input type="text" wire:model="dependents.{{$index}}.dependent_first_name"
+                                                   placeholder="First name..."
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="text" wire:model="dependents.{{$index}}.dependent_middle_name"
+                                                   placeholder="Middle name..."
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="text" wire:model="dependents.{{$index}}.dependent_last_name"
+                                                   placeholder="Last name..."
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <div class="flex items-center">
+                                                <div class="mr-6">
+                                                    <input type="radio" wire:model="dependents.{{$index}}.dependent_sex"
+                                                           value="Male" id="male" class="mr-2">
+                                                    <label for="male" class="cursor-pointer">Male</label>
+                                                </div>
+                                                <div>
+                                                    <input type="radio" wire:model="dependents.{{$index}}.dependent_sex"
+                                                           value="Female" id="female" class="mr-2">
+                                                    <label for="female" class="cursor-pointer">Female</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="border px-1 py-2">
+                                            <select wire:model="dependents.{{$index}}.dependent_civil_status_id"
+                                                    class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                                <option value="">Select Status</option>
+                                                @foreach($dependent_civil_statuses as $dependentStatus)
+                                                    <option value="{{ $dependentStatus->id }}">{{ $dependentStatus->civil_status }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="date" wire:model="dependents.{{$index}}.dependent_date_of_birth"
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="text" wire:model="dependents.{{$index}}.dependent_relationship"
+                                                   placeholder="Mother..."
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="text" wire:model="dependents.{{$index}}.dependent_occupation"
+                                                   placeholder="Occupation..."
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <input type="number" wire:model="dependents.{{$index}}.dependent_monthly_income"
+                                                   placeholder="9000"
+                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]" oninput="capitalizeInput(this)">
+                                        </td>
+                                        <td class="border px-4 py-2">
+                                            <button type="button" wire:click="remove({{ $index }})"
+                                                    class="text-red-500 hover:text-red-700 text-[14px]">
+                                                ✕
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                         <!-- Add Row Button -->
                         <div class="flex justify-end mb-4 mt-4">
-                            <button @click.prevent="addRow()" type="button" x-show="isEditing"
+                            <button type="button" wire:click="add()"
                                     class="text-white bg-green-500 hover:bg-green-600 text-[12px] px-2 py-2 rounded-md flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
                                      class="w-5 h-5 mr-1">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                 </svg>
-                                Add Row
+                                Add Dependent
                             </button>
                         </div>
                     </div>
@@ -460,6 +462,7 @@
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">UPLOAD DOCUMENTS</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured requirements submitted by the qualified applicants.</p>
                 </div>
+
                 <!-- File Uploads -->
                 <div x-data="fileUpload()" class="bg-white p-6 rounded shadow mb-6">
                     <div class="grid grid-cols-2 gap-2">
@@ -520,8 +523,11 @@
                                 <div class="flex justify-between items-center mb-4">
                                     <!-- Only show input if selectedFile is not null -->
                                     <template x-if="selectedFile">
-                                        <input type="text" x-model="selectedFile.displayName"
-                                               class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
+{{--                                        <input type="text" x-model="selectedFile.displayName"--}}
+{{--                                               class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">--}}
+                                        <input type="text" x-model="selectedFile.displayName" wire:model.defer="renamedFileName"
+                                               class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0"
+                                               placeholder="Rename file">
                                         @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
                                     </template>
                                     <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename File</button>
@@ -536,10 +542,10 @@
                                 </div>
                                 <!-- Modal Buttons -->
                                 <div class="flex justify-between mt-4">
-                                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                            @click="openPreviewModal = false">CONFIRM
+                                    <button type="button" class="px-4 py-2 bg-green-600 text-white rounded-lg"
+                                            @click="confirmFile(); $wire.store(selectedFile.file, selectedFile.renamedFileName)">CONFIRM
                                     </button>
-                                    <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
+                                    <button type="button" class="px-4 py-2 bg-red-600 text-white rounded-lg"
                                             @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
                                     </button>
                                 </div>
@@ -579,8 +585,19 @@
 
                                     }
                                 }
+                            },
+                            confirmFile() {
+                                // Logic to handle file confirmation (just close modal)
+                                this.openPreviewModal = false;
                             }
                         }
+                    }
+                </script>
+                <script>
+                    function capitalizeInput(input) {
+                        input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
+                            return char.toUpperCase();
+                        });
                     }
                 </script>
             </form>
