@@ -32,8 +32,12 @@ class CivilStatus extends Model
     {
         return $this->hasMany(Applicant::class);
     }
-    public function taggedAndValidatedApplicants()
+    public function taggedAndValidatedApplicants(): HasMany
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
+    }
+    public function dependents(): HasMany
+    {
+        return $this->hasMany(Dependent::class);
     }
 }
