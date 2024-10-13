@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaggedAndValidatedApplicant extends Model
 {
@@ -89,9 +90,9 @@ class TaggedAndValidatedApplicant extends Model
     }
 
     // Relationship with Dependent
-    public function dependent(): BelongsTo
+    public function dependents(): HasMany
     {
-        return $this->belongsTo(Dependent::class);
+        return $this->hasMany(Dependent::class);
     }
 
     // Relationship with LivingSituation
