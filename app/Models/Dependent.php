@@ -16,10 +16,16 @@ class Dependent extends Model
      * @var array
      */
     protected $fillable = [
-        'applicant_id',
-        'occupation_id',
-        'relationship',
-        'income',
+        'tagged_and_validated_applicant_id',
+        'dependent_civil_status_id',
+        'dependent_first_name',
+        'dependent_middle_name',
+        'dependent_last_name',
+        'dependent_sex',
+        'dependent_date_of_birth',
+        'dependent_relationship',
+        'dependent_occupation',
+        'dependent_monthly_income',
     ];
 
     /**
@@ -29,22 +35,16 @@ class Dependent extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'applicant_id' => 'integer',
-        'occupation_id' => 'integer',
+        'tagged_and_validated_applicant_id' => 'integer',
+        'dependent_civil_status_id' => 'integer',
     ];
 
-    public function applicant(): BelongsTo
+    public function taggedAndValidatedApplicant(): BelongsTo
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(TaggedAndValidatedApplicant::class);
     }
-
-    public function occupation(): BelongsTo
+    public function civilStatus(): BelongsTo
     {
-        return $this->belongsTo(Occupation::class);
-    }
-
-    public function taggedAndValidatedApplicants()
-    {
-        return $this->hasMany(TaggedAndValidatedApplicant::class);
+        return $this->belongsTo(CivilStatus::class);
     }
 }
