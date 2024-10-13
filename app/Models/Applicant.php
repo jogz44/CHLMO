@@ -84,6 +84,10 @@ class Applicant extends Model
     {
         return $this->belongsTo(Spouse::class);
     }
+    public function dependent(): BelongsTo
+    {
+        return $this->belongsTo(Dependent::class);
+    }
 
     public function address(): BelongsTo
     {
