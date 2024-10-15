@@ -261,37 +261,7 @@ class Applicants extends Component
         $applicant = Applicant::find($applicantId);
         $applicant->is_tagged = true;
         $applicant->save();
-
-        $this->dispatch('alert', [
-            'title' => 'Tagging Successful!',
-            'message' => 'Applicant tagged and validated successfully at <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
-        ]);
     }
-    public function untagged($applicantId)
-    {
-        $applicant = Applicant::find($applicantId);
-        $applicant->is_tagged = false;
-        $applicant->save();
-
-        $this->dispatch('alert', [
-            'title' => 'Untagging Successful!',
-            'message' => 'Applicant untagged successfully at <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
-        ]);
-    }
-
-//    public function alert()
-//    {
-//        if (true){
-//            return $this->dispatch('alert', [
-//                'title' => 'Success!',
-//                'message' => 'This is alert message. <br><small>'. now()->calendar().'</small>',
-//                'type' => 'success'
-//            ]);
-//        }
-//    }
-
     public function render()
     {
         $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated'])
@@ -331,12 +301,29 @@ class Applicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        $applicants = $query->paginate(5); // Apply pagination after filtering
+//        $applicants = $query->paginate(5); // Apply pagination after filtering
+//        $applicants = $query->orderBy('date_applied', 'desc')->paginate(5);
 
+        // Get the latest applicant, if any
+        $latestApplicant = $query->latest()->first();
+
+        $currentPage = $this->getPage();
+
+        // Check if latest applicant exists and exclude it from the rest of the paginated results
+        if ($latestApplicant && $currentPage == 1) {
+            // If the latest applicant exists and we're on page 1, exclude the latest
+            $otherApplicants = $query->where('id', '!=', $latestApplicant->id)->paginate(4); // Show 4 applicants per page
+        } else {
+            // If no latest applicant or we're on another page, paginate all results
+            $otherApplicants = $query->paginate(5); // Show 5 applicants per page
+        }
+
+        // Pass data to the view
         return view('livewire.applicants', [
             'puroks' => $this->puroks,
             'puroksFilter' => $this->puroksFilter,
-            'applicants' => $applicants
+            'latestApplicant' => $latestApplicant,
+            'otherApplicants' => $otherApplicants
         ]);
     }
 }
