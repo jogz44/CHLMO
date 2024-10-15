@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('last_name', 50);
             $table->string('suffix_name', 50)->nullable();
             $table->string('contact_number', 15)->nullable();
-            $table->date('date_applied');
+            $table->dateTime('date_applied');
             $table->string('initially_interviewed_by', 100);
             $table->boolean('is_tagged')->default(false);
             $table->timestamps();
