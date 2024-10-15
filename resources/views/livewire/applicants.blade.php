@@ -190,7 +190,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Display the latest applicant first -->
+                        <!-- Display the latest applicant first only if it's on the first page -->
                         @if($latestApplicant && $otherApplicants->currentPage() == 1)
                             <tr>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $latestApplicant->applicant_id }}</td>
@@ -243,7 +243,11 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                <td colspan="8" class="py-4 px-2 text-center border-b">
+                                    @if (!$latestApplicant)
+                                        No applicants found.
+                                    @endif
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -526,24 +530,6 @@
         </div>
     </div>
 </div>
-{{--<script>--}}
-{{--    function pagination() {--}}
-{{--        return {--}}
-{{--            currentPage: 1,--}}
-{{--            totalPages: 3, // Set this to the total number of pages you have--}}
-
-{{--            prevPage() {--}}
-{{--                if (this.currentPage > 1) this.currentPage--;--}}
-{{--            },--}}
-{{--            nextPage() {--}}
-{{--                if (this.currentPage < this.totalPages) this.currentPage++;--}}
-{{--            },--}}
-{{--            goToPage(page) {--}}
-{{--                this.currentPage = page;--}}
-{{--            }--}}
-{{--        }--}}
-{{--    }--}}
-{{--</script>--}}
 <script>
     function capitalizeInput(input) {
         input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
