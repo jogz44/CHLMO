@@ -37,7 +37,7 @@
                 </div>
                 <div class="flex-shrink-0">
                     <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
-                </div>
+                </div>  
             </div>
         </a>
 
