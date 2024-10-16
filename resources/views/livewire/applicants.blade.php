@@ -170,7 +170,7 @@
                 </div>
             </div>
 
-            <!-- Table with transaction requests -->
+            <!-- Applicants table -->
             <div x-data="{openEditModal: false}"
                  class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
@@ -190,7 +190,32 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($applicants as $applicant)
+                        <!-- Display the latest applicant first only if it's on the first page -->
+                        @if($latestApplicant && $otherApplicants->currentPage() == 1)
+                            <tr>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $latestApplicant->applicant_id }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $latestApplicant->last_name }}, {{ $latestApplicant->first_name }} {{ $latestApplicant->middle_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">{{ $latestApplicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $latestApplicant->contact_number }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $latestApplicant->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $latestApplicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($latestApplicant->date_applied)->format('m/d/Y') }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2 actions-col">
+                                    <button wire:click="edit({{ $latestApplicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
+                                    @if ($latestApplicant->taggedAndValidated)
+                                        <button class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">
+                                            Tagged
+                                        </button>
+                                    @else
+                                        <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $latestApplicant->id]) }}'"
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
+                                            Tag
+                                        </button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endif
+                        @forelse($otherApplicants as $applicant)
                             <tr>
 {{--                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">--}}
 {{--                                    <input type="checkbox" wire:model="selectedApplicantsForExport.{{ $applicant->applicant_id }}">--}}
@@ -218,7 +243,11 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                <td colspan="8" class="py-4 px-2 text-center border-b">
+                                    @if (!$latestApplicant)
+                                        No applicants found.
+                                    @endif
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -226,7 +255,8 @@
 
                 <!-- Pagination Links -->
                 <div class="py-4 px-3">
-                    {{ $applicants->links() }}
+                {{-- {{ $applicants->links() }}--}}
+                    {{ $otherApplicants->links() }}
                 </div>
 
                 <!-- ADD APPLICANT MODAL -->
@@ -500,24 +530,6 @@
         </div>
     </div>
 </div>
-{{--<script>--}}
-{{--    function pagination() {--}}
-{{--        return {--}}
-{{--            currentPage: 1,--}}
-{{--            totalPages: 3, // Set this to the total number of pages you have--}}
-
-{{--            prevPage() {--}}
-{{--                if (this.currentPage > 1) this.currentPage--;--}}
-{{--            },--}}
-{{--            nextPage() {--}}
-{{--                if (this.currentPage < this.totalPages) this.currentPage++;--}}
-{{--            },--}}
-{{--            goToPage(page) {--}}
-{{--                this.currentPage = page;--}}
-{{--            }--}}
-{{--        }--}}
-{{--    }--}}
-{{--</script>--}}
 <script>
     function capitalizeInput(input) {
         input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {

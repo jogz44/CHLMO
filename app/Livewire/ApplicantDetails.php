@@ -90,21 +90,13 @@ class ApplicantDetails extends Component
     public $dependents;
     public $dependent_civil_status_id; // Store selected Civil Status ID
     public $dependent_civil_statuses; // For populating the civil statuses dropdown
-//    public $dependent_first_name;
-//    public $dependent_middle_name;
-//    public $dependent_last_name;
-//    public $dependent_sex;
-//    public $dependent_date_of_birth;
-//    public $dependent_relationship;
-//    public $dependent_occupation;
-//    public $dependent_monthly_income;
     //
     public $images = [];
     public $renamedFileName = [];
 
     public function mount($applicantId)
     {
-//        $this->dependents = Dependent::all();
+        $this->dependents = Dependent::all();
 
         $this->applicantId = $applicantId;
         $this->applicant = Applicant::find($applicantId);
@@ -314,7 +306,7 @@ class ApplicantDetails extends Component
 
         // Attempt to create the new tagged and validated applicant record
         try {
-            TaggedAndValidatedApplicant::create([
+            $taggedApplicant = TaggedAndValidatedApplicant::create([
                 'applicant_id' => $this->applicantId,
                 'transaction_type_id' => $this->transaction_type_id,
                 'full_address' => $this->full_address ?: null,
@@ -346,7 +338,7 @@ class ApplicantDetails extends Component
             // Check if civil_status_id is 2 (Married) before creating Spouse record
             if ($this->civil_status_id == '2') {
                 Spouse::create([
-                    'tagged_and_validated_applicant_id' => $this->applicantId, // Link spouse to the applicant
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
                     'spouse_first_name' => $this->spouse_first_name,
                     'spouse_middle_name' => $this->spouse_middle_name,
                     'spouse_last_name' => $this->spouse_last_name,
@@ -358,7 +350,7 @@ class ApplicantDetails extends Component
             // Create dependent records associated with the applicant
             foreach ($this->dependents as $dependent) {
                 Dependent::create([
-                    'tagged_and_validated_applicant_id' => $this->applicantId,
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id,
                     'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
                     'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
                     'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
@@ -375,7 +367,7 @@ class ApplicantDetails extends Component
                 $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
                 $path = $image->storeAs('images', $renamedFileName, 'public');
                 ImagesForHousing::create([
-                    'tagged_and_validated_applicant_id' => $this->applicantId,
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id,
                     'image_path' => $path,
                     'display_name' => $renamedFileName,
                 ]);
@@ -387,121 +379,23 @@ class ApplicantDetails extends Component
 
             DB::commit();
 
-            session()->flash('message', 'Applicant has been successfully tagged and validated.');
+            $this->dispatch('alert', [
+                'title' => 'Tagging successful!',
+                'message' => 'Applicant has been successfully tagged and validated. <br><small>'. now()->calendar() .'</small>',
+                'type' => 'success'
+            ]);
 
             return redirect()->route('applicants');
         } catch (QueryException $e) {
             DB::rollBack();
             \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
-            session()->flash('error', 'An error occurred while tagging the applicant. Please try again.');
+            $this->dispatch('alert', [
+                'title' => 'Something went wrong!',
+                'message' => 'An error occurred while tagging the applicant. Please try again. <br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
         }
     }
-
-//    public function store()
-//    {
-//        // Validate the input data
-//        $this->validate();
-//
-//        \Log::info('Creating tagged applicant', ['is_tagged' => true]);
-//
-//        // Attempt to create the new tagged and validated applicant record
-//        try {
-//            // Create the tagged applicant
-//            $taggedApplicant = TaggedAndValidatedApplicant::create([
-//                'applicant_id' => $this->applicantId,
-//                'transaction_type_id' => $this->transaction_type_id,
-//                'full_address' => $this->full_address ?: null,
-//                'civil_status_id' => $this->civil_status_id,
-//                'tribe_id' => $this->tribe_id,
-//                'sex' => $this->sex,
-//                'date_of_birth' => $this->date_of_birth,
-//                'religion_id' => $this->religion_id ?: null,
-//                'occupation' => $this->occupation ?: null,
-//                'monthly_income' => $this->monthly_income,
-//                'family_income' => $this->family_income,
-//                'tagging_date' => $this->tagging_date,
-//                'living_situation_id' => $this->living_situation_id,
-//                'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null,
-//                'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null,
-//                'government_program_id' => $this->government_program_id,
-//                'living_status_id' => $this->living_status_id,
-//                'rent_fee' => $this->living_status_id == 1 ? $this->rent_fee : null,
-//                'landlord' => $this->living_status_id == 1 ? $this->landlord : null,
-//                'house_owner' => $this->living_status_id == 5 ? $this->house_owner : null,
-//                'roof_type_id' => $this->roof_type_id,
-//                'wall_type_id' => $this->wall_type_id,
-//                'remarks' => $this->remarks ?: 'N/A',
-//                'is_tagged' => true,
-//                'tagger_name' => $this->tagger_name,
-//            ]);
-//
-//            // Initialize spouse and dependent arrays
-//            $spouseData = null;
-//            $dependentData = [];
-//
-//            // Check if civil_status_id is 2 (Married) before creating Spouse record
-//            if ($this->civil_status_id == '2') {
-//                $spouseData = Spouse::create([
-//                    'tagged_and_validated_applicant_id' => $this->applicantId,
-//                    'spouse_first_name' => $this->spouse_first_name,
-//                    'spouse_middle_name' => $this->spouse_middle_name,
-//                    'spouse_last_name' => $this->spouse_last_name,
-//                    'spouse_occupation' => $this->spouse_occupation,
-//                    'spouse_monthly_income' => $this->spouse_monthly_income,
-//                ]);
-//            }
-//
-//            // Validate each dependent
-//            foreach ($this->dependents as $dependent) {
-//                $this->validate([
-//                    'dependent_first_name' => 'nullable|string|max:50',
-//                    'dependent_middle_name' => 'nullable|string|max:50',
-//                    'dependent_last_name' => 'nullable|string|max:50',
-//                    'dependent_sex' => 'nullable|in:Male,Female',
-//                    'dependent_date_of_birth' => 'nullable|date',
-//                    'dependent_relationship' => 'nullable|string|max:100',
-//                    'dependent_occupation' => 'nullable|string|max:255',
-//                    'dependent_monthly_income' => 'nullable|integer',
-//                ]);
-//            }
-//
-//            // Store images if any
-//            if ($this->images) {
-//                foreach ($this->images as $index => $image) {
-//                    $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
-//                    $path = $image->storeAs('images', $renamedFileName, 'public');
-//
-//                    ImagesForHousing::create([
-//                        'tagged_and_validated_applicant_id' => $this->applicantId,
-//                        'image_path' => $path,
-//                        'display_name' => $renamedFileName,
-//                    ]);
-//                }
-//            }
-//
-//            // Find the applicant by ID and update the 'tagged' field
-//            $applicant = Applicant::findOrFail($this->applicantId);
-//            $applicant->update(['is_tagged' => true]);
-//
-//            // Prepare data for debugging
-//            $dataToDebug = [
-//                'taggedApplicant' => $taggedApplicant,
-//                'spouse' => $spouseData,
-//                'dependents' => $dependentData,
-//            ];
-//
-//            // Dump the relevant data
-//            dd($dataToDebug);
-//
-//            // Flash success message
-//            session()->flash('message', 'Applicant has been successfully tagged and validated.');
-//
-//            return redirect()->route('applicants');
-//        } catch (QueryException $e) {
-//            session()->flash('error', 'An error occurred while tagging the applicant. Please try again.');
-//        }
-//    }
-
 
     public function render()
     {
