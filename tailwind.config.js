@@ -10,6 +10,8 @@ export default {
         "./vendor/laravel/jetstream/**/*.blade.php",
         "./storage/framework/views/*.php",
         "./resources/views/**/*.blade.php",
+        "./resources/views/**/*.js.php",
+        "./resources/views/**/*.vue.php",
     ],
     presets: [
         "./vendor/wireui/wireui/tailwind.config.js",
@@ -18,23 +20,27 @@ export default {
 
     theme: {
         extend: {
-            keyframes: {
-                'fade-in': {
-                    '0%': { opacity: '0' },
-                    '100%': { opacity: '1' },
-                },
-                'fade-out': {
-                    '0%': { opacity: '1' },
-                    '100%': { opacity: '0' },
-                },
-            },
-            animation: {
-                'fade-in': 'fade-in 0.5s ease-in-out forwards',
-                'fade-out': 'fade-out 0.5s ease-in-out forwards 2.5s', // 2.5s delay
-            },
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
                 poppins: ["Poppins", ...defaultTheme.fontFamily.sans],
+            },
+            animation: {
+                'alert-show': 'showAlert 1s ease forwards',
+                'alert-hide': 'hideAlert 1s ease forwards',
+            },
+            keyframes: {
+                showAlert: {
+                    '0%': { transform: 'translateX(100%)' },
+                    '40%': { transform: 'translateX(-10%)' },
+                    '80%': { transform: 'translateX(0%)' },
+                    '100%': { transform: 'translateX(-10px)' },
+                },
+                hideAlert: {
+                    '0%': { transform: 'translateX(-10px)' },
+                    '40%': { transform: 'translateX(0%)' },
+                    '80%': { transform: 'translateX(-10%)' },
+                    '100%': { transform: 'translateX(100%)' },
+                },
             },
             colors: {
                 Primary: "#434955",

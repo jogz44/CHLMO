@@ -17,8 +17,9 @@
     },
     "dependencies": {
         "alpinejs": "^3.14.1",
-        "apexcharts": "^3.53.0",
+        "filepond": "^4.31.4",
         "inputmask": "^5.0.9",
+        "simple-notify": "^1.0.4",
         "tailwind-scrollbar": "^3.1.0"
     }
 }

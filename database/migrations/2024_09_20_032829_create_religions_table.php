@@ -21,6 +21,7 @@ return new class extends Migration
 
         // insert religions
         $religions = [
+            'N/A',
             'Christianity',
             'Islam',
             'Hinduism',

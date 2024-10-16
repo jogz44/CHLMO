@@ -30,7 +30,6 @@
                     </div>
                 </div>
 
-
                 <div class="flex flex-col p-3 rounded mt-4">
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PERSONAL INFORMATION</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Encode here the personal information of the

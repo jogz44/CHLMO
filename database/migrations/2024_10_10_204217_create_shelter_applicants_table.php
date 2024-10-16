@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('spouses', function (Blueprint $table) {
+        Schema::create('shelter_applicants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('applicant_id')->constrained('applicants')->onDelete('cascade');
-            $table->string('occupation');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('request_origin_id')->constrained('origin_of_requests');
+            $table->string('profile_no')->unique()->nullable();
             $table->string('first_name', 50);
             $table->string('middle_name', 50)->nullable();
             $table->string('last_name', 50);
-            $table->integer('monthly_income');
+            $table->date('date_request');
+            $table->boolean('is_tagged')->default(false);
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('spouses');
+        Schema::dropIfExists('shelter_applicants');
     }
 };

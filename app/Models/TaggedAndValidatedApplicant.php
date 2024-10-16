@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaggedAndValidatedApplicant extends Model
 {
@@ -21,7 +22,7 @@ class TaggedAndValidatedApplicant extends Model
         'tribe_id',
         'religion_id',
         'living_situation_id',
-        'case_specification_id',
+        'living_situation_case_specification',
         'government_program_id',
         'living_status_id',
         'roof_type_id',
@@ -34,10 +35,11 @@ class TaggedAndValidatedApplicant extends Model
         'family_income',
         'tagging_date',
         'rent_fee',
+        'landlord',
+        'house_owner',
         'tagger_name',
         'remarks',
-        'photos',
-        'tagged'
+        'is_tagged'
     ];
 
     /**
@@ -62,20 +64,14 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(Applicant::class);
     }
-
-    // Relationship with CivilStatus
     public function civilStatus(): BelongsTo
     {
         return $this->belongsTo(CivilStatus::class);
     }
-
-    // Relationship with Tribe
     public function tribe(): BelongsTo
     {
         return $this->belongsTo(Tribe::class);
     }
-
-    // Relationship with Address
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
@@ -94,9 +90,9 @@ class TaggedAndValidatedApplicant extends Model
     }
 
     // Relationship with Dependent
-    public function dependent(): BelongsTo
+    public function dependents(): HasMany
     {
-        return $this->belongsTo(Dependent::class);
+        return $this->hasMany(Dependent::class);
     }
 
     // Relationship with LivingSituation
@@ -111,7 +107,7 @@ class TaggedAndValidatedApplicant extends Model
         return $this->belongsTo(CaseSpecification::class);
     }
 
-    // Relationship with CaseSpecification
+    // Relationship with government Program
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
@@ -133,5 +129,9 @@ class TaggedAndValidatedApplicant extends Model
     public function wallType(): BelongsTo
     {
         return $this->belongsTo(WallType::class);
+    }
+    public function images()
+    {
+        return $this->hasMany(ImagesForHousing::class);
     }
 }
