@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Lot;
+use App\Models\LotList;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,6 +13,6 @@ class LotSeeder extends Seeder
      */
     public function run(): void
     {
-        Lot::factory(10)->create();
+        LotList::factory(10)->create();
     }
 }
