@@ -36,4 +36,8 @@ class Barangay extends Model
     {
         return $this->hasMany(Address::class);
     }
+    public function lots(): HasMany
+    {
+        return $this->hasMany(LotList::class);
+    }
 }
