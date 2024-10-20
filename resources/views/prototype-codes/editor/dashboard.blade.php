@@ -110,7 +110,7 @@
     </div>
     <script>
         document.addEventListener('alpine:init', () => {
-        // Relocation Lot Applicants Bar Chart
+        // Relocation LotList Applicants Bar Chart
         const ctx1 = document.getElementById('relocationLotChart').getContext('2d');
         new Chart(ctx1, {
             type: 'bar',

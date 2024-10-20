@@ -233,7 +233,7 @@
                                 <input type="text" id="purok" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Purok">
                             </div>
 
-                            <!-- Lot Size Allocated Field -->
+                            <!-- LotList Size Allocated Field -->
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">LOT SIZE ALLOCATED</label>
                                 <input type="text" id="lot-size-allocated" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]" placeholder="Lot Size Allocated">
