@@ -45,7 +45,7 @@
 {{--                    <!-- filters and button -->--}}
 {{--                    <div x-data="{ openModalLot: false}" class="flex space-x-2">--}}
 {{--                        <button @click="openModalLot = true" class="bg-custom-yellow text-white px-4 py-2 rounded">Add--}}
-{{--                            Lot--}}
+{{--                            LotList--}}
 {{--                        </button>--}}
 {{--                        <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>--}}
 
@@ -89,7 +89,7 @@
 {{--                                        LOT SIZE</label>--}}
 {{--                                    <input type="text" id="total-lotsize"--}}
 {{--                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"--}}
-{{--                                           placeholder="Total Lot Size">--}}
+{{--                                           placeholder="Total LotList Size">--}}
 {{--                                </div>--}}
 {{--                                <br>--}}
 {{--                                <div class="grid grid-cols-2 gap-4 mb-4">--}}
@@ -118,7 +118,7 @@
 {{--                            <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>--}}
 {{--                            <th class="py-2 px-2 border-b text-center font-medium">Status</th>--}}
 {{--                            <th class="py-2 px-2 border-b text-center font-medium">No. of Awardees</th>--}}
-{{--                            <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size</th>--}}
+{{--                            <th class="py-2 px-2 border-b text-center font-medium">Total LotList Size</th>--}}
 {{--                            <th class="py-2 px-2 border-b text-center font-medium"></th>--}}
 {{--                        </tr>--}}
 {{--                        </thead>--}}
@@ -498,13 +498,13 @@
 {{--                                       placeholder="Purok">--}}
 {{--                            </div>--}}
 
-{{--                            <!-- Total Lot Size Field -->--}}
+{{--                            <!-- Total LotList Size Field -->--}}
 {{--                            <div class="mb-4">--}}
 {{--                                <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL--}}
 {{--                                    LOT SIZE</label>--}}
 {{--                                <input type="text" id="total-lotsize"--}}
 {{--                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"--}}
-{{--                                       placeholder="Total Lot Size">--}}
+{{--                                       placeholder="Total LotList Size">--}}
 {{--                            </div>--}}
 
 {{--                            <!-- Status Field -->--}}

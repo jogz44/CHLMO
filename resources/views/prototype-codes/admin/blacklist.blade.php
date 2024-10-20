@@ -99,7 +99,7 @@
 {{--                            <td class="py-4 px-2 text-center border-b">09637894863</td>--}}
 {{--                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>--}}
 {{--                            <td class="py-2 px-2 text-center border-b">11/23/2024</td>--}}
-{{--                            <td class="py-2 px-2 text-center border-b">Allocated Lot was Sold</td>--}}
+{{--                            <td class="py-2 px-2 text-center border-b">Allocated LotList was Sold</td>--}}
 {{--                        </tr>--}}
 {{--                        <tr>--}}
 {{--                            <td class="py-4 px-2 text-center  border-b">John Doe</td>--}}
@@ -108,7 +108,7 @@
 {{--                            <td class="py-4 px-2 text-center border-b">09637894863</td>--}}
 {{--                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>--}}
 {{--                            <td class="py-2 px-2 text-center border-b">11/23/2024</td>--}}
-{{--                            <td class="py-2 px-2 text-center border-b">Allocated Lot was Sold</td>--}}
+{{--                            <td class="py-2 px-2 text-center border-b">Allocated LotList was Sold</td>--}}
 {{--                        </tr>--}}
 {{--                        <tr>--}}
 {{--                            <td class="py-4 px-2 text-center  border-b">John Doe</td>--}}
@@ -117,7 +117,7 @@
 {{--                            <td class="py-4 px-2 text-center border-b">09637894863</td>--}}
 {{--                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>--}}
 {{--                            <td class="py-2 px-2 text-center border-b">11/23/2024</td>--}}
-{{--                            <td class="py-2 px-2 text-center border-b">Allocated Lot was Sold</td>--}}
+{{--                            <td class="py-2 px-2 text-center border-b">Allocated LotList was Sold</td>--}}
 {{--                        </tr>--}}
 {{--                        <tr>--}}
 {{--                            <td class="py-4 px-2 text-center  border-b">John Doe</td>--}}
@@ -126,7 +126,7 @@
 {{--                            <td class="py-4 px-2 text-center border-b">09637894863</td>--}}
 {{--                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>--}}
 {{--                            <td class="py-2 px-2 text-center border-b">11/23/2024</td>--}}
-{{--                            <td class="py-2 px-2 text-center border-b">Allocated Lot was Sold</td>--}}
+{{--                            <td class="py-2 px-2 text-center border-b">Allocated LotList was Sold</td>--}}
 {{--                        </tr>--}}
 {{--                        <tr>--}}
 {{--                            <td class="py-4 px-2 text-center  border-b">John Doe</td>--}}
@@ -135,7 +135,7 @@
 {{--                            <td class="py-4 px-2 text-center border-b">09637894863</td>--}}
 {{--                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>--}}
 {{--                            <td class="py-2 px-2 text-center border-b">11/23/2024</td>--}}
-{{--                            <td class="py-2 px-2 text-center border-b">Allocated Lot was Sold</td>--}}
+{{--                            <td class="py-2 px-2 text-center border-b">Allocated LotList was Sold</td>--}}
 {{--                        </tr>--}}
 {{--                        </tbody>--}}
 {{--                    </table>--}}

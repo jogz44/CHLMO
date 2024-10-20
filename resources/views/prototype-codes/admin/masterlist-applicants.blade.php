@@ -383,7 +383,7 @@
 {{--                                        SIZE ALLOCATED</label>--}}
 {{--                                    <input type="text" id="lot-size-allocated"--}}
 {{--                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"--}}
-{{--                                           placeholder="Lot Size Allocated">--}}
+{{--                                           placeholder="LotList Size Allocated">--}}
 {{--                                </div>--}}
 {{--                                <br>--}}
 {{--                                <div class="grid grid-cols-2 gap-4 mb-4">--}}

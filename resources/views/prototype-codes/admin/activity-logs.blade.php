@@ -81,7 +81,7 @@
 {{--                                <div>8/27/2024 4:00 pm</div>--}}
 {{--                            </td>--}}
 {{--                            <td class="px-6 py-4 text-center">Jane Doe</td>--}}
-{{--                            <td class="px-6 py-4 text-center">Data for Lot 0001 updated</td>--}}
+{{--                            <td class="px-6 py-4 text-center">Data for LotList 0001 updated</td>--}}
 {{--                            <td class="px-6 py-4 text-center">Modification</td>--}}
 {{--                            <td class="px-6 py-4 text-center">Validated</td>--}}
 {{--                        </tr>--}}
