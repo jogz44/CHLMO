@@ -7,6 +7,7 @@ use App\Models\Address;
 use App\Models\Applicant;
 use App\Models\Barangay;
 use App\Models\Purok;
+use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TransactionType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -301,29 +302,14 @@ class Applicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-//        $applicants = $query->paginate(5); // Apply pagination after filtering
+        $applicants = $query->paginate(5); // Apply pagination after filtering
 //        $applicants = $query->orderBy('date_applied', 'desc')->paginate(5);
-
-        // Get the latest applicant, if any
-        $latestApplicant = $query->latest()->first();
-
-        $currentPage = $this->getPage();
-
-        // Check if latest applicant exists and exclude it from the rest of the paginated results
-        if ($latestApplicant && $currentPage == 1) {
-            // If the latest applicant exists and we're on page 1, exclude the latest
-            $otherApplicants = $query->where('id', '!=', $latestApplicant->id)->paginate(4); // Show 4 applicants per page
-        } else {
-            // If no latest applicant or we're on another page, paginate all results
-            $otherApplicants = $query->paginate(5); // Show 5 applicants per page
-        }
 
         // Pass data to the view
         return view('livewire.applicants', [
             'puroks' => $this->puroks,
             'puroksFilter' => $this->puroksFilter,
-            'latestApplicant' => $latestApplicant,
-            'otherApplicants' => $otherApplicants
+            'applicants' => $applicants
         ]);
     }
 }
