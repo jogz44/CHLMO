@@ -1,3 +1,3 @@
 <x-app-layout>
-    <livewire:applicants-via-request/>
+    <livewire:tagged-and-validated-applicants-for-awarding/>
 </x-app-layout>
