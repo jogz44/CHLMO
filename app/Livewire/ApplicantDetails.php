@@ -347,9 +347,11 @@ class ApplicantDetails extends Component
                 ]);
             }
 
+            // batching the database for large data
+            $dependentData = [];
             // Create dependent records associated with the applicant
             foreach ($this->dependents as $dependent) {
-                Dependent::create([
+                $dependentData[] = ([
                     'tagged_and_validated_applicant_id' => $taggedApplicant->id,
                     'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
                     'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
@@ -362,6 +364,8 @@ class ApplicantDetails extends Component
                     'dependent_relationship' => $dependent['dependent_relationship'] ?: null,
                 ]);
             }
+
+            Dependent::insert($dependentData);
 
             foreach ($this->images as $index => $image) {
                 $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
