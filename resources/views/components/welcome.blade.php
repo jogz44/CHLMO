@@ -99,14 +99,14 @@
 {{--    <!-- Monthly Report Section -->--}}
 {{--    <div class="grid grid-cols-2 gap-6">--}}
 {{--        <div class="bg-white shadow rounded-lg p-6">--}}
-{{--            <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation Lot Applicants</h4>--}}
+{{--            <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation LotList Applicants</h4>--}}
 {{--            <div>--}}
 {{--                <canvas id="relocationLotChart"></canvas>--}}
 {{--            </div>--}}
 {{--        </div>--}}
 
 {{--        <div class="bg-white shadow rounded-lg p-6">--}}
-{{--            <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation Lot Applicants</h4>--}}
+{{--            <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation LotList Applicants</h4>--}}
 {{--            <div class="w-full ml-[65%] md:w-1/3 px-2 mb-3">--}}
 {{--            </div>--}}
 {{--            <div>--}}
@@ -116,7 +116,7 @@
 {{--    </div>--}}
 {{--    <script>--}}
 {{--        document.addEventListener('alpine:init', () => {--}}
-{{--            // Relocation Lot Applicants Bar Chart--}}
+{{--            // Relocation LotList Applicants Bar Chart--}}
 {{--            const ctx1 = document.getElementById('relocationLotChart').getContext('2d');--}}
 {{--            new Chart(ctx1, {--}}
 {{--                type: 'bar',--}}
