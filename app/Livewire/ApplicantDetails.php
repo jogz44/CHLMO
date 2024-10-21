@@ -96,7 +96,7 @@ class ApplicantDetails extends Component
 
     public function mount($applicantId)
     {
-        $this->dependents = Dependent::all();
+//        $this->dependents = Dependent::all();
 
         $this->applicantId = $applicantId;
         $this->applicant = Applicant::find($applicantId);
