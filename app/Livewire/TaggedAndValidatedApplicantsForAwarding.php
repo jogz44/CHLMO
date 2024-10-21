@@ -76,7 +76,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->search = '';
     }
 
-    public function mount()
+    public function mount(): void
     {
         // Set the default transaction type to 'Walk-in'
         $viaRequest = TransactionType::where('type_name', 'Request')->first();
@@ -109,11 +109,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->lots = LotList::all(); // Fetch all lot size units
         $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
     }
-    public function updatingBarangay()
+    public function updatingBarangay(): void
     {
         $this->resetPage();
     }
-    public function updatingPurok()
+    public function updatingPurok(): void
     {
         $this->resetPage();
     }
@@ -135,7 +135,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'lots' => $this->lots
         ]);
     }
-    public function updatedSelectedBarangayId($barangayId)
+    public function updatedSelectedBarangayId($barangayId): void
     {
         // Fetch the puroks based on the selected barangay
         $this->puroksFilter = Purok::where('barangay_id', $barangayId)->get();
@@ -160,7 +160,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     }
     public function awardApplicant(): void
     {
-//        dd($this->barangay_id, $this->purok_id, $this->lot_id, $this->lot_size, $this->lot_size_unit_id, $this->grant_date);
         // Validate the input data
         $this->validate();
 
@@ -178,10 +177,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'lot_size' => $this->lot_size,
             'lot_size_unit_id' => $this->lot_size_unit_id,
             'grant_date' => $this->grant_date,
+            'is_awarded' => false, // Update awardee table for status tracking
         ]);
 
-        // TODO: add 'is_awarded' fields in the 'tagged_and_validated_applicants'
-        // TODO: table and 'awardees' table for status checking
+        // Update the 'tagged_and_validated_applicants' table to mark the applicant as being processed for awarding
+        TaggedAndValidatedApplicant::where('id', $this->taggedAndValidatedApplicantId)->update([
+            'is_awarding_on_going' => true, // Update to reflect awarding is in process
+        ]);
 
         $this->resetForm();
 
