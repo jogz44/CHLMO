@@ -28,6 +28,7 @@ class Awardee extends Model
 //        'certificate_of_no_land_holding_photo',
 //        'marriage_certificate_photo',
 //        'birth_certificate_photo',
+        'is_awarded'
     ];
 
     /**
