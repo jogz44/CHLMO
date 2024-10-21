@@ -228,10 +228,22 @@
                                             class="text-custom-red text-bold underline px-4 py-1.5">
                                         Details
                                     </button>
-                                    <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
-                                            class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
-                                        Award
-                                    </button>
+                                    @if(!$applicant->is_awarding_on_going)
+                                        <!-- Award Button -->
+                                        <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
+                                            Award
+                                        </button>
+                                    @else
+                                        <!-- Award Pending Button (disabled) -->
+                                        <button disabled
+                                                class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
+                                            Award Pending
+                                        </button>
+                                        <span>
+
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
