@@ -25,6 +25,7 @@ return new class extends Migration
 //            $table->string('marriage_certificate_photo', 255)->nullable();
 //            $table->string('birth_certificate_photo', 255)->nullable();
             $table->dateTime('grant_date');
+            $table->boolean('is_awarded')->default(false);
             $table->timestamps();
         });
     }
