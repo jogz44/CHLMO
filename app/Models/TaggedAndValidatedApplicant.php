@@ -40,7 +40,9 @@ class TaggedAndValidatedApplicant extends Model
         'house_owner',
         'tagger_name',
         'remarks',
-        'is_tagged'
+        'is_tagged',
+        'is_awarding_on_going',
+        'is_awarded'
     ];
 
     /**
