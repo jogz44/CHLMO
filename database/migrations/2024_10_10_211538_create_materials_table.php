@@ -14,13 +14,9 @@ return new class extends Migration
         Schema::create('materials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_order_id')->constrained('purchase_orders')->onDelete('cascade');
-            $table->foreignId('material_unit_id')->constrained('material_units')->onDelete('cascade');
-            $table->string('item_description', 100);
-            $table->integer('quantity');
+            $table->string('name', 100);
             $table->timestamps();
         });
-
-        
     }
 
     /**
