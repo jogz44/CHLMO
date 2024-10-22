@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 //    return view('welcome');
 //});
 
+Route::middleware(['web'])->group(function () {
+    // Your routes here
+});
+
 Route::get('/', function () {
     return view('auth.login');
 });

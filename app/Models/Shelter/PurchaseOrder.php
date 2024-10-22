@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PurchaseOrder extends Model
 {
     use HasFactory;
+    protected $table = 'purchase_orders';
 
     /**
      * The attributes that are mass assignable.
@@ -19,8 +20,9 @@ class PurchaseOrder extends Model
     protected $fillable = [
         'purchase_requisition_id',
         'po_number',
+        
     ];
-
+   
     /**
      * The attributes that should be cast to native types.
      *

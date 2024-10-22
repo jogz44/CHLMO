@@ -13,11 +13,15 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_requisition_id')->constrained('purchase_requisitions')->onDelete('cascade');
-            $table->string('po_number', 100);
+            $table->unsignedBigInteger('purchase_requisition_id')->nullable()->change();  // Allowing it to be null
+            // $table->foreignId('purchase_requisition_id')->constrained('purchase_requisitions')->onDelete('cascade');
+            // $table->string('po_number', 100);
+            $table->string('po_number')->unique();
             $table->timestamps();
         });
     }
+
+
 
     /**
      * Reverse the migrations.
