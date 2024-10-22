@@ -33,13 +33,13 @@
 {{--                            Informal Settlers--}}
 {{--                        </option>--}}
 {{--                        <option value="/prototype-codes/admin/reports-summary-relocation-applicants" selected>Summary of--}}
-{{--                            Relocation Lot Applicant--}}
+{{--                            Relocation LotList Applicant--}}
 {{--                        </option>--}}
 {{--                    </select>--}}
 {{--                </div>--}}
 {{--            </div>--}}
 {{--            <div class="flex items-center mb-2 ml-2">--}}
-{{--                <h2 class="text-[14px] font-semibold items-center text-gray-700">Summary of Relocation Lot--}}
+{{--                <h2 class="text-[14px] font-semibold items-center text-gray-700">Summary of Relocation LotList--}}
 {{--                    Applicant</h2>--}}
 {{--            </div>--}}
 {{--            <div x-data="fileUpload()" class="bg-white p-6 rounded shadow">--}}
@@ -75,7 +75,7 @@
 {{--                    <table class="min-w-full bg-white border border-gray-200">--}}
 {{--                        <thead class="bg-gray-100">--}}
 {{--                        <tr>--}}
-{{--                            <th class="py-2 px-10 font-semibold  text-center">Relocation Lot Applicants</th>--}}
+{{--                            <th class="py-2 px-10 font-semibold  text-center">Relocation LotList Applicants</th>--}}
 {{--                            <th class="py-2 px-10 border-b text-center  font-medium">No. of Applicants</th>--}}
 {{--                        </tr>--}}
 {{--                        </thead>--}}
@@ -101,7 +101,7 @@
 
 {{--                        </tr>--}}
 {{--                        <tr>--}}
-{{--                            <td class="py-2 px-2 text-center  border-b font-semibold">Total Number Relocation Lot--}}
+{{--                            <td class="py-2 px-2 text-center  border-b font-semibold">Total Number Relocation LotList--}}
 {{--                                Applicants--}}
 {{--                            </td>--}}
 {{--                            <td class="py-2 px-2 border-b text-center font-medium"> 10873</td>--}}

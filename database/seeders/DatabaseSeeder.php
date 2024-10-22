@@ -8,7 +8,7 @@ use App\Models\Applicant;
 use App\Models\Awardee;
 use App\Models\Blacklist;
 use App\Models\Dependent;
-use App\Models\Lot;
+use App\Models\LotList;
 use App\Models\Occupation;
 use App\Models\Shelter\Grantee;
 use App\Models\Shelter\Material;
@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
             $this->call(ShelterSeeders\GranteeSeeder::class);
         }
 
-//        if (Lot::count() == 0){
+//        if (LotList::count() == 0){
 //            $this->call(LotSeeder::class);
 //        }
 //

@@ -115,7 +115,7 @@
     </div>
     <script>
         document.addEventListener('alpine:init', () => {
-            // Relocation Lot Applicants Bar Chart
+            // Relocation LotList Applicants Bar Chart
             const ctx1 = document.getElementById('relocationLotChart').getContext('2d');
             const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             new Chart(ctx1, {

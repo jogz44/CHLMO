@@ -22,6 +22,7 @@ class TaggedAndValidatedApplicant extends Model
         'tribe_id',
         'religion_id',
         'living_situation_id',
+        'case_specification_id',
         'living_situation_case_specification',
         'government_program_id',
         'living_status_id',
@@ -39,7 +40,9 @@ class TaggedAndValidatedApplicant extends Model
         'house_owner',
         'tagger_name',
         'remarks',
-        'is_tagged'
+        'is_tagged',
+        'is_awarding_on_going',
+        'is_awarded'
     ];
 
     /**
@@ -98,7 +101,7 @@ class TaggedAndValidatedApplicant extends Model
     // Relationship with LivingSituation
     public function livingSituation(): BelongsTo
     {
-        return $this->belongsTo(LivingSituation::class);
+        return $this->belongsTo(LivingSituation::class, 'living_situation_id');
     }
 
     // Relationship with CaseSpecification

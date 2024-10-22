@@ -386,7 +386,7 @@
                             <input type="text" id="purok" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Purok">
                         </div>
 
-                        <!-- Total Lot Size Field -->
+                        <!-- Total LotList Size Field -->
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-black" for="total-lotsize">TOTAL LOT SIZE</label>
                             <input type="text" id="total-lotsize" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]" placeholder="Total Lot Size">

@@ -34,7 +34,7 @@
                         </button>
                         <!-- Search -->
                         <div class="relative hidden md:block border-gray-300">
-                            <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21"
+                            <svg class="absolute top-[8px] left-4" width="19" height="19" viewBox="0 0 21 21"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z"
                                       stroke="#787C7F" stroke-width="1.75" stroke-linecap="round"
@@ -42,9 +42,13 @@
                                 <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75"
                                       stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
-                            <input type="search" name="search" id="search"
+                            <input wire:model.live.debounce.300ms="search" type="search" name="search" id="search"
                                    class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
                                    placeholder="Search">
+                            <!-- Clear Button -->
+                            <button wire:click="clearSearch" class="absolute top-1 right-4 text-2xl text-gray-500">
+                                &times; <!-- This is the "x" symbol -->
+                            </button>
                         </div>
                         <!-- Button to toggle dropdown -->
                         <div x-data="{ showDropdown: false }" class="relative">
@@ -70,13 +74,13 @@
                                     <input type="checkbox" class="toggle-column" id="toggle-barangay" checked> Barangay
                                 </label>
                                 <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-living-situation" checked> Living Situation
+                                    <input type="checkbox" class="toggle-column" id="toggle-living-situation" checked> Case
+                                </label>
+                                <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-case-specification" checked> Case Specification
                                 </label>
                                 <label class="block px-4 py-2">
                                     <input type="checkbox" class="toggle-column" id="toggle-contact" checked> Contact Number
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-occupation" checked> Occupation
                                 </label>
                                 <label class="block px-4 py-2">
                                     <input type="checkbox" class="toggle-column" id="toggle-monthly" checked> Monthly Income
@@ -127,11 +131,11 @@
                         </script>
                     </div>
                     <div class="flex justify-end">
-                        <label class="text-center mt-2 mr-1" for="start_date">Date Applied From:</label>
-                        <input type="date" id="start_date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                        <label class="text-center mt-2 mr-1" for="start_date">Tagging Date From:</label>
+                        <input type="date" id="start_date" wire:model.live="startTaggingDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
                                max="{{ now()->toDateString() }}">
                         <label class="text-center mt-2 ml-2 mr-1" for="end_date">To:</label>
-                        <input type="date" id="end_date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
+                        <input type="date" id="end_date" wire:model.live="endTaggingDate" class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
                                max="{{ now()->toDateString() }}">
 
                         <div class="relative group">
@@ -151,23 +155,23 @@
                 </div>
 
                 <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                    <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                        <option value="">Purok</option>
-                        <option value="purok1">Purok 1</option>
-                        <option value="purok2">Purok 2</option>
-                        <option value="purok3">Purok 3</option>
-                    </select>
-                    <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                    <select wire:model.live="selectedBarangay_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Barangay</option>
-                        <option value="barangay1">Barangay 1</option>
-                        <option value="barangay2">Barangay 2</option>
-                        <option value="barangay3">Barangay 3</option>
+                        @foreach($barangaysFilter as $barangayFilter)
+                            <option value="{{ $barangayFilter->id }}">{{ $barangayFilter->name }}</option>
+                        @endforeach
                     </select>
-                    <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                        <option value="">Situation</option>
-                        <option value="barangay1">Barangay 1</option>
-                        <option value="barangay2">Barangay 2</option>
-                        <option value="barangay3">Barangay 3</option>
+                    <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Purok</option>
+                        @foreach($puroksFilter as $purokFilter)
+                            <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
+                        @endforeach
+                    </select>
+                    <select wire:model.live="selectedLivingSituation_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">CASE</option>
+                        @foreach($livingSituationsFilter as $livingSituationFilter)
+                            <option value="{{ $livingSituationFilter->id }}">{{ $livingSituationFilter->living_situation_description }}</option>
+                        @endforeach
                     </select>
                     <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Occupation</option>
@@ -181,8 +185,8 @@
                         <option value="barangay2">Barangay 2</option>
                         <option value="barangay3">Barangay 3</option>
                     </select>
-
-                    <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>
+                    <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Reset Filters</button>
+{{--                    <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>--}}
                 </div>
             </div>
 
@@ -196,11 +200,12 @@
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">NAME</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">PUROK</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">BARANGAY</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column living-situation-col">LIVING SITUATION</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column living-situation-col">LIVING SITUATION (CASE)</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column case-specification-col">CASE SPECIFICATION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column occupation-col">OCCUPATION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-col">MONTHLY INCOME</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TRANSACTION TYPE</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TAGGING DATE</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">ACTIONS</th>
                         </tr>
                     </thead>
@@ -211,19 +216,34 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->applicant->last_name }}, {{ $applicant->applicant->first_name }} {{ $applicant->applicant->middle_name }} {{ $applicant->applicant->suffix_name }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap living-situation-col">{{ $applicant->livingSituation->living_situation_description }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->contact_number }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap occupation-col">{{ $applicant->occupation }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->applicant->transactionType->type_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap living-situation-col">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap case-specification-col">{{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->contact_number ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->applicant->transactionType->type_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
                                     <button
-                                            @click="window.location.href = '{{ route('request-applicant-details') }}'"
-                                            class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                            @click="window.location.href = '{{ route('request-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                            class="text-custom-red text-bold underline px-4 py-1.5">
+                                        Details
                                     </button>
-                                    <button @click="openModalRelocate = true"
-                                            class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Award
-                                    </button>
+                                    @if(!$applicant->is_awarding_on_going)
+                                        <!-- Award Button -->
+                                        <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
+                                            Award
+                                        </button>
+                                    @else
+                                        <!-- Award Pending Button (disabled) -->
+                                        <button disabled
+                                                class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
+                                            Award Pending
+                                        </button>
+                                        <span>
+
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -249,14 +269,14 @@
                         </div>
 
                         <!-- Form -->
-                        <form>
+                        <form wire:submit.prevent="awardApplicant">
                             <!-- Grant Date Field -->
                             <div class="mb-3">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">GRANT
-                                    DATE <span class="text-red-500">*</span></label>
-                                <input type="date" id="grant-date"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                       placeholder="Award Date">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="grant_date">GRANT DATE <span class="text-red-500">*</span></label>
+                                <input wire:model="grant_date" type="date" id="grant_date" required
+                                       class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                       max="{{ now()->toDateString() }}">
+                                @error('grant_date') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Main Fields -->
@@ -267,62 +287,114 @@
                                     ALLOCATED</label>
                                 <label class="block text-[12px] font-medium mb-2 text-black"
                                        for="barangay">BARANGAY <span class="text-red-500">*</span></label>
-                                <select id="barangay" name="barangay" :disabled="!isEditable"
-                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Select barangay</option>
-                                    <option value="barangay1">Lot 1</option>
-                                    <option value="barangay2">Lot 1</option>
-                                    <option value="barangay3">Lot 1</option>
-                                    <option value="barangay3">Lot 1</option>
+                                <select wire:model.live="barangay_id" id="barangay" name="barangay" :disabled="!isEditable" required
+                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                    <option value="">Select Barangay</option>
+                                    @foreach($barangays as $barangay)
+                                        <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                    @endforeach
                                 </select>
+                                @error('barangay_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Purok Field -->
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black"
                                        for="purok">PUROK <span class="text-red-500">*</span></label>
-                                <select id="purok" name="purok" :disabled="!isEditable"
-                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                <select wire:model.live="purok_id" id="purok" name="purok" :disabled="!isEditable" required
+                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
                                     <option value="">Select Purok </option>
-                                    <option value="purok1">Lot 1</option>
-                                    <option value="purok2">Lot 1</option>
-                                    <option value="purok3">Lot 1</option>
-                                    <option value="purok3">Lot 1</option>
+                                    @foreach($puroks as $purok)
+                                        <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                                    @endforeach
                                 </select>
+                                @error('purok_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="lot-number">LOT NUMBER <span class="text-red-500">*</span></label>
-                                <select id="lot-number" name="lot-number" :disabled="!isEditable"
-                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Select Available Lot No. </option>
-                                    <option value="lot-number1">Lot 1</option>
-                                    <option value="lot-number2">Lot 1</option>
-                                    <option value="lot-number3">Lot 1</option>
-                                    <option value="lot-number3">Lot 1</option>
+                                       for="lot_name">LOT NAME/NUMBER <span class="text-red-500">*</span></label>
+                                <select wire:model.live="lot_id" id="lot_name" name="lot_name" :disabled="!isEditable" required
+                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                    <option value="">Select Lot </option>
+                                    @foreach($lots as $lot)
+                                        <option value="{{ $lot->id }}">{{ $lot->lot_name }}</option>
+                                    @endforeach
                                 </select>
+                                @error('lot_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
-                            <!-- Lot Size Allocated Field -->
+                            <!-- LotList Size Allocated Field -->
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="lot-size">LOT
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="lot_size_allocated">LOT
                                     SIZE ALLOCATED <span class="text-red-500">*</span></label>
-                                <input type="text" id="lot-size-allocated"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                       placeholder="Lot Size Allocated">
+                                <input wire:model="lot_size" type="number" id="lot_size_allocated"
+                                       class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                       placeholder="1000.50">
+                                @error('lot_size') <span class="error">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Lot Size Unit -->
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black"
+                                       for="lot_size_unit">LOT SIZE UNIT <span class="text-red-500">*</span></label>
+                                <select wire:model.live="lot_size_unit_id" id="lot_size_unit" name="lot_size_unit" :disabled="!isEditable" required
+                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                    <option value="">Lot Size Unit </option>
+                                    @foreach($lotSizeUnits as $unit)
+                                        <option value="{{ $unit->id }}">{{ $unit->lot_size_unit_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('lot_size_unit_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
                             <br>
                             <div class="grid grid-cols-2 gap-4 mb-4">
-                                <!-- Add Product Button -->
-                                <button type="submit"
-                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                    <span class="text-[12px]">RELOCATE</span>
-                                </button>
+                                <div>
+                                    <div class="alert"
+                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         x-data="{ open:false, alert:{} }"
+                                         x-show="open" x-cloak
+                                         x-transition:enter="animate-alert-show"
+                                         x-transition:leave="animate-alert-hide"
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
+                                    >
+                                        <div class="alert-wrapper">
+                                            <strong x-html="alert.title">Title</strong>
+                                            <p x-html="alert.message">Description</p>
+                                        </div>
+                                        <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                                    </div>
+                                    <!-- Relocate Button -->
+                                    <button type="submit"
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                        <span class="text-[12px]">RELOCATE</span>
+                                        <div wire:loading>
+                                            <svg aria-hidden="true"
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                            </svg>
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                                <script>
+                                    document.addEventListener('livewire.initialized', () => {
+                                        let obj = @json(session('alert') ?? []);
+                                        if (Object.keys(obj).length){
+                                            Livewire.dispatch('alert', [obj])
+                                        }
+                                    })
+                                </script>
 
                                 <!-- Cancel Button -->
-                                <button type="submit"
-                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                <button type="button" @click="openModalRelocate = false"
+                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2 cursor-pointer">
                                     <span class="text-[12px]">CANCEL</span>
                                 </button>
                             </div>

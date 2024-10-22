@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class LivingSituation extends Model
 {
@@ -27,7 +28,7 @@ class LivingSituation extends Model
         'id' => 'integer',
     ];
 
-    public function taggedAndValidatedApplicants()
+    public function taggedAndValidatedApplicants(): HasMany
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
     }

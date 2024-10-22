@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use App\Models\Lot;
+use App\Models\LotList;
 
 class LotFactory extends Factory
 {
@@ -13,7 +13,7 @@ class LotFactory extends Factory
      *
      * @var string
      */
-    protected $model = Lot::class;
+    protected $model = LotList::class;
 
     /**
      * Define the model's default state.

@@ -2,10 +2,14 @@
 
 namespace App\Models\Shelter;
 
+use App\Models\ApplicantCounter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
+
 
 class ShelterApplicant extends Model
 {
@@ -37,6 +41,26 @@ class ShelterApplicant extends Model
         'request_origin_id' => 'integer',
         'date_request' => 'date',
     ];
+
+    public static function generateProfileNo()
+    {
+        $currentYear = Carbon::now()->year;
+
+        // Increment the count for the current year
+        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+
+        // Format the ID: "YYYY-000XXX"
+        $profileNo = sprintf('%d-%06d', $currentYear, $countForYear);
+
+        // Log the generated values for debugging
+        logger()->info('Generating Profile No', [
+            'year' => $currentYear,
+            'count' => $countForYear
+        ]);
+
+        return $profileNo;
+    }
+
     public function originOfRequest(): BelongsTo
     {
         return $this->belongsTo(OriginOfRequest::class, 'request_origin_id');

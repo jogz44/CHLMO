@@ -28,7 +28,7 @@ class AwardeeFactory extends Factory
 
         return [
             'applicant_id' => array_pop($applicantIds),
-            'lot_size_allocated' => $this->faker->numberBetween(100, 10000), // Lot size as a numeric value
+            'lot_size_allocated' => $this->faker->numberBetween(100, 10000), // LotList size as a numeric value
             'letter_of_intent_photo' => $this->faker->imageUrl(640, 480, 'business', true, 'Letter of Intent'), // Realistic photo URL
             'voters_id_photo' => $this->faker->imageUrl(640, 480, 'identity', true, 'Voter ID'), // Realistic photo URL
             'valid_id_photo' => $this->faker->imageUrl(640, 480, 'identity', true, 'Valid ID'), // Realistic photo URL

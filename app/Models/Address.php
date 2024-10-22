@@ -54,4 +54,8 @@ class Address extends Model
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
     }
+    public function awardees()
+    {
+        return $this->hasMany(Awardee::class);
+    }
 }
