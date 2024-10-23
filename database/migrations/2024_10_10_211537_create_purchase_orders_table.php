@@ -18,9 +18,8 @@ return new class extends Migration
             $table->string('po_number')->unique();
             $table->timestamps();
         });
+        
     }
-    
-
 
     /**
      * Reverse the migrations.
