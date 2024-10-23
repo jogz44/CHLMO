@@ -11,6 +11,7 @@ use App\Http\Controllers\ApplicantsController;
 use App\Http\Controllers\PurokController;
 
 use App\Livewire\ApplicantDetails;
+use App\Livewire\ShelterApplicantDetails;
 use App\Livewire\TransactionWalkin;
 use Illuminate\Support\Facades\Route;
 
@@ -136,17 +137,24 @@ Route::middleware([
         return view('shelter-transaction-applicants');
     })->name('shelter-transaction-applicants');
 
-    Route::get('/shelter-tag-applicant', function () {
-        return view('shelter-tag-applicant');
-    })->name('shelter-tag-applicant');
+    //Route::get('/shelter-tag-applicant', function () {
+    //    return view('shelter-tag-applicant');
+    //})->name('shelter-tag-applicant');
 
+    Route::get('/shelter-applicant-details/{profileNo}', ShelterApplicantDetails::class)
+    ->name('shelter-applicant-details');
+
+    Route::get('/test-view', function () {
+        return view('livewire.shelter-applicant-details');
+    });
+    
     Route::get('/shelter-profiled-tagged-applicants', function () {
         return view('shelter-profiled-tagged-applicants');
     })->name('shelter-profiled-tagged-applicants');
 
-    Route::get('/shelter-applicant-details', function () {
-        return view('shelter-applicant-details');
-    })->name('shelter-applicant-details');
+    // Route::get('/shelter-applicant-details', function () {
+    //     return view('shelter-applicant-details');
+    // })->name('shelter-applicant-details');
 
     Route::get('/shelter-material-inventory', function () {
         return view('shelter-material-inventory');
