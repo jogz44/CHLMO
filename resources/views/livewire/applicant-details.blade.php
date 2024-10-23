@@ -128,7 +128,9 @@
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT NUMBER <small class="text-red-500">(read only)</small></label>
-                                <input wire:model="contact_number" type="text" id="contact_number" name="contact_number" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                <input wire:model="contact_number" type="text" id="contact_number" name="contact_number"
+                                       required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default"
+                                       readonly oninput="validateNumberInput(this)">
                                 @error('contact_number') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -180,17 +182,19 @@
                                 @error('occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                    INCOME <span class="text-red-500">*</span></label>
-                                <input type="text" id="monthly_income" wire:model="monthly_income"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    MONTHLY INCOME <span class="text-red-500">*</span></label>
+                                <input type="number" id="monthly_income" wire:model="monthly_income"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)"
+                                       oninput="validateNumberInput(this)">
                                 @error('monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">FAMILY
-                                    INCOME <span class="text-red-500">*</span></label>
-                                <input type="text" id="family_income" wire:model="family_income"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    FAMILY INCOME <span class="text-red-500">*</span></label>
+                                <input type="number" id="family_income" wire:model="family_income"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)"
+                                       oninput="validateNumberInput(this)">
                                 @error('family_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -428,7 +432,7 @@
                                 <label for="rent_fee" class="block text-[13px] font-medium text-gray-700 mb-1">RENT FEE <span class="text-red-500">*</span></label>
                                 <input wire:model="rent_fee" type="number" id="rent_fee" name="rent_fee" placeholder="How much monthly?"
                                        class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                       min="0" step="0.01">
+                                       min="0" step="0.01" oninput="validateNumberInput(this)">
                                 @error('rent_fee') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-2/4 px-2 mb-4">
@@ -629,3 +633,10 @@
         </div>
     </div>
 </div>
+<script>
+    // Function to allow only numeric input
+    function validateNumberInput(input) {
+        // Remove any characters that are not digits
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+</script>

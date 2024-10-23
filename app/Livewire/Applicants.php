@@ -245,8 +245,14 @@ class Applicants extends Component
         $applicant->suffix_name = $this->edit_suffix_name;
         $applicant->contact_number = $this->edit_contact_number;
         $applicant->date_applied = $this->edit_date_applied;
-        $applicant->address->barangay_id = $this->edit_barangay_id;
-        $applicant->address->purok_id = $this->edit_purok_id;
+
+        // Update address
+        $address = $applicant->address;
+        if ($address) {
+            $address->barangay_id = $this->edit_barangay_id;
+            $address->purok_id = $this->edit_purok_id;
+            $address->save(); // Don't forget to save the address
+        }
 
         $applicant->save();
 
