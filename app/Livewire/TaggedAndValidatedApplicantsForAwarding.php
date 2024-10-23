@@ -4,21 +4,28 @@ namespace App\Livewire;
 
 use App\Models\Address;
 use App\Models\Awardee;
+use App\Models\AwardeeAttachmentsList;
+use App\Models\AwardeeDocumentsSubmission;
 use App\Models\Barangay;
 use App\Models\LivingSituation;
 use App\Models\LotList;
 use App\Models\LotSizeUnit;
 use App\Models\Purok;
 use App\Models\TaggedAndValidatedApplicant;
+use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
+use http\Env\Request;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 
 class TaggedAndValidatedApplicantsForAwarding extends Component
 {
     use WithPagination;
+    use WithFileUploads;
+
     public $search = '';
     public $isLoading = false;
     public $transaction_type_id;
@@ -53,12 +60,20 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public $lot_size_unit_id;
     public $lotSizeUnits = []; // Initialize as an empty array
 
+    // For uploading of files
+    public $awardee_attachments_list_id;
+    public $attachmentLists = [];
+    public $description;
+    public $awardeeId;
+    public $documents = [];
+    public $newFileImages = [];
+
     public function updatingSearch(): void
     {
         // This ensures that the search query is updated dynamically as the user types
         $this->resetPage();
     }
-    public function clearSearch()
+    public function clearSearch(): void
     {
         $this->search = ''; // Clear the search input
     }
@@ -108,6 +123,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         // Fetch related LotSizeUnits
         $this->lots = LotList::all(); // Fetch all lot size units
         $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
+
+        // Fetch attachment types for the dropdown
+        $this->attachmentLists = AwardeeAttachmentsList::all(); // Fetch all attachment lists
     }
     public function updatingBarangay(): void
     {
@@ -146,16 +164,21 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'puroksFilter' => $this->puroksFilter
         ]);
     }
-    // For Awarding Modal
     protected function rules(): array
     {
         return [
+            // For Awarding Modal
             'grant_date' => 'required|date',
             'barangay_id' => 'required|exists:barangays,id',
             'purok_id' => 'required|exists:puroks,id',
             'lot_id' => 'required|exists:lot_lists,id',
             'lot_size' => 'required|numeric',
             'lot_size_unit_id' => 'required|exists:lot_size_units,id',
+
+            // For file upload modal
+            'awardee_attachments_list_id' => 'required|exists:awardee_attachments_lists,id',
+            'description' => 'required|string|max:255',
+            'newFileImages.*' => 'required|file|max:10240', // File validation for multiple images
         ];
     }
     public function awardApplicant(): void
@@ -201,6 +224,51 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->reset([
             'lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date',
         ]);
+    }
+
+    // For file upload
+    public function uploadDocuments(): void
+    {
+        // Debugging line
+        logger()->info('uploadDocuments method triggered.');
+
+        $this->validate();
+
+        // Check if validation was successful
+        logger()->info('Validation passed.');
+
+        // Log the uploaded files
+        logger()->info('Uploaded files:', $this->newFileImages->toArray());
+
+        foreach ($this->newFileImages as $file) {
+            try {
+                $path = $file->store('awardee-' . $this->awardeeId, 'awardee-photo-requirements');
+                AwardeeDocumentsSubmission::create([
+                    'awardee_id' => $this->awardeeId,
+                    'description' => $this->description,
+                    'awardee_attachments_list_id' => $this->attachment_id,
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_type' => $file->getClientOriginalExtension(),
+                    'file_size' => $file->getSize(),
+                ]);
+            } catch (\Exception $e) {
+                logger()->error('Database error: ' . $e->getMessage());
+            }
+        }
+
+        $this->dispatch('alert', [
+            'title' => 'Documents Uploaded!',
+            'message' => 'Documents uploaded successfully! <br><small>'. now()->calendar() .'</small>',
+            'type' => 'success'
+        ]);
+
+        $this->resetUpload();
+    }
+    private function resetUpload(): void
+    {
+        $this->reset(['newFileImages', 'description', 'attachment_id']);
+        $this->show = false;
     }
 
     public function render()

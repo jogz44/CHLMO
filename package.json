@@ -18,6 +18,8 @@
     "dependencies": {
         "alpinejs": "^3.14.1",
         "filepond": "^4.31.4",
+        "filepond-plugin-file-validate-size": "^2.2.8",
+        "filepond-plugin-image-preview": "^4.6.12",
         "inputmask": "^5.0.9",
         "simple-notify": "^1.0.4",
         "tailwind-scrollbar": "^3.1.0"
