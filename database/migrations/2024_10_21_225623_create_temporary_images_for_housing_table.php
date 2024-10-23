@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchase_orders', function (Blueprint $table) {
+        Schema::create('temporary_image_for_housings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_requisition_id')->constrained('purchase_requisitions')->onDelete('cascade');
-            // $table->string('po_number', 100);
-            $table->string('po_number')->unique();
+            $table->string('folder', 255);
+            $table->string('file', 255);
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchase_orders');
+        Schema::dropIfExists('temporary_image_for_housings');
     }
 };

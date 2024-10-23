@@ -191,7 +191,7 @@
             </div>
 
             <!-- Table with transaction requests -->
-            <div x-data="{openModalRelocate: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
+            <div x-data="{openModalRelocate: false, openModalDocumentsChecklist: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
                  class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
@@ -223,26 +223,52 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->applicant->transactionType->type_name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
-                                    <button
-                                            @click="window.location.href = '{{ route('request-applicant-details', ['applicantId' => $applicant->id]) }}'"
-                                            class="text-custom-red text-bold underline px-4 py-1.5">
-                                        Details
-                                    </button>
+{{--                                    <button--}}
+{{--                                            @click="window.location.href = '{{ route('request-applicant-details', ['applicantId' => $applicant->id]) }}'"--}}
+{{--                                            class="text-custom-red text-bold underline px-4 py-1.5">--}}
+{{--                                        Details--}}
+{{--                                    </button>--}}
                                     @if(!$applicant->is_awarding_on_going)
                                         <!-- Award Button -->
                                         <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
-                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-14 py-1.5 rounded-full">
                                             Award
                                         </button>
                                     @else
                                         <!-- Award Pending Button (disabled) -->
-                                        <button disabled
-                                                class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
-                                            Award Pending
-                                        </button>
-                                        <span>
+                                        <div class="relative flex items-center space-x-2">
+                                            <!-- Award Pending Button -->
+                                            <button disabled
+                                                    class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
+                                                Award Pending
+                                            </button>
 
-                                        </span>
+                                            <!-- Info Icon with Hover Tooltip -->
+                                            <div class="group relative z-50">
+                                                <span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                                                        <path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                                                    </svg>
+                                                </span>
+
+                                                <!-- Tooltip content -->
+                                                <div class="absolute right-6 top-0 mb-2 w-max bg-custom-dark-green text-white text-xs rounded-lg py-2 px-3 opacity-0 group-hover:opacity-100 group-hover:visible group-hover:transition-opacity duration-200 z-50">
+                                                    Award is pending for this applicant. <br> Requirements are needed to be uploaded.
+                                                    <br>
+                                                    <small>Documents are ready.
+                                                        @if($applicant->is_awarding_on_going && $applicant->awardees->isNotEmpty())
+                                                            <button type="button" class="underline"
+                                                                @click="
+                                                                openModalDocumentsChecklist = true;
+                                                                $wire.set('awardeeId', {{ $applicant->awardees->first()->id }});
+                                                            ">
+                                                                Upload now.
+                                                            </button>
+                                                        @endif
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
                                 </td>
                             </tr>
@@ -254,7 +280,7 @@
                     </tbody>
                 </table>
 
-                <!-- Modal Background -->
+                <!-- Modal Relocate -->
                 <div x-show="openModalRelocate"
                      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak
                      style="font-family: 'Poppins', sans-serif;">
@@ -399,6 +425,130 @@
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- Modal Relocate - Checklist for uploading documents -->
+                <div x-show="openModalDocumentsChecklist"
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak
+                     style="font-family: 'Poppins', sans-serif;">
+                    <!-- Modal -->
+                    <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                        <!-- Modal Header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-md font-semibold text-black">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>
+                            <button @click="openModalDocumentsChecklist = false" class="text-gray-400 hover:text-gray-200">
+                                &times;
+                            </button>
+                        </div>
+
+                        <div class="max-w-md mx-auto rounded-lg p-4 text-gray-900">
+                            <form wire:submit.prevent="submit">
+                                <!-- Attachment Type -->
+                                <div class="mb-6">
+                                    <label class="block text-[12px] font-medium mb-2 text-black"
+                                           for="attachment">ATTACHMENT TYPE <span class="text-red-500">*</span></label>
+                                    <select wire:model="attachment_id" id="attachment_id" name="attachment_id" :disabled="!isEditable" required
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                        <option value="">Attachment Type</option>
+                                        @foreach($attachmentLists as $attachmentList)
+                                            <option value="{{ $attachmentList->id }}">{{ $attachmentList->attachment_name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('attachment_id')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                </div>
+
+                                <!-- Description -->
+                                <div class="mb-6">
+                                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Description:</label>
+                                    <textarea id="description" rows="4" name="description" wire:model="description"
+                                              class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg"
+                                              placeholder="Please leave a comment..."></textarea>
+                                    @error('description')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                </div>
+
+{{--                                <!-- File Upload -->--}}
+{{--                                <div wire:ignore x-data x-init="--}}
+{{--                                        FilePond.setOptions({--}}
+{{--                                            allowMultiple: true,--}}
+{{--                                            server: {--}}
+{{--                                                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                    console.log('FilePond is processing the file:', file);--}}
+{{--                                                    @this.upload('newFileImages', file, load, error, progress)--}}
+{{--                                                },--}}
+{{--                                                revert: (filename, load) => {--}}
+{{--                                                    @this.removeUpload('newFileImages', filename, load)--}}
+{{--                                                },--}}
+{{--                                            },--}}
+{{--                                        });--}}
+{{--                                        FilePond.create($refs.input);--}}
+{{--                                    "--}}
+{{--                                >--}}
+{{--                                    <input type="file" x-ref="input" wire:model="newFileImages" multiple>--}}
+{{--                                </div>--}}
+
+                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                        FilePond.registerPlugin(FilePondPluginImagePreview);
+                                        const pond = FilePond.create($refs.input, {
+                                            allowFileEncode: true,
+                                            onprocessfilestart: () => { isUploading = true; },
+                                            onprocessfile: (error, file) => { isUploading = false; },
+                                            server: {
+                                                process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                    @this.upload('letterOfIntent', file, load, error, progress);
+                                                },
+                                                revert: (fileName, load) => {
+                                                    @this.removeUpload('letterOfIntent', fileName, load);
+                                                },
+                                            },
+                                        });
+                                    ">
+                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="letterOfIntent">
+                                </div>
+                                <div>
+                                    <div class="alert"
+                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         x-data="{ open:false, alert:{} }"
+                                         x-show="open" x-cloak
+                                         x-transition:enter="animate-alert-show"
+                                         x-transition:leave="animate-alert-hide"
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
+                                    >
+                                        <div class="alert-wrapper">
+                                            <strong x-html="alert.title">Title</strong>
+                                            <p x-html="alert.message">Description</p>
+                                        </div>
+                                        <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                                    </div>
+                                    <!-- SUBMIT REQUIREMENTS Button -->
+                                    <button type="submit"
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                        <span class="text-[12px]">SUBMIT</span>
+                                        <div wire:loading>
+                                            <svg aria-hidden="true"
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                            </svg>
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                                <script>
+                                    document.addEventListener('livewire.initialized', () => {
+                                        let obj = @json(session('alert') ?? []);
+                                        if (Object.keys(obj).length){
+                                            Livewire.dispatch('alert', [obj])
+                                        }
+                                    })
+                                </script>
+                            </form>
+                        </div>
                     </div>
                 </div>
 

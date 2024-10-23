@@ -37,6 +37,16 @@ return [
             'throw' => false,
         ],
 
+        // newly created one
+        'awardee-photo-requirements' => [
+            'driver' => 'local',
+            'root' => storage_path('app/awardee-photo-requirements'),
+            'serve' => true,
+            'throw' => false,
+            'url' => env('APP_URL').'/awardee-photo-requirements',
+            'visibility' => 'public',
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -70,8 +80,11 @@ return [
     |
     */
 
+//    'links' => [
+//        public_path('storage') => storage_path('app/public'),
+//    ],
     'links' => [
-        public_path('storage') => storage_path('app/public'),
-    ],
-
+            public_path('awardee-photo-requirements') => storage_path('app/awardee-photo-requirements'),
+        ],
+    // after customizing, run php artisan storage:link
 ];

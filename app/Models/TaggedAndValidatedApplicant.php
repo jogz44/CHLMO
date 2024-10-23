@@ -67,6 +67,10 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(Applicant::class);
     }
+    public function awardees(): HasMany
+    {
+        return $this->hasMany(Awardee::class);
+    }
     public function civilStatus(): BelongsTo
     {
         return $this->belongsTo(CivilStatus::class);
