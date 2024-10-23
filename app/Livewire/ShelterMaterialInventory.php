@@ -80,6 +80,11 @@ class ShelterMaterialInventory extends Component
             // Validate the input
             $this->validate();
 
+            // Ensure the purchase order number starts with "PO"
+            if (!str_starts_with($this->purchaseOrderNo, 'PO-')) {
+                $this->purchaseOrderNo = 'PO-' . strtoupper($this->purchaseOrderNo); // Add "PO" and make uppercase
+            }
+
             // First, handle the Purchase Requisition
             $purchaseRequisition = PurchaseRequisition::firstOrCreate(
                 ['pr_number' => $this->purchaseRequisitionNo],  // Look for existing requisition by pr_number
@@ -89,7 +94,7 @@ class ShelterMaterialInventory extends Component
                 ['pr_number' => $this->purchaseRequisitionNo],  // Make sure this line refers to 'pr_number'
                 ['pr_number' => $this->purchaseRequisitionNo]   // This should be saving 'pr_number', not 'id'
             );
-            
+
 
             // Then, handle the Purchase Order creation
             $purchaseOrder = PurchaseOrder::firstOrCreate(
@@ -103,8 +108,8 @@ class ShelterMaterialInventory extends Component
             // Loop through each row and save the material information
             foreach ($this->rows as $row) {
                 // Get the material unit ID based on the selected unit from the form
-                $materialUnitId = MaterialUnit::where('id', $row['unit'])->value('id');
-
+                // $materialUnitId = MaterialUnit::where('id', $row['unit'])->value('id');
+                $materialUnitId = $row['unit'];
                 if (!$materialUnitId) {
                     session()->flash('error', 'Invalid material unit.');
                     return;
@@ -121,10 +126,9 @@ class ShelterMaterialInventory extends Component
 
             // Set a success message
             session()->flash('message', 'Material Inventory saved successfully!');
-            
+
             // Reset form fields after successful save
             $this->reset(['purchaseOrderNo', 'purchaseRequisitionNo', 'rows']);
-
         } catch (\Exception $e) {
             // Handle any exceptions that might be thrown during the save process
             session()->flash('error', 'An error occurred while saving: ' . $e->getMessage());
