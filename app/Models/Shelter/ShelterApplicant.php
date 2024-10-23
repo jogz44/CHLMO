@@ -66,9 +66,9 @@ class ShelterApplicant extends Model
         return $this->belongsTo(OriginOfRequest::class, 'request_origin_id');
     }
 
-    public function profiledTaggedApplicant(): HasOne
+    public function profiledTagged(): HasOne
     {
-        return $this->hasOne(ProfiledTaggedApplicant::class, 'applicant_id');
+        return $this->hasOne(ProfiledTaggedApplicant::class, 'profile_no', 'id');
     }
 
     public function spouse(): HasOne

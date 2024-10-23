@@ -103,16 +103,17 @@
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->OriginOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b">
                                 <button wire:click="openModalEdit({{ $applicant->id }})" @click="isEditModalOpen = true" class="text-custom-red underline px-4 py-1.5">Edit</button>
-                                @if ($applicant->taggedAndValidated)
+                                @if ($applicant->profiledTagged)
                                 <button class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">
                                     Tagged
                                 </button>
                                 @else
-                                <button onclick="window.location.href='{{ route('shelter-tag-applicant', ['profileNo' => $applicant->id]) }}'"
+                                <button onclick="window.location.href='{{ route('shelter-applicant-details', ['profileNo' => $applicant->id]) }}'"
                                     class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
                                     Tag
                                 </button>
                                 @endif
+
                             </td>
                         </tr>
                         @empty
