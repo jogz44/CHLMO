@@ -16,10 +16,10 @@ class ShelterApplicantSpouseFactory extends Factory
         }
 
         return [
-            'shelter_applicant_id' => $this->faker->randomElement($shelterApplicantIds),
-            'first_name' => $this->faker->firstName,
-            'middle_name' => $this->faker->optional()->firstName,
-            'last_name' => $this->faker->lastName,
+            'profile_no' => $this->faker->randomElement($shelterApplicantIds),
+            'shelter_spouse_first_name' => $this->faker->firstName,
+            'shelter_spouse_middle_name' => $this->faker->optional()->firstName,
+            'shelter_spouse_last_name' => $this->faker->lastName,
             'created_at' => now(),
             'updated_at' => now(),
         ];

@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Shelter\ShelterApplicant;
 use Livewire\WithPagination;
 use App\Models\Shelter\OriginOfRequest;
+use App\Models\ProfiledTaggedApplicant;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -29,6 +30,8 @@ class ShelterApplicants extends Component
     public $request_origin_id;
     public $editingApplicantId = null;
     public $origin_name;
+    public $selectedTaggingStatus;
+    public $taggingStatuses;
 
     public function openModal()
     {
@@ -133,6 +136,7 @@ class ShelterApplicants extends Component
         $this->startDate = null;
         $this->endDate = null;
         $this->search = ''; // Ensure search is empty initially
+        $this->taggingStatuses = ['Tagged', 'Not Tagged'];
     }
 
     // Reset pagination when search changes
@@ -154,6 +158,7 @@ class ShelterApplicants extends Component
         $this->endDate = null;
         $this->search = '';
         $this->selectedOriginOfRequest = null;
+        $this->selectedTaggingStatus = null;
         $this->resetPage();
     }
 
@@ -165,29 +170,25 @@ class ShelterApplicants extends Component
 
     public function tagApplicant($profileNo)
     {
-        // Logic to tag the applicant
+        // Tag the applicant
         $applicant = ShelterApplicant::find($profileNo);
         $applicant->is_tagged = true;
         $applicant->save();
-
-        $this->dispatch('alert', [
-            'title' => 'Tagging Successful!',
-            'message' => 'Applicant tagged and validated successfully at <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
-        ]);
     }
-    public function untagged($profileNo)
-    {
-        $applicant = ShelterApplicant::find($profileNo);
-        $applicant->is_tagged = false;
-        $applicant->save();
+    
+    
+    //public function untagged($profileNo)
+    //{
+    //    $applicant = ShelterApplicant::find($profileNo);
+    //    $applicant->is_tagged = false;
+    //    $applicant->save();
 
-        $this->dispatch('alert', [
-            'title' => 'Untagging Successful!',
-            'message' => 'Applicant untagged successfully at <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
-        ]);
-    }
+    //    $this->dispatch('alert', [
+    //        'title' => 'Untagging Successful!',
+    //        'message' => 'Applicant untagged successfully at <br><small>'. now()->calendar() .'</small>',
+    //        'type' => 'success'
+    //    ]);
+    //}
 
     public function render()
     {
@@ -211,6 +212,10 @@ class ShelterApplicants extends Component
         }
         if ($this->selectedOriginOfRequest) {
             $query->where('request_origin_id', $this->selectedOriginOfRequest);
+        }
+
+        if ($this->selectedTaggingStatus !== null) {
+            $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
         $applicants = $query->paginate(5);
