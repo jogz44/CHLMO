@@ -70,7 +70,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public $isUploading = false;
 
 
-    public $awardee_attachments_list_id;
+    public $attachment_id;
     public $attachmentLists = [];
     public $description;
     public $awardeeId;
@@ -102,6 +102,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public function mount(): void
     {
+        $this->awardeeId = null; // Initialize
+        \Log::info('Mounted with awardeeId', ['awardeeId' => $this->awardeeId]);
+
         // Set the default transaction type to 'Walk-in'
         $viaRequest = TransactionType::where('type_name', 'Request')->first();
         if ($viaRequest) {
@@ -209,8 +212,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'is_awarded' => false, // Update awardee table for status tracking
         ]);
 
-        // Get the ID of the newly created awardee
-        $this->awardeeId = $awardee->id;
+        // Check if the awardee was created successfully
+        if ($awardee) {
+            $this->awardeeId = $awardee->id; // Set awardeeId here
+            \Log::info('Awardee created successfully', ['awardeeId' => $this->awardeeId]);
+        } else {
+            \Log::error('Failed to create awardee');
+        }
 
         // Update the 'tagged_and_validated_applicants' table to mark the applicant as being processed for awarding
         TaggedAndValidatedApplicant::where('id', $this->taggedAndValidatedApplicantId)->update([
@@ -235,48 +243,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         ]);
     }
 
-    // For file upload
-//    public function uploadDocuments(): void
-//    {
-//        // Debugging line
-//        logger()->info('uploadDocuments method triggered.');
-//
-//        $this->validate();
-//
-//        // Log the count of new file images after validation
-//        logger()->info('New file images count:', ['count' => $this->newFileImages ? count($this->newFileImages) : 0]);
-//
-//        // Log the uploaded files
-//        logger()->info('Uploaded files:', $this->newFileImages->toArray());
-//
-//
-//        // Now you can reference $this->awardeeId in your file upload logic
-//        foreach ($this->newFileImages as $file) {
-//            logger()->info('New file images count:', ['count' => $this->newFileImages ? count($this->newFileImages) : 0]);
-//            try {
-//                $path = $file->store('awardee-' . $this->awardeeId, 'awardee-photo-requirements');
-//                AwardeeDocumentsSubmission::create([
-//                    'awardee_id' => $this->awardeeId,
-//                    'description' => $this->description,
-//                    'awardee_attachments_list_id' => $this->attachment_id,
-//                    'file_path' => $path,
-//                    'file_name' => $file->getClientOriginalName(),
-//                    'file_type' => $file->getClientOriginalExtension(),
-//                    'file_size' => $file->getSize(),
-//                ]);
-//            } catch (\Exception $e) {
-//                logger()->error('Database error: ' . $e->getMessage());
-//            }
-//        }
-//
-//        $this->dispatch('alert', [
-//            'title' => 'Documents Uploaded!',
-//            'message' => 'Documents uploaded successfully! <br><small>'. now()->calendar() .'</small>',
-//            'type' => 'success'
-//        ]);
-//
-//        $this->resetUpload();
-//    }
     public  function removeUpload($property, $fileName, $load): void
     {
         $filePath = storage_path('livewire-tmp/'.$fileName);
@@ -289,116 +255,37 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         $this->isFilePondUploadComplete = true;
         $this->validate([
-            'awardee_attachments_list_id' => 'required|exists:awardee_attachments_lists,id',
+            'attachment_id' => 'required|exists:awardee_attachments_lists,id',
             'description' => 'nullable|string|max:255',
             'letterOfIntent' => 'required|file|max:10240',
         ]);
     }
-//    public function submit(): void
-//    {
-//        $this->isFilePonduploading = false;
-//
-//        // Validate the input
-//        $this->validate([
-//            'awardee_attachments_list_id' => 'required|exists:awardee_attachments_lists,id',
-//            'description' => 'nullable|string|max:255',
-//            'letterOfIntent' => 'required|file|max:10240',
-//        ]);
-//
-//        // Generate unique filename
-//        $ext = $this->letterOfIntent->getClientOriginalExtension();
-//        $toSave = \Str::lower($this->awardeeId) . '_' . uniqid() . '.' . $ext;
-//
-//        // Check for existing file
-//        try {
-//            $awardeeDoc = AwardeeDocumentsSubmission::where('awardee_id', $this->awardeeId)
-//                ->where('awardee_attachments_list_id', $this->awardee_attachments_list_id)
-//                ->first();
-//
-//            if ($awardeeDoc && $awardeeDoc->file_path) {
-//                // Delete existing file if it exists
-//                \Storage::disk('awardee-photo-requirements')->delete($awardeeDoc->file_path);
-//            }
-//
-//            // Store new file
-//            $filePath = $this->letterOfIntent->storeAs('/', $toSave, 'awardee-photo-requirements');
-//
-//            // Create or update document record
-//            $saveFile = AwardeeDocumentsSubmission::updateOrCreate(
-//                [
-//                    'awardee_id' => $this->awardeeId,
-//                    'awardee_attachments_list_id' => $this->awardee_attachments_list_id
-//                ],
-//                [
-//                    'description' => $this->description,
-//                    'file_path' => $filePath,
-//                    'file_name' => $this->letterOfIntent->getClientOriginalName(),
-//                    'file_type' => $ext,
-//                    'file_size' => $this->letterOfIntent->getSize()
-//                ]
-//            );
-//
-//            if ($saveFile) {
-//                $this->dispatch('alert', [
-//                    'title' => 'Documents Uploaded!',
-//                    'message' => 'Documents uploaded successfully! <br><small>'. now()->calendar() .'</small>',
-//                    'type' => 'success'
-//                ]);
-//
-//                $this->dispatch('fileUploaded', $toSave);
-//
-//                // Reset the form
-//                $this->reset(['letterOfIntent', 'description', 'awardee_attachments_list_id']);
-//                $this->isFilePondUploadComplete = false;
-//            }
-//        } catch (\Exception $e) {
-//            logger()->error('File upload error: ' . $e->getMessage());
-//            $this->dispatch('alert', [
-//                'title' => 'Upload Failed',
-//                'message' => 'There was an error uploading the document. Please try again.',
-//                'type' => 'error'
-//            ]);
-//        }
-//    }
 
     public function submit(): void
     {
         try {
-            // 1. Log the start of submission
-//            logger()->info('Starting document submission', [
-//                'awardee_id' => $this->awardeeId,
-//                'attachment_list_id' => $this->awardee_attachments_list_id,
-//            ]);
-
             // Check if awardeeId is set
             if (is_null($this->awardeeId)) {
-                // Log an error or provide feedback
-                \Log::error('Document submission failed', ['error' => 'Awardee ID is missing']);
-                session()->flash('error', 'Awardee ID is missing. Please make sure the awardee is created first.');
-                return; // Exit the method early
+                $this->handleError('Awardee ID is missing. Please make sure the awardee is created first.');
+                return;
             }
 
             $this->isFilePonduploading = false;
 
-            // 2. Validate with strict error logging
+            // Validate inputs
             $validatedData = $this->validate([
-                'awardee_attachments_list_id' => 'required|exists:awardee_attachments_lists,id',
+                'attachment_id' => 'required|exists:awardee_attachments_lists,id',
                 'description' => 'nullable|string|max:255',
                 'letterOfIntent' => 'required|file|max:10240',
             ]);
 
             logger()->info('Validation passed', $validatedData);
 
-            // 3. Check if we have the required awardeeId
-            if (!$this->awardeeId) {
-                throw new \Exception('Awardee ID is missing');
-            }
-
-            // 4. Process the file
+            // Process the file
             $ext = $this->letterOfIntent->getClientOriginalExtension();
             $toSave = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $ext;
 
-            // 5. Store the file and get the path
+            // Store the file and get the path
             $filePath = $this->letterOfIntent->storeAs('documents', $toSave, 'awardee-photo-requirements');
 
             logger()->info('File stored successfully', [
@@ -406,10 +293,10 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'original_name' => $this->letterOfIntent->getClientOriginalName()
             ]);
 
-            // 6. Create the database record with explicit data array
+            // Prepare document data for storage
             $documentData = [
                 'awardee_id' => $this->awardeeId,
-                'awardee_attachments_list_id' => $this->awardee_attachments_list_id,
+                'attachment_id' => $this->attachment_id,
                 'description' => $this->description,
                 'file_path' => $filePath,
                 'file_name' => $this->letterOfIntent->getClientOriginalName(),
@@ -419,8 +306,15 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
             logger()->info('Attempting to save document', $documentData);
 
-            // 7. Create the record and store the result
+            // Save the document and update applicant status
             $savedDocument = AwardeeDocumentsSubmission::create($documentData);
+            TaggedAndValidatedApplicant::where('id', $this->taggedAndValidatedApplicantId)->update(['is_awarded' => true]);
+
+            // Update the 'awardees' table to mark the awardee as awarded
+            $awardee = Awardee::where('tagged_and_validated_applicant_id', $this->taggedAndValidatedApplicantId)->first();
+            if ($awardee) {
+                $awardee->update(['is_awarded' => true]);
+            }
 
             if (!$savedDocument) {
                 throw new \Exception('Failed to save document record to database');
@@ -428,28 +322,34 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
             logger()->info('Document saved successfully', ['document_id' => $savedDocument->id]);
 
-            // 8. Clear form and send success message
-            $this->reset(['letterOfIntent', 'description', 'awardee_attachments_list_id']);
+            // Clear form and send success message
+            $this->reset(['letterOfIntent', 'description', 'attachment_id']);
             $this->isFilePondUploadComplete = false;
 
             $this->dispatch('alert', [
-                'title' => 'Success!',
-                'message' => 'Document uploaded and saved successfully!',
+                'title' => 'Requirements Submitted Successfully!',
+                'message' => 'Applicant is now an official awardee! <br><small>'. now()->calendar() .'</small>',
                 'type' => 'success'
             ]);
-
         } catch (\Exception $e) {
+            $this->handleError('Failed to save document. Please try again.', $e);
+        }
+    }
+    private function handleError(string $message, \Exception $e = null): void
+    {
+        if ($e) {
             logger()->error('Document submission failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
-            $this->dispatch('alert', [
-                'title' => 'Error',
-                'message' => 'Failed to save document. Please try again.',
-                'type' => 'error'
-            ]);
+        } else {
+            logger()->error('Document submission failed', ['error' => $message]);
         }
+        $this->dispatch('alert', [
+            'title' => 'Error',
+            'message' => $message,
+            'type' => 'error'
+        ]);
     }
 
     private function resetUpload(): void
