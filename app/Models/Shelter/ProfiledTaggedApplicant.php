@@ -6,9 +6,10 @@ use App\Models\Address;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
-use App\Models\LivingSituation;
+use App\Models\Shelter\ShelterLivingStatus;
 use App\Models\Religion;
 use App\Models\Tribe;
+use App\Models\Shelter\OriginOfRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,23 +24,24 @@ class ProfiledTaggedApplicant extends Model
      * @var array
      */
     protected $fillable = [
-        'shelter_applicant_id',
+        'profile_no',
+        'request_origin_id',
+        'age',
         'civil_status_id',
         'religion_id',
         'address_id',
         'government_program_id',
         'tribe_id',
-        'living_situation_id',
+        'shelter_living_status_id',
         'case_specification_id',
         'living_situation_case_specification',
-        'date_of_birth',
         'sex',
         'occupation',
-        'years_of_residency',
+        'year_of_residency',
         'contact_number',
-        'house_no_or_street_name',
         'date_tagged',
-        'remarks'
+        'remarks',
+        'is_tagged'
     ];
 
     /**
@@ -49,11 +51,14 @@ class ProfiledTaggedApplicant extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'shelter_applicant_id' => 'integer',
+        'age' => 'integer',
         'civil_status_id' => 'integer',
+        'request_origin_id' => 'integer',
         'religion_id' => 'integer',
         'address_id' => 'integer',
         'government_program_id' => 'integer',
+        'year_of_residency' => 'integer',
+        'shelter_living_status_id' => 'integer',
         'tribe_id' => 'integer',
         'living_situation_id' => 'integer',
         'case_specification_id' => 'integer',
@@ -72,10 +77,10 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(Religion::class);
     }
-    public function address(): BelongsTo
+    public function address()
     {
-        return $this->belongsTo(Address::class);
-    }
+        return $this->belongsTo(Address::class, 'address_id');
+    }    
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
@@ -84,13 +89,18 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(Tribe::class);
     }
-    public function livingSituation(): BelongsTo
+    public function shelterLivingStatus(): BelongsTo
     {
-        return $this->belongsTo(LivingSituation::class);
+        return $this->belongsTo(ShelterLivingStatus::class);
     }
     public function caseSpecification(): BelongsTo
     {
         return $this->belongsTo(CaseSpecification::class);
+    }
+
+    public function originOfRequest(): BelongsTo
+    {
+        return $this->belongsTo(OriginOfRequest::class, 'request_origin_id');
     }
 
     public function grantees(): HasMany

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Shelter\ProfiledTaggedApplicant;
 
 class Address extends Model
 {
@@ -50,6 +51,12 @@ class Address extends Model
     {
         return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }
+    
+    public function profiledTaggedApplicants(): HasMany
+    {
+        return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
+    }
+    
     public function taggedAndValidatedApplicants()
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
