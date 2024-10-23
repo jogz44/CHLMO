@@ -58,6 +58,15 @@
                     </svg>
                     <p class="ml-2">Material Inventory</p>
                 </a>
+                <a href="{{ route('shelter-material-inventory') }}"
+                    @click="activeLink = 'grantee'; activeChildLink = ''; localStorage.setItem('activeLink', 'grantee'); localStorage.setItem('activeChildLink', '')"
+                    :class="{ 'bg-[rgb(217,217,217)] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'grantee' }"
+                    class="mx-2 flex items-center text-[12px] py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100] ">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                        <path d="M 24 5.015625 C 22.851301 5.015625 21.70304 5.3892757 20.753906 6.1367188 A 1.50015 1.50015 0 0 0 20.751953 6.1367188 L 8.859375 15.507812 C 7.0554772 16.929445 6 19.101786 6 21.398438 L 6 39.488281 C 6 41.403236 7.5850452 42.988281 9.5 42.988281 L 38.5 42.988281 C 40.414955 42.988281 42 41.403236 42 39.488281 L 42 21.398438 C 42 19.101786 40.944523 16.929445 39.140625 15.507812 L 27.246094 6.1367188 C 26.29696 5.3892758 25.148699 5.015625 24 5.015625 z M 24 8.0078125 C 24.489801 8.0078125 24.979759 8.1705836 25.390625 8.4941406 L 37.285156 17.865234 C 38.368508 18.719618 39 20.019609 39 21.398438 L 39 39.488281 C 39 39.783326 38.795045 39.988281 38.5 39.988281 L 36 39.988281 L 36 32.5 C 36 30.585045 34.414955 29 32.5 29 L 31 29 L 31 22.5 C 31 20.585045 29.414955 19 27.5 19 L 20.5 19 C 18.585045 19 17 20.585045 17 22.5 L 17 29 L 15.5 29 C 13.585045 29 12 30.585045 12 32.5 L 12 39.988281 L 9.5 39.988281 C 9.2049548 39.988281 9 39.783326 9 39.488281 L 9 21.398438 C 9 20.019088 9.6307412 18.71765 10.714844 17.863281 L 22.609375 8.4941406 C 23.020241 8.1705836 23.510199 8.0078125 24 8.0078125 z M 20.5 22 L 27.5 22 C 27.795045 22 28 22.204955 28 22.5 L 28 29 L 20 29 L 20 22.5 C 20 22.204955 20.204955 22 20.5 22 z M 15.5 32 L 22.5 32 L 22.5 39.988281 L 15 39.988281 L 15 32.5 C 15 32.204955 15.204955 32 15.5 32 z M 25.5 32 L 32.5 32 C 32.795045 32 33 32.204955 33 32.5 L 33 39.988281 L 25.5 39.988281 L 25.5 32 z"></path>
+                    </svg>
+                    <p class="ml-2">Material List</p>
+                </a>
                 <div class="relative" x-data="{ dropdownOpen: false, activeLink: localStorage.getItem('activeLink') || '', activeChildLink: localStorage.getItem('activeChildLink') || '' }" x-init="dropdownOpen = activeLink === 'client'">
                     <a href="#"
                         @click="dropdownOpen = !dropdownOpen; activeLink = 'report'; localStorage.setItem('activeLink', 'report')"
@@ -85,8 +94,13 @@
                             :class="{ 'text-[#FF9100] text-[12px] bg-opacity-40 font-bold': activeChildLink === 'shelter-reports-distribution-list' }"
                             class="text-[12px] block py-2.5 px-4 rounded transition duration-200 hover:bg-[#D9D9D9] hover:text-[#FF9100]"> Distribution List </a>
                     </div>
+                    <a href="{{ route('shelter-system-configuration') }}" @click="activeLink = 'settings'; activeChildLink = ''; localStorage.setItem('activeLink', 'settings'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'settings' }" class="ml-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                        <path d="M 10 6 A 4 4 0 0 0 6 10 L 6 38 A 4 4 0 0 0 10 42 L 38 42 A 4 4 0 0 0 42 38 L 42 10 A 4 4 0 0 0 38 6 L 10 6 z M 10 9 L 38 9 A 1 1 0 0 1 39 10 L 39 38 A 1 1 0 0 1 38 39 L 10 39 A 1 1 0 0 1 9 38 L 9 10 A 1 1 0 0 1 10 9 z M 23 13 A 2 2 0 0 0 21 15 L 21 15.410156 A 1.87 1.87 0 0 1 20 17.050781 L 20 17.099609 A 1.92 1.92 0 0 1 18.089844 17.099609 L 17.740234 16.890625 A 2 2 0 0 0 15 17.619141 L 14 19.359375 A 2 2 0 0 0 14.740234 22.089844 L 15.119141 22.310547 A 1.91 1.91 0 0 1 16.119141 23.980469 A 1.91 1.91 0 0 1 15.119141 25.650391 L 14.740234 25.869141 A 2 2 0 0 0 14 28.630859 L 15 30.369141 A 2 2 0 0 0 17.740234 31.099609 L 18.089844 30.890625 A 1.92 1.92 0 0 1 20 30.890625 L 20 31 A 1.87 1.87 0 0 1 21 32.640625 L 21 33 A 2 2 0 0 0 23 35 L 25 35 A 2 2 0 0 0 27 33 L 27 32.589844 A 1.87 1.87 0 0 1 28 31 L 28 30.900391 A 1.92 1.92 0 0 1 29.910156 30.900391 L 30.259766 31.109375 A 2 2 0 0 0 33 30.369141 L 34 28.630859 A 2 2 0 0 0 33.289062 25.900391 L 32.910156 25.679688 A 1.91 1.91 0 0 1 32 24 A 1.91 1.91 0 0 1 33 22.330078 L 33.380859 22.109375 A 2 2 0 0 0 34 19.369141 L 33 17.630859 A 2 2 0 0 0 30.259766 16.900391 L 29.910156 17.109375 A 1.92 1.92 0 0 1 28 17.109375 L 28 17.050781 A 1.87 1.87 0 0 1 27 15.410156 L 27 15 A 2 2 0 0 0 25 13 L 23 13 z M 23.875 21.001953 A 3 3 0 0 1 27 24 A 3 3 0 0 1 24 27 A 3 3 0 0 1 23.875 21.001953 z"></path>
+                    </svg>
+                    <p class="ml-2">System Configuration</p>
+                </a>
                 </div>
-
             </nav>
         </aside>
     </div>
