@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('shelter_applicant_spouses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shelter_applicant_id')->constrained('shelter_applicants')->onDelete('cascade');
-            $table->string('first_name', 50);
-            $table->string('middle_name', 50)->nullable();
-            $table->string('last_name', 50);
+            $table->foreignId('profile_no')->constrained('shelter_applicants')->onDelete('cascade');
+            $table->string('shelter_spouse_first_name', 50);
+            $table->string('shelter_spouse_middle_name', 50)->nullable();
+            $table->string('shelter_spouse_last_name', 50);
             $table->timestamps();
         });
     }
