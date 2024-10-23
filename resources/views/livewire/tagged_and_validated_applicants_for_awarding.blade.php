@@ -256,7 +256,11 @@
                                                     Award is pending for this applicant. <br> Requirements are needed to be uploaded.
                                                     <br>
                                                     <small>Documents are ready.
-                                                        <button type="button" class="underline" @click="openModalDocumentsChecklist = true; setApplicantId({{ $applicant->id }})">
+                                                        <button type="button" class="underline"
+                                                            @click="
+                                                            openModalDocumentsChecklist = true;
+                                                            $wire.set('awardeeId', {{ $applicant->awardee_id }});
+                                                        ">
                                                             Upload now.
                                                         </button>
                                                     </small>
@@ -437,7 +441,7 @@
                         </div>
 
                         <div class="max-w-md mx-auto rounded-lg p-4 text-gray-900">
-                            <form wire:submit.prevent="uploadDocuments">
+                            <form wire:submit.prevent="submit">
                                 <!-- Attachment Type -->
                                 <div class="mb-6">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
@@ -461,24 +465,43 @@
                                     @error('description')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                 </div>
 
-                                <!-- File Upload -->
-                                <div wire:ignore x-data x-init="
-                                        FilePond.setOptions({
-                                            allowMultiple: true,
+{{--                                <!-- File Upload -->--}}
+{{--                                <div wire:ignore x-data x-init="--}}
+{{--                                        FilePond.setOptions({--}}
+{{--                                            allowMultiple: true,--}}
+{{--                                            server: {--}}
+{{--                                                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                    console.log('FilePond is processing the file:', file);--}}
+{{--                                                    @this.upload('newFileImages', file, load, error, progress)--}}
+{{--                                                },--}}
+{{--                                                revert: (filename, load) => {--}}
+{{--                                                    @this.removeUpload('newFileImages', filename, load)--}}
+{{--                                                },--}}
+{{--                                            },--}}
+{{--                                        });--}}
+{{--                                        FilePond.create($refs.input);--}}
+{{--                                    "--}}
+{{--                                >--}}
+{{--                                    <input type="file" x-ref="input" wire:model="newFileImages" multiple>--}}
+{{--                                </div>--}}
+
+                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                        FilePond.registerPlugin(FilePondPluginImagePreview);
+                                        const pond = FilePond.create($refs.input, {
+                                            allowFileEncode: true,
+                                            onprocessfilestart: () => { isUploading = true; },
+                                            onprocessfile: (error, file) => { isUploading = false; },
                                             server: {
-                                                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                    console.log('FilePond is processing the file:', file);
-                                                    @this.upload('newFileImages', file, load, error, progress)
+                                                process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                    @this.upload('letterOfIntent', file, load, error, progress);
                                                 },
-                                                revert: (filename, load) => {
-                                                    @this.removeUpload('newFileImages', filename, load)
+                                                revert: (fileName, load) => {
+                                                    @this.removeUpload('letterOfIntent', fileName, load);
                                                 },
                                             },
                                         });
-                                        FilePond.create($refs.input);
-                                    "
-                                >
-                                    <input type="file" x-ref="input" wire:model="newFileImages" multiple>
+                                    ">
+                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="letterOfIntent">
                                 </div>
 
                                 <button type="submit" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
