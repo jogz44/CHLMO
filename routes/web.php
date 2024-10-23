@@ -179,6 +179,10 @@ Route::middleware([
     Route::get('/transfer-awardee', function () {
         return view('transfer-awardee');
     })->name('transfer-awardee');
+
+    Route::get('/shelter-system-configuration', function () {
+        return view('shelter-system-configuration');
+    })->name('shelter-system-configuration');
 });
 
 

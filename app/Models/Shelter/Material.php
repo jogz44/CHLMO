@@ -17,7 +17,9 @@ class Material extends Model
      */
     protected $fillable = [
         'purchase_order_id',
-        'name'
+        'material_unit_id',
+        'item_description',
+        'quantity',
     ];
     /**
      * The attributes that should be cast to native types.
@@ -26,11 +28,17 @@ class Material extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'purchase_order_id' => 'integer',
         'purchase_order_id' => 'integer'
     ];
     public function purchaseOrder(): BelongsTo
     {
         return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
+    }
+    
+    public function materialUnit(): BelongsTo
+    {
+        return $this->belongsTo(MaterialUnit::class, 'material_unit_id');
     }
 
     public function grantees(): HasMany
