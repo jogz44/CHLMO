@@ -51,9 +51,9 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
         ]);
 
-        if (OriginOfRequest::count() == 0){
-            $this->call(ShelterSeeders\OriginOfRequestSeeder::class);
-        }
+        // if (OriginOfRequest::count() == 0){
+        //     $this->call(ShelterSeeders\OriginOfRequestSeeder::class);
+        // }
 
         if (ShelterApplicant::count() == 0){
             $this->call(ShelterSeeders\ShelterApplicantSeeder::class);

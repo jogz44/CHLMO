@@ -22,12 +22,6 @@ class Awardee extends Model
         'lot_size',
         'lot_size_unit_id',
         'grant_date',
-//        'letter_of_intent_photo',
-//        'voters_id_photo',
-//        'valid_id_photo',
-//        'certificate_of_no_land_holding_photo',
-//        'marriage_certificate_photo',
-//        'birth_certificate_photo',
         'is_awarded'
     ];
 

@@ -18,12 +18,6 @@ return new class extends Migration
             $table->foreignId('lot_id')->constrained('lot_lists')->onDelete('cascade');
             $table->decimal('lot_size', 8, 2); // For the numeric value
             $table->foreignId('lot_size_unit_id')->constrained('lot_size_units')->onDelete('cascade');
-//            $table->string('letter_of_intent_photo', 255)->nullable();
-//            $table->string('voters_id_photo', 255)->nullable();
-//            $table->string('valid_id_photo', 255)->nullable();
-//            $table->string('certificate_of_no_land_holding_photo', 255)->nullable();
-//            $table->string('marriage_certificate_photo', 255)->nullable();
-//            $table->string('birth_certificate_photo', 255)->nullable();
             $table->dateTime('grant_date');
             $table->boolean('is_awarded')->default(false);
             $table->timestamps();
