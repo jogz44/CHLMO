@@ -35,23 +35,24 @@
                 <form x-ref="form">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="first-name" class="block text-[13px] font-medium text-gray-700 mb-1">FIRST
-                                NAME <span class="text-red-500">*</span></label>
-                            <input type="text" id="first-name" name="first-name" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:ring-1 focus:ring-custom-red">
+                            <label for="first-name" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                FIRST NAME <span class="text-red-500">*</span></label>
+                            <input type="text" id="first-name" name="first-name"
+                                   wire:model="first_name" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:ring-1 focus:ring-custom-red">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="middle-name" class="block text-[13px] font-medium text-gray-700 mb-1">MIDDLE
-                                NAME <span class="text-red-500">*</span></label>
+                            <label for="middle-name" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                MIDDLE NAME <span class="text-red-500">*</span></label>
                             <input type="text" id="middle-name" name="middle-name" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="last-name" class="block text-[13px] font-medium text-gray-700 mb-1">LAST
-                                NAME <span class="text-red-500">*</span></label>
+                            <label for="last-name" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                LAST NAME <span class="text-red-500">*</span></label>
                             <input type="text" id="last-name" name="last-name" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="name-suffix" class="block text-[13px] font-medium text-gray-700 mb-1">NAME
-                                SUFFIX</label>
+                            <label for="name-suffix" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                NAME SUFFIX</label>
                             <input type="text" id="name-suffix" name="name-suffix" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                     </div>
