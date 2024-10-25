@@ -102,9 +102,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public function mount(): void
     {
-        $this->awardeeId = null; // Initialize
-        \Log::info('Mounted with awardeeId', ['awardeeId' => $this->awardeeId]);
-
         // Set the default transaction type to 'Walk-in'
         $viaRequest = TransactionType::where('type_name', 'Request')->first();
         if ($viaRequest) {
@@ -229,9 +226,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
         // Trigger the alert message
         $this->dispatch('alert', [
-            'title' => 'Awarding Successful!',
-            'message' => 'Applicant awarded successfully! <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
+            'title' => 'Awarding Pending!',
+            'message' => 'Applicant needs to submit necessary requirements.',
+            'type' => 'warning'
         ]);
 
         $this->redirect('transaction-request');
@@ -260,7 +257,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'letterOfIntent' => 'required|file|max:10240',
         ]);
     }
-
     public function submit(): void
     {
         try {
@@ -308,10 +304,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
             // Save the document and update applicant status
             $savedDocument = AwardeeDocumentsSubmission::create($documentData);
-            TaggedAndValidatedApplicant::where('id', $this->taggedAndValidatedApplicantId)->update(['is_awarded' => true]);
 
             // Update the 'awardees' table to mark the awardee as awarded
-            $awardee = Awardee::where('tagged_and_validated_applicant_id', $this->taggedAndValidatedApplicantId)->first();
+            $awardee = Awardee::where('tagged_and_validated_applicant_id', $this->awardeeId)->first();
             if ($awardee) {
                 $awardee->update(['is_awarded' => true]);
             }
@@ -323,14 +318,18 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             logger()->info('Document saved successfully', ['document_id' => $savedDocument->id]);
 
             // Clear form and send success message
-            $this->reset(['letterOfIntent', 'description', 'attachment_id']);
-            $this->isFilePondUploadComplete = false;
+            $this->resetUpload();
+//            $this->reset(['letterOfIntent', 'description', 'attachment_id']);
+//            $this->isFilePondUploadComplete = false;
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
                 'message' => 'Applicant is now an official awardee! <br><small>'. now()->calendar() .'</small>',
                 'type' => 'success'
             ]);
+
+            $this->redirect('transaction-request');
+
         } catch (\Exception $e) {
             $this->handleError('Failed to save document. Please try again.', $e);
         }
@@ -354,7 +353,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     private function resetUpload(): void
     {
-        $this->reset(['newFileImages', 'description', 'attachment_id']);
+        $this->reset(['letterOfIntent', 'description', 'attachment_id']);
         $this->show = false;
     }
 
