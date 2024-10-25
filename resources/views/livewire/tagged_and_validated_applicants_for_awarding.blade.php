@@ -80,6 +80,9 @@
                                     <input type="checkbox" class="toggle-column" id="toggle-case-specification" checked> Case Specification
                                 </label>
                                 <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-case-specification-description" checked> Case Specification Description
+                                </label>
+                                <label class="block px-4 py-2">
                                     <input type="checkbox" class="toggle-column" id="toggle-contact" checked> Contact Number
                                 </label>
                                 <label class="block px-4 py-2">
@@ -202,6 +205,7 @@
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">BARANGAY</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column living-situation-col">LIVING SITUATION (CASE)</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column case-specification-col">CASE SPECIFICATION</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-col">MONTHLY INCOME</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TRANSACTION TYPE</th>
@@ -218,6 +222,7 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap living-situation-col">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap case-specification-col">{{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap case-specification-description-col">{{ $applicant->living_situation_case_specification ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->contact_number ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->applicant->transactionType->type_name ?? 'N/A' }}</td>
@@ -233,6 +238,11 @@
                                         <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
                                                 class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-14 py-1.5 rounded-full">
                                             Award
+                                        </button>
+                                    @elseif($applicant->awardees->isNotEmpty() && $applicant->awardees->first()->is_awarded)
+                                        <!-- Awarded Button -->
+                                        <button class="bg-gray-400 text-white px-12 py-1.5 rounded-full cursor-not-allowed">
+                                            Awarded
                                         </button>
                                     @else
                                         <!-- Award Pending Button (disabled) -->
@@ -258,7 +268,7 @@
                                                     <small>Documents are ready.
                                                         @if($applicant->is_awarding_on_going && $applicant->awardees->isNotEmpty())
                                                             <button type="button" class="underline"
-                                                                @click="
+                                                                    @click="
                                                                 openModalDocumentsChecklist = true;
                                                                 $wire.set('awardeeId', {{ $applicant->awardees->first()->id }});
                                                             ">
@@ -352,11 +362,12 @@
 
                             <!-- LotList Size Allocated Field -->
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="lot_size_allocated">LOT
-                                    SIZE ALLOCATED <span class="text-red-500">*</span></label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="lot_size_allocated">
+                                    LOT SIZE ALLOCATED <span class="text-red-500">*</span></label>
                                 <input wire:model="lot_size" type="number" id="lot_size_allocated"
                                        class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                       placeholder="1000.50">
+                                       placeholder="1000.50"
+                                       oninput="validateNumberInput(this)">
                                 @error('lot_size') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
@@ -377,7 +388,7 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <div class="alert"
-                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                          x-data="{ open:false, alert:{} }"
                                          x-show="open" x-cloak
                                          x-transition:enter="animate-alert-show"
@@ -466,27 +477,7 @@
                                               placeholder="Please leave a comment..."></textarea>
                                     @error('description')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                 </div>
-
-{{--                                <!-- File Upload -->--}}
-{{--                                <div wire:ignore x-data x-init="--}}
-{{--                                        FilePond.setOptions({--}}
-{{--                                            allowMultiple: true,--}}
-{{--                                            server: {--}}
-{{--                                                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
-{{--                                                    console.log('FilePond is processing the file:', file);--}}
-{{--                                                    @this.upload('newFileImages', file, load, error, progress)--}}
-{{--                                                },--}}
-{{--                                                revert: (filename, load) => {--}}
-{{--                                                    @this.removeUpload('newFileImages', filename, load)--}}
-{{--                                                },--}}
-{{--                                            },--}}
-{{--                                        });--}}
-{{--                                        FilePond.create($refs.input);--}}
-{{--                                    "--}}
-{{--                                >--}}
-{{--                                    <input type="file" x-ref="input" wire:model="newFileImages" multiple>--}}
-{{--                                </div>--}}
-
+                                <!-- File upload -->
                                 <div wire:ignore x-data="{ isUploading: false }" x-init="
                                         FilePond.registerPlugin(FilePondPluginImagePreview);
                                         const pond = FilePond.create($refs.input, {
@@ -503,11 +494,12 @@
                                             },
                                         });
                                     ">
-                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="letterOfIntent">
+                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="letterOfIntent" required>
+                                    @error('letterOfIntent')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                 </div>
                                 <div>
                                     <div class="alert"
-                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                          x-data="{ open:false, alert:{} }"
                                          x-show="open" x-cloak
                                          x-transition:enter="animate-alert-show"
@@ -725,5 +717,12 @@
                 this.currentPage = page;
             }
         }
+    }
+</script>
+<script>
+    // Function to allow only numeric input
+    function validateNumberInput(input) {
+        // Remove any characters that are not digits
+        input.value = input.value.replace(/[^0-9]/g, '');
     }
 </script>
