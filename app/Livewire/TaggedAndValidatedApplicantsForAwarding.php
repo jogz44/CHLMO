@@ -16,6 +16,7 @@ use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
 use http\Env\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -259,12 +260,19 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     }
     public function submit(): void
     {
+        DB::beginTransaction();
         try {
             // Check if awardeeId is set
             if (is_null($this->awardeeId)) {
                 $this->handleError('Awardee ID is missing. Please make sure the awardee is created first.');
                 return;
             }
+
+            // Log the current IDs we're working with
+            logger()->info('Starting submission with IDs', [
+                'awardee_id' => $this->awardeeId,
+                'attachment_id' => $this->attachment_id
+            ]);
 
             $this->isFilePonduploading = false;
 
@@ -280,14 +288,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             // Process the file
             $ext = $this->letterOfIntent->getClientOriginalExtension();
             $toSave = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $ext;
-
-            // Store the file and get the path
             $filePath = $this->letterOfIntent->storeAs('documents', $toSave, 'awardee-photo-requirements');
-
-            logger()->info('File stored successfully', [
-                'path' => $filePath,
-                'original_name' => $this->letterOfIntent->getClientOriginalName()
-            ]);
 
             // Prepare document data for storage
             $documentData = [
@@ -300,27 +301,47 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'file_size' => $this->letterOfIntent->getSize(),
             ];
 
-            logger()->info('Attempting to save document', $documentData);
-
-            // Save the document and update applicant status
             $savedDocument = AwardeeDocumentsSubmission::create($documentData);
-
-            // Update the 'awardees' table to mark the awardee as awarded
-            $awardee = Awardee::where('tagged_and_validated_applicant_id', $this->awardeeId)->first();
-            if ($awardee) {
-                $awardee->update(['is_awarded' => true]);
-            }
 
             if (!$savedDocument) {
                 throw new \Exception('Failed to save document record to database');
             }
 
-            logger()->info('Document saved successfully', ['document_id' => $savedDocument->id]);
+            // Find the awardee - first log the query we're about to make
+            logger()->info('Searching for awardee with ID', ['id' => $this->awardeeId]);
 
-            // Clear form and send success message
+            // Find the awardee directly by ID
+            $awardee = Awardee::findOrFail($this->awardeeId);
+
+            logger()->info('Found awardee', [
+                'awardee_id' => $awardee->id,
+                'tagged_and_validated_applicant_id' => $awardee->tagged_and_validated_applicant_id
+            ]);
+
+            $updated = $awardee->update(['is_awarded' => true]);
+
+            if (!$updated) {
+                throw new \Exception('Failed to update awardee status');
+            }
+
+            // Verify the update
+            $verifyUpdate = Awardee::where('id', $awardee->id)
+                ->where('is_awarded', true)
+                ->exists();
+
+            if (!$verifyUpdate) {
+                throw new \Exception('Failed to verify awardee status update');
+            }
+
+            logger()->info('Successfully updated awardee status', [
+                'awardee_id' => $awardee->id,
+                'is_awarded' => true
+            ]);
+
+            // Clear form
             $this->resetUpload();
-//            $this->reset(['letterOfIntent', 'description', 'attachment_id']);
-//            $this->isFilePondUploadComplete = false;
+
+            DB::commit();
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
@@ -330,8 +351,18 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
             $this->redirect('transaction-request');
 
+            DB::commit();
         } catch (\Exception $e) {
-            $this->handleError('Failed to save document. Please try again.', $e);
+            DB::rollBack();
+            logger()->error('Submission failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->dispatch('alert', [
+                'title' => 'Failed!',
+                'message' => 'Submission of requirements failed. Please try again. <br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
         }
     }
     private function handleError(string $message, \Exception $e = null): void
