@@ -58,7 +58,7 @@
                     </svg>
                     <p class="ml-2">Material Inventory</p>
                 </a>
-                <a href="{{ route('shelter-material-inventory') }}"
+                <a href="{{ route('shelter-materials-list') }}"
                     @click="activeLink = 'grantee'; activeChildLink = ''; localStorage.setItem('activeLink', 'grantee'); localStorage.setItem('activeChildLink', '')"
                     :class="{ 'bg-[rgb(217,217,217)] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'grantee' }"
                     class="mx-2 flex items-center text-[12px] py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100] ">

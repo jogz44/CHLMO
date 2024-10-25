@@ -129,6 +129,7 @@ class ShelterMaterialInventory extends Component
 
             // Reset form fields after successful save
             $this->reset(['purchaseOrderNo', 'purchaseRequisitionNo', 'rows']);
+        
         } catch (\Exception $e) {
             // Handle any exceptions that might be thrown during the save process
             session()->flash('error', 'An error occurred while saving: ' . $e->getMessage());
