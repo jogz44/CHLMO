@@ -50,7 +50,7 @@ class Applicant extends Model
      *
      * @return string
      */
-    public static function generateApplicantId()
+    public static function generateApplicantId(): string
     {
         $currentYear = Carbon::now()->year;
 
