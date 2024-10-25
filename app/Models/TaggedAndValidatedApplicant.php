@@ -42,7 +42,7 @@ class TaggedAndValidatedApplicant extends Model
         'remarks',
         'is_tagged',
         'is_awarding_on_going',
-        'is_awarded'
+//        'is_awarded'
     ];
 
     /**
