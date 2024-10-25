@@ -160,6 +160,10 @@ Route::middleware([
         return view('shelter-material-inventory');
     })->name('shelter-material-inventory');
 
+    Route::get('/shelter-materials-list', function () {
+        return view('shelter-materials-list');
+    })->name('shelter-materials-list');
+
     Route::get('/shelter-grantees-details', function () {
         return view('shelter-grantees-details');
     })->name('shelter-grantees-details');
@@ -191,6 +195,8 @@ Route::middleware([
     Route::get('/shelter-system-configuration', function () {
         return view('shelter-system-configuration');
     })->name('shelter-system-configuration');
+
+    
 });
 
 
