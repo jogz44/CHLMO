@@ -161,7 +161,6 @@ class Applicants extends Component
             'purok_id' => 'required|exists:puroks,id',
         ];
     }
-
     public function store()
     {
         // Validate the input data
@@ -204,14 +203,14 @@ class Applicants extends Component
         $this->redirect('applicants');
     }
 
-    public function resetForm()
+    public function resetForm(): void
     {
         $this->reset([
             'date_applied', 'transaction_type_id', 'first_name', 'middle_name', 'last_name',
             'suffix_name', 'barangay_id', 'purok_id', 'contact_number',
         ]);
     }
-    public function edit($id)
+    public function edit($id): void
     {
         $applicant = Applicant::findOrFail($id);
 
@@ -225,7 +224,7 @@ class Applicants extends Component
         $this->edit_purok_id = $applicant->address->purok_id ?? null;
         $this->edit_date_applied = $applicant->date_applied->format('Y-m-d');
     }
-    public function update()
+    public function update(): void
     {
         $this->validate([
             'edit_first_name' => 'required|string|max:255',
@@ -262,7 +261,7 @@ class Applicants extends Component
             'type' => 'success'
         ]);
     }
-    public function tagApplicant($applicantId)
+    public function tagApplicant($applicantId): void
     {
         // Logic to tag the applicant
         $applicant = Applicant::find($applicantId);
