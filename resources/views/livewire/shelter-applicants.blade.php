@@ -76,6 +76,12 @@
                         <option value="{{ $origin->id }}">{{ $origin->name }}</option>
                         @endforeach
                     </select>
+                    <select wire:model.live="selectedTaggingStatus" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Status</option>
+                        @foreach($taggingStatuses as $status)
+                            <option value="{{ $status }}">{{ $status }}</option>
+                        @endforeach
+                    </select>
                     <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
                         Reset Filter
                     </button>
@@ -108,7 +114,7 @@
                                     Tagged
                                 </button>
                                 @else
-                                <button onclick="window.location.href='{{ route('shelter-applicant-details', ['profileNo' => $applicant->id]) }}'"
+                                <button @click="window.location.href='{{ route('shelter-applicant-details', ['profileNo' => $applicant->id]) }}'"
                                     class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
                                     Tag
                                 </button>
