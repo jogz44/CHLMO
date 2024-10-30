@@ -13,6 +13,6 @@ class ProfiledTaggedApplicantSeeder extends Seeder
      */
     public function run(): void
     {
-        ProfiledTaggedApplicant::factory(10)->create();
+        // ProfiledTaggedApplicant::factory(3)->create();
     }
 }

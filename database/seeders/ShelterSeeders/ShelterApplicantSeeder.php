@@ -13,6 +13,6 @@ class ShelterApplicantSeeder extends Seeder
      */
     public function run(): void
     {
-        ShelterApplicant::factory(10)->create();
+        ShelterApplicant::factory(3)->create();
     }
 }
