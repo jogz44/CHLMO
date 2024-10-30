@@ -434,7 +434,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 //        }
 
         // Paginate the filtered results
-        $taggedAndValidatedApplicants = $query->paginate(10);
+//        $taggedAndValidatedApplicants = $query->paginate(10);
+        $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('livewire.tagged_and_validated_applicants_for_awarding', [
             'taggedAndValidatedApplicants' => $taggedAndValidatedApplicants,
