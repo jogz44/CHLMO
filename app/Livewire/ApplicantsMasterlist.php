@@ -21,7 +21,7 @@ class ApplicantsMasterlist extends Component
             'address.barangay',   // Load applicant's address with barangay
             'transactionType',    // Load applicant's transaction type
             'taggedAndValidated.livingSituation',    // Load related living situation details
-        ])->get();
+        ])->orderBy('created_at', 'desc')->get(); // Order by created_at descending
     }
     public function render()
     {
