@@ -41,7 +41,12 @@ class ProfiledTaggedApplicant extends Model
         'contact_number',
         'date_tagged',
         'remarks',
-        'is_tagged'
+        'is_tagged',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'date_request',
+        'is_granted'
     ];
 
     /**
@@ -65,9 +70,9 @@ class ProfiledTaggedApplicant extends Model
         'date_tagged' => 'date',
     ];
 
-    public function shelterApplicant(): BelongsTo
+    public function shelterApplicant()
     {
-        return $this->belongsTo(ShelterApplicant::class);
+        return $this->belongsTo(ShelterApplicant::class, 'profile_no', 'id');
     }
     public function civilStatus(): BelongsTo
     {
@@ -80,7 +85,7 @@ class ProfiledTaggedApplicant extends Model
     public function address()
     {
         return $this->belongsTo(Address::class, 'address_id');
-    }    
+    }
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
@@ -100,7 +105,7 @@ class ProfiledTaggedApplicant extends Model
 
     public function originOfRequest(): BelongsTo
     {
-        return $this->belongsTo(OriginOfRequest::class, 'request_origin_id');
+        return $this->belongsTo(OriginOfRequest::class, 'request_origin_id', 'id');
     }
 
     public function grantees(): HasMany

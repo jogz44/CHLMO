@@ -143,10 +143,6 @@ Route::middleware([
 
     Route::get('/shelter-applicant-details/{profileNo}', ShelterApplicantDetails::class)
     ->name('shelter-applicant-details');
-
-    Route::get('/test-view', function () {
-        return view('livewire.shelter-applicant-details');
-    });
     
     Route::get('/shelter-profiled-tagged-applicants', function () {
         return view('shelter-profiled-tagged-applicants');
