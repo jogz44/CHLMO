@@ -307,8 +307,8 @@ class Applicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        $applicants = $query->paginate(5); // Apply pagination after filtering
-//        $applicants = $query->orderBy('date_applied', 'desc')->paginate(5);
+//        $applicants = $query->paginate(5); // Apply pagination after filtering
+        $applicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
         // Pass data to the view
         return view('livewire.applicants', [
