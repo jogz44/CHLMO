@@ -126,7 +126,7 @@ class Applicants extends Component
     {
         $this->resetPage();
     }
-    public function updatedBarangayId($barangayId)
+    public function updatedBarangayId($barangayId): void
     {
         // Fetch the puroks based on the selected barangay
         $this->puroks = Purok::where('barangay_id', $barangayId)->get();
