@@ -78,101 +78,70 @@
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
                         <tr>
-                            <th class="py-2 px-2  text-center font-medium">Name</th>
-                            <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Awarded</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
+                            <th class="py-2 px-2  text-center font-medium whitespace-nowrap">ID</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Applicant</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot Size</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Grant Date</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Action</th>
                         </tr>
                         </thead>
-
-{{--                        TODO - display the awardees in the awardee list table--}}
-{{--                        TODO - perform the 'aging' feature--}}
-
                         <tbody>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('awardee-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
-                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('awardee-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
-                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('awardee-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
-                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('awardee-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
-                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="py-4 px-2 text-center  border-b">John Doe</td>
-                            <td class="py-4 px-2 text-center border-b">Suaybaguio</td>
-                            <td class="py-4 px-2 text-center border-b">Magugpo North</td>
-                            <td class="py-4 px-2 text-center border-b">09637894863</td>
-                            <td class="py-4 px-2 text-center border-b">11/23/2023</td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button
-                                        @click="window.location.href = '{{ route('awardee-details') }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
-                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"
-                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">Transfer
-                                </button>
-                            </td>
-                        </tr>
+                        @foreach($awardees as $awardee)
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->last_name ?? 'N/A' }}, {{ $awardee->taggedAndValidatedApplicant->applicant->first_name ?? 'N/A' }} {{ $awardee->taggedAndValidatedApplicant->applicant->middle_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot->lot_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
+                                    <!-- Animated Confetti -->
+                                    <div class="flex items-center">
+                                        @if($awardee->is_awarded)
+                                            Awarded
+                                            <span class="ml-1">
+                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                <lord-icon
+                                                        src="https://cdn.lordicon.com/fkmafinl.json"
+                                                        trigger="loop"
+                                                        delay="2000"
+                                                        style="width: 30px; height: 30px">
+                                                </lord-icon>
+                                            </span>
+                                        @else
+                                            <span class="text-red-500">Pending...</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap">
+                                    @if(!$awardee->is_awarded)
+                                        <button disabled class="text-gray-400 text-bold underline px-4 py-1.5 cursor-not-allowed">
+                                            Details
+                                        </button>
+                                        <button disabled class="bg-gray-400 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
+                                            Transfer
+                                        </button>
+                                    @else
+                                        <button @click="window.location.href = '{{ route('awardee-details') }}'" class="text-custom-red text-bold underline px-4 py-1.5">
+                                            Details
+                                        </button>
+                                        <button @click="window.location.href = '{{ route('transfer-awardee') }}'" class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">
+                                            Transfer
+                                        </button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        {{ $awardees->links() }}
+                    </div>
 
                     <!-- Modal Background -->
                     <div x-show="openModalTransfer"
@@ -419,28 +388,28 @@
                 </div>
 
                 <!-- Pagination controls -->
-                <div class="flex justify-end text-[12px] mt-4">
-                    <button
-                            @click="prevPage"
-                            :disabled="currentPage === 1"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
-                        Prev
-                    </button>
-                    <template x-for="page in totalPages" :key="page">
-                        <button
-                                @click="goToPage(page)"
-                                :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"
-                                class="px-4 py-2 mx-1 rounded">
-                            <span x-text="page"></span>
-                        </button>
-                    </template>
-                    <button
-                            @click="nextPage"
-                            :disabled="currentPage === totalPages"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
-                        Next
-                    </button>
-                </div>
+{{--                <div class="flex justify-end text-[12px] mt-4">--}}
+{{--                    <button--}}
+{{--                            @click="prevPage"--}}
+{{--                            :disabled="currentPage === 1"--}}
+{{--                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">--}}
+{{--                        Prev--}}
+{{--                    </button>--}}
+{{--                    <template x-for="page in totalPages" :key="page">--}}
+{{--                        <button--}}
+{{--                                @click="goToPage(page)"--}}
+{{--                                :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"--}}
+{{--                                class="px-4 py-2 mx-1 rounded">--}}
+{{--                            <span x-text="page"></span>--}}
+{{--                        </button>--}}
+{{--                    </template>--}}
+{{--                    <button--}}
+{{--                            @click="nextPage"--}}
+{{--                            :disabled="currentPage === totalPages"--}}
+{{--                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">--}}
+{{--                        Next--}}
+{{--                    </button>--}}
+{{--                </div>--}}
                 <script>
                     function fileUpload() {
                         return {
@@ -475,24 +444,24 @@
                         }
                     }
                 </script>
-                <script>
-                    function pagination() {
-                        return {
-                            currentPage: 1,
-                            totalPages: 3, // Set this to the total number of pages you have
+{{--                <script>--}}
+{{--                    function pagination() {--}}
+{{--                        return {--}}
+{{--                            currentPage: 1,--}}
+{{--                            totalPages: 3, // Set this to the total number of pages you have--}}
 
-                            prevPage() {
-                                if (this.currentPage > 1) this.currentPage--;
-                            },
-                            nextPage() {
-                                if (this.currentPage < this.totalPages) this.currentPage++;
-                            },
-                            goToPage(page) {
-                                this.currentPage = page;
-                            }
-                        }
-                    }
-                </script>
+{{--                            prevPage() {--}}
+{{--                                if (this.currentPage > 1) this.currentPage--;--}}
+{{--                            },--}}
+{{--                            nextPage() {--}}
+{{--                                if (this.currentPage < this.totalPages) this.currentPage++;--}}
+{{--                            },--}}
+{{--                            goToPage(page) {--}}
+{{--                                this.currentPage = page;--}}
+{{--                            }--}}
+{{--                        }--}}
+{{--                    }--}}
+{{--                </script>--}}
             </div>
         </div>
     </div>
