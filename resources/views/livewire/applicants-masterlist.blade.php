@@ -198,7 +198,10 @@
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-income-col">Monthly Income</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">Transaction Type</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column date-applied-col">Date Applied</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Status</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Tagged</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Awarding Status</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Awarded</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Blacklisted</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Aging</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">Actions</th>
                             </tr>
@@ -215,10 +218,80 @@
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-income-col">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->transactionType->type_name }}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap date-applied-col">{{ $applicant->date_applied ? date('M d, Y', strtotime($applicant->date_applied)) : 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">Pending</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Tagging Status -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->is_tagged)
+                                                <span class="ml-1 text-center justify-center">
+                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                    <lord-icon
+                                                            src="https://cdn.lordicon.com/guqkthkk.json"
+                                                            trigger="loop"
+                                                            delay="2000"
+                                                            colors="primary:#16c72e"
+                                                            style="width:20px;height:20px">
+                                                    </lord-icon>
+                                                </span>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <!-- Awarding Status -->
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Awarding Status -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->taggedAndValidated?->is_awarding_on_going)
+                                                <span class="ml-1 text-red-500 text-center justify-center">
+                                                    Pending...
+                                                </span>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <!-- Awarding Status -->
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Awarding Status -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->taggedAndValidated?->awardee?->is_awarded)
+                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                <lord-icon
+                                                        src="https://cdn.lordicon.com/guqkthkk.json"
+                                                        trigger="loop"
+                                                        delay="2000"
+                                                        colors="primary:#16c72e"
+                                                        style="width:20px;height:20px">
+                                                </lord-icon>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <!-- Blacklisted -->
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Blacklisted -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->is_blacklisted)
+                                                <span class="ml-1 text-center justify-center">
+                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                    <lord-icon
+                                                            src="https://cdn.lordicon.com/guqkthkk.json"
+                                                            trigger="loop"
+                                                            delay="2000"
+                                                            colors="primary:#16c72e"
+                                                            style="width:20px;height:20px">
+                                                    </lord-icon>
+                                                </span>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
                                     <td class="py-4 px-2 text-center text-red-600 border-b whitespace-nowrap status-col">
-                                        {{ $applicant->created_at->shortAbsoluteDiffForHumans() }}
-                                        <span class="mr-2">
+                                        <div class="flex items-center justify-center w-full">
+                                            {{ $applicant->date_applied->shortAbsoluteDiffForHumans() }}
+                                            <span class="ml-1">
                                             <script src="https://cdn.lordicon.com/lordicon.js"></script>
                                             <lord-icon
                                                     src="https://cdn.lordicon.com/lzgqzxrq.json"
@@ -227,12 +300,15 @@
                                                     style="width: 20px; height: 20px">
                                             </lord-icon>
                                         </span>
+                                        </div>
                                     </td>
                                     <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
-                                        <button
-                                                @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                                class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                        </button>
+                                        <div class="flex items-center justify-center w-full">
+                                            <button
+                                                    @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
+                                                    class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
