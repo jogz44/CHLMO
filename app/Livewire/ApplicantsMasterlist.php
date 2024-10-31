@@ -21,6 +21,7 @@ class ApplicantsMasterlist extends Component
             'address.barangay',   // Load applicant's address with barangay
             'transactionType',    // Load applicant's transaction type
             'taggedAndValidated.livingSituation',    // Load related living situation details
+            'taggedAndValidated',
         ])
             ->orderBy('created_at', 'desc')
             ->paginate(10); // You can adjust the number of items per page
