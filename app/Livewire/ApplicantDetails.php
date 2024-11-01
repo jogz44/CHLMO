@@ -102,17 +102,10 @@ class ApplicantDetails extends Component
         // Clear dependents array before populating it again
         $this->dependents = [];
 
-        // Fetch dependents if any exist
-//        $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::with('dependents')->find($applicantId);
-
         // Only load dependents for this specific tagged applicant if it exists
         $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::where('applicant_id', $applicantId)
             ->with('dependents')
             ->first();
-
-//        if ($taggedAndValidatedApplicant) {
-//            $this->dependents = $taggedAndValidatedApplicant->dependents->toArray();
-//        }
 
         if ($taggedAndValidatedApplicant && $taggedAndValidatedApplicant->dependents) {
             // Transform the dependents collection into the expected array format
@@ -387,21 +380,6 @@ class ApplicantDetails extends Component
             }
 
             Dependent::insert($dependentData);
-
-//            foreach ($this->dependents as $dependent) {
-//                Dependent::create([
-//                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Use the ID from the newly created TaggedAndValidatedApplicant
-//                    'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
-//                    'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
-//                    'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
-//                    'dependent_sex' => $dependent['dependent_sex'] ?: null,
-//                    'dependent_civil_status_id' => $dependent['dependent_civil_status_id'] ?: null,
-//                    'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
-//                    'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
-//                    'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?: null,
-//                    'dependent_relationship' => $dependent['dependent_relationship'] ?: null,
-//                ]);
-//            }
 
             foreach ($this->images as $index => $image) {
                 $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
