@@ -24,7 +24,7 @@ class ApplicantsMasterlist extends Component
             'taggedAndValidated',
         ])
             ->orderBy('created_at', 'desc')
-            ->paginate(10); // You can adjust the number of items per page
+            ->paginate(5); // You can adjust the number of items per page
 
         return view('livewire.applicants-masterlist', [
             'applicants' => $applicants
