@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TaggedAndValidatedApplicant extends Model
 {
@@ -52,7 +53,7 @@ class TaggedAndValidatedApplicant extends Model
      */
     protected $casts = [
         'date_of_birth' => 'date',
-        'tagged_date'  => 'datetime',
+        'tagging_date'  => 'datetime',
         'monthly_income' => 'integer',
         'family_income'  => 'integer',
         'rent_fee'       => 'integer',
@@ -91,15 +92,20 @@ class TaggedAndValidatedApplicant extends Model
     }
 
     // Relationship with Spouse
-    public function spouse(): BelongsTo
+//    public function spouse(): BelongsTo
+//    {
+//        return $this->belongsTo(Spouse::class);
+//    }
+
+    public function spouse(): HasOne
     {
-        return $this->belongsTo(Spouse::class);
+        return $this->hasOne(Spouse::class, 'tagged_and_validated_applicant_id');
     }
 
     // Relationship with Dependent
     public function dependents(): HasMany
     {
-        return $this->hasMany(Dependent::class);
+        return $this->hasMany(Dependent::class, 'tagged_and_validated_applicant_id');
     }
 
     // Relationship with LivingSituation
@@ -139,6 +145,6 @@ class TaggedAndValidatedApplicant extends Model
     }
     public function images()
     {
-        return $this->hasMany(ImagesForHousing::class);
+        return $this->hasMany(ImagesForHousing::class, 'tagged_and_validated_applicant_id');
     }
 }
