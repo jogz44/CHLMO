@@ -24,18 +24,17 @@ class Applicants extends Component
     public $isLoading = false;
     public $date_applied;
     public $transaction_type_id;
-    public $transaction_type_name;
+    public $transactionTypes = [];
     public $first_name;
     public $middle_name;
     public $last_name;
     public $suffix_name;
     public $contact_number;
     public $barangay_id; // Update this property name
+    public $barangays = []; // Initialize as an empty array
     public $purok_id; // Update this property name
     public $puroks = [];
     public $interviewer;
-
-    public $barangays = []; // Initialize as an empty array
 
     // Filter properties:
     public $applicantId;
@@ -44,6 +43,8 @@ class Applicants extends Component
     public $puroksFilter = []; // Initialize as an empty array
     public $selectedBarangay_id;
     public $barangaysFilter = []; // Initialize as an empty array
+    public $selectedTransactionType_id;
+    public $transactionTypesFilter = []; // Initialize as an empty array
     public $taggingStatuses;
     protected $paginationTheme = 'tailwind';
 
@@ -53,6 +54,7 @@ class Applicants extends Component
     public $edit_last_name;
     public $edit_suffix_name;
     public $edit_date_applied;
+    public $edit_transaction_type_id;
     public $edit_contact_number;
     public $edit_barangay_id; // Update this property name
     public $edit_purok_id; // Update this property name
@@ -78,6 +80,7 @@ class Applicants extends Component
         $this->endDate = null;
         $this->selectedPurok_id = null;
         $this->selectedBarangay_id = null;
+        $this->selectedTransactionType_id = null;
         $this->selectedTaggingStatus = null;
 
         // Reset pagination and any search terms
@@ -96,14 +99,7 @@ class Applicants extends Component
         // Initialize dropdowns
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
-//        $this->transactionTypes = TransactionType::all();
-
-        // Set the default transaction type to 'Walk-in'
-        $walkIn = TransactionType::where('type_name', 'Walk-in')->first();
-        if ($walkIn) {
-            $this->transaction_type_id = $walkIn->id; // This can still be used internally for further logic if needed
-            $this->transaction_type_name = $walkIn->type_name; // Set the name to display
-        }
+        $this->transactionTypes = TransactionType::all();
 
         // Set interviewer
         $this->interviewer = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
@@ -114,6 +110,9 @@ class Applicants extends Component
         });
         $this->barangaysFilter = Cache::remember('barangays', 60*60, function() {
             return Barangay::all();
+        });
+        $this->transactionTypesFilter = Cache::remember('transactionTypes', 60*60, function() {
+            return TransactionType::all();
         });
         $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
     }
@@ -159,6 +158,7 @@ class Applicants extends Component
             'contact_number' => 'nullable|string|max:15',
             'barangay_id' => 'required|exists:barangays,id',
             'purok_id' => 'required|exists:puroks,id',
+            'transaction_type_id' => 'required|exists:transaction_types,id',
         ];
     }
     public function store()
@@ -223,6 +223,7 @@ class Applicants extends Component
         $this->edit_barangay_id = $applicant->address->barangay_id ?? null;
         $this->edit_purok_id = $applicant->address->purok_id ?? null;
         $this->edit_date_applied = $applicant->date_applied->format('Y-m-d');
+        $this->edit_transaction_type_id = $applicant->transaction_type_id;
     }
     public function update(): void
     {
@@ -235,6 +236,7 @@ class Applicants extends Component
             'edit_barangay_id' => 'required|integer',
             'edit_purok_id' => 'required|integer',
             'edit_date_applied' => 'required|date',
+            'edit_transaction_type_id' => 'required|integer',
         ]);
 
         $applicant = Applicant::findOrFail($this->selectedApplicantId);
@@ -244,6 +246,7 @@ class Applicants extends Component
         $applicant->suffix_name = $this->edit_suffix_name;
         $applicant->contact_number = $this->edit_contact_number;
         $applicant->date_applied = $this->edit_date_applied;
+        $applicant->transaction_type_id = $this->edit_transaction_type_id;
 
         // Update address
         $address = $applicant->address;
@@ -270,7 +273,7 @@ class Applicants extends Component
     }
     public function render()
     {
-        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated'])
+        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'transactionType'])
             ->where(function($query) {
                 $query->where('applicant_id', 'like', '%'.$this->search.'%')
                     ->orWhere('first_name', 'like', '%'.$this->search.'%')
@@ -283,6 +286,9 @@ class Applicants extends Component
                     })
                     ->orWhereHas('address.barangay', function ($query) {
                         $query->where('name', 'like', '%'.$this->search.'%');
+                    })
+                    ->orWhereHas('transactionType', function ($query) {
+                        $query->where('type_name', 'like', '%' . $this->search . '%');
                     });
             });
 
@@ -305,6 +311,12 @@ class Applicants extends Component
 
         if ($this->selectedTaggingStatus !== null) {
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
+        }
+
+        if ($this->selectedTransactionType_id) {
+            $query->whereHas('transactionType', function ($q) {
+                $q->where('transaction_type_id', $this->selectedTransactionType_id);
+            });
         }
 
 //        $applicants = $query->paginate(5); // Apply pagination after filtering
