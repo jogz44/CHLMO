@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Awardee extends Model
 {
@@ -35,6 +36,7 @@ class Awardee extends Model
         'tagged_and_validated_applicant_id' => 'integer',
         'address_id' => 'integer',
         'lot_id' => 'integer',
+        'grant_date' => 'datetime'
     ];
 
     public function taggedAndValidatedApplicant(): BelongsTo
@@ -52,5 +54,9 @@ class Awardee extends Model
     public function lotSizeUnit(): BelongsTo
     {
         return $this->belongsTo(LotSizeUnit::class, 'lot_size_unit_id', 'id');
+    }
+    public function awardeeDocumentsSubmissions(): HasMany
+    {
+        return $this->hasMany(AwardeeDocumentsSubmission::class, 'awardee_id');
     }
 }
