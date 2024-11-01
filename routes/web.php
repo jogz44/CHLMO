@@ -79,9 +79,11 @@ Route::middleware([
         return view('lot-list-details');
     })->name('lot-list-details');
 
-    Route::get('/masterlist-applicant-details', function () {
-        return view('masterlist-applicant-details');
-    })->name('masterlist-applicant-details');
+//    Route::get('/masterlist-applicant-details', function () {
+//        return view('masterlist-applicant-details');
+//    })->name('masterlist-applicant-details');
+    Route::get('/masterlist-applicant-details/{applicantId}', App\Livewire\MasterlistApplicantDetails::class)
+        ->name('masterlist-applicant-details');
 
     Route::get('/masterlist-applicants', function () {
         return view('masterlist-applicants');
