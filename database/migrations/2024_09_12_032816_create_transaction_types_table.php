@@ -23,7 +23,6 @@ return new class extends Migration
         DB::table('transaction_types')->insert([
             ['type_name' => 'Walk-in', 'description' => 'Walk-in applicants may go to the office directly to request relocation.'],
             ['type_name' => 'Request', 'description' => 'Requested applicants from the Sherif.'],
-            ['type_name' => 'Shelter Assistance', 'description' => 'Shelter assistance applicants may go to the office directly to request shelter materials.'],
         ]);
 
         Schema::enableForeignKeyConstraints();
