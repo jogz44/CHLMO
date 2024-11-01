@@ -29,53 +29,28 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public $search = '';
     public $isLoading = false;
-    public $transaction_type_id;
-    public $transaction_type_name;
+    public $transaction_type_id, $transaction_type_name;
 
     // Filter properties:
     public $applicantId;
     public $startTaggingDate, $endTaggingDate, $selectedTaggingStatus;
-    public $selectedPurok_id;
-    public $puroksFilter = []; // Initialize as an empty array
-    public $selectedBarangay_id;
-    public $barangaysFilter = []; // Initialize as an empty array
-    public $selectedLivingSituation_id;
-    public $livingSituationsFilter = []; // Initialize as an empty array
+    public $selectedPurok_id, $puroksFilter = [], $selectedBarangay_id, $barangaysFilter = [], $selectedLivingSituation_id,
+        $livingSituationsFilter = [];
     public $taggingStatuses;
 
-//    public $taggedAndValidatedApplicants;
-
     // Tagged and validated applicant details
-    public $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $living_situation, $contact_number, $occupation, $monthly_income, $transaction_type;
+    public $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $living_situation, $contact_number,
+        $occupation, $monthly_income, $transaction_type;
 
     // For awarding modal
-    public $grant_date;
-    public $taggedAndValidatedApplicantId; // ID of the applicant being awarded
-    public $purok_id;
-    public $puroks = []; // Initialize as an empty array
-    public $barangay_id;
-    public $barangays = []; // Initialize as an empty array
-    public $lot_id;
-    public $lots = []; // Initialize as an empty array
-    public $lot_size;
-    public $lot_size_unit_id;
-    public $lotSizeUnits = []; // Initialize as an empty array
+    public $grant_date, $taggedAndValidatedApplicantId, $purok_id, $puroks = [], $barangay_id, $barangays = [], $lot_id,
+        $lots = [], $lot_size, $lot_size_unit_id, $lotSizeUnits = [];
 
     // For uploading of files
-    public $isFilePondUploadComplete = false;
-    public $isFilePonduploading = false;
-    public $letterOfIntent, $votersID, $validID, $certOfNoLandHolding, $marriageCert, $birthCert;
-    public $selectedAwardee;
-    public $files;
-    public $awardeeToPreview;
-    public $isUploading = false;
-
-
-    public $attachment_id;
-    public $attachmentLists = [];
-    public $awardeeId;
-    public $documents = [];
-    public $newFileImages = [];
+    public $isFilePondUploadComplete = false, $isFilePonduploading = false, $letterOfIntent, $votersID, $validID,
+        $certOfNoLandHolding, $marriageCert, $birthCert, $selectedAwardee, $files,
+        $awardeeToPreview, $isUploading = false, $attachment_id, $attachmentLists = [], $awardeeId, $documents = [],
+        $newFileImages = [];
 
     public function updatingSearch(): void
     {
@@ -328,14 +303,16 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         $file = $this->$fileInput;
         if ($file) {
-            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+//            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+//            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
+            $fileName = $file->getClientOriginalName();
             $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
 
             AwardeeDocumentsSubmission::create([
                 'awardee_id' => $this->awardeeId,
                 'attachment_id' => $attachmentId,
                 'file_path' => $filePath,
-                'file_name' => $file->getClientOriginalName(),
+                'file_name' => $fileName,
                 'file_type' => $file->extension(),
                 'file_size' => $file->getSize(),
             ]);
@@ -435,7 +412,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
         // Paginate the filtered results
 //        $taggedAndValidatedApplicants = $query->paginate(10);
-        $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate(10);
+        $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
         return view('livewire.tagged_and_validated_applicants_for_awarding', [
             'taggedAndValidatedApplicants' => $taggedAndValidatedApplicants,
