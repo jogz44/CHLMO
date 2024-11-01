@@ -191,11 +191,12 @@
                             <tr>
                                 <th class="py-2 px-2 border-b text-center font-medium">ID</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">Name</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">Purok</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">Barangay</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Sex</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Contact Number</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column occupation-col">Occupation</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-income-col">Monthly Income</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">Barangay</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">Purok</th>
+{{--                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column occupation-col">Occupation</th>--}}
+{{--                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-income-col">Monthly Income</th>--}}
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">Transaction Type</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column date-applied-col">Date Applied</th>
                                 <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Tagged</th>
@@ -211,11 +212,12 @@
                                 <tr>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant_id}}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->taggedAndValidated?->sex ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number}}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap occupation-col">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-income-col">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap occupation-col">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>--}}
+{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-income-col">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>--}}
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->transactionType->type_name }}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap date-applied-col">{{ $applicant->date_applied ? date('M d, Y', strtotime($applicant->date_applied)) : 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
@@ -254,7 +256,7 @@
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
                                         <!-- Awarding Status -->
                                         <div class="flex items-center justify-center w-full">
-                                            @if($applicant->taggedAndValidated?->awardee?->is_awarded)
+                                            @if($applicant->taggedAndValidated?->awardees->where('is_awarded', true)->count() > 0)
                                                 <script src="https://cdn.lordicon.com/lordicon.js"></script>
                                                 <lord-icon
                                                         src="https://cdn.lordicon.com/guqkthkk.json"
@@ -304,16 +306,16 @@
                                     </td>
                                     <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
                                         <div class="flex items-center justify-center w-full">
-                                            <button
-                                                    @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                                    class="text-custom-red text-bold underline px-4 py-1.5">Details
+                                            <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                    class="text-custom-red text-bold underline px-4 py-1.5">
+                                                Details
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                    <td colspan="14" class="py-4 px-2 text-center border-b">No applicants found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
