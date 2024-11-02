@@ -12,45 +12,13 @@ class TaggedAndValidatedApplicant extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'applicant_id',
-        'civil_status_id',
-        'tribe_id',
-        'religion_id',
-        'living_situation_id',
-        'case_specification_id',
-        'living_situation_case_specification',
-        'government_program_id',
-        'living_status_id',
-        'roof_type_id',
-        'wall_type_id',
-        'full_address',
-        'sex',
-        'date_of_birth',
-        'occupation',
-        'monthly_income',
-        'family_income',
-        'tagging_date',
-        'rent_fee',
-        'landlord',
-        'house_owner',
-        'tagger_name',
-        'remarks',
-        'is_tagged',
-        'is_awarding_on_going',
-//        'is_awarded'
+        'applicant_id', 'civil_status_id', 'tribe_id', 'religion_id', 'living_situation_id', 'case_specification_id',
+        'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id', 'wall_type_id',
+        'full_address', 'sex', 'date_of_birth', 'occupation', 'monthly_income', 'family_income', 'tagging_date', 'rent_fee',
+        'landlord', 'house_owner', 'tagger_name', 'remarks', 'is_tagged', 'is_awarding_on_going',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
     protected $casts = [
         'date_of_birth' => 'date',
         'tagging_date'  => 'datetime',
@@ -58,10 +26,6 @@ class TaggedAndValidatedApplicant extends Model
         'family_income'  => 'integer',
         'rent_fee'       => 'integer',
     ];
-
-    /**
-     * Define relationships to other models.
-     */
 
     // Relationship with Applicant
     public function applicant(): BelongsTo
