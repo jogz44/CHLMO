@@ -38,7 +38,7 @@ return new class extends Migration
             $table->text('remarks')->nullable();
             $table->boolean('is_tagged')->default(false);
             $table->boolean('is_awarding_on_going')->default(false);
-            $table->boolean('is_awarded')->default(false);
+//            $table->boolean('is_awarded')->default(false);
             $table->timestamps();
         });
     }

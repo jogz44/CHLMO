@@ -83,9 +83,9 @@ class DatabaseSeeder extends Seeder
             $this->call(ShelterSeeders\ShelterApplicantSeeder::class);
         }
 
-        if (Grantee::count() == 0){
-            $this->call(ShelterSeeders\GranteeSeeder::class);
-        }
+//        if (Grantee::count() == 0){
+//            $this->call(ShelterSeeders\GranteeSeeder::class);
+//        }
 
 //        if (LotList::count() == 0){
 //            $this->call(LotSeeder::class);

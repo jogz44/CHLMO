@@ -45,6 +45,6 @@ class Dependent extends Model
     }
     public function civilStatus(): BelongsTo
     {
-        return $this->belongsTo(CivilStatus::class);
+        return $this->belongsTo(CivilStatus::class, 'dependent_civil_status_id', 'id');
     }
 }

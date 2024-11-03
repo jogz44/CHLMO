@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
@@ -13,11 +12,6 @@ class Applicant extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'user_id',
         'transaction_type_id',
@@ -33,11 +27,6 @@ class Applicant extends Model
         'is_tagged',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
@@ -45,12 +34,7 @@ class Applicant extends Model
         'date_applied' => 'date',
     ];
 
-    /**
-     * Generate a unique applicant ID for the current year.
-     *
-     * @return string
-     */
-    public static function generateApplicantId()
+    public static function generateApplicantId(): string
     {
         $currentYear = Carbon::now()->year;
 

@@ -35,8 +35,12 @@ class Spouse extends Model
         'tagged_and_validated_applicant_id' => 'integer',
     ];
 
-    public function taggedAndValidatedApplicants(): HasMany
+//    public function taggedAndValidatedApplicants(): HasMany
+//    {
+//        return $this->hasMany(TaggedAndValidatedApplicant::class);
+//    }
+    public function taggedAndValidatedApplicant(): BelongsTo
     {
-        return $this->hasMany(TaggedAndValidatedApplicant::class);
+        return $this->belongsTo(TaggedAndValidatedApplicant::class, 'tagged_and_validated_applicant_id');
     }
 }

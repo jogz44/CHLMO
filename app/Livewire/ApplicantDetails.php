@@ -87,26 +87,41 @@ class ApplicantDetails extends Component
     public $spouse_monthly_income;
 
     // Dependent's details
-    public $dependents;
+    public $dependents = [];
     public $dependent_civil_status_id; // Store selected Civil Status ID
     public $dependent_civil_statuses; // For populating the civil statuses dropdown
     //
     public $images = [];
     public $renamedFileName = [];
 
-    public function mount($applicantId)
+    public function mount($applicantId): void
     {
-//        $this->dependents = Dependent::all();
-
         $this->applicantId = $applicantId;
         $this->applicant = Applicant::find($applicantId);
 
-        // Reset dependents array when the component is mounted
+        // Clear dependents array before populating it again
         $this->dependents = [];
 
-        $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::with('dependents')->find($applicantId);
-        if ($taggedAndValidatedApplicant) {
-            $this->dependents = $taggedAndValidatedApplicant->dependents->toArray();
+        // Only load dependents for this specific tagged applicant if it exists
+        $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::where('applicant_id', $applicantId)
+            ->with('dependents')
+            ->first();
+
+        if ($taggedAndValidatedApplicant && $taggedAndValidatedApplicant->dependents) {
+            // Transform the dependents collection into the expected array format
+            $this->dependents = $taggedAndValidatedApplicant->dependents->map(function($dependent) {
+                return [
+                    'dependent_first_name' => $dependent->dependent_first_name,
+                    'dependent_middle_name' => $dependent->dependent_middle_name,
+                    'dependent_last_name' => $dependent->dependent_last_name,
+                    'dependent_sex' => $dependent->dependent_sex,
+                    'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
+                    'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
+                    'dependent_occupation' => $dependent->dependent_occupation,
+                    'dependent_monthly_income' => $dependent->dependent_monthly_income,
+                    'dependent_relationship' => $dependent->dependent_relationship,
+                ];
+            })->toArray();
         }
 
         // Set the default transaction type to 'Walk-in'
@@ -176,7 +191,7 @@ class ApplicantDetails extends Component
     }
 
     // Add row for another dependent
-    public function add()
+    public function add(): void
     {
         // Add a new blank dependent array to the dependents list
         $this->dependents[] = [
@@ -191,12 +206,12 @@ class ApplicantDetails extends Component
             'dependent_relationship' => null,
         ];
     }
-    public function remove($index)
+    public function remove($index): void
     {
         unset($this->dependents[$index]);
     }
 
-    protected function rules()
+    protected function rules(): array
     {
         return [
             'full_address' => 'nullable|string|max:255',
@@ -283,18 +298,17 @@ class ApplicantDetails extends Component
             ],
 
             // Dependent's details
-            'dependents.*.dependent_civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'dependents.*.dependent_first_name' => 'nullable|string|max:50',
+            'dependents.*.dependent_civil_status_id' => 'required|exists:civil_statuses,id',
+            'dependents.*.dependent_first_name' => 'required|string|max:50',
             'dependents.*.dependent_middle_name' => 'nullable|string|max:50',
-            'dependents.*.dependent_last_name' => 'nullable|string|max:50',
-            'dependents.*.dependent_sex' => 'nullable|in:Male,Female',
-            'dependents.*.dependent_date_of_birth' => 'nullable|date',
-            'dependents.*.dependent_relationship' => 'nullable|string|max:100',
-            'dependents.*.dependent_occupation' => 'nullable|string|max:255',
-            'dependents.*.dependent_monthly_income' => 'nullable|integer',
+            'dependents.*.dependent_last_name' => 'required|string|max:50',
+            'dependents.*.dependent_sex' => 'required|in:Male,Female',
+            'dependents.*.dependent_date_of_birth' => 'required|date',
+            'dependents.*.dependent_relationship' => 'required|string|max:100',
+            'dependents.*.dependent_occupation' => 'required|string|max:255',
+            'dependents.*.dependent_monthly_income' => 'required|integer',
         ];
     }
-
     public function store()
     {
         // Validate the input data
@@ -347,7 +361,7 @@ class ApplicantDetails extends Component
                 ]);
             }
 
-            // batching the database for large data
+////            // batching the database for large data
             $dependentData = [];
             // Create dependent records associated with the applicant
             foreach ($this->dependents as $dependent) {
@@ -388,8 +402,10 @@ class ApplicantDetails extends Component
                 'message' => 'Applicant has been successfully tagged and validated. <br><small>'. now()->calendar() .'</small>',
                 'type' => 'success'
             ]);
+            $this->dependents = [];
 
             return redirect()->route('applicants');
+
         } catch (QueryException $e) {
             DB::rollBack();
             \Log::error('Error creating applicant or dependents: ' . $e->getMessage());

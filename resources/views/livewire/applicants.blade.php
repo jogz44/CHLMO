@@ -78,6 +78,9 @@
                                     <input type="checkbox" class="toggle-column" id="toggle-barangay" checked> BARANGAY
                                 </label>
                                 <label class="block px-4 py-2">
+                                    <input type="checkbox" class="toggle-column" id="toggle-transaction-type" checked> TRANSACTION TYPE
+                                </label>
+                                <label class="block px-4 py-2">
                                     <input type="checkbox" class="toggle-column" id="toggle-date-applied" checked> DATE APPLIED
                                 </label>
                                 <label class="block px-4 py-2">
@@ -160,6 +163,12 @@
                             <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
                         @endforeach
                     </select>
+                    <select wire:model.live="selectedTransactionType_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Transaction Type</option>
+                        @foreach($transactionTypesFilter as $transactionTypeFilter)
+                            <option value="{{ $transactionTypeFilter->id }}">{{ $transactionTypeFilter->type_name }}</option>
+                        @endforeach
+                    </select>
                     <select wire:model.live="selectedTaggingStatus" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
                         @foreach($taggingStatuses as $status)
@@ -180,41 +189,17 @@
 {{--                                <input type="checkbox">--}}
 {{--                            </th>--}}
                             <th class="py-2 px-2 border-b text-center font-medium">ID</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">SUFFIX NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">PUROK</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">BARANGAY</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column date-applied-col">DATE APPLIED</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column actions-col">ACTIONS</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">Suffix Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Contact Number</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column transaction-type-col">Transaction Type</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column date-applied-col">Date Applied</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column actions-col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Display the latest applicant first only if it's on the first page -->
-{{--                        @if($latestApplicant && $otherApplicants->currentPage() == 1)--}}
-{{--                            <tr>--}}
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $latestApplicant->applicant_id }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $latestApplicant->last_name }}, {{ $latestApplicant->first_name }} {{ $latestApplicant->middle_name }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">{{ $latestApplicant->suffix_name }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $latestApplicant->contact_number }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $latestApplicant->address->purok->name ?? 'N/A' }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $latestApplicant->address->barangay->name ?? 'N/A' }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($latestApplicant->date_applied)->format('m/d/Y') }}</td>--}}
-{{--                                <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2 actions-col">--}}
-{{--                                    <button wire:click="edit({{ $latestApplicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>--}}
-{{--                                    @if ($latestApplicant->taggedAndValidated)--}}
-{{--                                        <button class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">--}}
-{{--                                            Tagged--}}
-{{--                                        </button>--}}
-{{--                                    @else--}}
-{{--                                        <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $latestApplicant->id]) }}'"--}}
-{{--                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">--}}
-{{--                                            Tag--}}
-{{--                                        </button>--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                            </tr>--}}
-{{--                        @endif--}}
                         @forelse($applicants as $applicant)
                             <tr>
 {{--                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">--}}
@@ -226,14 +211,17 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->transactionType->type_name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2 actions-col">
-                                    <button wire:click="edit({{ $applicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
                                     @if ($applicant->taggedAndValidated)
-                                        <button class="bg-gray-400 text-white px-5 py-1.5 rounded-full cursor-not-allowed">
+                                        <button class="bg-gray-400 text-white px-14 py-1.5 rounded-full cursor-not-allowed">
                                             Tagged
                                         </button>
                                     @else
+                                        <!-- Edit Button -->
+                                        <button wire:click="edit({{ $applicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
+                                        <!-- Tag Button -->
                                         <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
                                                 class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
                                             Tag
@@ -243,7 +231,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                <td colspan="9" class="py-4 px-2 text-center border-b">No applicants found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -252,7 +240,6 @@
                 <!-- Pagination Links -->
                 <div class="py-4 px-3">
                     {{ $applicants->links() }}
-{{--                    {{ $otherApplicants->links() }}--}}
                 </div>
 
                 <!-- ADD APPLICANT MODAL -->
@@ -271,9 +258,24 @@
                         <form wire:submit.prevent="store">
                             <x-validation-errors class="mb-4" />
                             <!-- Date Applied Field -->
-                            <div class="grid grid-cols-1 mb-4">
+                            <div class="grid grid-cols-2 gap-2 mb-4">
+                                <div class="mb-3">
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="transaction_type_id">
+                                        TRANSACTION TYPE <span class="text-red-500">*</span>
+                                    </label>
+                                    <select wire:model="transaction_type_id" id="transaction_type_id"
+                                            class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
+                                        <option value="">Select Transaction Type</option>
+                                        @foreach($transactionTypes as $transactionType)
+                                            <option value="{{ $transactionType->id }}">{{ $transactionType->type_name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('transaction_type_id') <span class="error">{{ $message }}</span> @enderror
+                                </div>
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="date_applied">APPLICATION DATE <span class="text-red-500">*</span></label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="date_applied">
+                                        APPLICATION DATE <span class="text-red-500">*</span>
+                                    </label>
                                     <input type="date" id="date_applied" wire:model="date_applied" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none"
                                            max="{{ now()->toDateString() }}">
                                     @error('date_applied') <span class="error">{{ $message }}</span> @enderror
@@ -283,28 +285,36 @@
                             <div class="grid grid-cols-2 gap-3 mb-3">
                                 <!-- First Name Field -->
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">FIRST NAME <span class="text-red-500">*</span> </label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">
+                                        FIRST NAME <span class="text-red-500">*</span>
+                                    </label>
                                     <input type="text" wire:model="first_name" id="first_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                     @error('first_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- Middle Name Field -->
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="middle_name">MIDDLE NAME <span class="text-red-500">*</span> </label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="middle_name">
+                                        MIDDLE NAME <span class="text-red-500">*</span>
+                                    </label>
                                     <input type="text" wire:model="middle_name" id="middle_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                     @error('middle_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- Last Name Field -->
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="last_name">LAST NAME <span class="text-red-500">*</span> </label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="last_name">
+                                        LAST NAME <span class="text-red-500">*</span>
+                                    </label>
                                     <input type="text" wire:model="last_name" id="last_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                     @error('last_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
                                 <!-- Suffix Name Field -->
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="suffix_name">SUFFIX NAME</label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="suffix_name">
+                                        SUFFIX NAME
+                                    </label>
                                     <input type="text" wire:model="suffix_name" id="suffix_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                     @error('suffix_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
@@ -312,8 +322,11 @@
 
                             <!-- Barangay Field -->
                             <div class="mb-3">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY <span class="text-red-500">*</span> </label>
-                                <select id="barangay" wire:model.live="barangay_id" class="w-full px-3 py-1 text-[12px] select2-barangay bg-white-700 border border-gray-600 rounded-lg text-gray-800 uppercase" required>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">
+                                    BARANGAY <span class="text-red-500">*</span>
+                                </label>
+                                <select id="barangay" wire:model.live="barangay_id"
+                                        class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
                                     <option value="">Select Barangay</option>
                                     @foreach($barangays as $barangay)
                                         <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
@@ -324,8 +337,11 @@
 
                             <!-- Purok Field -->
                             <div class="mb-3">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK <span class="text-red-500">*</span> </label>
-                                <select id="purok" wire:model.live="purok_id" class="w-full px-3 py-1 text-[12px] select2-purok bg-white-700 border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="purok">
+                                    PUROK <span class="text-red-500">*</span>
+                                </label>
+                                <select id="purok" wire:model.live="purok_id"
+                                        class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
                                     <option value="">Select Purok</option>
                                     @foreach($puroks as $purok)
                                         <option value="{{ $purok->id }}">{{ $purok->name }}</option>
@@ -336,14 +352,19 @@
 
                             <!-- Contact Number Field -->
                             <div class="mb-3">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">CONTACT NUMBER</label>
-                                <input type="text" wire:model="contact_number" id="contact_number" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">
+                                    CONTACT NUMBER
+                                </label>
+                                <input type="text" wire:model="contact_number" id="contact_number"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
                                 @error('contact_number') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Interviewer Field -->
                             <div class="mb-6">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">INITIALLY INTERVIEWED BY <small class="text-red-500">(read only)</small></label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">
+                                    INITIALLY INTERVIEWED BY <small class="text-red-500">(read only)</small>
+                                </label>
                                 <input type="text" id="interviewer" wire:model="interviewer" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-red-600 focus:outline-none text-[12px] uppercase cursor-default" readonly>
                             </div>
 
@@ -351,13 +372,12 @@
                                 <!-- Submit button and alert message -->
                                 <div>
                                     <div class="alert"
-                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                          x-data="{ open:false, alert:{} }"
                                          x-show="open" x-cloak
                                          x-transition:enter="animate-alert-show"
                                          x-transition:leave="animate-alert-hide"
-                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
-                                    >
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
                                         <div class="alert-wrapper">
                                             <strong x-html="alert.title">Title</strong>
                                             <p x-html="alert.message">Description</p>
@@ -414,37 +434,52 @@
                         </div>
 
                         <form wire:submit.prevent="update">
+                            <div class="grid grid-cols-1 mb-3">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">TRANSACTION TYPE </label>
+                                <select wire:model.live="edit_transaction_type_id" id="barangay"
+                                        class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
+                                    <option value="">Select Transaction Type</option>
+                                    @foreach($transactionTypes as $transactionType)
+                                        <option value="{{ $transactionType->id }}">{{ $transactionType->type_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <!-- Main Fields -->
                             <div class="grid grid-cols-2 gap-3 mb-3">
                                 <!-- First Name Field -->
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">FIRST NAME </label>
-                                    <input type="text" wire:model="edit_first_name" id="first_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
+                                    <input type="text" wire:model="edit_first_name" id="first_name"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                 </div>
 
                                 <!-- Middle Name Field -->
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="middle_name">MIDDLE NAME </label>
-                                    <input type="text" wire:model="edit_middle_name" id="middle_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
+                                    <input type="text" wire:model="edit_middle_name" id="middle_name"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                 </div>
 
                                 <!-- Last Name Field -->
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="last_name">LAST NAME </label>
-                                    <input type="text" wire:model="edit_last_name" id="last_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
+                                    <input type="text" wire:model="edit_last_name" id="last_name"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                 </div>
 
                                 <!-- Suffix Name Field -->
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix_name">SUFFIX NAME</label>
-                                    <input type="text" wire:model="edit_suffix_name" id="suffix_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
+                                    <input type="text" wire:model="edit_suffix_name" id="suffix_name"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                 </div>
                             </div>
 
                             <!-- Barangay Field -->
                             <div class="mb-3">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY </label>
-                                <select id="barangay" wire:model.live="edit_barangay_id" class="w-full px-3 py-1 text-[12px] select2-barangay bg-white-700 border border-gray-600 rounded-lg text-gray-800 uppercase" required>
+                                <select id="barangay" wire:model.live="edit_barangay_id"
+                                        class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
                                     <option value="">Select Barangay</option>
                                     @foreach($barangays as $barangay)
                                         <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
@@ -455,7 +490,8 @@
                             <!-- Purok Field -->
                             <div class="mb-3">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK </label>
-                                <select id="purok" wire:model.live="edit_purok_id" class="w-full px-3 py-1 text-[12px] select2-purok bg-white-700 border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
+                                <select id="purok" wire:model.live="edit_purok_id"
+                                        class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
                                     <option value="">Select Purok</option>
                                     @foreach($puroks as $purok)
                                         <option value="{{ $purok->id }}">{{ $purok->name }}</option>
@@ -466,14 +502,15 @@
                             <!-- Contact Number Field -->
                             <div class="mb-6">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">CONTACT NUMBER</label>
-                                <input type="text" wire:model="edit_contact_number" id="contact_number" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
+                                <input type="text" wire:model="edit_contact_number" id="contact_number"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
                             </div>
 
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <!-- Submit button and alert message -->
                                 <div>
                                     <div class="alert"
-                                         :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                         :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                          x-data="{ open:false, alert:{} }"
                                          x-show="open" x-cloak
                                          x-transition:enter="animate-alert-show"

@@ -1,3 +1,3 @@
-<x-app-layout>
+<x-adminshelter-layout>
     <livewire:shelter-material-inventory/>
-</x-app-layout>
+</x-adminshelter-layout>

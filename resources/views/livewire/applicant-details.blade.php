@@ -17,7 +17,7 @@
                     <div class="flex space-x-2 z-[1000]">
                         <div class="z-50">
                             <div class="alert"
-                                 :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                 :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                  x-data="{ open:false, alert:{} }"
                                  x-show="open" x-cloak
                                  x-transition:enter="animate-alert-show"
@@ -115,7 +115,7 @@
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
                                 <select x-model="civilStatus" id="civil_status" name="civil_status" wire:model="civil_status_id"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                        class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Status</option>
                                     @foreach($civil_statuses as $status)
                                         <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
@@ -135,7 +135,8 @@
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="tribe" class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                                <select wire:model="tribe_id" id="tribe" name="tribe" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
+                                <select wire:model="tribe_id" id="tribe" name="tribe"
+                                        required class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
                                     <option value="">Select Tribe/Ethnicity</option>
                                     @foreach($tribes as $tribe)
                                         <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
@@ -166,7 +167,8 @@
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
-                                <select wire:model="religion_id" id="religion" name="religion" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <select wire:model="religion_id" id="religion" name="religion"
+                                        class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Religion</option>
                                     @foreach($religions as $religion)
                                         <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
@@ -246,18 +248,6 @@
                             <div class="mt-4 flex justify-start">
                                 <h2 class="text-[12px] font-medium text-gray-700 mb-2">DEPENDENTS</h2>
                             </div>
-{{--                            <div class="mt-4 flex justify-end mb-2">--}}
-                                <!-- Toggle Edit/Cancel -->
-{{--                                <button type="button"--}}
-{{--                                        class="mr-4 text-[12px] px-4 py-1 bg-custom-yellow text-white hover:bg-orange-500 rounded-full">--}}
-{{--                                    <span x-text="isEditing ? 'Cancel' : 'Edit'"></span>--}}
-{{--                                </button>--}}
-{{--                                <!-- Show Save button only when in editing mode -->--}}
-{{--                                <button type="submit" x-show="isEditing" @click="toggleEditMode"--}}
-{{--                                        class="px-4 text-[12px] py-1 bg-green-500 text-white rounded-full hover:bg-green-600">--}}
-{{--                                    Save--}}
-{{--                                </button>--}}
-{{--                            </div>--}}
                         </div>
                         <table class="w-full">
                             <thead>
@@ -372,7 +362,8 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION (CASE) <span class="text-red-500">*</span></label>
-                            <select x-model.number="livingSituation" wire:model="living_situation_id" id="living_situation" name="living_situation" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select x-model.number="livingSituation" wire:model="living_situation_id" id="living_situation" name="living_situation"
+                                    required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select situation</option>
                                 @foreach($livingSituations as $livingSituation)
                                 <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
@@ -392,7 +383,8 @@
                         <template x-if="livingSituation == '8'">
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">CASE SPECIFICATION <span class="text-red-500">*</span></label>
-                                <select wire:model="case_specification_id" id="case_specification" name="case_specification" class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase" required>
+                                <select wire:model="case_specification_id" id="case_specification" name="case_specification"
+                                        class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase" required>
                                     <option value="">Select specification</option>
                                     @foreach($caseSpecifications as $caseSpecification)
                                     <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
@@ -406,7 +398,8 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="government_program" class="block text-[13px] font-medium text-gray-700 mb-1">GOVERNMENT PROGRAMS</label>
-                            <select wire:model="government_program_id" id="government_program" name="government_program" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select wire:model="government_program_id" id="government_program" name="government_program"
+                                    required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of assistance</option>
                                 @foreach($governmentPrograms as $governmentProgram)
                                 <option value="{{ $governmentProgram->id }}">{{ $governmentProgram->program_name }}</option>
@@ -416,8 +409,8 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_status" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING STATUS <span class="text-red-500">*</span></label>
-                            <select x-model.number="livingStatus" wire:model="living_status_id" id="living_status" name="living_status" required
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select x-model.number="livingStatus" wire:model="living_status_id" id="living_status" name="living_status"
+                                    required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select status</option>
                                 @foreach($livingStatuses as $livingStatus)
                                     <option value="{{ $livingStatus->id }}">{{ $livingStatus->living_status_name }}</option>
@@ -448,7 +441,7 @@
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="house_owner" class="block text-[13px] font-medium text-gray-700 mb-1">HOUSE OWNER NAME <span class="text-red-500">*</span></label>
                                 <input wire:model="house_owner" type="text" id="house_owner" name="house_owner" placeholder="HOUSE OWNER NAME"
-                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       required class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 @error('house_owner') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -458,7 +451,8 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label class="block text-[13px] font-bold text-gray-700 mt-1 mb-1">HOUSE MATERIALS</label>
                             <label for="roof_type" class="block text-[13px] font-medium text-gray-700 mb-1">ROOF <span class="text-red-500">*</span></label>
-                            <select wire:model="roof_type_id" id="roof_type" name="roof_type" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select wire:model="roof_type_id" id="roof_type" name="roof_type"
+                                    required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of roof</option>
                                 @foreach($roofTypes as $roofType)
                                 <option value="{{ $roofType->id }}">{{ $roofType->roof_type_name }}</option>
@@ -468,7 +462,8 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="wall_type" class="block text-[13px] font-medium text-gray-700 mt-7 mb-1">WALL <span class="text-red-500">*</span></label>
-                            <select wire:model="wall_type_id" id="wall_type" name="wall_type" required class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <select wire:model="wall_type_id" id="wall_type" name="wall_type"
+                                    required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of wall</option>
                                 @foreach($wallTypes as $wallType)
                                 <option value="{{ $wallType->id }}">{{ $wallType->wall_type_name }}</option>
@@ -622,17 +617,17 @@
                         }
                     }
                 </script>
-                <script>
-                    function capitalizeInput(input) {
-                        input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
-                            return char.toUpperCase();
-                        });
-                    }
-                </script>
             </form>
         </div>
     </div>
 </div>
+<script>
+    function capitalizeInput(input) {
+        input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
+            return char.toUpperCase();
+        });
+    }
+</script>
 <script>
     // Function to allow only numeric input
     function validateNumberInput(input) {

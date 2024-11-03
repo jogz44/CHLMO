@@ -11,6 +11,7 @@ use App\Http\Controllers\ApplicantsController;
 use App\Http\Controllers\PurokController;
 
 use App\Livewire\ApplicantDetails;
+use App\Livewire\AwardeeDetails;
 use App\Livewire\ShelterApplicantDetails;
 use App\Livewire\TransactionWalkin;
 use Illuminate\Support\Facades\Route;
@@ -59,9 +60,11 @@ Route::middleware([
 //    })->name('applicant-details');
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 
-    Route::get('/awardee-details', function () {
-        return view('awardee-details');
-    })->name('awardee-details');
+//    Route::get('/awardee-details', function () {
+//        return view('awardee-details');
+//    })->name('awardee-details');
+    Route::get('/awardee-details/{applicantId}', AwardeeDetails::class)
+        ->name('awardee-details');
 
     Route::get('/awardee-list', function () {
         return view('awardee-list');
@@ -79,9 +82,11 @@ Route::middleware([
         return view('lot-list-details');
     })->name('lot-list-details');
 
-    Route::get('/masterlist-applicant-details', function () {
-        return view('masterlist-applicant-details');
-    })->name('masterlist-applicant-details');
+//    Route::get('/masterlist-applicant-details', function () {
+//        return view('masterlist-applicant-details');
+//    })->name('masterlist-applicant-details');
+    Route::get('/masterlist-applicant-details/{applicantId}', App\Livewire\MasterlistApplicantDetails::class)
+        ->name('masterlist-applicant-details');
 
     Route::get('/masterlist-applicants', function () {
         return view('masterlist-applicants');
@@ -143,10 +148,6 @@ Route::middleware([
 
     Route::get('/shelter-applicant-details/{profileNo}', ShelterApplicantDetails::class)
     ->name('shelter-applicant-details');
-
-    Route::get('/test-view', function () {
-        return view('livewire.shelter-applicant-details');
-    });
     
     Route::get('/shelter-profiled-tagged-applicants', function () {
         return view('shelter-profiled-tagged-applicants');
