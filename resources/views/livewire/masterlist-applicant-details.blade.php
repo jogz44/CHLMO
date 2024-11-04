@@ -331,8 +331,9 @@
                             <!-- TODO - update this when you updated the adding of applicants to add a dropdown of transaction type -->
                             <div class="w-full md:w-1/3 px-2 mb-4 mt-5">
                                 <label for="livingStatus" class="block text-[13px] font-semibold mt-6 text-gray-700 mb-1">
-                                    TRANSACTION TYPE</label>
-                                <input type="text" id="livingStatus" name="livingStatus" :disabled="!isEditable"
+                                    TRANSACTION TYPE
+                                </label>
+                                <input wire:model="transaction_type" type="text" id="livingStatus" :disabled="!isEditable"
                                         class="capitalize w-full p-1 border-b text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
@@ -346,7 +347,6 @@
                                        :disabled="!isEditable"
                                        class="capitalize italic w-full p-3 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
-
                         </div>
                     </form>
                 </div>
