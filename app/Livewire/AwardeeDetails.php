@@ -27,7 +27,8 @@ class AwardeeDetails extends Component
     // Applicant information
     public $transaction_type_id, $transactionTypes, $first_name, $middle_name, $last_name, $suffix_name, $barangay_id, $purok_id, $full_address, $contact_number;
     public $puroks = [], $tribe_id, $sex, $date_of_birth, $religion_id, $occupation, $monthly_income, $family_income,
-            $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income;
+            $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income,
+            $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
 
     // Tagged applicant details
     public $civil_status_id, $civilStatuses, $date_applied, $tagging_date, $grant_date,
@@ -58,6 +59,7 @@ class AwardeeDetails extends Component
             'taggedAndValidatedApplicant.roofType',
             'taggedAndValidatedApplicant.wallType',
             'taggedAndValidatedApplicant.spouse',
+            'taggedAndValidatedApplicant.liveInPartner',
             'taggedAndValidatedApplicant.dependents',
             'address.purok',
             'address.barangay',
@@ -94,6 +96,13 @@ class AwardeeDetails extends Component
         $this->family_income = $this->taggedApplicant?->family_income ?? '--';
         $this->tagging_date = optional($this->taggedApplicant?->tagging_date)
             ->format('F d, Y') ?? '--';
+
+        // Load live-in partner information
+        $this->partner_first_name = $this->taggedApplicant?->liveInPartner?->partner_first_name ?? '--';
+        $this->partner_middle_name = $this->taggedApplicant?->liveInPartner?->partner_middle_name ?? '--';
+        $this->partner_last_name = $this->taggedApplicant?->liveInPartner?->partner_last_name ?? '--';
+        $this->partner_occupation = $this->taggedApplicant?->liveInPartner?->partner_occupation ?? '--';
+        $this->partner_monthly_income = $this->taggedApplicant?->liveInPartner?->partner_monthly_income ?? '--';
 
         // Load spouse information
         $this->spouse_first_name = $this->taggedApplicant?->spouse?->spouse_first_name ?? '--';
@@ -260,10 +269,45 @@ class AwardeeDetails extends Component
             'remarks' => 'nullable|string|max:255',
             'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
+            // Live-in partner's details
+            'partner_first_name' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2 && empty($value)) {
+                        $fail('Live-in partner\'s first name is required.');
+                    }
+                },
+            ],
+            'partner_middle_name' => 'nullable|string|max:255',
+            'partner_last_name' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2) {
+                        if (empty($value)) {
+                            $fail('Spouse last name is required.');
+                        }
+                    }
+                },
+            ],
+            'partner_occupation' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2 && empty($value)) {
+                        $fail('Live-in partner\'s occupation is required. Put N/A if none.');
+                    }
+                },
+            ],
+            'partner_monthly_income' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2 && empty($value)) {
+                        $fail('Live-in partner\'s monthly income is required.');
+                    } elseif ($this->civil_status_id == 2 && !is_numeric($value)) {
+                        $fail('Live-in partner\'s monthly income must be a number.');
+                    }
+                },
+            ],
+
             // Spouse details
             'spouse_first_name' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse first name is required.');
                     }
                 },
@@ -271,7 +315,7 @@ class AwardeeDetails extends Component
             'spouse_middle_name' => 'nullable|string|max:255',
             'spouse_last_name' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2) {
+                    if ($this->civil_status_id == 3) {
                         if (empty($value)) {
                             $fail('Spouse last name is required.');
                         } elseif ($value !== $this->last_name) {
@@ -282,16 +326,16 @@ class AwardeeDetails extends Component
             ],
             'spouse_occupation' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse occupation is required.');
                     }
                 },
             ],
             'spouse_monthly_income' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse monthly income is required.');
-                    } elseif ($this->civil_status_id == 2 && !is_numeric($value)) {
+                    } elseif ($this->civil_status_id == 3 && !is_numeric($value)) {
                         $fail('Spouse monthly income must be a number.');
                     }
                 },
