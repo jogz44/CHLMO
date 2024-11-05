@@ -65,6 +65,10 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->hasOne(Spouse::class, 'tagged_and_validated_applicant_id');
     }
+    public function liveInPartner(): HasOne
+    {
+        return $this->hasOne(LiveInPartner::class, 'tagged_and_validated_applicant_id');
+    }
 
     // Relationship with Dependent
     public function dependents(): HasMany
