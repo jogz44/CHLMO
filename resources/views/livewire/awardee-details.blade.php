@@ -381,6 +381,63 @@
                     </div>
 
                     <hr class="mt-2 mb-2 ">
+                    <h2 class="block text-[12px] font-semibold text-gray-700 mb-2">LIVE-IN PARTNER'S MAIDEN NAME</h2>
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="partner_first_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                FIRST NAME</label>
+                            <input wire:model="partner_first_name"
+                                   type="text" id="partner_first_name"
+                                   @disabled(!$isEditing)
+                                   class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                   oninput="capitalizeInput(this)">
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="partner_middle_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                MIDDLE NAME
+                            </label>
+                            <input wire:model="partner_middle_name"
+                                   type="text"
+                                   id="partner_middle_name"
+                                   @disabled(!$isEditing)
+                                   class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                   oninput="capitalizeInput(this)">
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="partner_last_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                LAST NAME</label>
+                            <input wire:model="partner_last_name"
+                                   type="text"
+                                   id="partner_last_name"
+                                   @disabled(!$isEditing)
+                                   class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                   oninput="capitalizeInput(this)">
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="partner_occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                OCCUPATION
+                            </label>
+                            <input wire:model="partner_occupation"
+                                   type="text"
+                                   id="partner_occupation"
+                                   @disabled(!$isEditing)
+                                   class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                   oninput="capitalizeInput(this)">
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="partner_monthly_income" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                MONTHLY INCOME
+                            </label>
+                            <input wire:model="partner_monthly_income"
+                                   type="text"
+                                   id="partner_monthly_income"
+                                   @disabled(!$isEditing)
+                                   class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                   oninput="validateNumberInput(this)">
+                        </div>
+                    </div>
+
+                    <hr class="mt-2 mb-2 ">
                     <h2 class="block text-[12px] font-semibold text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
