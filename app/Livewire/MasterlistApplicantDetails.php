@@ -14,6 +14,7 @@ class MasterlistApplicantDetails extends Component
     public $full_address, $civil_status, $tribe, $sex, $date_of_birth, $religion, $occupation, $monthly_income, $family_income, $tagging_date, $awarding_date;
 
     public $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income,
+        $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income,
         $living_situation, $case_specification, $government_program, $living_status, $rent_fee, $roof_type, $wall_type,
         $remarks;
 
@@ -35,6 +36,7 @@ class MasterlistApplicantDetails extends Component
             'taggedAndValidated.tribe',
             'taggedAndValidated.religion',
             'taggedAndValidated.spouse',
+            'taggedAndValidated.liveInPartner',
             'taggedAndValidated.dependents.civilStatus',
             'taggedAndValidated.governmentProgram',
             'taggedAndValidated.livingStatus',
@@ -71,6 +73,13 @@ class MasterlistApplicantDetails extends Component
         $this->family_income = $this->applicant->taggedAndValidated?->family_income ?? '--';
         $this->tagging_date = optional($this->applicant->taggedAndValidated?->tagging_date)
             ->format('F d, Y') ?? '--';
+
+        // Access live-in partner's details
+        $this->partner_first_name = $this->applicant->taggedAndValidated?->liveInPartner?->partner_first_name ?? '--';
+        $this->partner_middle_name = $this->applicant->taggedAndValidated?->liveInPartner?->partner_middle_name ?? '--';
+        $this->partner_last_name = $this->applicant->taggedAndValidated?->liveInPartner?->partner_last_name ?? '--';
+        $this->partner_occupation = $this->applicant->taggedAndValidated?->liveInPartner?->partner_occupation ?? '--';
+        $this->partner_monthly_income = $this->applicant->taggedAndValidated?->liveInPartner?->partner_monthly_income ?? '--';
 
         // Access spouse details
         $this->spouse_first_name = $this->applicant->taggedAndValidated?->spouse?->spouse_first_name ?? '--';
