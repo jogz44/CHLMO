@@ -45,6 +45,7 @@ class ProfiledTaggedApplicant extends Model
         'first_name',
         'middle_name',
         'last_name',
+        'is_awarding_on_going',
         'date_request',
         'is_granted'
     ];
