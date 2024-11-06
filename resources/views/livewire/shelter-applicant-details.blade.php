@@ -175,7 +175,7 @@
                     </div>
 
                     <!-- Spouse Details Template -->
-                    <template x-if="civilStatus == 2">
+                    <template x-if="civilStatus == 2 || civilStatus == 3">
                         <div class="bg-gray-100 p-2 mb-4">
                             <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
                             <div class="flex flex-wrap -mx-2">
