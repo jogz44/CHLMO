@@ -263,6 +263,8 @@ class Applicants extends Component
             'message' => 'Applicant successfully updated at <br><small>'. now()->calendar() .'</small>',
             'type' => 'success'
         ]);
+
+        $this->redirect('applicants');
     }
     public function tagApplicant($applicantId): void
     {
