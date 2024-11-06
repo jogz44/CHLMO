@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('blacklists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('applicant_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('awardee_id')->constrained('awardees')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->dateTime('date_blacklisted');
             $table->text('blacklist_reason_description');
-            $table->string('updated_by', 255);
+            $table->string('updated_by', 100);
             $table->timestamps();
         });
     }
