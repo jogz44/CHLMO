@@ -20,79 +20,95 @@
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                      class="absolute right-0 top-0 h-full object-cover 0 z-0">
                 <div x-data="{ saved: false }" class="flex space-x-2 z-0">
-                    <button
-                            class="bg-custom-dark-green text-white text-xs font-semibold px-6 py-2 rounded"
-                            @click="openModalBlacklist = true">
-                        BLACKLIST
-                    </button>
-                    @if(!$isEditing)
-                        <button
-                                wire:click="toggleEdit"
-                                type="button"
-                                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-xs font-semibold px-6 py-2 rounded">
-                            EDIT
-                            <div wire:loading>
-                                <svg aria-hidden="true"
-                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                            fill="currentColor" />
-                                    <path
-                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                            fill="currentFill" />
-                                </svg>
-                                <span class="sr-only">Loading...</span>
-                            </div>
+                    @if ($awardee->is_blacklisted)
+                        <button class="bg-gray-500 text-white text-xs font-semibold px-6 py-2 rounded cursor-not-allowed">
+                            BLACKLISTED
                         </button>
                     @else
-                        <button wire:click="saveChanges"
-                                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-xs font-semibold px-6 py-2 rounded">
-                            SAVE
-                            <div wire:loading>
-                                <svg aria-hidden="true"
-                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                            fill="currentColor" />
-                                    <path
-                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                            fill="currentFill" />
-                                </svg>
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                        </button>
-                        <button wire:click="toggleEdit"
-                                class="bg-custom-yellow text-white text-xs font-semibold px-6 py-2 rounded">
-                            CANCEL
-                            <div wire:loading>
-                                <svg aria-hidden="true"
-                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                            fill="currentColor" />
-                                    <path
-                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                            fill="currentFill" />
-                                </svg>
-                                <span class="sr-only">Loading...</span>
-                            </div>
+                        <button
+                                class="bg-custom-dark-green text-white text-xs font-semibold px-6 py-2 rounded"
+                                @click="openModalBlacklist = true">
+                            BLACKLIST
                         </button>
                     @endif
+{{--                    @if(!$isEditing)--}}
+{{--                        <button--}}
+{{--                                wire:click="toggleEdit"--}}
+{{--                                type="button"--}}
+{{--                                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-xs font-semibold px-6 py-2 rounded">--}}
+{{--                            EDIT--}}
+{{--                            <div wire:loading>--}}
+{{--                                <svg aria-hidden="true"--}}
+{{--                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"--}}
+{{--                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+{{--                                    <path--}}
+{{--                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"--}}
+{{--                                            fill="currentColor" />--}}
+{{--                                    <path--}}
+{{--                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"--}}
+{{--                                            fill="currentFill" />--}}
+{{--                                </svg>--}}
+{{--                                <span class="sr-only">Loading...</span>--}}
+{{--                            </div>--}}
+{{--                        </button>--}}
+{{--                    @else--}}
+{{--                        <button wire:click="saveChanges"--}}
+{{--                                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-xs font-semibold px-6 py-2 rounded">--}}
+{{--                            SAVE--}}
+{{--                            <div wire:loading>--}}
+{{--                                <svg aria-hidden="true"--}}
+{{--                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"--}}
+{{--                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+{{--                                    <path--}}
+{{--                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"--}}
+{{--                                            fill="currentColor" />--}}
+{{--                                    <path--}}
+{{--                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"--}}
+{{--                                            fill="currentFill" />--}}
+{{--                                </svg>--}}
+{{--                                <span class="sr-only">Loading...</span>--}}
+{{--                            </div>--}}
+{{--                        </button>--}}
+{{--                        <button wire:click="toggleEdit"--}}
+{{--                                class="bg-custom-yellow text-white text-xs font-semibold px-6 py-2 rounded">--}}
+{{--                            CANCEL--}}
+{{--                            <div wire:loading>--}}
+{{--                                <svg aria-hidden="true"--}}
+{{--                                     class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"--}}
+{{--                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+{{--                                    <path--}}
+{{--                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"--}}
+{{--                                            fill="currentColor" />--}}
+{{--                                    <path--}}
+{{--                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"--}}
+{{--                                            fill="currentFill" />--}}
+{{--                                </svg>--}}
+{{--                                <span class="sr-only">Loading...</span>--}}
+{{--                            </div>--}}
+{{--                        </button>--}}
+{{--                    @endif--}}
                 </div>
             </div>
 
 
             <div class="flex flex-col p-3 rounded mt-11">
-                <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
-                <h1 class="text-[25px] items-center font-bold text-gray-700">
-                    {{ $applicant->first_name }}
-                    @if($applicant->middle_name) {{ substr($applicant->middle_name, 0, 1) }}. @endif
-                    {{ $applicant->last_name }}
-                    {{ $applicant->suffix_name }}
-                </h1>
+                @if ($awardee->is_blacklisted)
+                    <h2 class="text-[30px] items-center font-bold text-custom-dark-green underline">{{ $applicant->applicant_id }}</h2>
+                    <h1 class="text-[25px] items-center font-bold text-custom-dark-green">
+                        {{ $applicant->first_name }}
+                        @if($applicant->middle_name) {{ substr($applicant->middle_name, 0, 1) }}. @endif
+                        {{ $applicant->last_name }}
+                        {{ $applicant->suffix_name }}
+                    </h1>
+                @else
+                    <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
+                    <h1 class="text-[25px] items-center font-bold text-gray-700">
+                        {{ $applicant->first_name }}
+                        @if($applicant->middle_name) {{ substr($applicant->middle_name, 0, 1) }}. @endif
+                        {{ $applicant->last_name }}
+                        {{ $applicant->suffix_name }}
+                    </h1>
+                @endif
             </div>
 
             <div class="bg-white p-6 rounded shadow mb-6">
@@ -1099,38 +1115,89 @@
                 <!-- Modal Header -->
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-md font-semibold text-black " style="font-family:'Poppins', sans-serif;">
-                        BLACKLIST AWARDEE</h3>
+                        BLACKLIST AWARDEE
+                    </h3>
                     <button @click="openModalBlacklist = false"
                             class="text-red-500 hover:text-red-700 font-bold text-sm">&times;
                     </button>
                 </div>
 
-                <form>
+                <form wire:submit.prevent="store">
+                    <!-- Date blacklisted (default now()) -->
+                    <div class="mb-4">
+                        <label class="block text-[12px] font-semibold mb-2 text-gray-700" for="date_blacklisted">
+                            DATE BLACKLISTED
+                        </label>
+                        <input wire:model="date_blacklisted"
+                               type="date"
+                               id="date_blacklisted"
+                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none"
+                               required
+                               max="{{ now()->toDateString() }}">
+                        @error('date_blacklisted') <span class="error">{{ $message }}</span> @enderror
+                    </div>
+
                     <!-- Reason Field -->
                     <div class="mb-4">
-                        <label class="block text-[12px] font-semibold mb-2 text-gray-700" for="reason">REASON
-                            BEING BLACKLISTED <span class="text-red-500">*</span></label>
-                        <textarea id="reason" rows="4"
-                                  class="uppercase w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                  placeholder="Enter reason..."></textarea>
+                        <label class="block text-[12px] font-semibold mb-2 text-gray-700" for="reason">
+                            REASON FOR BEING BLACKLISTED <span class="text-red-500">*</span>
+                        </label>
+                        <textarea  wire:model="blacklist_reason_description"
+                                   id="reason"
+                                   rows="4"
+                                   class="uppercase w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                                   required
+                                   placeholder="Enter reason..."></textarea>
                     </div>
 
                     <!-- Updated By Field -->
                     <div class="mb-4">
-                        <label class="block text-[12px] font-semibold mb-2 text-gray-700" for="updated-by">UPDATED
-                            BY</label>
-                        <input type="text" id="updated-by"
-                               class="uppercase    w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                        <label class="block text-[12px] font-semibold mb-2 text-gray-700" for="updated-by">
+                            UPDATED BY
+                        </label>
+                        <input wire:model="updated_by"
+                               type="text"
+                               id="updated-by"
+                               disabled
+                               class="uppercase w-full px-3 py-2 bg-gray-300 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px] cursor-not-allowed"
                                placeholder="Updated by...">
                     </div>
 
                     <!-- Buttons -->
                     <div class="flex justify-between items-center">
-                        <!-- Blacklist Button -->
-                        <button type="submit"
-                                class="px-4 py-2 bg-red-600 text-[12px] text-white rounded-lg hover:bg-red-700">
-                            BLACKLIST
-                        </button>
+                        <div>
+                            <div class="alert"
+                                 :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
+                                 x-data="{ open:false, alert:{} }"
+                                 x-show="open" x-cloak
+                                 x-transition:enter="animate-alert-show"
+                                 x-transition:leave="animate-alert-hide"
+                                 @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
+                                <div class="alert-wrapper">
+                                    <strong x-html="alert.title">Title</strong>
+                                    <p x-html="alert.message">Description</p>
+                                </div>
+                                <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                            </div>
+                            <!-- Blacklist Button -->
+                            <button type="submit" wire:click.prevent="store"
+                                    class="px-4 py-2 bg-red-600 text-[12px] text-white rounded-lg hover:bg-red-700">
+                                BLACKLIST
+                                <div wire:loading>
+                                    <svg aria-hidden="true"
+                                         class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                         viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                fill="currentColor" />
+                                        <path
+                                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                fill="currentFill" />
+                                    </svg>
+                                    <span class="sr-only">Loading...</span>
+                                </div>
+                            </button>
+                        </div>
                         <!-- Cancel Button -->
                         <button type="button" @click="openModalBlacklist = false"
                                 class="px-4 py-2 bg-gray-500 text-[12px] text-white rounded-lg hover:bg-gray-600">
@@ -1141,10 +1208,10 @@
             </div>
         </div>
 
-        @if($showDeleteModal)
+        @if($showBlacklistConfirmationModal)
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
                 <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-                    <h3 class="text-lg font-semibold mb-4">Confirm Deletion</h3>
+                    <h3 class="text-lg font-semibold mb-4">Confirm Blacklisting</h3>
 
                     <p class="mb-4 text-gray-600">Please enter your password to confirm deletion of this dependent.</p>
 
@@ -1155,8 +1222,8 @@
                                placeholder="Enter your password"
                                autocomplete="off">
 
-                        @if($deleteError)
-                            <p class="mt-1 text-red-500 text-sm">{{ $deleteError }}</p>
+                        @if($blacklistError)
+                            <p class="mt-1 text-red-500 text-sm">{{ $blacklistError }}</p>
                         @endif
                     </div>
 
@@ -1190,10 +1257,10 @@
                                          viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
                                                 d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                                fill="currentColor" />
+                                                fill="currentColor"/>
                                         <path
                                                 d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                                fill="currentFill" />
+                                                fill="currentFill"/>
                                     </svg>
                                     <span class="sr-only">Loading...</span>
                                 </div>
