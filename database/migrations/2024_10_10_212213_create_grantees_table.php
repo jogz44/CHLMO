@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('profiled_tagged_applicant_id')->constrained('profiled_tagged_applicants')->onDelete('cascade');
             $table->foreignId('material_id')->constrained('materials')->onDelete('cascade');
+            $table->integer('grantee_quantity'); // For the numeric value
             $table->dateTime('date_of_delivery');
             $table->dateTime('date_of_ris');
-            $table->string('photo', 2048)->nullable();
+            $table->boolean('is_granted')->default(false);
             $table->timestamps();
         });
     }
