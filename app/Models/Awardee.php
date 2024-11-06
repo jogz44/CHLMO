@@ -6,13 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Awardee extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'tagged_and_validated_applicant_id', 'address_id', 'lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date', 'is_awarded'
+        'tagged_and_validated_applicant_id',
+        'address_id',
+        'lot_id',
+        'lot_size',
+        'lot_size_unit_id',
+        'grant_date',
+        'is_awarded',
+        'is_blacklisted'
     ];
 
     protected $casts = [
@@ -20,7 +28,9 @@ class Awardee extends Model
         'tagged_and_validated_applicant_id' => 'integer',
         'address_id' => 'integer',
         'lot_id' => 'integer',
-        'grant_date' => 'datetime'
+        'grant_date' => 'datetime',
+        'is_awarded' => 'boolean',
+        'is_blacklisted' => 'boolean'
     ];
 
     public function taggedAndValidatedApplicant(): BelongsTo
@@ -42,5 +52,9 @@ class Awardee extends Model
     public function awardeeDocumentsSubmissions(): HasMany
     {
         return $this->hasMany(AwardeeDocumentsSubmission::class, 'awardee_id');
+    }
+    public function blacklist(): HasOne
+    {
+        return $this->hasOne(Blacklist::class);
     }
 }
