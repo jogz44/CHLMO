@@ -182,6 +182,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'lot_size_unit_id' => $this->lot_size_unit_id,
             'grant_date' => $this->grant_date,
             'is_awarded' => false, // Update awardee table for status tracking
+            'is_blacklisted' => false, // Update awardee table for status tracking
         ]);
 
         // Check if the awardee was created successfully
