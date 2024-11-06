@@ -11,11 +11,6 @@ class Spouse extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'tagged_and_validated_applicant_id',
         'spouse_first_name',
@@ -25,18 +20,17 @@ class Spouse extends Model
         'spouse_monthly_income',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'tagged_and_validated_applicant_id' => 'integer',
     ];
 
-    public function taggedAndValidatedApplicants(): HasMany
+//    public function taggedAndValidatedApplicants(): HasMany
+//    {
+//        return $this->hasMany(TaggedAndValidatedApplicant::class);
+//    }
+    public function taggedAndValidatedApplicant(): BelongsTo
     {
-        return $this->hasMany(TaggedAndValidatedApplicant::class);
+        return $this->belongsTo(TaggedAndValidatedApplicant::class, 'tagged_and_validated_applicant_id');
     }
 }

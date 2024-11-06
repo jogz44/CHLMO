@@ -13,7 +13,6 @@ class AwardeeDocumentsSubmission extends Model
     protected $fillable = [
         'awardee_id',
         'attachment_id',
-        'description',
         'file_path',
         'file_name',
         'file_type',

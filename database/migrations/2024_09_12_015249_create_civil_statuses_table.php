@@ -21,6 +21,7 @@ return new class extends Migration
         // insert civil statuses
         $civilStatuses = [
             'Single',
+            'Live-in',
             'Married',
             'Divorced',
             'Widowed',

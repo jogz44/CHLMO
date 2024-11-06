@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('awardee_id')->constrained('awardees')->onDelete('cascade');
             $table->foreignId('attachment_id')->constrained('awardee_attachments_lists')->onDelete('cascade');
-            $table->text('description')->nullable();
             $table->string('file_path');
             $table->string('file_name');
             $table->string('file_type');

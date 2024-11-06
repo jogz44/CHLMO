@@ -9,6 +9,7 @@ use App\Models\CivilStatus;
 use App\Models\Dependent;
 use App\Models\GovernmentProgram;
 use App\Models\ImagesForHousing;
+use App\Models\LiveInPartner;
 use App\Models\LivingSituation;
 use App\Models\LivingStatus;
 use App\Models\Purok;
@@ -30,69 +31,25 @@ use Livewire\WithFileUploads;
 class ApplicantDetails extends Component
 {
     use WithFileUploads;
-    public $applicantId;
-    public $applicant;
+    public $applicantId, $applicant;
     public $applicantForSpouse;
-    public $transaction_type_id;
-    public $transaction_type_name;
-    public $first_name;
-    public $middle_name;
-    public $last_name;
-    public $suffix_name;
-    public $contact_number;
-    public $barangay;
-    public $purok;
+    public $transaction_type_id, $transaction_type_name;
+    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay, $purok;
 
     // New fields
-    public $full_address;
-    public $civil_status_id; // Store selected Civil Status ID
-    public $civil_statuses; // For populating the civil statuses dropdown
+    public $full_address, $civil_status_id, $civil_statuses, $religion_id, $religions, $tribe_id, $tribes;
+    public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
+        $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
+        $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $family_income, $tagging_date, $rent_fee, $landlord,
+        $house_owner, $tagger_name, $remarks;
 
-    public $religion_id; // Store selected Religion ID
-    public $religions; // For populating the religions dropdown
-    public $tribe_id; // Store selected Tribe ID
-    public $tribes; // For populating the tribes dropdown
-    public $living_situation_id; // Store selected Living Situation ID
-    public $livingSituations; // For populating the living situations dropdown
-    public $case_specification_id; // Store selected Case Specification ID
-    public $caseSpecifications; // For populating the case specifications dropdown
-    public $living_situation_case_specification;
-    public $government_program_id; // Store selected Government Program ID
-    public $governmentPrograms; // For populating the government programs dropdown
-    public $living_status_id; // Store selected Living Status ID
-    public $livingStatuses; // For populating the living statuses dropdown
-    public $roof_type_id; // Store selected Roof Type ID
-    public $roofTypes; // For populating the roof types dropdown
-    public $wall_type_id; // Store selected Wall Type ID
-    public $wallTypes; // For populating the wall types dropdown
-
-    public $sex;
-    public $date_of_birth;
-
-    public $occupation;
-    public $monthly_income;
-    public $family_income;
-    public $tagging_date;
-    public $rent_fee;
-    public $landlord;
-    public $house_owner;
-    public $tagger_name;
-    public $remarks;
-
+    // Live-in partner's details
+    public $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
     // Spouse's details
-    public $spouse_first_name;
-    public $spouse_middle_name;
-    public $spouse_last_name;
-    public $spouse_occupation;
-    public $spouse_monthly_income;
+    public $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income;
 
     // Dependent's details
-    public $dependents = [];
-    public $dependent_civil_status_id; // Store selected Civil Status ID
-    public $dependent_civil_statuses; // For populating the civil statuses dropdown
-    //
-    public $images = [];
-    public $renamedFileName = [];
+    public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $images = [], $renamedFileName = [];
 
     public function mount($applicantId): void
     {
@@ -102,17 +59,10 @@ class ApplicantDetails extends Component
         // Clear dependents array before populating it again
         $this->dependents = [];
 
-        // Fetch dependents if any exist
-//        $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::with('dependents')->find($applicantId);
-
         // Only load dependents for this specific tagged applicant if it exists
         $taggedAndValidatedApplicant = TaggedAndValidatedApplicant::where('applicant_id', $applicantId)
             ->with('dependents')
             ->first();
-
-//        if ($taggedAndValidatedApplicant) {
-//            $this->dependents = $taggedAndValidatedApplicant->dependents->toArray();
-//        }
 
         if ($taggedAndValidatedApplicant && $taggedAndValidatedApplicant->dependents) {
             // Transform the dependents collection into the expected array format
@@ -267,10 +217,45 @@ class ApplicantDetails extends Component
             'remarks' => 'nullable|string|max:255',
             'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
+            // Live-in partner details
+            'partner_first_name' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2 && empty($value)) {
+                        $fail('Live-in partner\'s first name is required.');
+                    }
+                },
+            ],
+            'partner_middle_name' => 'nullable|string|max:255',
+            'partner_last_name' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2) {
+                        if (empty($value)) {
+                            $fail('Live-in partner\'s last name is required.');
+                        }
+                    }
+                },
+            ],
+            'partner_occupation' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2 && empty($value)) {
+                        $fail('Live-in partner\'s occupation is required.');
+                    }
+                },
+            ],
+            'partner_monthly_income' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 2 && empty($value)) {
+                        $fail('Live-in partner\'s monthly income is required.');
+                    } elseif ($this->civil_status_id == 2 && !is_numeric($value)) {
+                        $fail('Live-in partner\'s monthly income must be a number.');
+                    }
+                },
+            ],
+
             // Spouse details
             'spouse_first_name' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse first name is required.');
                     }
                 },
@@ -278,7 +263,7 @@ class ApplicantDetails extends Component
             'spouse_middle_name' => 'nullable|string|max:255',
             'spouse_last_name' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2) {
+                    if ($this->civil_status_id == 3) {
                         if (empty($value)) {
                             $fail('Spouse last name is required.');
                         } elseif ($value !== $this->last_name) {
@@ -289,16 +274,16 @@ class ApplicantDetails extends Component
             ],
             'spouse_occupation' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse occupation is required.');
                     }
                 },
             ],
             'spouse_monthly_income' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse monthly income is required.');
-                    } elseif ($this->civil_status_id == 2 && !is_numeric($value)) {
+                    } elseif ($this->civil_status_id == 3 && !is_numeric($value)) {
                         $fail('Spouse monthly income must be a number.');
                     }
                 },
@@ -356,8 +341,20 @@ class ApplicantDetails extends Component
                 'tagger_name' => $this->tagger_name,
             ]);
 
-            // Check if civil_status_id is 2 (Married) before creating Spouse record
+            // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
             if ($this->civil_status_id == '2') {
+                LiveInPartner::create([
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
+                    'partner_first_name' => $this->partner_first_name,
+                    'partner_middle_name' => $this->partner_middle_name,
+                    'partner_last_name' => $this->partner_last_name,
+                    'partner_occupation' => $this->partner_occupation,
+                    'partner_monthly_income' => $this->partner_monthly_income,
+                ]);
+            }
+
+            // Check if civil_status_id is 3 (Married) before creating Spouse record
+            if ($this->civil_status_id == '3') {
                 Spouse::create([
                     'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
                     'spouse_first_name' => $this->spouse_first_name,
@@ -368,7 +365,7 @@ class ApplicantDetails extends Component
                 ]);
             }
 
-////            // batching the database for large data
+            // batching the database for large data
             $dependentData = [];
             // Create dependent records associated with the applicant
             foreach ($this->dependents as $dependent) {
@@ -387,21 +384,6 @@ class ApplicantDetails extends Component
             }
 
             Dependent::insert($dependentData);
-
-//            foreach ($this->dependents as $dependent) {
-//                Dependent::create([
-//                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Use the ID from the newly created TaggedAndValidatedApplicant
-//                    'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
-//                    'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
-//                    'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
-//                    'dependent_sex' => $dependent['dependent_sex'] ?: null,
-//                    'dependent_civil_status_id' => $dependent['dependent_civil_status_id'] ?: null,
-//                    'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
-//                    'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
-//                    'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?: null,
-//                    'dependent_relationship' => $dependent['dependent_relationship'] ?: null,
-//                ]);
-//            }
 
             foreach ($this->images as $index => $image) {
                 $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();

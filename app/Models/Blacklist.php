@@ -10,34 +10,24 @@ class Blacklist extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
-        'applicant_id',
+        'awardee_id',
         'user_id',
         'date_blacklisted',
         'blacklist_reason_description',
         'updated_by',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
-        'applicant_id' => 'integer',
+        'awardee_id' => 'integer',
         'user_id' => 'integer',
-        'date_blacklisted' => 'datetime',
+        'date_blacklisted' => 'date',
     ];
 
-    public function applicant(): BelongsTo
+    public function awardee(): BelongsTo
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(Awardee::class);
     }
 
     public function user(): BelongsTo

@@ -15,6 +15,6 @@ class AwardeeAttachmentsList extends Model
     ];
     public function submissions(): HasMany
     {
-        return $this->hasMany(AwardeeDocumentSubmission::class);
+        return $this->hasMany(AwardeeDocumentsSubmission::class, 'attachment_id');
     }
 }

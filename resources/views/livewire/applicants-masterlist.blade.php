@@ -183,132 +183,28 @@
                     </div>
                 </div>
 
-                <!-- ADD APPLICANT MODAL -->
-                <div x-show="openModal"
-                     class="fixed inset-0 flex z-50 items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
-                     x-cloak>
-                    <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                        <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
-                            <button @click="openModal = false" class="text-gray-400 hover:text-gray-200">
-                                &times;
-                            </button>
-                        </div>
-
-                        <!-- Form -->
-                        <form>
-                            <!-- Date Applied Field -->
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE
-                                    APPLIED</label>
-                                <input type="date" id="date-applied"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                       placeholder="Date Applied">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">TYPE
-                                    OF APPLICANT <span class="text-red-500">*</span></label>
-                                <select class="block text-[12px] w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600"
-                                        style="padding: 2px 4px;">
-                                    <option value="">TYPE OF APPLICANT</option>
-                                    <option value="barangay1">Walkin Housing Applicant</option>
-                                    <option value="barangay2">Request for Relocation Applicant</option>
-                                    <option value="barangay3">Shelter Assistance Applicant</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <div>
-                                    <label class="block  text-[12px] font-medium mb-2 text-black"
-                                           for="first-name">FIRST NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="first-name"
-                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                           placeholder="First Name">
-                                </div>
-                                <div>
-                                    <label class="block  text-[12px] font-medium mb-2 text-black"
-                                           for="middle-name">MIDDLE NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="middle-name"
-                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                           placeholder="Middle Name">
-                                </div>
-                                <div>
-                                    <label class="block  text-[12px] font-medium mb-2 text-black"
-                                           for="last-name">LAST NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="last-name"
-                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                           placeholder="Last Name">
-                                </div>
-                                <div>
-                                    <label class="block  text-[12px] font-medium mb-2 text-black"
-                                           for="suffix-name">SUFFIX NAME</label>
-                                    <input type="text" id="suffix-name"
-                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                           placeholder="Suffix Name">
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY <span class="text-red-500">*</span></label>
-                                <input type="text" id="barangay"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                       placeholder="Barangay">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="purok">PUROK <span class="text-red-500">*</span></label>
-                                <input type="text" id="purok"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                       placeholder="Purok">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="contact number">CONTACT NUMBER <span class="text-red-500">*</span></label>
-                                <input type="text" id="contact-number"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                       placeholder="Contact Number">
-                            </div>
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">INITIALLY
-                                    INTERVIEWED BY</label>
-                                <input type="text" id="initially-interviewed-by"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                       placeholder="Initially Interviewed By">
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-4 mb-4">
-                                <!-- Award Button -->
-                                <button type="submit"
-                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                    <span class="text-sm"> + ADD APPLICANT</span>
-                                </button>
-
-                                <!-- Cancel Button -->
-                                <button type="submit"
-                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                    <span class="text-[12px]">CANCEL</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Table with transaction requests -->
+                <!-- Table for Applicants Master   list -->
                 <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
                      class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
                                 <th class="py-2 px-2 border-b text-center font-medium">ID</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">NAME</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">PUROK</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">BARANGAY</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column occupation-col">OCCUPATION</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-income-col">MONTHLY INCOME</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TRANSACTION TYPE</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column date-applied-col">DATE APPLIED</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">STATUS</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">ACTIONS</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">Name</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Sex</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Contact Number</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">Barangay</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">Purok</th>
+{{--                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column occupation-col">Occupation</th>--}}
+{{--                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-income-col">Monthly Income</th>--}}
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">Transaction Type</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column date-applied-col">Date Applied</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Tagged</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Awarding Status</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Awarded</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Blacklisted</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Aging</th>
+                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -316,285 +212,119 @@
                                 <tr>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant_id}}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->taggedAndValidated?->sex ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number}}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap occupation-col">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-income-col">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
+{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap occupation-col">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>--}}
+{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-income-col">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>--}}
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->transactionType->type_name }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">Pending</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap date-applied-col">{{ $applicant->date_applied ? date('M d, Y', strtotime($applicant->date_applied)) : 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Tagging Status -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->is_tagged)
+                                                <span class="ml-1 text-center justify-center">
+                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                    <lord-icon
+                                                            src="https://cdn.lordicon.com/guqkthkk.json"
+                                                            trigger="loop"
+                                                            delay="2000"
+                                                            colors="primary:#16c72e"
+                                                            style="width:20px;height:20px">
+                                                    </lord-icon>
+                                                </span>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <!-- Awarding Status -->
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Awarding Status -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->taggedAndValidated?->is_awarding_on_going)
+                                                <span class="ml-1 text-red-500 text-center justify-center">
+                                                    Pending...
+                                                </span>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <!-- Awarding Status -->
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Awarding Status -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->taggedAndValidated?->awardees->where('is_awarded', true)->count() > 0)
+                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                <lord-icon
+                                                        src="https://cdn.lordicon.com/guqkthkk.json"
+                                                        trigger="loop"
+                                                        delay="2000"
+                                                        colors="primary:#16c72e"
+                                                        style="width:20px;height:20px">
+                                                </lord-icon>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <!-- Blacklisted -->
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
+                                        <!-- Blacklisted -->
+                                        <div class="flex items-center justify-center w-full">
+                                            @if($applicant->is_blacklisted)
+                                                <span class="ml-1 text-center justify-center">
+                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                    <lord-icon
+                                                            src="https://cdn.lordicon.com/guqkthkk.json"
+                                                            trigger="loop"
+                                                            delay="2000"
+                                                            colors="primary:#16c72e"
+                                                            style="width:20px;height:20px">
+                                                    </lord-icon>
+                                                </span>
+                                            @else
+                                                --
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-2 text-center text-red-600 border-b whitespace-nowrap status-col">
+                                        <div class="flex items-center justify-center w-full">
+                                            {{ $applicant->date_applied->shortAbsoluteDiffForHumans() }}
+                                            <span class="ml-1">
+                                            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                            <lord-icon
+                                                    src="https://cdn.lordicon.com/lzgqzxrq.json"
+                                                    trigger="loop"
+                                                    delay="3000"
+                                                    style="width: 20px; height: 20px">
+                                            </lord-icon>
+                                        </span>
+                                        </div>
+                                    </td>
                                     <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
-                                        <button
-                                                @click="window.location.href = '{{ route('masterlist-applicant-details') }}'"
-                                                class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                        </button>
+                                        <div class="flex items-center justify-center w-full">
+                                            <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                    class="text-custom-red text-bold underline px-4 py-1.5">
+                                                Details
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                    <td colspan="14" class="py-4 px-2 text-center border-b">No applicants found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-
-                    <!-- Award Applicant Modal -->
-                    <div x-show="openModalAward"
-                         class="fixed inset-0 flex z-50 items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                         x-cloak style="font-family: 'Poppins', sans-serif;">
-                        <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                            <!-- Modal Header -->
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold text-black">AWARD APPLICANT</h3>
-                                <button @click="openModalAward = false" class="text-gray-400 hover:text-gray-200">
-                                    &times;
-                                </button>
-                            </div>
-
-                            <!-- Form -->
-                            <form>
-                                <!-- Award Date Field -->
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">AWARD
-                                        DATE</label>
-                                    <input type="date" id="award-date"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Award Date">
-                                </div>
-
-
-                                <!-- Main Fields -->
-
-                                <!-- Barangay Field -->
-                                <div class="mb-4">
-                                    <br>
-                                    <label class="block text-sm font-medium mb-2 text-black" for="barangay">LOT
-                                        ALLOCATED</label>
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                           for="barangay">BARANGAY</label>
-                                    <input type="text" id="barangay"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Barangay">
-                                </div>
-
-                                <!-- Purok Field -->
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                           for="purok">PUROK</label>
-                                    <input type="text" id="purok"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Purok">
-                                </div>
-
-                                <!-- Contact Number Field -->
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="contact number">CONTACT
-                                        NUMBER</label>
-                                    <input type="text" id="contact-number"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Contact Number">
-                                </div>
-
-                                <!-- Interviewer Field -->
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="interviewer">LOT
-                                        SIZE ALLOCATED</label>
-                                    <input type="text" id="lot-size-allocated"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Lot Size Allocated">
-                                </div>
-                                <br>
-                                <div class="grid grid-cols-2 gap-4 mb-4">
-                                    <button type="submit"
-                                            class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg">
-                                        AWARD
-                                    </button>
-                                    <button type="button" @click="openModalAward = false"
-                                            class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
-                                        CANCEL
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Tagging/Validation Modal -->
-                    <div x-show="openModalTag"
-                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                         x-cloak style="font-family: 'Poppins', sans-serif;">
-                        <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                            <!-- Modal Header -->
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold text-black">TAGGED/VALIDATED</h3>
-                                <button @click="openModalTag = false" class="text-gray-400 hover:text-gray-200">
-                                    &times;
-                                </button>
-                            </div>
-
-                            <!-- Form -->
-                            <form @submit.prevent>
-                                <!-- Tagging and Validation Date Field -->
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                           for="tagging-validation-date">TAGGING AND VALIDATION DATE</label>
-                                    <input type="date" id="tagging-validation-date"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
-                                </div>
-
-                                <!-- Validator's Name Field -->
-                                <div class="mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="validator-name">VALIDATOR'S
-                                        NAME</label>
-                                    <input type="text" id="validator-name"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Validator's Name">
-                                </div>
-
-                                <!-- House Situation Upload -->
-                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD HOUSE SITUATION</h2>
-
-                                <!-- Drag and Drop Area -->
-                                <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
-                                    <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                         viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                                    </svg>
-                                    <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                                    <p class="text-gray-500 text-xs">or</p>
-                                    <button type="button"
-                                            class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                            @click="$refs.fileInput.click()">BROWSE FILES
-                                    </button>
-
-                                    <!-- Hidden File Input -->
-                                    <input type="file" x-ref="fileInput"
-                                           @change="selectedFile = $refs.fileInput.files[0]; fileName = selectedFile.name"
-                                           class="hidden" />
-                                </div>
-
-                                <!-- Show selected file and progress bar when a file is selected -->
-                                <template x-if="selectedFile">
-                                    <div @click="openPreviewModal = true" class="mt-4 bg-white p-2 rounded-lg shadow">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <div class="flex items-center space-x-2">
-                                                <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2" d="M7 3v6h4l1 1h4V3H7z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2" d="M5 8v10h14V8H5z" />
-                                                </svg>
-                                                <span class="text-xs font-medium text-gray-700"
-                                                      x-text="fileName"></span>
-
-                                            </div>
-                                            <!-- Status -->
-                                            <span class="text-xs text-green-500 font-medium">100%</span>
-                                        </div>
-                                        <!-- Progress Bar -->
-                                        <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                            <div class="w-full h-full bg-green-500"></div>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- Buttons -->
-                                <div class="grid grid-cols-2 gap-4 mt-4">
-                                    <button type="submit"
-                                            class="w-full py-2 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg">
-                                        TAGGED & VALIDATED
-                                    </button>
-                                    <button type="button" @click="openModalTag = false"
-                                            class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
-                                        CANCEL
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Preview Modal (Triggered by Clicking the Progress Bar) -->
-                    <div x-show="openPreviewModal"
-                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                         x-cloak>
-                        <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                            <!-- Modal Header with File Name -->
-                            <div class="flex justify-between items-center mb-4">
-                                <input type="text" x-model="fileName"
-                                       class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                                <button class="text-orange-500 underline text-sm"
-                                        @click="fileName = prompt('Rename File', fileName) || fileName">Rename File
-                                </button>
-                                <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
-                                    &times;
-                                </button>
-                            </div>
-
-                            <!-- Display Image -->
-                            <div class="flex justify-center mb-4">
-                                <img :src="selectedFile ? URL.createObjectURL(selectedFile) : '/path/to/default/image.jpg'"
-                                     alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                            </div>
-                            <!-- Modal Buttons -->
-                            <div class="flex justify-between mt-4">
-                                <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                        @click="openPreviewModal = false">CONFIRM
-                                </button>
-                                <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                        @click="selectedFile = null; openPreviewModal = false">REMOVE
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Pagination controls -->
-                <div class="flex justify-end text-[12px] mt-4">
-                    <button
-                            @click="prevPage"
-                            :disabled="currentPage === 1"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
-                        Prev
-                    </button>
-                    <template x-for="page in totalPages" :key="page">
-                        <button
-                                @click="goToPage(page)"
-                                :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"
-                                class="px-4 py-2 mx-1 rounded">
-                            <span x-text="page"></span>
-                        </button>
-                    </template>
-                    <button
-                            @click="nextPage"
-                            :disabled="currentPage === totalPages"
-                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
-                        Next
-                    </button>
+                <div class="mt-4">
+                    {{ $applicants->links() }}
                 </div>
-
             </div>
         </div>
     </div>
-
-
-    <script>
-        function pagination() {
-            return {
-                currentPage: 1,
-                totalPages: 3, // Set this to the total number of pages you have
-
-                prevPage() {
-                    if (this.currentPage > 1) this.currentPage--;
-                },
-                nextPage() {
-                    if (this.currentPage < this.totalPages) this.currentPage++;
-                },
-                goToPage(page) {
-                    this.currentPage = page;
-                }
-            }
-        }
-    </script>
 </div>

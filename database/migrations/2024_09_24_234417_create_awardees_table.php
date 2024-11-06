@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('lot_size_unit_id')->constrained('lot_size_units')->onDelete('cascade');
             $table->dateTime('grant_date');
             $table->boolean('is_awarded')->default(false);
+            $table->boolean('is_blacklisted')->default(false);
             $table->timestamps();
         });
     }
