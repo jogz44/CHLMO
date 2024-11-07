@@ -20,8 +20,7 @@ class Applicants extends Component
     use WithPagination;
     public $search = '';
 
-    public $isModalOpen = false;
-    public $isLoading = false;
+    public $isModalOpen = false, $isLoading = false;
     public $date_applied;
     public $transaction_type_id;
     public $transactionTypes = [];
