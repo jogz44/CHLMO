@@ -12,6 +12,7 @@ use App\Http\Controllers\PurokController;
 
 use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
+use App\Livewire\GranteeDetails;
 use App\Livewire\ShelterApplicantDetails;
 use App\Livewire\TransactionWalkin;
 use Illuminate\Support\Facades\Route;
@@ -165,10 +166,12 @@ Route::middleware([
         return view('shelter-materials-list');
     })->name('shelter-materials-list');
 
-    Route::get('/shelter-grantees-details', function () {
-        return view('shelter-grantees-details');
-    })->name('shelter-grantees-details');
+    // Route::get('/shelter-grantees-details', function () {
+    //     return view('shelter-grantees-details');
+    // })->name('shelter-grantees-details');
 
+    Route::get('/grantee-details/{profileNo}', GranteeDetails::class)->name('grantee-details');
+    
     Route::get('/shelter-grantees', function () {
         return view('shelter-grantees');
     })->name('shelter-grantees');
