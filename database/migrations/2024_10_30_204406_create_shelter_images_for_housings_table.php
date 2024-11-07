@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grantees', function (Blueprint $table) {
+        Schema::create('shelter_images_for_housings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('profiled_tagged_applicant_id')->constrained('profiled_tagged_applicants')->onDelete('cascade');
-            $table->foreignId('material_id')->constrained('materials')->onDelete('cascade');
-            $table->integer('grantee_quantity'); // For the numeric value
-            $table->dateTime('date_of_delivery');
-            $table->dateTime('date_of_ris');
-            $table->boolean('is_granted')->default(false);
+            $table->string('image_path');
+            $table->string('display_name')->nullable();
+            $table->integer('order')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('grantees');
+        Schema::dropIfExists('shelter_images_for_housings');
     }
 };

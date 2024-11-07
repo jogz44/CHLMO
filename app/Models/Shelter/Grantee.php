@@ -17,9 +17,9 @@ class Grantee extends Model
     protected $fillable = [
         'profiled_tagged_applicant_id',
         'material_id',
+        'grantee_quantity',
         'date_of_delivery',
         'date_of_ris',
-        'photo'
     ];
 
     /**
@@ -42,6 +42,15 @@ class Grantee extends Model
 
     public function material(): BelongsTo
     {
-        return $this->belongsTo(Material::class);
+        return $this->belongsTo(Material::class, 'material_id', 'id');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(GranteeAttachmentList::class, 'grantee_id'); // Assuming there's a `grantee_id` in the attachment table
+    }
+    public function photo()
+    {
+        return $this->hasMany(ShelterUploadedFiles::class);
     }
 }

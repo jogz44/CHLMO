@@ -55,9 +55,9 @@ class DatabaseSeeder extends Seeder
         //     $this->call(ShelterSeeders\OriginOfRequestSeeder::class);
         // }
 
-        if (ShelterApplicant::count() == 0){
-            $this->call(ShelterSeeders\ShelterApplicantSeeder::class);
-        }
+        // if (ShelterApplicant::count() == 0){
+        //     $this->call(ShelterSeeders\ShelterApplicantSeeder::class);
+        // }
 
         if (PurchaseRequisition::count() == 0){
             $this->call(ShelterSeeders\PurchaseRequisitionSeeder::class);
@@ -75,17 +75,13 @@ class DatabaseSeeder extends Seeder
             $this->call(AddressSeeder::class);
         }
 
-        if (ProfiledTaggedApplicant::count() == 0){
-            $this->call(ShelterSeeders\ProfiledTaggedApplicantSeeder::class);
-        }
+        // if (ProfiledTaggedApplicant::count() == 0){
+        //     $this->call(ShelterSeeders\ProfiledTaggedApplicantSeeder::class);
+        // }
 
-        if (ShelterApplicant::count() == 0){
-            $this->call(ShelterSeeders\ShelterApplicantSeeder::class);
-        }
-
-//        if (Grantee::count() == 0){
-//            $this->call(ShelterSeeders\GranteeSeeder::class);
-//        }
+        // if (Grantee::count() == 0){
+        //     $this->call(ShelterSeeders\GranteeSeeder::class);
+        // }
 
 //        if (LotList::count() == 0){
 //            $this->call(LotSeeder::class);

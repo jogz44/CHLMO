@@ -19,6 +19,7 @@ use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\WallType;
 use App\Models\Tribe;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -185,7 +186,7 @@ class ShelterApplicantDetails extends Component
         $this->validate();
        // dd('Validation passed');
         DB::beginTransaction();
-        \Log::info('Transaction started.');
+        Log::info('Transaction started.');
 
         $address = Address::create([
             'barangay_id' => $this->barangay_id,
@@ -235,10 +236,11 @@ class ShelterApplicantDetails extends Component
                 'message' => 'Applicant has been successfully tagged and validated. <br><small>' . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
+            return redirect()->route('shelter-transaction-applicants');
 
         } catch (QueryException $e) {
             DB::rollBack();
-            \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
+            Log::error('Error creating applicant or dependents: ' . $e->getMessage());
             dd('Database Error: ' . $e->getMessage());
         }
     }
