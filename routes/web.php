@@ -14,6 +14,7 @@ use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
 use App\Livewire\GranteeDetails;
 use App\Livewire\ShelterApplicantDetails;
+use App\Livewire\TaggedAndValidatedApplicantDetails;
 use App\Livewire\TransactionWalkin;
 use Illuminate\Support\Facades\Route;
 
@@ -52,14 +53,15 @@ Route::middleware([
         return view('activity-logs');
     })->name('activity-logs');
 
-    Route::get('/add-new-request', function () {
-        return view('add-new-request');
-    })->name('add-new-request');
-
 //    Route::get('/applicant-details', function () {
 //        return view('applicant-details');
 //    })->name('applicant-details');
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
+
+    // Tagged and Validated Applicant Details
+    Route::get('/tagged-and-validated-applicant-details/{taggedAndValidatedApplicantId}',
+        TaggedAndValidatedApplicantDetails::class)
+        ->name('tagged-and-validated-applicant-details');
 
 //    Route::get('/awardee-details', function () {
 //        return view('awardee-details');

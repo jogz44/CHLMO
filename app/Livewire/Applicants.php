@@ -18,46 +18,21 @@ use Ramsey\Collection\Collection;
 class Applicants extends Component
 {
     use WithPagination;
-    public $search = '';
+    public $paginationTheme = 'tailwind', $search = '';
 
-    public $isModalOpen = false;
-    public $isLoading = false;
-    public $date_applied;
-    public $transaction_type_id;
+    public $isModalOpen = false, $isLoading = false;
+    public $date_applied, $transaction_type_id;
     public $transactionTypes = [];
-    public $first_name;
-    public $middle_name;
-    public $last_name;
-    public $suffix_name;
-    public $contact_number;
-    public $barangay_id; // Update this property name
-    public $barangays = []; // Initialize as an empty array
-    public $purok_id; // Update this property name
-    public $puroks = [];
-    public $interviewer;
+    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
+        $purok_id, $puroks = [], $interviewer;
 
     // Filter properties:
-    public $applicantId;
-    public $startDate, $endDate, $selectedTaggingStatus;
-    public $selectedPurok_id;
-    public $puroksFilter = []; // Initialize as an empty array
-    public $selectedBarangay_id;
-    public $barangaysFilter = []; // Initialize as an empty array
-    public $selectedTransactionType_id;
-    public $transactionTypesFilter = []; // Initialize as an empty array
-    public $taggingStatuses;
-    protected $paginationTheme = 'tailwind';
+    public $applicantId, $startDate, $endDate, $selectedTaggingStatus, $selectedPurok_id, $puroksFilter = [],
+        $selectedBarangay_id, $barangaysFilter = [], $selectedTransactionType_id, $transactionTypesFilter = [],
+        $taggingStatuses;
 
-    public $selectedApplicantId;
-    public $edit_first_name;
-    public $edit_middle_name;
-    public $edit_last_name;
-    public $edit_suffix_name;
-    public $edit_date_applied;
-    public $edit_transaction_type_id;
-    public $edit_contact_number;
-    public $edit_barangay_id; // Update this property name
-    public $edit_purok_id; // Update this property name
+    public $selectedApplicantId, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
+        $edit_transaction_type_id, $edit_contact_number, $edit_barangay_id, $edit_purok_id;
 
     // For export
     public Collection $applicantsForExport;

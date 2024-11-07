@@ -223,6 +223,11 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
                                     @if(!$applicant->is_awarding_on_going)
+                                        <!-- Tagged and Validated Applicant details -->
+                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['taggedAndValidatedApplicantId' => $applicant->id]) }}'"
+                                                class="text-custom-red text-bold underline px-4 py-1.5">
+                                            Details
+                                        </button>
                                         <!-- Award Button -->
                                         <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
                                                 class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-14 py-1.5 rounded-full">
@@ -236,6 +241,11 @@
                                     @else
                                         <!-- Award Pending Button (disabled) -->
                                         <div class="relative flex items-center space-x-2">
+                                            <!-- Details Button -->
+                                            <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['taggedAndValidatedApplicantId' => $applicant->id]) }}'"
+                                                    class="text-custom-red text-bold underline px-4 py-1.5">
+                                                Details
+                                            </button>
                                             <!-- Award Pending Button -->
                                             <button disabled
                                                     class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
@@ -244,27 +254,29 @@
 
                                             <!-- Info Icon with Hover Tooltip -->
                                             <div class="group relative z-50">
-                                                <span>
-                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
-                                                        <path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
-                                                    </svg>
-                                                </span>
+                                                <div class="relative w-6 h-6 flex justify-center items-center">
+                                                    <span class="absolute inset-0 flex justify-center items-center group-hover:opacity-100 group-hover:visible group-hover:transition-opacity duration-200">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
+                                                            <path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                                                        </svg>
+                                                    </span>
 
-                                                <!-- Tooltip content -->
-                                                <div class="absolute right-6 top-0 mb-2 w-max bg-custom-dark-green text-white text-xs rounded-lg py-2 px-3 opacity-0 group-hover:opacity-100 group-hover:visible group-hover:transition-opacity duration-200 z-50">
-                                                    Award is pending for this applicant. <br> Requirements are needed to be uploaded.
-                                                    <br>
-                                                    <small>Documents are ready.
-                                                        @if($applicant->is_awarding_on_going && $applicant->awardees->isNotEmpty())
-                                                            <button type="button" class="underline"
-                                                                    @click="
-                                                                openModalDocumentsChecklist = true;
-                                                                $wire.set('awardeeId', {{ $applicant->awardees->first()->id }});
-                                                            ">
-                                                                Upload now.
-                                                            </button>
-                                                        @endif
-                                                    </small>
+                                                    <!-- Tooltip content -->
+                                                    <div class="absolute right-6 top-5 mb-2 w-max bg-custom-dark-green text-white text-xs rounded-lg py-2 px-3 opacity-0 group-hover:opacity-100 group-hover:visible group-hover:transition-opacity duration-200 z-50">
+                                                        Award is pending for this applicant. <br> Requirements are needed to be uploaded.
+                                                        <br>
+                                                        <small>Documents are ready.
+                                                            @if($applicant->is_awarding_on_going && $applicant->awardees->isNotEmpty())
+                                                                <button type="button" class="underline"
+                                                                        @click="
+                                                                            openModalDocumentsChecklist = true;
+                                                                            $wire.set('awardeeId', {{ $applicant->awardees->first()->id }});
+                                                                        ">
+                                                                    Upload now.
+                                                                </button>
+                                                            @endif
+                                                        </small>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -382,8 +394,7 @@
                                          x-show="open" x-cloak
                                          x-transition:enter="animate-alert-show"
                                          x-transition:leave="animate-alert-hide"
-                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
-                                    >
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
                                         <div class="alert-wrapper">
                                             <strong x-html="alert.title">Title</strong>
                                             <p x-html="alert.message">Description</p>
