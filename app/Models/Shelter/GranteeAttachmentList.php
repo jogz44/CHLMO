@@ -19,8 +19,8 @@ class GranteeAttachmentList extends Model
         return $this->hasMany(GranteeDocumentsSubmission::class);
     }
 
-    public function grantee()
-    {
-        return $this->belongsTo(Grantee::class, 'grantee_id');
-    }
+    // public function grantee()
+    // {
+    //     return $this->belongsTo(Grantee::class, 'grantee_id');
+    // }
 }
