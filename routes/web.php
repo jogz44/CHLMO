@@ -112,6 +112,10 @@ Route::middleware([
         return view('shelter-assistance-applicant-details');
     })->name('shelter-assistance-applicant-details');
 
+    Route::get('/shelter-applicants-masterlist', function () {
+        return view('shelter-applicants-masterlist');
+    })->name('shelter-applicants-masterlist');
+
     Route::get('/shelter-assistance-grantees', function () {
         return view('shelter-assistance-grantees');
     })->name('shelter-assistance-grantees');
@@ -129,9 +133,9 @@ Route::middleware([
     })->name('applicants');
 //    Route::get('/transaction-walkin', TransactionWalkin::class)->name('transaction-walkin');
 
-    Route::get('/user-settings', function () {
-        return view('user-settings');
-    })->name('user-settings');
+    Route::get('/system-configuration', function () {
+        return view('system-configuration');
+    })->name('system-configuration');
 
     //shelter assistance program
     Route::get('/shelter-dashboard', function () {
