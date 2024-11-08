@@ -58,8 +58,7 @@ Route::middleware([
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 
     // Tagged and Validated Applicant Details
-    Route::get('/tagged-and-validated-applicant-details/{taggedAndValidatedApplicantId}',
-        TaggedAndValidatedApplicantDetails::class)
+    Route::get('/tagged-and-validated-applicant-details/{applicantId}', TaggedAndValidatedApplicantDetails::class)
         ->name('tagged-and-validated-applicant-details');
 
 //    Route::get('/awardee-details', function () {
