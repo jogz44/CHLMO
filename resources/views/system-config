@@ -1,3 +1,0 @@
-<x-app-layout>
-    <livewire:shelter-system-configuration/>
-</x-app-layout>

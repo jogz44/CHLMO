@@ -102,7 +102,7 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <!-- Card 2 -->
                 <div x-data="{ openModal2: false, confirmDelete: false, deleteIndex: null, applicant_tribes: [''], confirmRemove(index) {this.deleteIndex = index; this.confirmDelete = true;},
                 removeTribe() { if (this.deleteIndex !== null) { this.applicant_tribes.splice(this.deleteIndex, 1); this.deleteIndex = null; this.confirmDelete = false;
@@ -183,7 +183,7 @@
                             @endif
                         </div>
                     </div>
-                
+
                     <!-- Confirmation Modal -->
                     <div x-show="showConfirmModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
                         <div class="bg-white rounded-lg p-6 w-[300px]">
@@ -195,7 +195,7 @@
                         </div>
                     </div>
                 </div>
-            
+
                 <script>
                     // Initialize Alpine.js
                     document.addEventListener('alpine:init', () => {
@@ -292,13 +292,13 @@
                             <div class="bg-white rounded-lg p-6 w-[300px]">
                                 <h3 class="text-md font-semibold text-black mb-4">Are you sure you want to remove this?</h3>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <button @click="removeTrib(confirmRemoveIndex)"  class="w-full py-1 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg">Remove</button>
+                                    <button @click="removeTrib(confirmRemoveIndex)" class="w-full py-1 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-lg">Remove</button>
                                     <button @click="confirmDelete = false" class="w-full py-1 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">Cancel</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-               
+
 
                     <script>
                         // Initialize Alpine.js
@@ -311,10 +311,8 @@
                             }));
                         });
                     </script>
-
-                    
-                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>

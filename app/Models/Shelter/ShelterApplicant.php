@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 class ShelterApplicant extends Model
 {
     use HasFactory;
-
+    protected $table = 'shelter_applicants';
     /**
      * The attributes that are mass assignable.
      *
