@@ -174,39 +174,74 @@
                         </div>
                     </div>
 
-                    <!-- Spouse Details Template -->
-                    <template x-if="civilStatus == 2">
-                        <div class="bg-gray-100 p-2 mb-4">
-                            <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
-                            <div class="flex flex-wrap -mx-2">
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="shelter_spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        FIRST NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="shelter_spouse_first_name" name="shelter_spouse_first_name" wire:model="shelter_spouse_first_name"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                        oninput="capitalizeInput(this)">
-                                    @error('shelter_spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="shelter_spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="shelter_spouse_middle_name" name="shelter_spouse_middle_name" wire:model="shelter_spouse_middle_name"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                        oninput="capitalizeInput(this)">
-                                    @error('shelter_spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                </div>
-                                <div class="w-full md:w-1/3 px-2 mb-4">
-                                    <label for="shelter_spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        LAST NAME <span class="text-red-500">*</span></label>
-                                    <input type="text" id="shelter_spouse_last_name" name="shelter_spouse_last_name" wire:model="shelter_spouse_last_name"
-                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                        oninput="capitalizeInput(this)">
-                                    @error('shelter_spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                    
+                    <template x-if="civilStatus === '2'">
+                            <div class="bg-gray-100 p-2 mb-4">
+                                <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            FIRST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_first_name"
+                                               wire:model="partner_first_name"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            MIDDLE NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_middle_name"
+                                               wire:model="partner_middle_name"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            LAST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_last_name"
+                                               wire:model="partner_last_name"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </template>
+                        </template>
 
+                        <template x-if="civilStatus === '3'">
+                            <div>
+                                <hr class="mt-2 mb-2 ">
+                                <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            FIRST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            MIDDLE NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            LAST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
 
 
                     <div class="flex flex-wrap -mx-2">

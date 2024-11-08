@@ -2,9 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Models\Applicant;
 use App\Models\Awardee;
 use App\Models\Barangay;
+use App\Models\Blacklist;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
@@ -16,6 +16,7 @@ use App\Models\RoofType;
 use App\Models\TransactionType;
 use App\Models\Tribe;
 use App\Models\WallType;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
@@ -41,10 +42,13 @@ class AwardeeDetails extends Component
     public $selectedImage = null; // This is for the tagging image
     public $selectedAttachment = null; // this is for the awarding attachment
 
-    // For deleting a dependent in Editing mode
-    public $showDeleteModal = false, $deletingIndex = null, $confirmationPassword = '', $deleteError = '';
+    // For blacklisting
+    public $showBlacklistConfirmationModal = false, $awardeeToBlacklist, $confirmationPassword = '', $blacklistError = '';
     // Track deleted dependents
     public $deletedDependentIds = [];
+
+    // Blacklisting
+    public $date_blacklisted, $blacklist_reason_description, $updated_by;
     public function mount($applicantId): void
     {
         $this->awardee = Awardee::with([
@@ -64,11 +68,15 @@ class AwardeeDetails extends Component
             'address.purok',
             'address.barangay',
             'lot',
-            'lotSizeUnit'
+            'lotSizeUnit',
+            'blacklist'
         ])->findOrFail($applicantId);
 
         $this->taggedApplicant = $this->awardee->taggedAndValidatedApplicant;
         $this->applicant = $this->taggedApplicant->applicant;
+        // Blacklisting
+        $this->date_blacklisted = now()->toDateString();
+        $this->updated_by = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
         $this->loadFormData();
     }
     public function loadFormData(): void
@@ -220,266 +228,129 @@ class AwardeeDetails extends Component
             $this->loadFormData(); // Reset form data if canceling edit
         }
     }
-    public function rules(): array
+    protected function rules()
     {
         return [
-            'full_address' => 'nullable|string|max:255',
-            'civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'tribe_id' => 'required|exists:tribes,id',
-            'sex' => 'required|in:Male,Female',
-            'date_of_birth' => 'required|date',
-            'religion_id' => 'required|exists:religions,id',
-            'occupation' => 'required|string|max:255',
-            'monthly_income' => 'required|integer',
-            'family_income' => 'required|integer',
-            'tagging_date' => 'required|date',
-            'living_situation_id' => 'required|exists:living_situations,id',
-            'living_situation_case_specification' => [
-                'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,1,2,3,4,5,6,7,9',
-                'string',
-                'max:255'
-            ],
-            'case_specification_id' => [
-                'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,8', // Only required if living_situation_id is 8
-                'exists:case_specifications,id'
-            ],
-            'government_program_id' => 'required|exists:government_programs,id',
-            'living_status_id' => 'required|exists:living_statuses,id',
-            'rent_fee' => [
-                'nullable', // Allow it to be null if not required
-                'required_if:living_status_id,1', // Only required if living_status_id is 1
-                'integer'
-            ],
-            'landlord' => [
-                'nullable', // Allow it to be null if not required
-                'required_if:living_status_id,1',
-                'string',
-                'max:255'
-            ],
-            'house_owner' => [
-                'nullable', // Allow it to be null if not required
-                'required_if:living_status_id,5',
-                'string',
-                'max:255'
-            ],
-            'roof_type_id' => 'required|exists:roof_types,id',
-            'wall_type_id' => 'required|exists:wall_types,id',
-            'remarks' => 'nullable|string|max:255',
-            'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
-
-            // Live-in partner's details
-            'partner_first_name' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
-                        $fail('Live-in partner\'s first name is required.');
-                    }
-                },
-            ],
-            'partner_middle_name' => 'nullable|string|max:255',
-            'partner_last_name' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2) {
-                        if (empty($value)) {
-                            $fail('Spouse last name is required.');
-                        }
-                    }
-                },
-            ],
-            'partner_occupation' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
-                        $fail('Live-in partner\'s occupation is required. Put N/A if none.');
-                    }
-                },
-            ],
-            'partner_monthly_income' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
-                        $fail('Live-in partner\'s monthly income is required.');
-                    } elseif ($this->civil_status_id == 2 && !is_numeric($value)) {
-                        $fail('Live-in partner\'s monthly income must be a number.');
-                    }
-                },
-            ],
-
-            // Spouse details
-            'spouse_first_name' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 3 && empty($value)) {
-                        $fail('Spouse first name is required.');
-                    }
-                },
-            ],
-            'spouse_middle_name' => 'nullable|string|max:255',
-            'spouse_last_name' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 3) {
-                        if (empty($value)) {
-                            $fail('Spouse last name is required.');
-                        } elseif ($value !== $this->last_name) {
-                            $fail('The spouse\'s last name must match the applicant\'s last name.');
-                        }
-                    }
-                },
-            ],
-            'spouse_occupation' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 3 && empty($value)) {
-                        $fail('Spouse occupation is required.');
-                    }
-                },
-            ],
-            'spouse_monthly_income' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 3 && empty($value)) {
-                        $fail('Spouse monthly income is required.');
-                    } elseif ($this->civil_status_id == 3 && !is_numeric($value)) {
-                        $fail('Spouse monthly income must be a number.');
-                    }
-                },
-            ],
-
-            // Dependent's details
-            'dependents.*.dependent_civil_status_id' => 'required|exists:civil_statuses,id',
-            'dependents.*.dependent_first_name' => 'required|string|max:50',
-            'dependents.*.dependent_middle_name' => 'nullable|string|max:50',
-            'dependents.*.dependent_last_name' => 'required|string|max:50',
-            'dependents.*.dependent_sex' => 'required|in:Male,Female',
-            'dependents.*.dependent_date_of_birth' => 'required|date',
-            'dependents.*.dependent_relationship' => 'required|string|max:100',
-            'dependents.*.dependent_occupation' => 'required|string|max:255',
-            'dependents.*.dependent_monthly_income' => 'required|integer',
+            'date_blacklisted' => 'required|date',
+            'blacklist_reason_description' => 'required|string|max:255',
         ];
     }
-    public function saveChanges(): void
+    public function store()
     {
-        $validatedData = $this->validate();
+        // Validate the input data
+        $this->validate();
 
-        // Update Applicant
-        $this->applicant->update([
-            'first_name' => $validatedData['first_name'],
-            'middle_name' => $validatedData['middle_name'],
-            'last_name' => $validatedData['last_name'],
-            'suffix_name' => $validatedData['suffix_name'],
-            'date_applied' => $validatedData['date_applied'],
+        // Check if the user has provided the correct password
+//        if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
+//            $this->blacklistError = 'Incorrect password';
+//            return;
+//        }
+
+        // Create the new applicant record and get the ID of the newly created applicant
+        $blacklist = Blacklist::create([
+            'awardee_id' => $this->awardee->id,
+            'user_id' => Auth::id(),
+            'date_blacklisted' => $this->date_blacklisted,
+            'blacklist_reason_description' => $this->blacklist_reason_description,
+            'updated_by' => $this->updated_by,
         ]);
 
-        // Update Tagged Applicant
-        $this->taggedApplicant->update([
-            'civil_status_id' => $validatedData['civil_status_id'],
-            'tribe_id' => $validatedData['tribe_id'],
-            'religion_id' => $validatedData['religion_id'],
-            'sex' => $validatedData['sex'],
-            'date_of_birth' => $validatedData['date_of_birth'],
-            'occupation' => $validatedData['occupation'],
-            'monthly_income' => $validatedData['monthly_income'],
-            'family_income' => $validatedData['family_income'],
-            'tagging_date' => $validatedData['tagging_date'],
-            'roof_type_id' => $validatedData['roof_type_id'],
-            'wall_type_id' => $validatedData['wall_type_id'],
-
-            'living_situation_id' => $validatedData['living_situation_id'],
-            'case_specification_id' => $validatedData['case_specification_id'],
-            'living_situation_case_specification' => $validatedData['living_situation_case_specification'],
-            'government_program_id' => $validatedData['government_program_id'],
-            'living_status_id' => $validatedData['living_status_id'],
-            'rent_fee' => $validatedData['rent_fee'],
-            'remarks' => $validatedData['remarks'],
+        $this->awardee->update([
+            'is_blacklisted' => true
         ]);
 
-        $this->awardee->address->update([
-            'barangay_id' => $validatedData['barangay_id'],
-            'purok_id' => $validatedData['purok_id'],
+        $this->resetForm();
+        $this->showBlacklistConfirmationModal = false;
+
+        // Trigger the alert message
+        $this->dispatch('alert', [
+            'title' => 'Awardee is now Blacklisted!',
+            'message' => '<br><small>'. now()->calendar() .'</small>',
+            'type' => 'success'
         ]);
 
-        // Save dependents
-        $this->taggedApplicant->dependents()->delete(); // Remove existing
-        foreach ($this->dependents as $dependent) {
-            $this->taggedApplicant->dependents()->create($dependent);
-        }
-
-        $this->isEditing = false;
-//        session()->flash('message', 'Awardee details updated successfully.');
+        $this->redirect(route('awardee-details', ['applicantId' => $this->awardee->id]));
     }
-    public function addDependent(): void
+    public function resetForm(): void
     {
-        $this->dependents[] = [
-            'dependent_first_name' => '',
-            'dependent_middle_name' => '',
-            'dependent_last_name' => '',
-            'dependent_sex' => '',
-            'dependent_civil_status_id' => '',
-            'dependent_date_of_birth' => '',
-            'dependent_relationship' => '',
-            'dependent_occupation' => '',
-            'dependent_monthly_income' => 0,
-        ];
+        $this->reset(['date_blacklisted', 'blacklist_reason_description', 'updated_by']);
     }
-    public function removeDependent(): void
+//    public function addDependent(): void
+//    {
+//        $this->dependents[] = [
+//            'dependent_first_name' => '',
+//            'dependent_middle_name' => '',
+//            'dependent_last_name' => '',
+//            'dependent_sex' => '',
+//            'dependent_civil_status_id' => '',
+//            'dependent_date_of_birth' => '',
+//            'dependent_relationship' => '',
+//            'dependent_occupation' => '',
+//            'dependent_monthly_income' => 0,
+//        ];
+//    }
+//    public function blacklistAwardee(): void
+//    {
+//        if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
+//            $this->deleteError = 'Incorrect password';
+//            return;
+//        }
+//
+//        if ($this->deletingIndex !== null) {
+//            try {
+//                $dependentToDelete = $this->dependents[$this->deletingIndex];
+//
+//                // Delete from database
+//                if (!empty($dependentToDelete['id'])) {
+//                    $deleted = $this->taggedApplicant->dependents()
+//                        ->where('id', $dependentToDelete['id'])
+//                        ->delete();
+//
+//                    if ($deleted) {
+//                        // Only remove from UI if database deletion was successful
+//                        unset($this->dependents[$this->deletingIndex]);
+//                        $this->dependents = array_values($this->dependents);
+//
+//                        // Show success message (optional)
+////                        session()->flash('message', 'Dependent successfully deleted.');
+//                        $this->dispatch('alert', [
+//                            'title' => 'Dependent deleted!',
+//                            'message' => 'Dependent has been successfully deleted. <br><small>'. now()->calendar() .'</small>',
+//                            'type' => 'success'
+//                        ]);
+//                    } else {
+//                        $this->dispatch('alert', [
+//                            'title' => 'Deletion failed!',
+//                            'message' => 'Something went wrong. Try again. <br><small>'. now()->calendar() .'</small>',
+//                            'type' => 'danger'
+//                        ]);
+//                        return;
+//                    }
+//                }
+//
+//                $this->cancelDelete();
+//
+//            } catch (\Exception $e) {
+//                logger('Error deleting dependent:', ['error' => $e->getMessage()]);
+//                $this->deleteError = 'Error deleting dependent. Please try again.';
+//                return;
+//            }
+//        }
+//    }
+    public function confirmBlacklisting($awardeeId): void
     {
-        if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
-            $this->deleteError = 'Incorrect password';
-            return;
-        }
-
-        if ($this->deletingIndex !== null) {
-            try {
-                $dependentToDelete = $this->dependents[$this->deletingIndex];
-
-                // Delete from database
-                if (!empty($dependentToDelete['id'])) {
-                    $deleted = $this->taggedApplicant->dependents()
-                        ->where('id', $dependentToDelete['id'])
-                        ->delete();
-
-                    if ($deleted) {
-                        // Only remove from UI if database deletion was successful
-                        unset($this->dependents[$this->deletingIndex]);
-                        $this->dependents = array_values($this->dependents);
-
-                        // Show success message (optional)
-//                        session()->flash('message', 'Dependent successfully deleted.');
-                        $this->dispatch('alert', [
-                            'title' => 'Dependent deleted!',
-                            'message' => 'Dependent has been successfully deleted. <br><small>'. now()->calendar() .'</small>',
-                            'type' => 'success'
-                        ]);
-                    } else {
-                        $this->dispatch('alert', [
-                            'title' => 'Deletion failed!',
-                            'message' => 'Something went wrong. Try again. <br><small>'. now()->calendar() .'</small>',
-                            'type' => 'danger'
-                        ]);
-                        return;
-                    }
-                }
-
-                $this->cancelDelete();
-
-            } catch (\Exception $e) {
-                logger('Error deleting dependent:', ['error' => $e->getMessage()]);
-                $this->deleteError = 'Error deleting dependent. Please try again.';
-                return;
-            }
-        }
-    }
-    public function confirmDelete($index): void
-    {
-        $this->deletingIndex = $index;
+        $this->awardeeToBlacklist = $awardeeId;
         $this->confirmationPassword = '';
-        $this->deleteError = '';
-        $this->showDeleteModal = true;
+        $this->blacklistError = '';
+        $this->showBlacklistConfirmationModal = true;
     }
-    public function cancelDelete(): void
+    public function cancelBlacklisting(): void
     {
-        $this->showDeleteModal = false;
-        $this->deletingIndex = null;
+        $this->showBlacklistConfirmationModal = false;
+        $this->awardeeToBlacklist = '';
         $this->confirmationPassword = '';
-        $this->deleteError = '';
+        $this->blacklistError = '';
     }
-
     public function render()
     {
         return view('livewire.awardee-details',[

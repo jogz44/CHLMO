@@ -23,24 +23,24 @@
 }
 
 /* Define a smaller hover area in the center of the icon */
-.hover-area::before {
-    content: '';
-    position: absolute;
-    top: 25%;
-    left: 25%;
-    width: 50%;
-    height: 50%;
-    background: transparent;
-    pointer-events: auto;
-}
+/*.hover-area::before {*/
+/*    content: '';*/
+/*    position: absolute;*/
+/*    top: 25%;*/
+/*    left: 25%;*/
+/*    width: 50%;*/
+/*    height: 50%;*/
+/*    background: transparent;*/
+/*    pointer-events: auto;*/
+/*}*/
 
 /* Prevent tooltip from disappearing when hovering over it */
-.group:hover .hover-area::before,
-.group:hover .tooltip,
-.tooltip:hover {
-    opacity: 1;               /* Ensure tooltip remains visible */
-    visibility: visible;       /* Make sure it's visible */
-    pointer-events: auto;      /* Allow interaction */
-}
+/*.group:hover .hover-area::before,*/
+/*.group:hover .tooltip,*/
+/*.tooltip:hover {*/
+/*    opacity: 1;               !* Ensure tooltip remains visible *!*/
+/*    visibility: visible;       !* Make sure it's visible *!*/
+/*    pointer-events: auto;      !* Allow interaction *!*/
+/*}*/
 
 

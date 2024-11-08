@@ -2,36 +2,36 @@
 
 namespace App\Models\Shelter;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ShelterApplicantSpouse extends Model
+
+class ShelterImagesForHousing extends Model
 {
-    use HasFactory;
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'shelter_applicant_id',
-        'first_name',
-        'middle_name',
-        'last_name',
+        'profiled_tagged_applicant_id',
+        'image_path',
+        'display_name',
+        'order',
     ];
-    /**
+
+     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
     protected $casts = [
         'id' => 'integer',
-        'shelter_applicant_id' => 'integer',
+        'profiled_tagged_applicant_id' => 'integer',
+        'order' => 'integer',
     ];
-
-    public function shelterApplicant(): BelongsTo
+    public function profiledTaggedApplicant(): BelongsTo
     {
-        return $this->belongsTo(ShelterApplicant::class);
+        return $this->belongsTo(ProfiledTaggedApplicant::class);
     }
 }

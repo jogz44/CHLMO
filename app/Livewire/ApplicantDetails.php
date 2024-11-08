@@ -365,7 +365,7 @@ class ApplicantDetails extends Component
                 ]);
             }
 
-////            // batching the database for large data
+            // batching the database for large data
             $dependentData = [];
             // Create dependent records associated with the applicant
             foreach ($this->dependents as $dependent) {

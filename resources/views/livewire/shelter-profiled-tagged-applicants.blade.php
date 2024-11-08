@@ -45,7 +45,7 @@
                         </div>
                     </div>
                     <div class="flex justify-end">
-                        <label class="text-center mt-2 mr-1" for="start_date">Date Applied From:</label>
+                        <label class="text-center mt-2 mr-1" for="start_date">Date Profiled/Tagged From:</label>
                         <input type="date" id="start_date" wire:model.live="startTaggingDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
                             max="{{ now()->toDateString() }}">
                         <label class="text-center mt-2 ml-2 mr-1" for="end_date">To:</label>
@@ -85,7 +85,7 @@
 
 
             <!-- Table with transaction requests -->
-            <div x-data="{openModalGrant: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
+            <div x-data="{openModalGrant: false, openModalDocumentsChecklist: false, openPreviewModal: false}"
                 class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
@@ -113,7 +113,7 @@
                                     class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-14 py-1.5 rounded-full">
                                     Grant
                                 </button>
-                                @elseif($shelterApplicant->grantees->isNotEmpty() && $shelterApplicant->grantees->first()->is_awarded)
+                                @elseif($shelterApplicant->grantees->isNotEmpty() && $shelterApplicant->grantees->first()->is_granted)
                                 <!-- Granted Button -->
                                 <button class="bg-gray-400 text-white px-12 py-1.5 rounded-full cursor-not-allowed">
                                     Granted
@@ -144,7 +144,7 @@
                                                 <button type="button" class="underline"
                                                     @click="
                                                                 openModalDocumentsChecklist = true;
-                                                                $wire.set('grantId', {{ $shelterApplicant->grantees->first()->id }});
+                                                                $wire.set('granteeId', {{ $shelterApplicant->grantees->first()->id }});
                                                             ">
                                                     Upload now.
                                                 </button>
@@ -175,7 +175,7 @@
                 <div x-show="openModalGrant"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
                     x-cloak style="font-family: 'Poppins', sans-serif;">
-                    <div class="bg-white text-white w-[500px] rounded-lg shadow-lg p-6 relative">
+                    <div class="bg-white text-white w-[530px] rounded-lg shadow-lg p-6 relative">
                         <!-- Modal Header -->
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-semibold text-black">GRANT APPLICANT</h3>
@@ -185,174 +185,440 @@
                         </div>
 
                         <!-- Form -->
-                        <form @submit.prevent>
+                        <form wire:submit.prevent="grantApplicant">
                             <div class="flex flex-wrap -mx-2">
                                 <!-- Tagging and Validation Date Field -->
                                 <div class="w-full md:w-1/2 px-2 mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="delivery-date">DATE OF DELIVERY</label>
-                                    <input type="date" id="delivery-date" max="{{ now()->toDateString() }}"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
+                                    <input type="date" id="delivery-date" wire:model="date_of_delivery" required
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
+                                        max="{{ now()->toDateString() }}">
+                                    @error('date_of_delivery') <span class="error">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="w-full md:w-1/2 px-2 mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="irs-date">DATE OF RIS</label>
-                                    <input type="date" id="irs-date" max="{{ now()->toDateString() }}"
+                                    <input type="date" id="irs-date" wire:model="date_of_ris" max="{{ now()->toDateString() }}" required
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
+                                    @error('date_of_ris') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
                             </div>
                             <label class="block text-[13px] font-medium text-gray-700 mb-4">MATERIALS DELIVERED</label>
-                            <div class="flex flex-wrap -mx-2">
-                                <div class="w-full md:w-2/4 px-2 mb-2">
-                                    <label for="material"
-                                        class="block text-[12px] font-medium text-gray-700">MATERIAL</label>
+                            <div class="flex flex-wrap -mx-2 text-start">
+                                <div class="w-full md:w-3/12 px-2 mb-2">
+                                    <label
+                                        class="block text-[12px] font-medium text-gray-700">ITEM</label>
                                 </div>
-                                <div class="w-full md:w-1/4 px-2 mb-2">
-                                    <label class="block text-[12px] font-medium text-black" for="qty">QUANTITY</label>
+                                <div class="w-full md:w-2/12 px-2 mb-2 text-end">
+                                    <label class="block text-[12px] font-medium text-black">STOCK</label>
                                 </div>
-                                <div class="w-full md:w-1/4 px-2 mb-2">
-                                    <label class="block text-[12px] font-medium text-black" for="PoNum">PO NUMBER</label>
+                                <div class="w-full md:w-2/12 px-2 mb-2 text-end">
+                                    <label class="block text-[12px] font-medium text-black">QTY</label>
+                                </div>
+                                <div class="w-full md:w-2/12 px-2 mb-2 text-end">
+                                    <label class="block text-[12px] font-medium text-black">UNIT</label>
+                                </div>
+                                <div class="w-full md:w-3/12 px-2 mb-2 text-center">
+                                    <label class="block text-[12px] font-medium text-black">PO NO.</label>
                                 </div>
                             </div>
-                            <div x-data="{ materials: [{ material: '', qty: '', poNum: '' }], addMaterial() {this.materials.push({ material: '', qty: '', poNum: '' });}}">
-                                <template x-for="(material, index) in materials" :key="index">
-                                    <div class="flex flex-wrap -mx-2">
-                                        <!-- Material Select -->
-                                        <div class="w-full md:w-2/4 px-2 mb-2">
-                                            <select x-model="material.material"
-                                                class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg focus:outline-none focus:ring-custom-yellow">
-                                                <option value="">Select Material</option>
-                                                <option value="barangay1">Barangay 1</option>
-                                            </select>
-                                        </div>
-
-                                        <!-- Quantity Input -->
-                                        <div class="w-full md:w-1/4 px-2 mb-2">
-                                            <input type="number" x-model="material.qty"
-                                                class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                                placeholder="Quantity">
-                                        </div>
-
-                                        <!-- PO Number Select -->
-                                        <div class="w-full md:w-1/4 px-2 mb-2">
-                                            <select x-model="material.poNum"
-                                                class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg focus:outline-none focus:ring-custom-yellow">
-                                                <option value="">Select</option>
-                                                <option value="barangay1">Barangay 1</option>
-                                            </select>
-                                        </div>
+                            <div>
+                                @foreach ($materials as $index => $material)
+                                <div class="flex flex-wrap -mx-2">
+                                    <!-- Material Select -->
+                                    <div class="w-full md:w-4/12 px-2 mb-2">
+                                        <select wire:model="materials.{{ $index }}.material_id" wire:change="updateMaterialInfo({{ $index }})" required class="uppercase w-full px-1 py-1.5 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                            <option value="">Select Material</option>
+                                            @foreach($materialLists as $materialItem)
+                                            <option value="{{ $materialItem->id }}">{{ $materialItem->item_description }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('materials.' . $index . '.material_id') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
                                     </div>
-                                </template>
+                                    <!-- Available quantity -->
+                                    <div class="w-full md:w-2/12 px-2 mb-2">
+                                        <input type="text" wire:model="materials.{{ $index }}.quantity" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="available">
+                                    </div>
 
-                                <!-- Add Button -->
+                                    <!-- Quantity Input -->
+                                    <div class="w-full md:w-2/12 px-2 mb-2">
+                                        <input type="number" wire:model="materials.{{ $index }}.grantee_quantity" required class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]" placeholder="Quantity">
+                                        @error('materials.' . $index . '.grantee_quantity') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <!-- Material Unit -->
+                                    <div class="w-full md:w-2/12 px-2 mb-2">
+                                        <input type="text" wire:model="materials.{{ $index }}.material_unit_id" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="Material Unit">
+                                    </div>
+
+                                    <!-- PO Number -->
+                                    <div class="w-full md:w-2/12 px-2 mb-2">
+                                        <input type="text" wire:model="materials.{{ $index }}.purchase_order_id" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="PO Number">
+                                    </div>
+                                </div>
+                                @endforeach
+
+                                <!-- Add Material Button -->
                                 <div class="flex justify-center mt-4 mb-4">
-                                    <button type="button" @click="addMaterial"
-                                        class="px-3 py-1 bg-custom-yellow text-white rounded-md text-xs hover:bg-custom-yellow">
-                                        Add Materials Delivered
-                                    </button>
+                                    <button type="button" wire:click="addMaterial" class="px-3 py-1 bg-custom-yellow text-white rounded-md text-xs hover:bg-custom-yellow">Add Materials Delivered</button>
                                 </div>
-                            </div>
 
 
-                            <!-- House Situation Upload -->
-                            <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD HOUSE SITUATION</h2>
+                                <!-- House Situation Upload -->
+                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD HOUSE SITUATION</h2>
 
-                            <!-- Drag and Drop Area -->
-                            <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
-                                <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                                </svg>
-                                <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                                <p class="text-gray-500 text-xs">or</p>
-                                <button type="button"
-                                    class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                    @click="$refs.fileInput.click()">BROWSE FILES
-                                </button>
+                                <!-- Drag and Drop Area -->
+                                <div x-data="fileUpload()">
+                                    <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
+                                        <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
+                                        </svg>
+                                        <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
+                                        <p class="text-gray-500 text-xs">or</p>
+                                        <button type="button" class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
+                                            @click="$refs.fileInput.click()">BROWSE FILES
+                                        </button>
 
-                                <!-- Hidden File Input -->
-                                <input type="file" x-ref="fileInput"
-                                    @change="selectedFile = $refs.fileInput.files[0]; fileName = selectedFile.name"
-                                    class="hidden" />
-                            </div>
+                                        <!-- Hidden File Input -->
+                                        <input type="file" x-ref="fileInput" wire:model="photo" class="hidden"
+                                            @change="addFiles($refs.fileInput.files)" multiple />
+                                        @error('photo')
+                                        <span class="text-red-400 text-sm">{{ $message }}</span>
+                                        @enderror
+                                    </div>
 
-                            <!-- Show selected file and progress bar when a file is selected -->
-                            <template x-if="selectedFile">
-                                <div @click="openPreviewModal = true" class="mt-4 bg-white p-2 rounded-lg shadow">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center space-x-2">
-                                            <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2" d="M7 3v6h4l1 1h4V3H7z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2" d="M5 8v10h14V8H5z" />
-                                            </svg>
-                                            <span class="text-xs font-medium text-gray-700"
-                                                x-text="fileName"></span>
-
+                                    <!-- Show selected file and progress bar when a file is selected -->
+                                    <template x-for="(fileWrapper, index) in files" :key="index">
+                                        <div @click="openPreviewModal = true; selectedFile = fileWrapper" class="mt-4 bg-white p-2 rounded-lg shadow">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="flex items-center space-x-2">
+                                                    <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3v6h4l1 1h4V3H7z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8v10h14V8H5z" />
+                                                    </svg>
+                                                    <span class="text-xs font-medium text-gray-700" x-text="fileWrapper.displayName"></span>
+                                                </div>
+                                                <!-- Status -->
+                                                <span class="text-xs text-green-500 font-medium" x-text="fileWrapper.progress + '%'"></span>
+                                            </div>
+                                            <!-- Progress Bar -->
+                                            <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
+                                                <div class="h-full bg-green-500" x-bind:style="'width: ' + fileWrapper.progress + '%'"></div>
+                                            </div>
                                         </div>
-                                        <!-- Status -->
-                                        <span class="text-xs text-green-500 font-medium">100%</span>
-                                    </div>
-                                    <!-- Progress Bar -->
-                                    <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                        <div class="w-full h-full bg-green-500"></div>
-                                    </div>
-                                </div>
-                            </template>
+                                    </template>
 
-                            <!-- Buttons -->
-                            <div class="grid grid-cols-2 gap-4 mt-4">
-                                <button type="submit"
-                                    class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg">
-                                    GRANT APPLICANT
-                                </button>
-                                <button type="button" @click="openModalGrant = false"
-                                    class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
-                                    CANCEL
-                                </button>
+                                    <!-- Preview Modal (Triggered by Clicking the Progress Bar) -->
+                                    <div x-show="openPreviewModal"
+                                        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
+                                        x-cloak>
+                                        <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
+                                            <!-- Modal Header with File Name -->
+                                            <div class="flex justify-between items-center mb-4">
+                                                <!-- Only show input if selectedFile is not null -->
+                                                <template x-if="selectedFile">
+                                                    <input type="text" x-model="selectedFile.displayName"
+                                                        class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0"
+                                                        placeholder="Rename file">
+                                                    @error('photo') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                                </template>
+                                                <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
+                                                    &times;
+                                                </button>
+                                            </div>
+
+                                            <!-- Display Image -->
+                                            <div class="flex justify-center mb-4">
+                                                <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) :  '/storage/images/default.jpg'"
+                                                    alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
+                                            </div>
+                                            <!-- Modal Buttons -->
+                                            <div class="flex justify-between mt-4">
+                                                <button type="button" class="px-4 py-2 bg-green-600 text-white rounded-lg"
+                                                    @click="confirmFile(); $wire.grantApplicant(selectedFile.file)">CONFIRM
+                                                </button>
+                                                <button type="button" class="px-4 py-2 bg-red-600 text-white rounded-lg"
+                                                    @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- Buttons -->
+                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <div class="alert"
+                                            :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
+                                            x-data="{ open:false, alert:{} }"
+                                            x-show="open" x-cloak
+                                            x-transition:enter="animate-alert-show"
+                                            x-transition:leave="animate-alert-hide"
+                                            @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
+                                            <div class="alert-wrapper">
+                                                <strong x-html="alert.title">Title</strong>
+                                                <p x-html="alert.message">Description</p>
+                                            </div>
+                                            <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                                        </div>
+                                        <button type="submit"
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                            <span class="text-[12px]">GRANT APPLICANT</span>
+                                            <div wire:loading>
+                                                <svg aria-hidden="true"
+                                                    class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                    viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                    <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                                </svg>
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                    <script>
+                                        document.addEventListener('livewire.initialized', () => {
+                                            let obj = @json(session('alert') ?? []);
+                                            if (Object.keys(obj).length) {
+                                                Livewire.dispatch('alert', [obj])
+                                            }
+                                        })
+                                    </script>
+                                    <button type="button" @click="openModalGrant = false"
+                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
+                                        CANCEL
+                                    </button>
+
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- Preview Modal (Triggered by Clicking the Progress Bar) -->
-                <div x-show="openPreviewModal"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                    x-cloak>
-                    <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                        <!-- Modal Header with File Name -->
-                        <div class="flex justify-between items-center mb-4">
-                            <input type="text" x-model="fileName"
-                                class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                            <button class="text-orange-500 underline text-sm"
-                                @click="fileName = prompt('Rename File', fileName) || fileName">Rename File
-                            </button>
-                            <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
+                <!-- Modal Relocate - Checklist for uploading documents -->
+                <div x-show="openModalDocumentsChecklist"
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                     x-cloak
+                     style="font-family: 'Poppins', sans-serif;">
+                    <!-- Modal -->
+                    <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">
+                        <!-- Modal Header -->
+                        <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-900">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>
+                            <button @click="openModalDocumentsChecklist = false" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
                                 &times;
                             </button>
                         </div>
 
-                        <!-- Display Image -->
-                        <div class="flex justify-center mb-4">
-                            <img :src="selectedFile ? URL.createObjectURL(selectedFile) : '/path/to/default/image.jpg'"
-                                alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                        </div>
-                        <!-- Modal Buttons -->
-                        <div class="flex justify-between mt-4">
-                            <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                @click="openPreviewModal = false">CONFIRM
-                            </button>
-                            <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                @click="selectedFile = null; openPreviewModal = false">REMOVE
-                            </button>
+                        <!-- Modal Content - Scrollable Area -->
+                        <div class="flex-1 p-8 overflow-y-auto">
+                            <form wire:submit.prevent="submit">
+                                <!-- Horizontal Scrollable Container -->
+                                <div class="w-full overflow-x-auto pb-4">
+                                    <div class="flex flex-nowrap gap-4 min-w-full">
+                                        <!-- 1st Attachment - Request Letter Address to City Mayor-->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <p class="uppercase font-bold text-gray-900 text-sm">
+                                                {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Request Letter Address to City Mayor' }}
+                                                <span class="text-red-500">*</span>
+                                            </p>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('requestLetterAddressToCityMayor', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('requestLetterAddressToCityMayor', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="requestLetterAddressToCityMayor" required>
+                                                @error('requestLetterAddressToCityMayor')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                        <!-- 2nd attachment - Certificate of Indigency -->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <div class="mb-1">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Certificate of Indigency' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('certificateOfIndigency', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('certificateOfIndigency', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certificateOfIndigency" required>
+                                                @error('certificateOfIndigency')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                        <!-- 3rd attachment - Consent Letter (if the land is not theirs) -->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <div class="mb-1">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Consent Letter (if the land is not theirs)' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('consentLetterIfTheLandIsNotTheirs', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('consentLetterIfTheLandIsNotTheirs', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="consentLetterIfTheLandIsNotTheirs" required>
+                                                @error('consentLetterIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                        <!-- 4th attachment - Photocopy of ID from the Land Owner (if the land is not theirs)  -->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <div class="mb-1">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Photocopy of ID from the Land Owner (if the land is not theirs) ' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" required>
+                                                @error('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button Section - Fixed at bottom -->
+                                <div class="mt-4">
+                                    <button type="submit"
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                        <span class="text-[12px]">SUBMIT</span>
+                                        <div wire:loading>
+                                            <svg aria-hidden="true"
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                      fill="currentColor"/>
+                                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                      fill="currentFill"/>
+                                            </svg>
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<!-- <script>
+    // Initialize FilePond instance
+    document.addEventListener('livewire:load', function() {
+        FilePond.create(document.querySelector('.filepond'), {
+            onprocessfile: (error, file) => {
+                if (error) {
+                    console.error('FilePond Error:', error);
+                } else {
+                    console.log('File processed:', file);
+                }
+            }
+        });
+    });
+</script> -->
+<script>
+    function fileUpload() {
+        return {
+            files: [],
+            selectedFile: null,
+
+            addFiles(fileList) {
+                for (let i = 0; i < fileList.length; i++) {
+                    const file = fileList[i];
+                    this.files.push({
+                        file,
+                        displayName: file.name,
+                        progress: 0 // Initialize progress to 0
+                    });
+                    // Start the upload process for the file
+                    this.uploadFile(file, this.files.length - 1);
+                }
+            },
+            removeFile(fileWrapper) {
+                this.files = this.files.filter(f => f !== fileWrapper);
+            },
+            uploadFile(file, index) {
+                const uploadSimulation = setInterval(() => {
+                    if (this.files[index].progress >= 100) {
+                        clearInterval(uploadSimulation);
+                    } else {
+                        this.files[index].progress += 10; // Simulate progress increase
+                    }
+                }, 100); // Adjust the speed of progress simulation
+            },
+
+            confirmFile() {
+                // Logic to handle file confirmation (just close modal)
+                this.openPreviewModal = false;
+            }
+        };
+    }
+</script>
