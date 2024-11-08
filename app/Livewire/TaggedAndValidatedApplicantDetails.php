@@ -8,6 +8,7 @@ use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\LivingStatus;
+use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\TaggedAndValidatedApplicant;
@@ -24,7 +25,7 @@ class TaggedAndValidatedApplicantDetails extends Component
 
     public $applicantForSpouse;
     public $transaction_type_id, $transaction_type_name;
-    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay, $purok;
+    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [], $purok_id, $puroks = [];
 
     // New fields
     public $full_address, $civil_status_id, $civil_statuses, $religion_id, $religions, $tribe_id, $tribes;
@@ -56,10 +57,20 @@ class TaggedAndValidatedApplicantDetails extends Component
             'caseSpecification',
             'civilStatus',
             'tribe',
-            'religion'
+            'religion',
+            'liveInPartner',
+            'spouse'
         ])->findOrFail($applicantId);
 
+        $this->loadFormData();
+    }
+    public function loadFormData(): void
+    {
         $this->civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
+            return CivilStatus::all();  // Cache for 1 hour
+        });
+        // For Dependents
+        $this->dependent_civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
         $this->tribes = Cache::remember('tribes', 60*60, function() {
@@ -86,7 +97,53 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->wallTypes = Cache::remember('wallTypes', 60*60, function() {
             return WallType::all();  // Cache for 1 hour
         });
+
+        // Applicant basic information
+        $this->first_name = $this->taggedAndValidatedApplicant->applicant->first_name ?? '--';
+        $this->middle_name = $this->taggedAndValidatedApplicant->applicant->middle_name ?? '--';
+        $this->last_name = $this->taggedAndValidatedApplicant->applicant->last_name ?? '--';
+        $this->suffix_name = $this->taggedAndValidatedApplicant->applicant->suffix_name ?? '--';
+        $this->contact_number = $this->taggedAndValidatedApplicant->applicant->contact_number ?? '--';
+        // Load Address Information - Store IDs instead of names
+        $this->barangay_id = $this->taggedAndValidatedApplicant->applicant?->address?->barangay?->id;
+        $this->purok_id = $this->taggedAndValidatedApplicant->applicant?->address?->purok?->id;
+        $this->full_address = $this->taggedAndValidatedApplicant->full_address ?? '--';
+        $this->occupation = $this->taggedAndValidatedApplicant->occupation ?? '--';
+        $this->monthly_income = $this->taggedAndValidatedApplicant->family_income ?? '--';
+        $this->family_income = $this->taggedAndValidatedApplicant->family_income ?? '--';
+        // Load initial puroks if barangay is selected
+        if ($this->barangay_id) {
+            $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
+        }
+        // Live in partner details
+        $this->partner_first_name = $this->taggedAndValidatedApplicant->liveInPartner->partner_first_name ?? '--';
+        $this->partner_middle_name = $this->taggedAndValidatedApplicant->liveInPartner->partner_middle_name ?? '--';
+        $this->partner_last_name = $this->taggedAndValidatedApplicant->liveInPartner->partner_last_name ?? '--';
+        $this->partner_occupation = $this->taggedAndValidatedApplicant->liveInPartner->partner_occupation ?? '--';
+        $this->partner_monthly_income = $this->taggedAndValidatedApplicant->liveInPartner->partner_monthly_income ?? '--';
+        // spouse details
+        $this->spouse_first_name = $this->taggedAndValidatedApplicant->spouse->spouse_first_name ?? '--';
+        $this->spouse_middle_name = $this->taggedAndValidatedApplicant->spouse->spouse_middle_name ?? '--';
+        $this->spouse_last_name = $this->taggedAndValidatedApplicant->spouse->spouse_last_name ?? '--';
+        $this->spouse_occupation = $this->taggedAndValidatedApplicant->spouse->spouse_occupation ?? '--';
+        $this->spouse_monthly_income = $this->taggedAndValidatedApplicant->spouse->spouse_monthly_income ?? '--';
+        // Dependents' details
+        $this->dependents = $this->taggedAndValidatedApplicant->dependents->map(function($dependent) {
+            return [
+                'id' => $dependent->id,  // Make sure this is included
+                'dependent_first_name' => $dependent->dependent_first_name,
+                'dependent_middle_name' => $dependent->dependent_middle_name,
+                'dependent_last_name' => $dependent->dependent_last_name,
+                'dependent_sex' => $dependent->dependent_sex,
+                'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
+                'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
+                'dependent_relationship' => $dependent->dependent_relationship,
+                'dependent_occupation' => $dependent->dependent_occupation,
+                'dependent_monthly_income' => $dependent->dependent_monthly_income,
+            ];
+        })->toArray();
     }
+
     public function toggleEdit(): void
     {
         $this->isEditing = !$this->isEditing;

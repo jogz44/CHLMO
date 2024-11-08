@@ -1024,7 +1024,7 @@
                             </label>
                             <input wire:model="first_name"
                                    type="text"
-                                   id="first-name"
+                                   id="first_name"
                                    @disabled(!$isEditing)
                                    class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                    oninput="capitalizeInput(this)">
@@ -1092,7 +1092,7 @@
                                 @error('barangay_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                                 <input type="text"
-                                       value="{{ $taggedAndValidatedApplicant->address?->barangay?->name ?? '--' }}"
+                                       value="{{ $taggedAndValidatedApplicant->applicant?->address?->barangay?->name ?? '--' }}"
                                        disabled
                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -1115,7 +1115,7 @@
                                 @error('purok_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                                 <input type="text"
-                                       value="{{ $taggedAndValidatedApplicant->address?->purok?->name ?? '--' }}"
+                                       value="{{ $taggedAndValidatedApplicant->applicant?->address?->purok?->name ?? '--' }}"
                                        disabled
                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -1126,7 +1126,7 @@
                             </label>
                             <input wire:model="full_address"
                                    type="text"
-                                   id="full-address"
+                                   id="full_address"
                                    @disabled(!$isEditing)
                                    class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                    oninput="capitalizeInput(this)">
@@ -1301,7 +1301,7 @@
                     </div>
 
                     <hr class="mt-2 mb-2 ">
-                    <h2 class="block text-[12px] font-semibold text-gray-700 mb-2">LIVE-IN PARTNER'S MAIDEN NAME</h2>
+                    <h2 class="block text-[16px] font-semibold text-gray-700 mb-2">LIVE-IN PARTNER'S MAIDEN NAME</h2>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="partner_first_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
@@ -1358,7 +1358,7 @@
                     </div>
 
                     <hr class="mt-2 mb-2 ">
-                    <h2 class="block text-[12px] font-semibold text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
+                    <h2 class="block text-[16px] font-semibold text-gray-700 mb-2">SPOUSE MAIDEN NAME</h2>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="spouse_first_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
