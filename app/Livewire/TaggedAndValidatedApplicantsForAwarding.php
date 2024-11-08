@@ -15,6 +15,7 @@ use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
 use http\Env\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -77,12 +78,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public function mount(): void
     {
-        // Set the default transaction type to 'Walk-in'
-        $viaRequest = TransactionType::where('type_name', 'Request')->first();
-        if ($viaRequest) {
-            $this->transaction_type_id = $viaRequest->id; // This can still be used internally for further logic if needed
-            $this->transaction_type_name = $viaRequest->type_name; // Set the name to display
-        }
+//        $viaRequest = TransactionType::where('type_name', 'Request')->first();
+//        if ($viaRequest) {
+//            $this->transaction_type_id = $viaRequest->id; // This can still be used internally for further logic if needed
+//            $this->transaction_type_name = $viaRequest->type_name; // Set the name to display
+//        }
 
         // Initialize filter options
         $this->puroksFilter = Cache::remember('puroks', 60*60, function() {
@@ -363,6 +363,10 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
         $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
         $this->show = false;  // Close the modal or hide any UI related to uploads if needed
+    }
+    public function viewApplicantDetails($applicantId): RedirectResponse
+    {
+        return redirect()->route('tagged-and-validated-applicant-details', ['applicantId' => $applicantId]);
     }
 
     public function render()
