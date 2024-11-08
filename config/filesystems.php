@@ -47,6 +47,16 @@ return [
             'visibility' => 'public',
         ],
 
+        'grantee-photo-requirements' => [
+            'driver' => 'local',
+            'root' => storage_path('app/grantee-photo-requirements'),
+            'serve' => true,
+            'throw' => false,
+            'url' => env('APP_URL').'/grantee-photo-requirements',
+            'visibility' => 'public',
+        ],
+
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
@@ -83,6 +93,7 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
         public_path('awardee-photo-requirements') => storage_path('app/awardee-photo-requirements'),
+        public_path('grantee-photo-requirements') => storage_path('app/grantee-photo-requirements'),
     ],
 //    'links' => [
 //            public_path('awardee-photo-requirements') => storage_path('app/awardee-photo-requirements'),

@@ -4,11 +4,11 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Shelter\ShelterApplicant;
-use App\Models\Shelter\ShelterApplicantSpouse;
 use App\Models\Shelter\ProfiledTaggedApplicant;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\ShelterLivingStatus;
-
+use App\Models\Shelter\ShelterSpouse;
+use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Barangay;
 use App\Models\Purok;
 use App\Models\Address;
@@ -60,10 +60,11 @@ class ShelterApplicantDetails extends Component
      public $shelterLivingStatuses;
     public $date_tagged;
     public $remarks;
-
-    public $shelter_spouse_first_name;
-    public $shelter_spouse_middle_name;
-    public $shelter_spouse_last_name;
+    public $applicantForSpouse;
+    public $spouse_first_name;
+    public $spouse_middle_name;
+    public $spouse_last_name;
+    public $partner_first_name, $partner_middle_name, $partner_last_name;
 
     public function mount($profileNo)
     {
@@ -148,6 +149,7 @@ class ShelterApplicantDetails extends Component
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
             'tribe_id' => 'required|exists:tribes,id',
             'sex' => 'required|in:Male,Female',
+            'age' => 'required|integer',
             'religion_id' => 'required|exists:religions,id',
             'barangay_id' => 'required|exists:barangays,id',
             'occupation' => 'required|string|max:255',
@@ -158,18 +160,35 @@ class ShelterApplicantDetails extends Component
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
 
-            // Spouse details
-            'shelter_spouse_first_name' => [
+             // Live-in partner details
+             'partner_first_name' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2 && empty($value)) {
+                    if ($this->civil_status_id == '2' && empty($value)) {
+                        $fail('Live-in partner\'s first name is required.');
+                    }
+                },
+            ],
+            'partner_middle_name' => 'nullable|string|max:255',
+            'partner_last_name' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == '2' && empty($value)) {
+                        $fail('Live-in partner\'s last name is required.');
+                    }
+                },
+            ],
+
+            // Spouse details
+            'spouse_first_name' => [
+                function ($attribute, $value, $fail) {
+                    if ($this->civil_status_id == 3 && empty($value)) {
                         $fail('Spouse first name is required.');
                     }
                 },
             ],
-            'shelter_spouse_middle_name' => 'nullable|string|max:255',
-            'shelter_spouse_last_name' => [
+            'spouse_middle_name' => 'nullable|string|max:255',
+            'spouse_last_name' => [
                 function ($attribute, $value, $fail) {
-                    if ($this->civil_status_id == 2) {
+                    if ($this->civil_status_id == 3) {
                         if (empty($value)) {
                             $fail('Spouse last name is required.');
                         } elseif ($value !== $this->last_name) {
@@ -178,6 +197,7 @@ class ShelterApplicantDetails extends Component
                     }
                 },
             ],
+
         ];
     }
 
@@ -200,6 +220,7 @@ class ShelterApplicantDetails extends Component
                 'civil_status_id' => $this->civil_status_id,
                 'tribe_id' => $this->tribe_id,
                 'sex' => $this->sex,
+                'age' => $this->age,
                 'religion_id' => $this->religion_id ?: null,
                 'address_id' => $address->id,
                 'occupation' => $this->occupation ?: null,
@@ -214,15 +235,26 @@ class ShelterApplicantDetails extends Component
             ]);
             // dd($taggedApplicant);
 
-            if ($this->civil_status_id == '2') {
-                ShelterApplicantSpouse::create([
-                    'profile_no' => $taggedApplicant->id, // Link spouse to the applicant
-                    'shelter_spouse_first_name' => $this->shelter_spouse_first_name,
-                    'shelter_spouse_middle_name' => $this->shelter_spouse_middle_name,
-                    'shelter_spouse_last_name' => $this->shelter_spouse_last_name,
+             // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
+             if ($this->civil_status_id == '2') {
+                ShelterLiveInPartner::create([
+                    'profiled_tagged_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
+                    'partner_first_name' => $this->partner_first_name,
+                    'partner_middle_name' => $this->partner_middle_name,
+                    'partner_last_name' => $this->partner_last_name,
                 ]);
-                // dd('Spouse creation started');
             }
+
+            // Check if civil_status_id is 3 (Married) before creating Spouse record
+            if ($this->civil_status_id == '3') {
+                ShelterSpouse::create([
+                    'profiled_tagged_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
+                    'spouse_first_name' => $this->spouse_first_name,
+                    'spouse_middle_name' => $this->spouse_middle_name,
+                    'spouse_last_name' => $this->spouse_last_name,
+                ]);
+            }
+            
 
             // Find the applicant by ID and update the 'tagged' field
             $applicant = ShelterApplicant::findOrFail($this->profileNo);

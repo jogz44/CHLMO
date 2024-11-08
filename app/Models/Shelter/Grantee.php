@@ -37,12 +37,22 @@ class Grantee extends Model
 
     public function profiledTaggedApplicant(): BelongsTo
     {
-        return $this->belongsTo(ProfiledTaggedApplicant::class);
+        return $this->belongsTo(ProfiledTaggedApplicant::class, 'profiled_tagged_applicant_id', 'id');
     }
 
     public function material(): BelongsTo
     {
         return $this->belongsTo(Material::class, 'material_id', 'id');
+    }
+
+    public function shelterApplicant(): BelongsTo
+    {
+        return $this->belongsTo(ShelterApplicant::class, 'shelter_applicant_id', 'id');
+    }
+
+    public function originOfRequest(): BelongsTo
+    {
+        return $this->belongsTo(OriginOfRequest::class, 'origin_of_request_id', 'id');
     }
 
     public function attachments()

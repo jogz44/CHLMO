@@ -402,119 +402,175 @@
 
                 <!-- Modal Relocate - Checklist for uploading documents -->
                 <div x-show="openModalDocumentsChecklist"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak
-                    style="font-family: 'Poppins', sans-serif;">
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                     x-cloak
+                     style="font-family: 'Poppins', sans-serif;">
                     <!-- Modal -->
-                    <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                    <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">
                         <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-md font-semibold text-black">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>
-                            <button @click="openModalDocumentsChecklist = false" class="text-gray-400 hover:text-gray-200">
+                        <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
+                            <h3 class="text-lg font-bold text-gray-900">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>
+                            <button @click="openModalDocumentsChecklist = false" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
                                 &times;
                             </button>
                         </div>
 
-                        <div class="max-w-md mx-auto rounded-lg p-4 text-gray-900">
+                        <!-- Modal Content - Scrollable Area -->
+                        <div class="flex-1 p-8 overflow-y-auto">
                             <form wire:submit.prevent="submit">
-                                <!-- Attachment Type -->
-                                <div class="mb-6">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="attachment">ATTACHMENT TYPE <span class="text-red-500">*</span></label>
-                                    <select wire:model="attachment_id" id="attachment_id" name="attachment_id" required
-                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                        <option value="">Attachment Type</option>
-                                        @foreach($attachmentLists as $attachmentList)
-                                        <option value="{{ $attachmentList->id }}">{{ $attachmentList->attachment_name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('attachment_id')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                <!-- Horizontal Scrollable Container -->
+                                <div class="w-full overflow-x-auto pb-4">
+                                    <div class="flex flex-nowrap gap-4 min-w-full">
+                                        <!-- 1st Attachment - Request Letter Address to City Mayor-->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <p class="uppercase font-bold text-gray-900 text-sm">
+                                                {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Request Letter Address to City Mayor' }}
+                                                <span class="text-red-500">*</span>
+                                            </p>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('requestLetterAddressToCityMayor', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('requestLetterAddressToCityMayor', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="requestLetterAddressToCityMayor" required>
+                                                @error('requestLetterAddressToCityMayor')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                        <!-- 2nd attachment - Certificate of Indigency -->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <div class="mb-1">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Certificate of Indigency' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('certificateOfIndigency', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('certificateOfIndigency', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certificateOfIndigency" required>
+                                                @error('certificateOfIndigency')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                        <!-- 3rd attachment - Consent Letter (if the land is not theirs) -->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <div class="mb-1">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Consent Letter (if the land is not theirs)' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('consentLetterIfTheLandIsNotTheirs', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('consentLetterIfTheLandIsNotTheirs', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="consentLetterIfTheLandIsNotTheirs" required>
+                                                @error('consentLetterIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                        <!-- 4th attachment - Photocopy of ID from the Land Owner (if the land is not theirs)  -->
+                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                            <div class="mb-1">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Photocopy of ID from the Land Owner (if the land is not theirs) ' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                            </div>
+
+                                            <!-- File upload -->
+                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                const pond = FilePond.create($refs.input, {
+                                                    allowFileEncode: true,
+                                                    onprocessfilestart: () => { isUploading = true; },
+                                                    onprocessfile: (error, file) => { isUploading = false; },
+                                                    server: {
+                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                            @this.upload('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', file, load, error, progress);
+                                                        },
+                                                        revert: (fileName, load) => {
+                                                            @this.removeUpload('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', fileName, load);
+                                                        },
+                                                    },
+                                                });">
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" required>
+                                                @error('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
 
-                                <!-- Description -->
-                                <div class="mb-6">
-                                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Description:</label>
-                                    <textarea id="description" rows="4" name="description" wire:model="description"
-                                        class="block p-2.5 w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg"
-                                        placeholder="Please leave a comment..."></textarea>
-                                    @error('description')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                </div>
-                                <!-- File upload -->
-                                <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                    if (typeof FilePond !== 'undefined') {
-                                        FilePond.registerPlugin(FilePondPluginImagePreview);
-                                        const pond = FilePond.create($refs.input, {
-                                            allowFileEncode: true,
-                                            onprocessfilestart: () => { isUploading = true; },
-                                            onprocessfile: (error, file) => { isUploading = false; },
-                                            server: {
-                                                process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                    @this.upload('requestLetterAddressToCityMayor', file, load, error, progress);
-                                                },
-                                                revert: (fileName, load) => {
-                                                    @this.removeUpload('requestLetterAddressToCityMayor', fileName, load);
-                                                },
-                                            },
-                                        });
-                                    } else {
-                                        console.error('FilePond is not defined');
-                                    }
-                                ">
-                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="requestLetterAddressToCityMayor">
-                                    @error('requestLetterAddressToCityMayor')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                </div>
-                                <div>
-                                    <div class="alert"
-                                        :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
-                                        x-data="{ open:false, alert:{} }"
-                                        x-show="open" x-cloak
-                                        x-transition:enter="animate-alert-show"
-                                        x-transition:leave="animate-alert-hide"
-                                        @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
-                                        <div class="alert-wrapper">
-                                            <strong x-html="alert.title">Title</strong>
-                                            <p x-html="alert.message">Description</p>
-                                        </div>
-                                        <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
-                                    </div>
-                                    <!-- SUBMIT REQUIREMENTS Button -->
+                                <!-- Submit Button Section - Fixed at bottom -->
+                                <div class="mt-4">
                                     <button type="submit"
-                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                         <span class="text-[12px]">SUBMIT</span>
                                         <div wire:loading>
                                             <svg aria-hidden="true"
-                                                class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                                    fill="currentColor" />
-                                                <path
-                                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                                    fill="currentFill" />
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                      fill="currentColor"/>
+                                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                      fill="currentFill"/>
                                             </svg>
                                             <span class="sr-only">Loading...</span>
                                         </div>
                                     </button>
                                 </div>
-                                <script>
-                                    document.addEventListener('livewire.initialized', () => {
-                                        let obj = @json(session('alert') ?? []);
-                                        if (Object.keys(obj).length) {
-                                            Livewire.dispatch('alert', [obj])
-                                        }
-                                    })
-                                </script>
                             </form>
                         </div>
                     </div>
                 </div>
-
 
             </div>
         </div>
     </div>
 </div>
 
-<script>
+<!-- <script>
     // Initialize FilePond instance
     document.addEventListener('livewire:load', function() {
         FilePond.create(document.querySelector('.filepond'), {
@@ -527,7 +583,7 @@
             }
         });
     });
-</script>
+</script> -->
 <script>
     function fileUpload() {
         return {
