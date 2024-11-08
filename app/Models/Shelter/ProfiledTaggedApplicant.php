@@ -7,6 +7,7 @@ use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
 use App\Models\Shelter\ShelterLivingStatus;
+use App\Models\Shelter\ShelterSpouse;
 use App\Models\Religion;
 use App\Models\Tribe;
 use App\Models\Shelter\OriginOfRequest;
@@ -108,7 +109,6 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(OriginOfRequest::class, 'request_origin_id', 'id');
     }
-
     public function grantees(): HasMany
     {
         return $this->hasMany(Grantee::class);

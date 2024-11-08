@@ -10,6 +10,7 @@ use App\Models\Shelter\ShelterLivingStatus;
 use App\Models\LivingSituation;
 use App\Models\Religion;
 use App\Models\Shelter\ShelterApplicant;
+use App\Models\Shelter\ShelterApplicantSpouse;
 use App\Models\Tribe;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,6 +26,7 @@ class ProfiledTaggedApplicantFactory extends Factory
         static $tribeIds;
         static $shelterlivingStatusIds;
         static $caseSpecificationIds;
+        static $shelterSpouseIds;
 
         if (!$shelterApplicantIds) {
             $shelterApplicantIds = ShelterApplicant::pluck('id')->shuffle()->toArray();
@@ -68,6 +70,7 @@ class ProfiledTaggedApplicantFactory extends Factory
             'shelter_living_status_id' => $this->faker->randomElement($shelterlivingStatusIds),
             'case_specification_id' => $this->faker->optional()->randomElement($caseSpecificationIds),
             'living_situation_case_specification' => $this->faker->optional()->sentence,
+            'age' => $this->faker->numberBetween(1, 100),
             'sex' => $this->faker->randomElement(['Male', 'Female']),
             'occupation' => $this->faker->jobTitle,
             'year_of_residency' => $this->faker->numberBetween(1, 50),

@@ -13,7 +13,6 @@ class GranteeDocumentsSubmission extends Model
     protected $fillable = [
         'grantee_id',
         'attachment_id',
-        'description',
         'file_path',
         'file_name',
         'file_type',

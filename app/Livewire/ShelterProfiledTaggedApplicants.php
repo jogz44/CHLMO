@@ -42,11 +42,10 @@ class ShelterProfiledTaggedApplicants extends Component
     public $grantee_quantity = [];
     public $photo = [];
 
-    // File upload fields
-    public $isFilePondUploadComplete = false;
-    public $isFilePonduploading = false;
-    public $requestLetterAddressToCityMayor, $selectedGrantee, $files;
-    public $granteeToPreview, $isUploading = false;
+  // For uploading of files
+  public $isFilePondUploadComplete = false, $isFilePonduploading = false, $requestLetterAddressToCityMayor, $certificateOfIndigency, $consentLetterIfTheLandIsNotTheirs,
+  $photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs, $selectedGrantee, $files,
+  $granteeToPreview, $isUploading = false;
 
     public $attachment_id, $attachmentLists = [];
     public $description, $granteeId, $documents = [], $newFileImages = [];
@@ -264,8 +263,6 @@ protected function handleGrantingError(QueryException $e)
     ]);
 }
 
-
-
     public function resetForm(): void
     {
         $this->reset([
@@ -291,9 +288,10 @@ protected function handleGrantingError(QueryException $e)
     {
         $this->isFilePondUploadComplete = true;
         $this->validate([
-            'attachment_id' => 'required|exists:grantee_attachment_lists,id',
-            'description' => 'nullable|string|max:255',
             'requestLetterAddressToCityMayor' => 'required|file|max:10240',
+            'certificateOfIndigency' => 'required|file|max:10240',
+            'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
+            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
         ]);
     }
 
@@ -310,75 +308,43 @@ protected function handleGrantingError(QueryException $e)
             // Log the current IDs we're working with
             logger()->info('Starting submission with IDs', [
                 'grantee_id' => $this->granteeId,
-                'attachment_id' => $this->attachment_id,
+                // 'attachment_id' => $this->attachment_id,
             ]);
 
             $this->isFilePonduploading = false;
 
             // Validate inputs
             $validatedData = $this->validate([
-                'attachment_id' => 'required|exists:grantee_attachment_lists,id',
-                'description' => 'nullable|string|max:255',
-                'requestLetterAddressToCityMayor' => 'required|file|max:10240',
+            'requestLetterAddressToCityMayor' => 'required|file|max:10240',
+            'certificateOfIndigency' => 'required|file|max:10240',
+            'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
+            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
             ]);
 
             logger()->info('Validation passed', $validatedData);
 
-            // Process the file
-            $ext = $this->requestLetterAddressToCityMayor->getClientOriginalExtension();
-            $toSave = 'grantee_' . $this->granteeId . '_' . uniqid() . '.' . $ext;
-            $filePath = $this->requestLetterAddressToCityMayor->storeAs('documents', $toSave, 'grantee-photo-requirements');
+            // // Process the file
+            // $ext = $this->requestLetterAddressToCityMayor->getClientOriginalExtension();
+            // $toSave = 'grantee_' . $this->granteeId . '_' . uniqid() . '.' . $ext;
+            // $filePath = $this->requestLetterAddressToCityMayor->storeAs('documents', $toSave, 'grantee-photo-requirements');
 
-            // Prepare document data for storage
-            $documentData = [
-                'grantee_id' => $this->granteeId,
-                'attachment_id' => $this->attachment_id,
-                'description' => $this->description,
-                'file_path' => $filePath,
-                'file_name' => $this->requestLetterAddressToCityMayor->getClientOriginalName(),
-                'file_type' => $ext,
-                'file_size' => $this->requestLetterAddressToCityMayor->getSize(),
-            ];
+            // // Prepare document data for storage
+            // $documentData = [
+            //     'grantee_id' => $this->granteeId,
+            //     'attachment_id' => $this->attachment_id,
+            //     'description' => $this->description,
+            //     'file_path' => $filePath,
+            //     'file_name' => $this->requestLetterAddressToCityMayor->getClientOriginalName(),
+            //     'file_type' => $ext,
+            //     'file_size' => $this->requestLetterAddressToCityMayor->getSize(),
+            // ];
 
-            $savedDocument = GranteeDocumentsSubmission::create($documentData);
+            // $savedDocument = GranteeDocumentsSubmission::create($documentData);
 
-            if (!$savedDocument) {
-                throw new \Exception('Failed to save document record to database');
-            }
-
-            // Find the grantee - first log the query we're about to make
-            logger()->info('Searching for grantee with ID', ['id' => $this->granteeId]);
-
-            // Find the grantee directly by ID
-            $grantee = Grantee::findOrFail($this->granteeId);
-
-            logger()->info('Found grantee', [
-                'grantee_id' => $grantee->id,
-                'profiled_tagged_applicant_id' => $grantee->profiled_tagged_applicant_id
-            ]);
-
-            $updated = $grantee->update(['is_granted' => true]);
-
-            if (!$updated) {
-                throw new \Exception('Failed to update grantee status');
-            }
-
-            // Verify the update
-            $verifyUpdate = Grantee::where('id', $grantee->id)
-                ->where('is_granted', true)
-                ->exists();
-
-            if (!$verifyUpdate) {
-                throw new \Exception('Failed to verify grantee status update');
-            }
-
-            logger()->info('Successfully updated grantee status', [
-                'grantee_id' => $grantee->id,
-                'is_granted' => true
-            ]);
-
-            // Clear form
-            $this->resetUpload();
+            $this->storeAttachment('requestLetterAddressToCityMayor', 1);
+            $this->storeAttachment('certificateOfIndigency', 2);
+            $this->storeAttachment('consentLetterIfTheLandIsNotTheirs', 3);
+            $this->storeAttachment('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', 4);
 
             DB::commit();
 
@@ -403,10 +369,72 @@ protected function handleGrantingError(QueryException $e)
         }
     }
 
-    private function resetUpload(): void
+     /**
+     * Store individual attachment
+     */
+    private function storeAttachment($fileInput, $attachmentId): void
     {
-        $this->reset(['requestLetterAddressToCityMayor', 'description', 'attachment_id']);
-        $this->show = false;
+        $file = $this->$fileInput;
+        if ($file) {
+//            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+//            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->storeAs('documents', $fileName, 'grantee-photo-requirements');
+
+            GranteeDocumentsSubmission::create([
+                'grantee_id' => $this->granteeId,
+                'attachment_id' => $attachmentId,
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+                'file_type' => $file->extension(),
+                'file_size' => $file->getSize(),
+            ]);
+
+            logger()->info('Searching for grantee with ID', ['id' => $this->granteeId]);
+
+            $grantee = Grantee::findOrFail($this->granteeId);
+
+            logger()->info('Found grantee', [
+                'grantee_id' => $grantee->id,
+                'profiled_tagged_applicant_id' => $grantee->profiled_tagged_applicant_id
+            ]);
+
+            // $grantee->update(['is_granted' => true]);
+            Grantee::where('id', $this->granteeId)->update([
+                'is_granted' => true
+            ]);
+            logger()->info('The grantee is now granted', ['id' => $this->granteeId]);
+        }
+    }
+    private function handleError(string $message, \Exception $e = null): void
+    {
+        if ($e) {
+            logger()->error('Document submission failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        } else {
+            logger()->error('Document submission failed', ['error' => $message]);
+        }
+        $this->dispatch('alert', [
+            'title' => 'Error',
+            'message' => $message,
+            'type' => 'error'
+        ]);
+    }
+
+     private function resetUpload(): void
+    {
+        $this->reset([
+           'requestLetterAddressToCityMayor',
+            'certificateOfIndigency',
+            'consentLetterIfTheLandIsNotTheirs',
+            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs',
+            'attachment_id',
+        ]);
+
+        $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
+        $this->show = false;  // Close the modal or hide any UI related to uploads if needed
     }
 
     public function render()
