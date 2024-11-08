@@ -12,6 +12,7 @@ use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\TaggedAndValidatedApplicant;
+use App\Models\TransactionType;
 use App\Models\Tribe;
 use App\Models\WallType;
 use Illuminate\Support\Facades\Cache;
@@ -24,11 +25,13 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $isEditing = false, $isLoading = false;
 
     public $applicantForSpouse;
-    public $transaction_type_id, $transaction_type_name;
-    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [], $purok_id, $puroks = [];
+    public $transaction_type_id, $transactionTypes, $transaction_type_name;
+    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [], $purok_id, $puroks = [],
+            $date_applied;
+
 
     // New fields
-    public $full_address, $civil_status_id, $civil_statuses, $religion_id, $religions, $tribe_id, $tribes;
+    public $full_address, $civil_status_id, $civilStatuses, $religion_id, $religions, $tribe_id, $tribes;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
         $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $family_income, $tagging_date, $rent_fee, $landlord,
@@ -40,10 +43,8 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income;
 
     // Dependent's details
-    public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $images = [], $renamedFileName = [];
-    // Dependent's details
-//    public $dependents = [];
-//    public $images = [];
+    public $dependents = [], $dependent_civil_status_id, $dependent_civilStatuses, $renamedFileName = [];
+    public $images = [], $imagesForTagging = [];
     public $selectedImage = null; // This is for the tagging image
     public $selectedAttachment = null; // this is for the awarding attachment
 
@@ -55,22 +56,26 @@ class TaggedAndValidatedApplicantDetails extends Component
             'applicant.transactionType',
             'livingSituation',
             'caseSpecification',
+            'governmentProgram',
+            'livingStatus',
             'civilStatus',
             'tribe',
             'religion',
             'liveInPartner',
-            'spouse'
+            'spouse',
+            'roofType',
+            'wallType'
         ])->findOrFail($applicantId);
 
         $this->loadFormData();
     }
     public function loadFormData(): void
     {
-        $this->civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
+        $this->civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
         // For Dependents
-        $this->dependent_civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
+        $this->dependent_civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
         $this->tribes = Cache::remember('tribes', 60*60, function() {
@@ -100,10 +105,14 @@ class TaggedAndValidatedApplicantDetails extends Component
 
         // Applicant basic information
         $this->first_name = $this->taggedAndValidatedApplicant->applicant->first_name ?? '--';
+        $this->transactionTypes = TransactionType::all();
         $this->middle_name = $this->taggedAndValidatedApplicant->applicant->middle_name ?? '--';
         $this->last_name = $this->taggedAndValidatedApplicant->applicant->last_name ?? '--';
         $this->suffix_name = $this->taggedAndValidatedApplicant->applicant->suffix_name ?? '--';
         $this->contact_number = $this->taggedAndValidatedApplicant->applicant->contact_number ?? '--';
+        $this->transaction_type_id = $this->taggedAndValidatedApplicant?->applicant->transactionType?->transaction_type_id ?? '--';
+        $this->date_applied = optional($this->taggedAndValidatedApplicant->applicant->date_applied)
+            ->format('F d, Y') ?? '--';
         // Load Address Information - Store IDs instead of names
         $this->barangay_id = $this->taggedAndValidatedApplicant->applicant?->address?->barangay?->id;
         $this->purok_id = $this->taggedAndValidatedApplicant->applicant?->address?->purok?->id;
@@ -142,6 +151,58 @@ class TaggedAndValidatedApplicantDetails extends Component
                 'dependent_monthly_income' => $dependent->dependent_monthly_income,
             ];
         })->toArray();
+        $this->tagging_date = optional($this->taggedAndValidatedApplicant->tagging_date)
+            ->format('F d, Y') ?? '--';
+        $this->living_situation_id = $this->taggedAndValidatedApplicant?->livingSituation?->living_situation_id ?? null;
+        $this->livingSituations = LivingSituation::all();
+        // Load case specification data
+        if ($this->taggedAndValidatedApplicant?->livingSituation?->living_situation_id == 8) {
+            $this->case_specification_id = $this->taggedAndValidatedApplicant?->caseSpecification?->case_specification_id ?? null;
+        } else {
+            $this->living_situation_case_specification = $this->taggedAndValidatedApplicant?->living_situation_case_specification ?? '';
+        }
+        $this->caseSpecifications = CaseSpecification::all();
+
+        // government programs
+        $this->government_program_id = $this->taggedAndValidatedApplicant?->governmentProgram->government_program_id ?? '--';
+        $this->governmentPrograms = GovernmentProgram::all();
+
+        $this->living_status_id = $this->taggedAndValidatedApplicant?->living_status_id ?? '--';
+        $this->livingStatuses = LivingStatus::all();
+        if ($this->living_status_id == 1){
+            // Renting
+            $this->rent_fee = $this->taggedAndValidatedApplicant?->rent_fee ?? '--';
+            $this->landlord = $this->taggedAndValidatedApplicant?->landlord ?? '--';
+        } elseif ($this->living_status_id == 5){
+            // Just staying in someone's house
+            $this->house_owner = $this->taggedAndValidatedApplicant?->house_owner ?? '--';
+        }
+
+        $this->roof_type_id = $this->taggedAndValidatedApplicant?->roofType?->roof_type_id ?? '--';
+        $this->roofTypes = RoofType::all();
+
+        $this->wall_type_id = $this->taggedAndValidatedApplicant?->wallType?->wall_type_id ?? '--';
+        $this->wallTypes = WallType::all();
+
+        $this->remarks = $this->taggedAndValidatedApplicant?->remarks ?? '--';
+
+        $this->images = $this->taggedAndValidatedApplicant?->images ?? [];
+
+//        $this->imagesForTagging = $this->taggedAndValidatedApplicant?->flatMap(function ($taggedAndValidatedApplicant) {
+//            return $taggedAndValidatedApplicant->images()
+//                ->get()
+//                ->map(function ($submission) {
+//                    return $submission->file_name;
+//                })->filter();
+//        }) ?? collect();
+    }
+    public function viewImage($imageId): void
+    {
+        $this->selectedImage = $this->taggedAndValidatedApplicant->images->find($imageId);
+    }
+    public function closeImage(): void
+    {
+        $this->selectedImage = null;
     }
 
     public function toggleEdit(): void

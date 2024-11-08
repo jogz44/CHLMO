@@ -1686,7 +1686,7 @@
 
                                     </textarea>
                                     @error('living_situation_case_specification')
-                                    <span class="error text-red-600">{{ $message }}</span>
+                                        <span class="error text-red-600">{{ $message }}</span>
                                     @enderror
                                 </div>
                                 <div x-show="living_situation_id == 8">
@@ -1704,15 +1704,15 @@
                                     @enderror
                                 </div>
                             @else
-                                @if($taggedAndValidatedApplicant->living_situation_id == 8)
+                                @if($taggedAndValidatedApplicant->livingSituation->living_situation_id == 8)
                                     <textarea rows="2"
                                               disabled
-                                              class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($taggedApplicant->caseSpecification)->case_specification_name ?? '--' }}
+                                              class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($taggedAndValidatedApplicant->caseSpecification)->case_specification_name ?? '--' }}
                                     </textarea>
                                 @else
                                     <textarea rows="2"
                                               disabled
-                                              class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ $taggedApplicant->living_situation_case_specification ?? '--' }}
+                                              class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ $taggedAndValidatedApplicant->living_situation_case_specification ?? '--' }}
                                     </textarea>
                                 @endif
                             @endif
@@ -1756,7 +1756,7 @@
                                     @endforeach
                                 </select>
                                 @error('living_status_id')
-                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                                    <span class="text-red-500 text-xs">{{ $message }}</span>
                                 @enderror
                             @else
                                 <textarea rows="2"
