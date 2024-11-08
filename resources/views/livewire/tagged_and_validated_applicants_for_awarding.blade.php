@@ -223,8 +223,8 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
                                     @if(!$applicant->is_awarding_on_going)
-                                        <!-- Tagged and Validated Applicant details -->
-                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['taggedAndValidatedApplicantId' => $applicant->id]) }}'"
+                                        <!-- button to the -> Tagged and Validated Applicant details -->
+                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
                                                 class="text-custom-red text-bold underline px-4 py-1.5">
                                             Details
                                         </button>
@@ -242,7 +242,7 @@
                                         <!-- Award Pending Button (disabled) -->
                                         <div class="relative flex items-center space-x-2">
                                             <!-- Details Button -->
-                                            <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['taggedAndValidatedApplicantId' => $applicant->id]) }}'"
+                                            <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
                                                     class="text-custom-red text-bold underline px-4 py-1.5">
                                                 Details
                                             </button>
