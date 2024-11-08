@@ -168,7 +168,59 @@
                             </div>
                         </div>
 
-                        <h2 class="block text-[16px] font-semibold text-gray-700 mb-2 mt-2">SPOUSE MAIDEN NAME</h2>
+                        <h2 class="block text-[16px] font-semibold text-gray-700 mb-2 mt-2">PARTNER'S MAIDEN NAME</h2>
+                        <hr class="mb-2">
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_first_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    FIRST NAME</label>
+                                <input wire:model="partner_first_name"
+                                       type="text"
+                                       id="partner_first_name"
+                                       :disabled="!isEditable"
+                                       class="capitalize w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_middle_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    MIDDLE NAME</label>
+                                <input wire:model="partner_middle_name"
+                                       type="text"
+                                       id="partner_middle_name"
+                                       :disabled="!isEditable"
+                                       class="capitalize w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_last_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    LAST NAME</label>
+                                <input wire:model="partner_last_name"
+                                       type="text"
+                                       id="partner_last_name"
+                                       :disabled="!isEditable"
+                                       class="capitalize w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner-occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    OCCUPATION
+                                </label>
+                                <input wire:model="partner_occupation"
+                                       type="text"
+                                       id="partner_occupation"
+                                       :disabled="!isEditable"
+                                       class="capitalize w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_monthly_income" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    MONTHLY INCOME</label>
+                                <input wire:model="partner_monthly_income"
+                                       type="text"
+                                       id="partner_monthly_income"
+                                       name="partner_monthly_income"
+                                       :disabled="!isEditable"
+                                       class="capitalize w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            </div>
+                        </div>
+
+                        <h2 class="block text-[16px] font-semibold text-gray-700 mb-2 mt-4">SPOUSE MAIDEN NAME</h2>
                         <hr class="mb-2">
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/3 px-2 mb-4">
@@ -331,8 +383,9 @@
                             <!-- TODO - update this when you updated the adding of applicants to add a dropdown of transaction type -->
                             <div class="w-full md:w-1/3 px-2 mb-4 mt-5">
                                 <label for="livingStatus" class="block text-[13px] font-semibold mt-6 text-gray-700 mb-1">
-                                    TRANSACTION TYPE</label>
-                                <input type="text" id="livingStatus" name="livingStatus" :disabled="!isEditable"
+                                    TRANSACTION TYPE
+                                </label>
+                                <input wire:model="transaction_type" type="text" id="livingStatus" :disabled="!isEditable"
                                         class="capitalize w-full p-1 border-b text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
                         </div>
@@ -346,7 +399,6 @@
                                        :disabled="!isEditable"
                                        class="capitalize italic w-full p-3 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             </div>
-
                         </div>
                     </form>
                 </div>

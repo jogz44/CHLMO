@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             'last_name' => 'Cooper',
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => Hash::make('password'),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,

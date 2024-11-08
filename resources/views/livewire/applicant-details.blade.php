@@ -15,15 +15,14 @@
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                     <div class="flex space-x-2 z-[1000]">
-                        <div class="z-50">
+                        <div class="z-[2000]">
                             <div class="alert"
                                  :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                  x-data="{ open:false, alert:{} }"
                                  x-show="open" x-cloak
                                  x-transition:enter="animate-alert-show"
                                  x-transition:leave="animate-alert-hide"
-                                 @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
-                            >
+                                 @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
                                 <div class="alert-wrapper">
                                     <strong x-html="alert.title">Title</strong>
                                     <p x-html="alert.message">Description</p>
@@ -98,23 +97,42 @@
                     <div x-data="{ civilStatus: '' }">
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="barangay" class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY <small class="text-red-500">(read only)</small></label>
-                                <input wire:model="barangay" id="barangay" name="barangay" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                <label for="barangay" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    BARANGAY <small class="text-red-500">(read only)</small>
+                                </label>
+                                <input wire:model="barangay"
+                                       id="barangay"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
                                 @error('barangay') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK <small class="text-red-500">(read only)</small></label>
-                                <input wire:model="purok" id="purok" name="purok" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    PUROK <small class="text-red-500">(read only)</small>
+                                </label>
+                                <input wire:model="purok"
+                                       id="purok"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
                                 @error('purok') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="full_address" class="block text-[12px] font-medium text-gray-700 mb-1">FULL ADDRESS</label>
-                                <input wire:model="full_address" type="text" id="full_address" name="full_address" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                <label for="full_address"
+                                       class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    FULL ADDRESS
+                                </label>
+                                <input wire:model="full_address"
+                                       type="text"
+                                       id="full_address"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                                 @error('full_address') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="civil_status" class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
-                                <select x-model="civilStatus" id="civil_status" name="civil_status" wire:model="civil_status_id"
+                                <label for="civil_status"
+                                       class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    CIVIL STATUS <span class="text-red-500">*</span>
+                                </label>
+                                <select x-model="civilStatus"
+                                        wire:model="civil_status_id"
+                                        id="civil_status"
                                         class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Status</option>
                                     @foreach($civil_statuses as $status)
@@ -127,16 +145,24 @@
 
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT NUMBER <small class="text-red-500">(read only)</small></label>
-                                <input wire:model="contact_number" type="text" id="contact_number" name="contact_number"
+                                <label for="contact_number" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    CONTACT NUMBER <small class="text-red-500">(read only)</small>
+                                </label>
+                                <input wire:model="contact_number"
+                                       type="text"
+                                       id="contact_number"
                                        required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default"
                                        readonly oninput="validateNumberInput(this)">
                                 @error('contact_number') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="tribe" class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                                <select wire:model="tribe_id" id="tribe" name="tribe"
-                                        required class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
+                                <label for="tribe" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    TRIBE/ETHNICITY <span class="text-red-500">*</span>
+                                </label>
+                                <select wire:model="tribe_id"
+                                        id="tribe"
+                                        required
+                                        class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
                                     <option value="">Select Tribe/Ethnicity</option>
                                     @foreach($tribes as $tribe)
                                         <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
@@ -145,29 +171,51 @@
                                 @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">SEX <span class="text-red-500">*</span></label>
+                                <label for="sex" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    SEX <span class="text-red-500">*</span>
+                                </label>
                                 <div class="flex items-center">
                                     <div class="mr-6">
-                                        <input type="radio" wire:model="sex" value="Male" id="male" class="mr-2" required>
+                                        <input type="radio"
+                                               wire:model="sex"
+                                               value="Male"
+                                               id="male"
+                                               class="mr-2"
+                                               required>
                                         <label for="male" class="cursor-pointer">Male</label>
                                     </div>
                                     <div>
-                                        <input type="radio" wire:model="sex" value="Female" id="female" class="mr-2" required>
+                                        <input type="radio"
+                                               wire:model="sex"
+                                               value="Female"
+                                               id="female"
+                                               class="mr-2"
+                                               required>
                                         <label for="female" class="cursor-pointer">Female</label>
                                     </div>
                                     @error('sex') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">DATE OF BIRTH <span class="text-red-500">*</span></label>
-                                <input wire:model="date_of_birth" type="date" id="date_of_birth" name="date_of_birth" required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <label for="date_of_birth" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    DATE OF BIRTH <span class="text-red-500">*</span>
+                                </label>
+                                <input wire:model="date_of_birth"
+                                       type="date"
+                                       id="date_of_birth"
+                                       name="date_of_birth"
+                                       required
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 @error('date_of_birth') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                         </div>
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
-                                <select wire:model="religion_id" id="religion" name="religion"
+                                <label for="religion" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    RELIGION
+                                </label>
+                                <select wire:model="religion_id"
+                                        id="religion"
                                         class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                     <option value="">Select Religion</option>
                                     @foreach($religions as $religion)
@@ -178,14 +226,19 @@
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="occupation"
-                                       class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <small>(Put N/A if none)</small> <span class="text-red-500">*</span></label>
-                                <input type="text" id="occupation" name="occupation" wire:model="occupation"
+                                       class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    OCCUPATION <small>(Put N/A if none)</small> <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                       id="occupation"
+                                       wire:model="occupation"
                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                                 @error('occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                    MONTHLY INCOME <span class="text-red-500">*</span></label>
+                                    MONTHLY INCOME <span class="text-red-500">*</span>
+                                </label>
                                 <input type="number" id="monthly_income" wire:model="monthly_income"
                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)"
                                        oninput="validateNumberInput(this)">
@@ -193,7 +246,8 @@
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="family_income" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                    FAMILY INCOME <span class="text-red-500">*</span></label>
+                                    FAMILY INCOME <span class="text-red-500">*</span>
+                                </label>
                                 <input type="number" id="family_income" wire:model="family_income"
                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)"
                                        oninput="validateNumberInput(this)">
@@ -204,38 +258,110 @@
                         <template x-if="civilStatus === '2'">
                             <div>
                                 <hr class="mt-2 mb-2 ">
+                                <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            FIRST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_first_name"
+                                               wire:model="partner_first_name"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            MIDDLE NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_middle_name"
+                                               wire:model="partner_middle_name"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            LAST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_last_name"
+                                               wire:model="partner_last_name"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_occupation" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            OCCUPATION <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text"
+                                               id="partner_occupation"
+                                               wire:model="partner_occupation"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        @error('partner_occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="w-full md:w-1/3 px-2 mb-4">
+                                        <label for="partner_monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            MONTHLY INCOME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number"
+                                               id="partner_monthly_income"
+                                               wire:model="partner_monthly_income"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="validateNumberInput(this)">
+                                        @error('spouse_monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template x-if="civilStatus === '3'">
+                            <div>
+                                <hr class="mt-2 mb-2 ">
                                 <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
                                 <div class="flex flex-wrap -mx-2">
                                     <div class="w-full md:w-1/3 px-2 mb-4">
                                         <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            FIRST NAME <span class="text-red-500">*</span></label>
-                                        <input type="text" id="spouse_first_name" name="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                            FIRST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                                         @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
                                         <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            MIDDLE NAME <span class="text-red-500">*</span></label>
-                                        <input type="text" id="spouse_middle_name" name="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                            MIDDLE NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                                         @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
                                         <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            LAST NAME <span class="text-red-500">*</span></label>
-                                        <input type="text" id="spouse_last_name" name="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                            LAST NAME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                                         @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
 
                                     <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="spouse_occupation" class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
-                                        <input type="text" id="spouse_occupation" name="spouse_occupation" wire:model="spouse_occupation"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        <label for="spouse_occupation" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            OCCUPATION <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="spouse_occupation"
+                                               wire:model="spouse_occupation"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('spouse_occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="spouse_monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">MONTHLY
-                                            INCOME <span class="text-red-500">*</span></label>
-                                        <input type="text" id="spouse_monthly_income" name="spouse_monthly_income" wire:model="spouse_monthly_income"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        <label for="spouse_monthly_income" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                            MONTHLY INCOME <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="number"
+                                               id="spouse_monthly_income"
+                                               wire:model="spouse_monthly_income"
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="validateNumberInput(this)">
                                         @error('spouse_monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                 </div>

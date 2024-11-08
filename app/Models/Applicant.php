@@ -13,18 +13,8 @@ class Applicant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'transaction_type_id',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'suffix_name',
-        'contact_number',
-        'date_applied',
-        'initially_interviewed_by',
-        'address_id',
-        'applicant_id',
-        'is_tagged',
+        'user_id', 'transaction_type_id', 'first_name', 'middle_name', 'last_name', 'suffix_name', 'contact_number', 'date_applied',
+        'initially_interviewed_by', 'address_id', 'applicant_id', 'is_tagged',
     ];
 
     protected $casts = [
