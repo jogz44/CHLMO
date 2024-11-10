@@ -62,8 +62,6 @@ class Applicants extends Component
         $this->resetPage();
         $this->search = '';
     }
-
-
     public function mount()
     {
 //        dd('Component mounted');
