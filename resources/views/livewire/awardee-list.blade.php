@@ -90,71 +90,196 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($awardees as $awardee)
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->last_name ?? 'N/A' }}, {{ $awardee->taggedAndValidatedApplicant->applicant->first_name ?? 'N/A' }} {{ $awardee->taggedAndValidatedApplicant->applicant->middle_name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot->lot_name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
-                                    <!-- Animated Confetti -->
-                                    <div class="flex items-center">
-                                        @if($awardee->is_awarded)
-                                            Awarded
-                                            <span class="ml-1">
-                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                <lord-icon
-                                                        src="https://cdn.lordicon.com/fkmafinl.json"
-                                                        trigger="loop"
-                                                        delay="2000"
-                                                        style="width: 30px; height: 30px">
-                                                </lord-icon>
-                                            </span>
-                                        @else
-                                            <span class="text-red-500">Pending...</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap">
-                                    @if(!$awardee->is_awarded)
-                                        <button disabled class="text-gray-400 text-bold underline px-4 py-1.5 cursor-not-allowed">
-                                            Details
-                                        </button>
-                                        <button disabled class="bg-gray-400 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
-                                            Transfer
-                                        </button>
-                                    @else
-                                        <button @click="window.location.href = '{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"
-                                                class="text-custom-red text-bold underline px-4 py-1.5">
-                                            Details
-                                        </button>
-                                        @if ($awardee->is_blacklisted)
-                                            <button disabled class="bg-gray-300 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
+                            @foreach($awardees as $awardee)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->last_name ?? 'N/A' }}, {{ $awardee->taggedAndValidatedApplicant->applicant->first_name ?? 'N/A' }} {{ $awardee->taggedAndValidatedApplicant->applicant->middle_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->purok->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot->lot_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
+                                        <!-- Animated Confetti -->
+                                        <div class="flex items-center">
+                                            @if($awardee->is_awarded)
+                                                Awarded
+                                                <span class="ml-1">
+                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                    <lord-icon
+                                                            src="https://cdn.lordicon.com/fkmafinl.json"
+                                                            trigger="loop"
+                                                            delay="2000"
+                                                            style="width: 30px; height: 30px">
+                                                    </lord-icon>
+                                                </span>
+                                            @else
+                                                <span class="text-red-500">Pending...</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap">
+                                        @if(!$awardee->is_awarded)
+                                            <button
+                                                    disabled
+                                                    class="text-gray-400 text-bold underline px-4 py-1.5 cursor-not-allowed">
+                                                Details
+                                            </button>
+                                            <button
+                                                    disabled
+                                                    class="bg-gray-400 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
                                                 Transfer
                                             </button>
                                         @else
-                                            <button @click="window.location.href = '{{ route('transfer-awardee') }}'" class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">
-                                                Transfer
+                                            <button @click="window.location.href = '{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"
+                                                    class="text-custom-red text-bold underline px-4 py-1.5">
+                                                Details
                                             </button>
+                                            @if ($awardee->is_blacklisted)
+                                                <button disabled class="bg-gray-300 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
+                                                    Transfer
+                                                </button>
+                                            @else
+{{--                                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"--}}
+{{--                                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">--}}
+{{--                                                    Transfer--}}
+{{--                                                </button>--}}
+                                                <button @click="$wire.openTransferModal({{ $awardee->id }})"
+                                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">
+                                                    Transfer
+                                                </button>
+                                            @endif
                                         @endif
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                     <div class="mt-4">
                         {{ $awardees->links() }}
                     </div>
 
+                    <!-- First Modal - Dependent Selection -->
+                    <div x-show="$wire.showTransferModal"
+                         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center overflow-y-auto"
+                         x-cloak>
+                        <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 my-8">
+                            <h2 class="text-xl font-bold mb-4">Transfer Award</h2>
+
+                            @if(count($eligibleDependents) > 0)
+                                <p class="mb-4">Please select the eligible dependent to transfer the award to:</p>
+
+                                <div class="max-h-[60vh] overflow-y-auto">
+                                    <div class="space-y-4">
+                                        @foreach($eligibleDependents as $dependent)
+                                            <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
+                                                 wire:click="confirmTransfer({{ $dependent->id }})">
+                                                <div class="font-semibold">
+                                                    {{ $dependent->dependent_last_name }}, {{ $dependent->dependent_first_name }} {{ $dependent->dependent_middle_name }}
+                                                </div>
+                                                <div class="text-sm text-gray-600">
+                                                    Relationship: {{ $dependent->dependent_relationship }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-red-600">No eligible dependents found for this awardee.</p>
+                            @endif
+
+                            <div class="mt-6 flex justify-end space-x-3 border-t pt-4">
+                                <button
+                                        wire:click="$set('showTransferModal', false)"
+                                        class="px-4 py-2 border rounded hover:bg-gray-100 transition duration-150">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Second Modal - Confirmation -->
+                    <div x-show="$wire.showConfirmationModal"
+                         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                         x-cloak>
+                        <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+                            <h2 class="text-xl font-bold mb-4">Confirm Award Transfer</h2>
+
+                            @if($selectedDependent)
+                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <!-- Warning Icon -->
+                                            <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm text-yellow-700">
+                                                This action will transfer the award to:
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                    <p class="font-medium">{{ $selectedDependent->dependent_last_name }}, {{ $selectedDependent->dependent_first_name }} {{ $selectedDependent->dependent_middle_name }}</p>
+                                    <p class="text-sm text-gray-600">Relationship: {{ $selectedDependent->dependent_relationship }}</p>
+                                </div>
+
+                                <p class="mb-4 text-gray-600">
+                                    This action cannot be undone. The current awardee's record will be updated and a new award record will be created for the selected dependent.
+                                </p>
+                            @endif
+
+                            <div class="mt-6 flex justify-end space-x-3 border-t pt-4">
+                                <button
+                                        wire:click="cancelTransfer"
+                                        class="px-4 py-2 border rounded hover:bg-gray-100 transition duration-150">
+                                    Cancel
+                                </button>
+                                <div>
+                                    <div class="alert"
+                                         :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
+                                         x-data="{ open:false, alert:{} }"
+                                         x-show="open" x-cloak
+                                         x-transition:enter="animate-alert-show"
+                                         x-transition:leave="animate-alert-hide"
+                                         @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
+                                        <div class="alert-wrapper">
+                                            <strong x-html="alert.title">Title</strong>
+                                            <p x-html="alert.message">Description</p>
+                                        </div>
+                                        <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
+                                    </div>
+                                    <button
+                                            wire:click="proceedWithTransfer"
+                                            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-150">
+                                        Confirm Transfer
+                                        <div wire:loading>
+                                            <svg aria-hidden="true"
+                                                 class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                 viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                        d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                        fill="currentColor" />
+                                                <path
+                                                        d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                        fill="currentFill" />
+                                            </svg>
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Modal Background -->
                     <div x-show="openModalTransfer"
                          class="fixed inset-0 flex z-50 items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
                          x-cloak>
-                        <!-- Modal -->
+                        <!-- Modal -->Tr
                         <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto scrollbar-hide">
                             <!-- Modal Header -->
                             <div class="flex justify-between items-center mb-2">
