@@ -218,7 +218,7 @@
                                     {{ $transfer->remarks }}
                                 </td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">
-                                    {{ $transfer->previousAwardee->lot->lot_name }}
+                                    {{ $transfer->previousAwardee->relocationLot->relocation_site_name }}
                                 </td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">
                                     {{ $transfer->transfer_reason }}
