@@ -82,7 +82,7 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Applicant</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Purok</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Barangay</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Relocation Site</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot Size</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Grant Date</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
@@ -96,7 +96,7 @@
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->last_name ?? 'N/A' }}, {{ $awardee->taggedAndValidatedApplicant->applicant->first_name ?? 'N/A' }} {{ $awardee->taggedAndValidatedApplicant->applicant->middle_name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->purok->name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->barangay->name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot->lot_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->relocationLot->relocation_site_name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">

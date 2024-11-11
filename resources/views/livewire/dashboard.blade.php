@@ -8,20 +8,6 @@
                 @endforeach
             </select>
         </div>
-
-{{--        <div class="flex items-center space-x-2">--}}
-{{--            <label for="barangay" class="text-[13px] font-medium">Barangay:</label>--}}
-{{--            <select id="barangay" class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">--}}
-{{--                <option value="barangay1">Barangay 1</option>--}}
-{{--                <option value="barangay2">Barangay 2</option>--}}
-{{--                <option value="barangay3">Barangay 3</option>--}}
-{{--                <option value="barangay4">Barangay 4</option>--}}
-{{--            </select>--}}
-{{--        </div>--}}
-
-{{--        <button class="bg-green-700 hover:bg-green-500 text-white text-[13px] font-medium py-2 px-6 rounded-lg">--}}
-{{--            Filter--}}
-{{--        </button>--}}
     </div>
     <div class="grid grid-cols-4 gap-10 mb-12">
         <a href="{{ route('awardee-list') }}">
