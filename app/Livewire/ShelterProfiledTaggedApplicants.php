@@ -131,8 +131,8 @@ class ShelterProfiledTaggedApplicants extends Component
         $material = Material::with(['purchaseOrder', 'materialUnit'])->find($this->materials[$index]['material_id']);
         if ($material) {
             $this->materials[$index]['quantity'] = $material->quantity;
-            $this->materials[$index]['material_unit_id'] = $material->material_unit_id; // Use the actual unit name
-            $this->materials[$index]['purchase_order_id'] = $material->purchase_order_id; // Use the actual PO number
+            $this->materials[$index]['material_unit_id'] = $material->material_unit_id; 
+            $this->materials[$index]['purchase_order_id'] = $material->purchase_order_id; 
         }
     }
     
