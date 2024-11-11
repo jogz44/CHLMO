@@ -47,8 +47,8 @@ Route::middleware([
     })->name('dashboard');
 
     // GET Requests
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/get-puroks/{barangay}', [PurokController::class, 'getPuroks']);
+//    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+//    Route::get('/get-puroks/{barangay}', [PurokController::class, 'getPuroks']);
 
     Route::get('/activity-logs', function () {
         return view('activity-logs');
