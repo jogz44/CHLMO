@@ -11,7 +11,7 @@ class TransferHistories extends Component
     {
         $transfers = AwardeeTransferHistory::with([
             'previousAwardee.taggedAndValidatedApplicant',
-            'previousAwardee.lot',
+            'previousAwardee.relocationLot',
             'processor'
         ])->latest()->paginate(5);
 

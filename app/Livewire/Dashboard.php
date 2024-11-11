@@ -9,11 +9,7 @@ use Livewire\Component;
 
 class Dashboard extends Component
 {
-    public $years = [];
-    public $selectedYear;
-    public $totalAwardees;
-    public $totalApplicants = 0;
-    public $monthlyApplicants = [];
+    public $years = [], $selectedYear, $totalAwardees, $totalApplicants = 0, $monthlyApplicants = [];
 
     public function mount()
     {

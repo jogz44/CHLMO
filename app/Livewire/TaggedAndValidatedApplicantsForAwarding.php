@@ -12,6 +12,7 @@ use App\Models\LivingSituation;
 use App\Models\LotList;
 use App\Models\LotSizeUnit;
 use App\Models\Purok;
+use App\Models\RelocationSite;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
@@ -45,8 +46,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $occupation, $monthly_income, $transaction_type;
 
     // For awarding modal
-    public $grant_date, $taggedAndValidatedApplicantId, $purok_id, $puroks = [], $barangay_id, $barangays = [], $lot_id,
-        $lots = [], $lot_size, $lot_size_unit_id, $lotSizeUnits = [];
+    public $grant_date, $taggedAndValidatedApplicantId, $purok_id, $puroks = [], $barangay_id, $barangays = [], $relocation_lot_id,
+        $relocationSites = [], $lot_size, $lot_size_unit_id, $lotSizeUnits = [];
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $letterOfIntent, $votersID, $validID,
@@ -80,11 +81,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public function mount(): void
     {
-//        $viaRequest = TransactionType::where('type_name', 'Request')->first();
-//        if ($viaRequest) {
-//            $this->transaction_type_id = $viaRequest->id; // This can still be used internally for further logic if needed
-//            $this->transaction_type_name = $viaRequest->type_name; // Set the name to display
-//        }
         $this->tagging_date = now()->toDateString();
 
         // Initialize filter options
@@ -108,10 +104,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->grant_date = now()->toDateString(); // YYYY-MM-DD format
 
         // Initialize dropdowns
+        $this->relocationSites = RelocationSite::all(); // Fetch all relocation sites
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
-        // Fetch related LotSizeUnits
-        $this->lots = LotList::all(); // Fetch all lot size units
         $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
 
         // Fetch attachment types for the dropdown
@@ -132,17 +127,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         // Fetch the puroks based on the selected barangay
         $this->puroks = Purok::where('barangay_id', $barangayId)->get();
-        $this->lots = LotList::where('barangay_id', $barangayId)->get();
-
         $this->purok_id = null; // Reset selected purok when barangay changes
-        $this->lot_id = null; // Reset selected lot when barangay changes
-
         $this->isLoading = false; // Reset loading state
-
         logger()->info('Retrieved Puroks', [
             'barangay_id' => $barangayId,
-            'puroks' => $this->puroks,
-            'lots' => $this->lots
+            'puroks' => $this->puroks
         ]);
     }
     public function updatedSelectedBarangayId($barangayId): void
@@ -161,9 +150,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         return [
             // For Awarding Modal
             'grant_date' => 'required|date',
+            'relocation_lot_id' => 'required|exists:relocation_sites,id',
             'barangay_id' => 'required|exists:barangays,id',
             'purok_id' => 'required|exists:puroks,id',
-            'lot_id' => 'required|exists:lot_lists,id',
             'lot_size' => 'required|numeric',
             'lot_size_unit_id' => 'required|exists:lot_size_units,id',
         ];
@@ -182,8 +171,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         // Create the new awardee record and get the ID of the newly created awardee
         $awardee = Awardee::create([
             'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
+            'relocation_lot_id' => $this->relocation_lot_id,
             'address_id' => $address->id,
-            'lot_id' => $this->lot_id,
             'lot_size' => $this->lot_size,
             'lot_size_unit_id' => $this->lot_size_unit_id,
             'grant_date' => $this->grant_date,
@@ -218,7 +207,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date',
+            'relocation_lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date',
         ]);
     }
 

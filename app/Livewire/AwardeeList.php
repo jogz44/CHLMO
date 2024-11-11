@@ -74,118 +74,6 @@ class AwardeeList extends Component
 
         $this->eligibleDependents = $awardee->taggedAndValidatedApplicant->dependents;
     }
-//    public function transferAward($dependentId): void
-//    {
-//        // Implement your award transfer logic here
-//        // For example:
-//        // 1. Update the current awardee's status
-//        // 2. Create a new awardee record for the dependent
-//        // 3. Transfer all relevant records and relationships
-//
-//        try {
-//            DB::beginTransaction();
-//
-//            // Log the start of the process
-//            logger()->info('Starting DB transaction', [
-//                'dependentId' => $dependentId,
-//                'awardeeId' => $this->selectedAwardeeId
-//            ]);
-//
-//            // Get the current awardee with all necessary relationships
-//            $currentAwardee = Awardee::with([
-//                'taggedAndValidatedApplicant.dependents',
-//                'address',
-//                'lot',
-//                'lotSizeUnit'
-//            ])->findOrFail($this->selectedAwardeeId);
-//
-//            logger()->info('Current awardee loaded', [
-//                'awardee_id' => $currentAwardee->id
-//            ]);
-//
-//            // Get the dependent
-//            $dependent = $currentAwardee->taggedAndValidatedApplicant->dependents()
-//                ->where('id', $dependentId)
-//                ->firstOrFail();
-//
-//            logger()->info('Dependent found', [
-//                'dependent_id' => $dependent->id
-//            ]);
-//
-//            // Create a blacklist record to mark the awardee as deceased
-//            $blacklist = new Blacklist([
-//                'awardee_id' => $currentAwardee->id,
-//                'user_id' => auth()->id(),
-//                'blacklist_reason_description' => 'Deceased - Award transferred to ' . $dependent->dependent_first_name . ' ' . $dependent->dependent_last_name,
-//                'date_blacklisted' => now(),
-//                'updated_by' => auth()->id()
-//            ]);
-//            // Save the blacklist record
-//            $blacklist->save();
-//
-//            logger()->info('Blacklist record created');
-//
-//            $currentAwardee->update([
-//                'is_blacklisted' => true
-//            ]);
-//
-//            logger()->info('Current awardee updated');
-//
-//            $newAwardee = Awardee::create([
-//                'tagged_and_validated_applicant_id' => $currentAwardee->taggedAndValidatedApplicant->id,
-//                'address_id' => $currentAwardee->address_id,
-//                'lot_id' => $currentAwardee->lot_id,
-//                'lot_size' => $currentAwardee->lot_size,
-//                'lot_size_unit_id' => $currentAwardee->lot_size_unit_id,
-//                'grant_date' => now(),
-//                'is_awarded' => true,
-//                'is_blacklisted' => false
-//            ]);
-//
-//            logger()->info('New awardee created', ['new_awardee_id' => $newAwardee->id]);
-//
-//            $transferHistory = AwardeeTransferHistory::create([
-//                'previous_awardee_id' => $currentAwardee->id,
-//                'new_awardee_id' => $newAwardee->id,
-//                'transfer_date' => now(),
-//                'transfer_reason' => 'Death of previous awardee',
-//                'relationship' => $dependent->dependent_relationship,
-//                'processed_by' => auth()->id(),
-//                'remarks' => 'Award transferred due to death of original awardee'
-//            ]);
-//
-//            logger()->info('Transfer history created', ['history_id' => $transferHistory->id]);
-//
-//            DB::commit();
-//            logger()->info('Transaction committed successfully');
-//
-////            $this->showTransferModal = false;
-////            $this->reset(['selectedAwardeeId', 'eligibleDependents']);
-//
-//            // success message here
-//            $this->dispatch('alert', [
-//                'title' => 'Award Transferred successfully!',
-//                'message' => '<br><small>'. now()->calendar() .'</small>',
-//                'type' => 'success'
-//            ]);
-//        } catch (\Exception $e) {
-//            DB::rollBack();
-//            logger()->error('Transfer failed', [
-//                'error' => $e->getMessage(),
-//                'line' => $e->getLine(),
-//                'file' => $e->getFile(),
-//                'trace' => $e->getTraceAsString()
-//            ]);
-//
-//            throw $e; // Re-throw to be caught by the caller
-//        }
-//
-//        $this->showTransferModal = false;
-//        $this->reset(['selectedAwardeeId', 'eligibleDependents']);
-//
-//        // Show success message
-//        session()->flash('message', 'Award transferred successfully.');
-//    }
 
     public function transferAward($dependentId): void
     {
@@ -249,7 +137,7 @@ class AwardeeList extends Component
     public function render()
     {
         $awardees = Awardee::with([
-            'taggedAndValidatedApplicant', 'address', 'lot', 'lotSizeUnit'
+            'taggedAndValidatedApplicant', 'address', 'relocationLot', 'lotSizeUnit'
         ])->orderBy('created_at', 'desc')->paginate( 10);
 
         return view('livewire.awardee-list', [

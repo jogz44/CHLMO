@@ -67,7 +67,7 @@ class AwardeeDetails extends Component
             'taggedAndValidatedApplicant.dependents',
             'address.purok',
             'address.barangay',
-            'lot',
+            'relocationLot',
             'lotSizeUnit',
             'blacklist'
         ])->findOrFail($applicantId);
@@ -240,7 +240,7 @@ class AwardeeDetails extends Component
         // Validate the input data
         $this->validate();
 
-        // Check if the user has provided the correct password
+//        // Check if the user has provided the correct password
 //        if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
 //            $this->blacklistError = 'Incorrect password';
 //            return;
