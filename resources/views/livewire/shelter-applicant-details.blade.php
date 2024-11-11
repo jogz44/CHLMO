@@ -14,16 +14,15 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                        <div class="flex space-x-2 z-[1000]">
+                    <div class="flex space-x-2 z-[1000]">
                         <div class="z-50">
                             <div class="alert mt-14"
-                                 :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
-                                 x-data="{ open:false, alert:{} }"
-                                 x-show="open" x-cloak
-                                 x-transition:enter="animate-alert-show"
-                                 x-transition:leave="animate-alert-hide"
-                                 @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]"
-                            >
+                                :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                x-data="{ open:false, alert:{} }"
+                                x-show="open" x-cloak
+                                x-transition:enter="animate-alert-show"
+                                x-transition:leave="animate-alert-hide"
+                                @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
                                 <div class="alert-wrapper">
                                     <strong x-html="alert.title">Title</strong>
                                     <p x-html="alert.message">Description</p>
@@ -32,18 +31,18 @@
                             </div>
                             <!-- SUBMIT Button -->
                             <button type="submit"
-                                    class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
+                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
                                 SUBMIT
                                 <div wire:loading>
                                     <svg aria-hidden="true"
-                                         class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                         viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                        viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path
-                                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                                fill="currentColor" />
+                                            d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                            fill="currentColor" />
                                         <path
-                                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                                fill="currentFill" />
+                                            d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                            fill="currentFill" />
                                     </svg>
                                     <span class="sr-only">Loading...</span>
                                 </div>
@@ -52,7 +51,7 @@
                         <script>
                             document.addEventListener('livewire.initialized', () => {
                                 let obj = @json(session('alert') ?? []);
-                                if (Object.keys(obj).length){
+                                if (Object.keys(obj).length) {
                                     Livewire.dispatch('alert', [obj])
                                 }
                             })
@@ -116,8 +115,14 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="requestDate" class="block text-[13px] font-medium text-gray-700 mb-1">REQUEST DATE</label>
-                            <input type="date" wire:model="request_date" id="requestDate" name="requestDate"
+                            <input type="date" wire:model="date_request" id="requestDate" name="requestDate"
                                 class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" readonly>
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="taggedDate" class="block text-[13px] font-medium text-gray-700 mb-1">DATE PROFILED/TAGGED</label>
+                            <input type="date" id="taggedDate" name="taggedDate" wire:model="date_tagged" max="{{ date('Y-m-d') }}"
+                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @error('date_tagged') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                     </div>
                 </div>
@@ -174,74 +179,73 @@
                         </div>
                     </div>
 
-                    
-                    <template x-if="civilStatus === '2'">
-                            <div class="bg-gray-100 p-2 mb-4">
-                                <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
-                                <div class="flex flex-wrap -mx-2">
-                                    <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="partner_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            FIRST NAME <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text"
-                                               id="partner_first_name"
-                                               wire:model="partner_first_name"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
-                                        @error('partner_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            MIDDLE NAME <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text"
-                                               id="partner_middle_name"
-                                               wire:model="partner_middle_name"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
-                                        @error('partner_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="partner_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            LAST NAME <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text"
-                                               id="partner_last_name"
-                                               wire:model="partner_last_name"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
-                                        @error('partner_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
 
-                        <template x-if="civilStatus === '3'">
-                            <div>
-                                <hr class="mt-2 mb-2 ">
-                                <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
-                                <div class="flex flex-wrap -mx-2">
-                                    <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            FIRST NAME <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
-                                        @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            MIDDLE NAME <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
-                                        @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="w-full md:w-1/3 px-2 mb-4">
-                                        <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                            LAST NAME <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
-                                        @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                                    </div>
+                    <template x-if="civilStatus === '2'">
+                        <div class="bg-gray-100 p-2 mb-4">
+                            <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
+                            <div class="flex flex-wrap -mx-2">
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="partner_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        FIRST NAME <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text"
+                                        id="partner_first_name"
+                                        wire:model="partner_first_name"
+                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                    @error('partner_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        MIDDLE NAME <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text"
+                                        id="partner_middle_name"
+                                        wire:model="partner_middle_name"
+                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                    @error('partner_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="partner_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        LAST NAME <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text"
+                                        id="partner_last_name"
+                                        wire:model="partner_last_name"
+                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                    @error('partner_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-                        </template>
+                        </div>
+                    </template>
+
+                    <template x-if="civilStatus === '3'">
+                        <div class="bg-gray-100 p-2 mb-4">
+                            <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
+                            <div class="flex flex-wrap -mx-2">
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        FIRST NAME <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                    @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        MIDDLE NAME <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                    @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                        LAST NAME <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                    @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </template>
 
 
                     <div class="flex flex-wrap -mx-2">
@@ -314,7 +318,8 @@
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                     </div>
-                    <div class="flex flex-wrap -mx-2">
+                    <div x-data="{
+                    livingSituation: @entangle('living_situation_id')" class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR</label>
                             <select id="govAssistance" name="govAssistance" wire:model="government_program_id"
@@ -327,24 +332,38 @@
                             @error('government_program') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="livingStatus" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING
-                                STATUS</label>
-                            <select id="livingStatus" name="livingStatus" wire:model="shelter_living_status_id"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select status</option>
-                                @foreach($shelterLivingStatuses as $shelterLivingStatus)
-                                <option value="{{ $shelterLivingStatus->id }}">{{ $shelterLivingStatus->shelter_living_status_name }}</option>
+                            <label for="living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION (CASE) <span class="text-red-500">*</span></label>
+                            <select x-model.number="livingSituation" wire:model.live="living_situation_id" id="living_situation" name="living_situation"
+                                required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select situation</option>
+                                @foreach($livingSituations as $livingSituation)
+                                <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
                                 @endforeach
                             </select>
-                            @error('government_program') <span class="error text-red-600">{{ $message }}</span> @enderror
-                            </select>
+                            @error('living_situation') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="taggedDate" class="block text-[13px] font-medium text-gray-700 mb-1">DATE PROFILED/TAGGED</label>
-                            <input type="date" id="taggedDate" name="taggedDate" wire:model="date_tagged" max="{{ date('Y-m-d') }}"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @error('date_tagged') <span class="text-red-600 error">{{ $message }}</span> @enderror
-                        </div>
+                        <template x-if="livingSituation >= '1' && livingSituation <= '7'  || livingSituation === '9'">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span></label>
+                                <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification" name="living_situation_case_specification" placeholder="Enter case details"
+                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required>
+                                </textarea>
+                                @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                        </template>
+                        <template x-if="livingSituation == '8'">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">CASE SPECIFICATION <span class="text-red-500">*</span></label>
+                                <select wire:model.live="case_specification_id" id="case_specification" name="case_specification"
+                                        class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase" required>
+                                    <option value="">Select specification</option>
+                                    @foreach($caseSpecifications as $caseSpecification)
+                                    <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                        </template>
                     </div>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-full px-2 mb-4">

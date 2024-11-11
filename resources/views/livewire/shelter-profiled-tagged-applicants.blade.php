@@ -104,7 +104,7 @@
                             <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->shelterApplicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->last_name }}, {{ $shelterApplicant->shelterApplicant->first_name }} {{ $shelterApplicant->shelterApplicant->middle_name }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b"> {{ optional($shelterApplicant->created_at)->format('Y-m-d') }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b"> {{ $shelterApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ optional($shelterApplicant->date_tagged)->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 @if(!$shelterApplicant->is_awarding_on_going)
@@ -250,12 +250,12 @@
 
                                     <!-- Material Unit -->
                                     <div class="w-full md:w-2/12 px-2 mb-2">
-                                        <input type="text" wire:model="materials.{{ $index }}.material_unit_id" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="Material Unit">
+                                        <input type="text" wire:model="materials.{{ $index }}.materialUnitDisplay" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="Material Unit">
                                     </div>
 
                                     <!-- PO Number -->
                                     <div class="w-full md:w-2/12 px-2 mb-2">
-                                        <input type="text" wire:model="materials.{{ $index }}.purchase_order_id" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="PO Number">
+                                        <input type="text" wire:model="materials.{{ $index }}.purchaseOrderDisplay" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="PO Number">
                                     </div>
                                 </div>
                                 @endforeach
@@ -267,7 +267,7 @@
 
 
                                 <!-- House Situation Upload -->
-                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD HOUSE SITUATION</h2>
+                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD PHOTO</h2>
 
                                 <!-- Drag and Drop Area -->
                                 <div x-data="fileUpload()">

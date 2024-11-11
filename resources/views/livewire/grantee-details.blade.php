@@ -43,29 +43,29 @@
             </div>
 
 
-            <form>
+            <form wire:submit.prevent="saveChanges">
                 <div class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="first-name" class="block text-[12px] font-semibold text-gray-700 mb-1">FIRST
                                 NAME</label>
                             <input type="text" id="first-name" name="first-name"
-                                :disabled="!isEditable" wire:model="firstName"
+                                :disabled="!isEditable" wire:model="first_name"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @error('firstName') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            @error('first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="middle-name" class="block text-[12px] font-medium text-gray-700 mb-1">MIDDLE
                                 NAME</label>
                             <input type="text" id="middle-name" name="middle-name"
-                                :disabled="!isEditable" wire:model="middleName"
+                                :disabled="!isEditable" wire:model="middle_name"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
                             <label for="last-name" class="block text-[12px] font-medium text-gray-700 mb-1">LAST
                                 NAME</label>
                             <input type="text" id="last-name" name="last-name"
-                                :disabled="!isEditable" wire:model="lastName"
+                                :disabled="!isEditable" wire:model="last_name"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
@@ -80,89 +80,259 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="origin-request"
                                 class="block text-[12px] font-medium text-gray-700 mb-1">ORIGIN OF REQUEST</label>
-                            <input wire:model="originOfRequest" id="origin-request" name="origin-request"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
-                            @error('originOfRequest') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            @if($isEditing)
+                            <select wire:model="request_origin_id"
+                                id="request_origin_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select Origin of Request</option>
+                                @foreach($originOfRequests as $originOfRequest)
+                                <option value="{{ $originOfRequest->id }}">{{ $originOfRequest->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('request_origin_id') <span class="text-danger">{{ $message }}</span> @enderror
+                            @else
+                            <input type="text"
+                                wire:model="request_origin_id"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="requestDate" class="block text-[12px] font-medium text-gray-700 mb-1">REQUEST DATE</label>
-                            <input type="date" id="requestDate" name="requestDate" :disabled="!isEditable" wire:model="requestDate"
+                            <input type="date" id="requestDate" name="requestDate" :disabled="!isEditable" wire:model="date_request"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="date_tagged" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                DATE PROFILED/TAGGED
+                            </label>
+                            @if($isEditing)
+                            <input wire:model="date_tagged"
+                                type="date"
+                                id="date_tagged"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTagged->date_tagged ? date('F d, Y', strtotime($profiledTagged->date_tagged)) : 'N/A' }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded shadow mb-6">
+                <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="w-full md:w-1/2 px-2 mb-4">
                             <label for="age" class="block text-[12px] font-medium text-gray-700 mb-1">AGE</label>
                             <input type="number" id="age" name="age" :disabled="!isEditable" wire:model="age"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="gender" class="block text-[12px] font-medium text-gray-700 mb-1">GENDER</label>
-                            <select id="gender" name="gender" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select gender</option>
-                                <option value="purok1">Male</option>
-                                <option value="purok2">Female</option>
-                            </select>
+                        <div class="w-full md:w-1/2 px-2 mb-4">
+                            <label for="sex" class="block text-[12px] font-semibold text-gray-700 mb-1">SEX</label>
+                            <div class="flex items-center">
+                                @if($isEditing)
+                                <div class="mr-6">
+                                    <input type="radio" wire:model="sex" value="Male" id="male" class="mr-2" required>
+                                    <label for="male" class="cursor-pointer">Male</label>
+                                </div>
+                                <div>
+                                    <input type="radio" wire:model="sex" value="Female" id="female" class="mr-2" required>
+                                    <label for="female" class="cursor-pointer">Female</label>
+                                </div>
+                                @else
+                                <input type="text"
+                                    value="{{ $profiledTagged->sex }}"
+                                    disabled
+                                    class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @endif
+                                @error('sex')
+                                <span class="text-red-600 error">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="tribe"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
-                            <select id="tribe" name="tribe" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Status</option>
-                                <option value="barangay1">Barangay 1</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="occupation"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">OCCUPATION</label>
-                            <input type="text" id="occupation" name="occupation" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="spousename" class="block text-[12px] font-medium text-gray-700 mb-1">SPOUSE
-                                NAME</label>
-                            <input type="text" id="spousename" name="spousename" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="years-residency"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">YEARS OF RESIDENCY</label>
-                            <input type="text" id="years-residency" name="years-residency" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap -mx-2">
 
+                    </div>
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                OCCUPATION
+                            </label>
+                            <input wire:model="occupation"
+                                type="text"
+                                id="occupation"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('occupation')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="year_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                YEARS OF RESIDENCY
+                            </label>
+                            <input wire:model="year_of_residency"
+                                type="number"
+                                id="year_of_residency"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('year_of_residency')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="civil_status_id" class="block text-[12px] font-semibold text-gray-700 mb-1">CIVIL STATUS</label>
+                            @if($isEditing)
+                            <select wire:model="civil_status_id"
+                                id="civil_status_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($civilStatuses as $status)
+                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                @endforeach
+                            </select>
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTagged->civilStatus->civil_status }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
+                            @error('civil_status_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    @if ($civil_status_id == $liveInPartnerStatusId)
+                    <div class="bg-gray-100 p-2 mb-4">
+                        <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    FIRST NAME <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                    id="partner_first_name"
+                                    wire:model="partner_first_name"
+                                    @disabled(!$isEditing)
+                                    oninput="capitalizeInput(this)"
+                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('partner_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    MIDDLE NAME <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                    id="partner_middle_name"
+                                    wire:model="partner_middle_name"
+                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('partner_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="partner_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    LAST NAME <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text"
+                                    id="partner_last_name"
+                                    wire:model="partner_last_name"
+                                    class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('partner_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        @endif
+
+                        @if ($civil_status_id == $marriedStatusId)
+
+                        <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
+                        <div class="flex flex-wrap -mx-2">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spouse_first_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    FIRST NAME <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    MIDDLE NAME <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="spouse_last_name" class="block text-[12px] font-medium text-gray-700 mb-1">
+                                    LAST NAME <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="religion"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">RELIGION</label>
-                            <input type="text" id="religion" name="religion" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="tribe"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY</label>
-                            <select id="tribe" name="tribe" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select tribe/ethnicity</option>
-                                <option value="barangay1">Barangay 1</option>
-                                <option value="barangay2">Barangay 2</option>
-                                <option value="barangay3">Barangay 3</option>
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                RELIGION
+                            </label>
+                            @if($isEditing)
+                            <select wire:model="religion_id"
+                                id="religion_id"
+                                class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($religions as $religion)
+                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                                @endforeach
                             </select>
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTagged->religion->religion_name }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
+                            @error('religion_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="contactNo" class="block text-[12px] font-medium text-gray-700 mb-1">CONTACT
-                                NUMBER</label>
-                            <input type="number" id="contactNo" name="contactNo"
-                                :disabled="!isEditable"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="tribe" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                TRIBE/ETHNICITY
+                            </label>
+                            @if($isEditing)
+                            <select wire:model="tribe_id"
+                                id="tribe_id"
+                                class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($tribes as $tribe)
+                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
+                                @endforeach
+                            </select>
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTagged->tribe->tribe_name }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
+                            @error('tribe_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="contactNo" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                CONTACT NUMBER
+                            </label>
+                            <input wire:model="contact_number"
+                                type="text"
+                                id="contact_number"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="validateNumberInput(this)">
+                            @error('contact_number')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
 
 
@@ -170,72 +340,176 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="barangay"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">BARANGAY</label>
-                            <select id="barangay" name="barangay" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="barangay_id"
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">BARANGAY</label>
+                            @if($isEditing)
+                            <select wire:model.live="barangay_id"
+                                id="barangay_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Barangay</option>
-                                <option value="barangay1">Barangay 1</option>
-                                <option value="barangay2">Barangay 2</option>
-                                <option value="barangay3">Barangay 3</option>
+                                @foreach($barangays as $barangay)
+                                <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                @endforeach
                             </select>
+                            @error('barangay_id') <span class="text-danger">{{ $message }}</span> @enderror
+                            @else
+                            <input type="text"
+                                value="{{  $profiledTagged->address?->barangay?->name ?? '--' }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="purok" class="block text-[12px] font-medium text-gray-700 mb-1">PUROK</label>
-                            <select id="purok" name="purok" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="purok_id" class="block text-[12px] font-semibold text-gray-700 mb-1">PUROK</label>
+                            @if($isEditing)
+                            <div wire:loading wire:target="barangay_id">
+                                <span class="text-muted">Loading puroks...</span>
+                            </div>
+                            <select wire:model.live="purok_id"
+                                id="purok_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow"
+                                {{ empty($puroks) ? 'disabled' : '' }}>
                                 <option value="">Select Purok</option>
-                                <option value="purok1">Purok 1</option>
-                                <option value="purok2">Purok 2</option>
-                                <option value="purok3">Purok 3</option>
+                                @foreach($puroks as $purok)
+                                <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                                @endforeach
                             </select>
+                            @error('purok_id') <span class="text-danger">{{ $message }}</span> @enderror
+                            @else
+                            <input type="text"
+                                value="{{  $profiledTagged->address?->purok?->name ?? '--' }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="houseNo"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">HOUSE NO/STREET NAME</label>
-                            <input type="text" id="houseNo" name="houseNo" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="full-address" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                FULL ADDRESS
+                            </label>
+                            <input wire:model="full_address"
+                                type="text"
+                                id="full-address"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('full-address')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="govAssistance" class="block text-[12px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR</label>
-                            <select id="govAssistance" name="govAssistance" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Type</option>
-                                <option value="barangay1">Barangay 1</option>
-                                <option value="barangay2">Barangay 2</option>
-                                <option value="barangay3">Barangay 3</option>
+                            <label for="govAssistance" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                SOCIAL WELFARE SECTOR
+                            </label>
+                            @if($isEditing)
+                            <select wire:model="government_program_id"
+                                id="government_program_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($governmentPrograms as $governmentProgram)
+                                <option value="{{ $governmentProgram->id }}">{{ $governmentProgram->program_name }}</option>
+                                @endforeach
                             </select>
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTagged->governmentProgram->program_name }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
+                            @error('government_program_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="livingStatus" class="block text-[12px] font-medium text-gray-700 mb-1">LIVING
-                                SITUATION</label>
-                            <select id="livingStatus" name="livingStatus" :disabled="!isEditable"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select status</option>
-                                <option value="purok1">Purok 1</option>
-                                <option value="purok2">Purok 2</option>
-                                <option value="purok3">Purok 3</option>
+                            <label for="living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                LIVING SITUATION (CASE)
+                            </label>
+                            @if($isEditing)
+                            <select wire:model="living_situation_id"
+                                x-model="livingSituation"
+                                id="living_situation_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select Living Situation</option>
+                                @foreach($livingSituations as $livingSituation)
+                                <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
+                                @endforeach
                             </select>
+                            @error('living_situation_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                            @else
+                            <textarea rows="2"
+                                disabled
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->livingSituation)->living_situation_description ?? '--' }}
+                            </textarea>
+                            @endif
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="taggedDate" class="block text-[12px] font-medium text-gray-700 mb-1">DATE PROFILED/TAGGED</label>
-                            <input type="date" id="taggedDate" name="taggedDate" :disabled="!isEditable"
-                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                CASE SPECIFICATION
+                            </label>
+                            @if($isEditing)
+                            <div x-show="living_situation_id != 8">
+                                <textarea
+                                    wire:model="living_situation_case_specification"
+                                    placeholder="Enter case details"
+                                    class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                    required>
+
+                                    </textarea>
+                                @error('living_situation_case_specification')
+                                <span class="error text-red-600">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div x-show="living_situation_id == 8">
+                                <select
+                                    wire:model="case_specification_id"
+                                    class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase"
+                                    required>
+                                    <option value="">Select specification</option>
+                                    @foreach($caseSpecifications as $caseSpecification)
+                                    <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('case_specification_id')
+                                <span class="error text-red-600">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            @else
+                            @if($profiledTagged->living_situation_id == 8)
+                            <textarea rows="2"
+                                disabled
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->caseSpecification)->case_specification_name ?? '--' }}
+                            </textarea>
+                            @else
+                            <textarea rows="2"
+                                disabled
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ $profiledTagged->living_situation_case_specification ?? '--' }}
+                            </textarea>
+                            @endif
+                            @endif
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-full px-2 mb-4">
                             <label for="remarks"
-                                class="block text-[12px] font-medium text-gray-700 mb-1">REMARKS</label>
-                            <input type="text" id="remarks" name="remarks" :disabled="!isEditable"
-                                class="uppercase w-full p-3 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                REMARKS
+                            </label>
+                            <input wire:model="remarks"
+                                type="text"
+                                id="remarks"
+                                @disabled(!$isEditing)
+                                class="capitalize italic w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('remarks')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
                         </div>
 
                     </div>
-
                 </div>
+
 
                 <div class="flex flex-col p-3 rounded mt-5 mb-1">
                     <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">DELIVERY DETAILS</h2>

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
             $table->foreignId('government_program_id')->constrained('government_programs')->onDelete('cascade');
             $table->foreignId('tribe_id')->constrained('tribes')->onDelete('cascade');
-            $table->foreignId('shelter_living_status_id')->constrained('shelter_living_statuses')->onDelete('cascade');    
+            $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
             $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
             $table->text('living_situation_case_specification')->nullable();
             $table->integer('age');

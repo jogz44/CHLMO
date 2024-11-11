@@ -5,6 +5,9 @@ namespace App\Models\Shelter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Address;
+use App\Models\Barangay;
+use App\Models\Purok;
 
 class Grantee extends Model
 {
@@ -45,19 +48,32 @@ class Grantee extends Model
         return $this->belongsTo(Material::class, 'material_id', 'id');
     }
 
-    public function shelterApplicant(): BelongsTo
+    public function shelterApplicant()
     {
-        return $this->belongsTo(ShelterApplicant::class, 'shelter_applicant_id', 'id');
+        return $this->belongsTo(ShelterApplicant::class, 'profile_no', 'id');
     }
 
     public function originOfRequest(): BelongsTo
     {
-        return $this->belongsTo(OriginOfRequest::class, 'origin_of_request_id', 'id');
+        return $this->belongsTo(OriginOfRequest::class, 'request_origin_id', 'id');
     }
 
     public function attachments()
     {
         return $this->hasMany(GranteeAttachmentList::class, 'grantee_id'); // Assuming there's a `grantee_id` in the attachment table
+    }
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'address_id');
+    }
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class, 'barangay_id');
+    }
+
+    public function purok()
+    {
+        return $this->belongsTo(Purok::class, 'purok_id');
     }
     public function photo()
     {
