@@ -13,13 +13,7 @@ class Awardee extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tagged_and_validated_applicant_id',
-        'address_id',
-        'relocation_lot_id',
-        'lot_size',
-        'lot_size_unit_id',
-        'grant_date',
-        'is_awarded',
+        'tagged_and_validated_applicant_id', 'address_id','relocation_lot_id','lot_size','lot_size_unit_id','grant_date','is_awarded',
         'is_blacklisted'
     ];
 
