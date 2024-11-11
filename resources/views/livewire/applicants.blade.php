@@ -127,12 +127,20 @@
                     </div>
 
                     <div class="flex justify-end">
-                        <label class="text-center mt-2 mr-1" for="start_date">Date Applied From:</label>
-                        <input type="date" id="start_date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                               max="{{ now()->toDateString() }}">
-                        <label class="text-center mt-2 ml-2 mr-1" for="end_date">To:</label>
-                        <input type="date" id="end_date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
-                               max="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 mr-1" for="start_date">
+                            Date Applied From:
+                        </label>
+                        <input type="date" id="start_date" wire:model.live="startDate"
+                               class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                               max="{{ now()->toDateString() }}"
+                               value="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 ml-2 mr-1" for="end_date">
+                            To:
+                        </label>
+                        <input type="date" id="end_date" wire:model.live="endDate"
+                               class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
+                               max="{{ now()->toDateString() }}"
+                               value="{{ now()->toDateString() }}">
 
                         <div class="relative group">
                             <button wire:click="resetFilters" class="flex items-center justify-center border border-gray-300 bg-gray-100 rounded w-8 h-8">

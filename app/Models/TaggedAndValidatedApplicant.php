@@ -38,7 +38,7 @@ class TaggedAndValidatedApplicant extends Model
     }
     public function civilStatus(): BelongsTo
     {
-        return $this->belongsTo(CivilStatus::class);
+        return $this->belongsTo(CivilStatus::class, 'civil_status_id');
     }
     public function tribe(): BelongsTo
     {

@@ -57,4 +57,12 @@ class Awardee extends Model
     {
         return $this->hasOne(Blacklist::class);
     }
+    public function transfersAsOriginal(): HasMany
+    {
+        return $this->hasMany(AwardeeTransferHistory::class, 'previous_awardee_id');
+    }
+    public function transfersAsNew(): HasMany
+    {
+        return $this->hasMany(AwardeeTransferHistory::class, 'new_awardee_id');
+    }
 }

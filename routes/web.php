@@ -16,6 +16,7 @@ use App\Livewire\GranteeDetails;
 use App\Livewire\ShelterApplicantDetails;
 use App\Livewire\TaggedAndValidatedApplicantDetails;
 use App\Livewire\TransactionWalkin;
+use App\Livewire\TransferHistories;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', function () {
@@ -71,6 +72,8 @@ Route::middleware([
     Route::get('/awardee-list', function () {
         return view('awardee-list');
     })->name('awardee-list');
+
+    Route::get('/transfer-histories', TransferHistories::class)->name('transfer-histories');
 
     Route::get('/blacklist', function () {
         return view('blacklist');
