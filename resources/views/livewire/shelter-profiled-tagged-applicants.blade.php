@@ -250,12 +250,12 @@
 
                                     <!-- Material Unit -->
                                     <div class="w-full md:w-2/12 px-2 mb-2">
-                                        <input type="text" wire:model="materials.{{ $index }}.material_unit_id" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="Material Unit">
+                                        <input type="text" wire:model="materials.{{ $index }}.materialUnitDisplay" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="Material Unit">
                                     </div>
 
                                     <!-- PO Number -->
                                     <div class="w-full md:w-2/12 px-2 mb-2">
-                                        <input type="text" wire:model="materials.{{ $index }}.purchase_order_id" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="PO Number">
+                                        <input type="text" wire:model="materials.{{ $index }}.purchaseOrderDisplay" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="PO Number">
                                     </div>
                                 </div>
                                 @endforeach

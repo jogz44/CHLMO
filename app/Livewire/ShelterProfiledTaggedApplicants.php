@@ -42,10 +42,10 @@ class ShelterProfiledTaggedApplicants extends Component
     public $grantee_quantity = [];
     public $photo = [];
 
-  // For uploading of files
-  public $isFilePondUploadComplete = false, $isFilePonduploading = false, $requestLetterAddressToCityMayor, $certificateOfIndigency, $consentLetterIfTheLandIsNotTheirs,
-  $photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs, $selectedGrantee, $files,
-  $granteeToPreview, $isUploading = false;
+    // For uploading of files
+    public $isFilePondUploadComplete = false, $isFilePonduploading = false, $requestLetterAddressToCityMayor, $certificateOfIndigency, $consentLetterIfTheLandIsNotTheirs,
+        $photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs, $selectedGrantee, $files,
+        $granteeToPreview, $isUploading = false;
 
     public $attachment_id, $attachmentLists = [];
     public $description, $granteeId, $documents = [], $newFileImages = [];
@@ -127,15 +127,32 @@ class ShelterProfiledTaggedApplicants extends Component
 
 
     public function updateMaterialInfo($index)
-    {
-        $material = Material::with(['purchaseOrder', 'materialUnit'])->find($this->materials[$index]['material_id']);
-        if ($material) {
-            $this->materials[$index]['quantity'] = $material->quantity;
-            $this->materials[$index]['material_unit_id'] = $material->material_unit_id; 
-            $this->materials[$index]['purchase_order_id'] = $material->purchase_order_id; 
-        }
-    }
+{
+    $material = Material::with(['purchaseOrder', 'materialUnit'])->find($this->materials[$index]['material_id']);
     
+    if ($material) {
+        // Store IDs for internal logic
+        $this->materials[$index]['material_unit_id'] = $material->materialUnit?->id ?? null;
+        $this->materials[$index]['purchase_order_id'] = $material->purchaseOrder?->id ?? null;
+
+        // Store readable values for display
+        $this->materials[$index]['materialUnitDisplay'] = $material->materialUnit?->unit ?? 'N/A';
+        $this->materials[$index]['purchaseOrderDisplay'] = $material->purchaseOrder?->po_number ?? 'N/A';
+
+        // Quantity is a straightforward value
+        $this->materials[$index]['quantity'] = $material->quantity;
+    } else {
+        // Set defaults if material not found
+        $this->materials[$index]['material_unit_id'] = null;
+        $this->materials[$index]['purchase_order_id'] = null;
+        $this->materials[$index]['materialUnitDisplay'] = 'N/A';
+        $this->materials[$index]['purchaseOrderDisplay'] = 'N/A';
+        $this->materials[$index]['quantity'] = 'N/A';
+    }
+}
+
+
+
     public function addMaterial()
     {
         $this->materials[] = ['material_id' => '', 'grantee_quantity' => '', 'material_unit_id' => '', 'purchase_order_id' => '', 'quantity' => ''];
@@ -177,91 +194,91 @@ class ShelterProfiledTaggedApplicants extends Component
 
 
     public function grantApplicant()
-{
-    $this->validate();
-    DB::beginTransaction();
+    {
+        $this->validate();
+        DB::beginTransaction();
 
-    try {
-        // Loop over each material to create a grantee entry
-        foreach ($this->materials as $material) {
-            // Check if there's enough stock available for the material
-            $currentMaterial = Material::find($material['material_id']);
-            if ($currentMaterial->quantity < $material['grantee_quantity']) {
-                throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
+        try {
+            // Loop over each material to create a grantee entry
+            foreach ($this->materials as $material) {
+                // Check if there's enough stock available for the material
+                $currentMaterial = Material::find($material['material_id']);
+                if ($currentMaterial->quantity < $material['grantee_quantity']) {
+                    throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
+                }
+
+                // Create the grantee entry
+                $grantee = Grantee::create([
+                    'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
+                    'material_id' => $material['material_id'],
+                    'grantee_quantity' => $material['grantee_quantity'],
+                    'material_unit_id' => $material['material_unit_id'],
+                    'purchase_order_id' => $material['purchase_order_id'],
+                    'date_of_delivery' => $this->date_of_delivery,
+                    'date_of_ris' => $this->date_of_ris,
+                    'is_granted' => false,
+                ]);
+
+                // Upload photos if any
+                foreach ($this->photo as $image) {
+                    $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
+                    ShelterUploadedFiles::create([
+                        'grantee_id' => $grantee->id,
+                        'image_path' => $path,
+                        'display_name' => $image->getClientOriginalName(),
+                    ]);
+                }
+
+                // Subtract the granted quantity from the available stock
+                $currentMaterial->decrement('quantity', $material['grantee_quantity']);
+
+                Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
             }
 
-            // Create the grantee entry
-            $grantee = Grantee::create([
-                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
-                'material_id' => $material['material_id'],
-                'grantee_quantity' => $material['grantee_quantity'],
-                'material_unit_id' => $material['material_unit_id'],
-                'purchase_order_id' => $material['purchase_order_id'],
-                'date_of_delivery' => $this->date_of_delivery,
-                'date_of_ris' => $this->date_of_ris,
-                'is_granted' => false,
+            // Update the applicant's status
+            ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
+                'is_awarding_on_going' => true
             ]);
 
-            // Upload photos if any
-            foreach ($this->photo as $image) {
-                $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
-                ShelterUploadedFiles::create([
-                    'grantee_id' => $grantee->id,
-                    'image_path' => $path,
-                    'display_name' => $image->getClientOriginalName(),
-                ]);
-            }
+            DB::commit();
+            $this->resetForm();
+            $this->dispatch('alert', [
+                'title' => 'Granting Pending!',
+                'message' => 'Applicant needs to submit necessary requirements.',
+                'type' => 'warning',
+            ]);
 
-            // Subtract the granted quantity from the available stock
-            $currentMaterial->decrement('quantity', $material['grantee_quantity']);
+            return redirect()->route('shelter-profiled-tagged-applicants');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            $this->handleGrantingError($e);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error processing grant: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Insufficient Stock!',
+                'message' => 'There was not enough stock to fulfill this request.',
+                'type' => 'danger',
+            ]);
+        }
+    }
 
-            Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
+    protected function handleGrantingError(QueryException $e)
+    {
+        $errorMessage = 'An error occurred while processing your request. Please try again later.';
+        if ($e->getCode() === 23000) {
+            $errorMessage = 'The information you provided conflicts with existing records. Please check your input and try again.';
+        } elseif ($e->getCode() === 42000) {
+            $errorMessage = 'There was a problem with the data you provided. Please check your input and try again.';
         }
 
-        // Update the applicant's status
-        ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
-            'is_awarding_on_going' => true
-        ]);
-
-        DB::commit();
-        $this->resetForm();
+        Log::error('Error creating applicant or dependents: ' . $e->getMessage());
         $this->dispatch('alert', [
-            'title' => 'Granting Pending!',
-            'message' => 'Applicant needs to submit necessary requirements.',
-            'type' => 'warning',
-        ]);
-
-        return redirect()->route('shelter-profiled-tagged-applicants');
-    } catch (QueryException $e) {
-        DB::rollBack();
-        $this->handleGrantingError($e);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error processing grant: ' . $e->getMessage());
-        $this->dispatch('alert', [
-            'title' => 'Insufficient Stock!',
-            'message' => 'There was not enough stock to fulfill this request.',
+            'title' => 'Something went wrong!',
+            'message' => $errorMessage . ' <br><small>' . now()->calendar() . '</small>',
             'type' => 'danger',
         ]);
     }
-}
-
-protected function handleGrantingError(QueryException $e)
-{
-    $errorMessage = 'An error occurred while processing your request. Please try again later.';
-    if ($e->getCode() === 23000) {
-        $errorMessage = 'The information you provided conflicts with existing records. Please check your input and try again.';
-    } elseif ($e->getCode() === 42000) {
-        $errorMessage = 'There was a problem with the data you provided. Please check your input and try again.';
-    }
-
-    Log::error('Error creating applicant or dependents: ' . $e->getMessage());
-    $this->dispatch('alert', [
-        'title' => 'Something went wrong!',
-        'message' => $errorMessage . ' <br><small>' . now()->calendar() . '</small>',
-        'type' => 'danger',
-    ]);
-}
 
     public function resetForm(): void
     {
@@ -315,10 +332,10 @@ protected function handleGrantingError(QueryException $e)
 
             // Validate inputs
             $validatedData = $this->validate([
-            'requestLetterAddressToCityMayor' => 'required|file|max:10240',
-            'certificateOfIndigency' => 'required|file|max:10240',
-            'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
-            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
+                'requestLetterAddressToCityMayor' => 'required|file|max:10240',
+                'certificateOfIndigency' => 'required|file|max:10240',
+                'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
+                'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
             ]);
 
             logger()->info('Validation passed', $validatedData);
@@ -369,15 +386,15 @@ protected function handleGrantingError(QueryException $e)
         }
     }
 
-     /**
+    /**
      * Store individual attachment
      */
     private function storeAttachment($fileInput, $attachmentId): void
     {
         $file = $this->$fileInput;
         if ($file) {
-//            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-//            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
+            //            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            //            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
             $fileName = $file->getClientOriginalName();
             $filePath = $file->storeAs('documents', $fileName, 'grantee-photo-requirements');
 
@@ -423,10 +440,10 @@ protected function handleGrantingError(QueryException $e)
         ]);
     }
 
-     private function resetUpload(): void
+    private function resetUpload(): void
     {
         $this->reset([
-           'requestLetterAddressToCityMayor',
+            'requestLetterAddressToCityMayor',
             'certificateOfIndigency',
             'consentLetterIfTheLandIsNotTheirs',
             'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs',
