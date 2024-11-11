@@ -54,18 +54,12 @@ Route::middleware([
         return view('activity-logs');
     })->name('activity-logs');
 
-//    Route::get('/applicant-details', function () {
-//        return view('applicant-details');
-//    })->name('applicant-details');
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 
     // Tagged and Validated Applicant Details
     Route::get('/tagged-and-validated-applicant-details/{applicantId}', TaggedAndValidatedApplicantDetails::class)
         ->name('tagged-and-validated-applicant-details');
 
-//    Route::get('/awardee-details', function () {
-//        return view('awardee-details');
-//    })->name('awardee-details');
     Route::get('/awardee-details/{applicantId}', AwardeeDetails::class)
         ->name('awardee-details');
 
@@ -79,17 +73,14 @@ Route::middleware([
         return view('blacklist');
     })->name('blacklist');
 
-    Route::get('/lot-list', function () {
-        return view('lot-list');
-    })->name('lot-list');
+    Route::get('/relocation-sites', function () {
+        return view('relocation-sites');
+    })->name('relocation-sites');
 
     Route::get('/lot-list-details', function () {
         return view('lot-list-details');
     })->name('lot-list-details');
 
-//    Route::get('/masterlist-applicant-details', function () {
-//        return view('masterlist-applicant-details');
-//    })->name('masterlist-applicant-details');
     Route::get('/masterlist-applicant-details/{applicantId}', App\Livewire\MasterlistApplicantDetails::class)
         ->name('masterlist-applicant-details');
 
