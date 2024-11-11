@@ -105,7 +105,7 @@
                             <td class="py-4 px-2 text-center border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{  $grantee->profiledTaggedApplicant->shelterApplicant->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->middle_name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b"> {{ optional($grantee->created_at)->format('Y-m-d') }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b"> {{ $grantee->profiledTaggedApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">
                                 {{ optional($grantee->profiledTaggedApplicant)->date_tagged ? $grantee->profiledTaggedApplicant->date_tagged->format('Y-m-d') : '' }}
                             </td>

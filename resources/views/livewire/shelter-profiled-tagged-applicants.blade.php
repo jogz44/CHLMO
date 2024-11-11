@@ -104,7 +104,7 @@
                             <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->shelterApplicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->last_name }}, {{ $shelterApplicant->shelterApplicant->first_name }} {{ $shelterApplicant->shelterApplicant->middle_name }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b"> {{ optional($shelterApplicant->created_at)->format('Y-m-d') }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b"> {{ $shelterApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ optional($shelterApplicant->date_tagged)->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
                                 @if(!$shelterApplicant->is_awarding_on_going)
@@ -267,7 +267,7 @@
 
 
                                 <!-- House Situation Upload -->
-                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD HOUSE SITUATION</h2>
+                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD PHOTO</h2>
 
                                 <!-- Drag and Drop Area -->
                                 <div x-data="fileUpload()">
