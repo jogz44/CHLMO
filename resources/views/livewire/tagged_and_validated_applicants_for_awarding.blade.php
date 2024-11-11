@@ -315,8 +315,22 @@
                             <div class="mb-4">
                                 <br>
                                 <label class="block text-sm font-medium mb-2 text-black" for="barangay">
-                                    LOT ALLOCATED
+                                    LOT ALLOCATION
                                 </label>
+                                <div class="mb-4">
+                                    <label class="block text-[12px] font-medium mb-2 text-black"
+                                           for="lot_name">RELOCATION SITE <span class="text-red-500">*</span></label>
+                                    <select wire:model.live="relocation_lot_id" id="lot_name" name="lot_name" :disabled="!isEditable" required
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                        <option value="">Select Relocation Site </option>
+                                        @forelse($relocationSites as $relocationSite)
+                                            <option value="{{ $relocationSite->id }}">{{ $relocationSite->relocation_site_name }}</option>
+                                        @empty
+                                            <option disabled>There's no record available yet.</option>
+                                        @endforelse
+                                    </select>
+                                    @error('relocation_lot_id') <span class="error">{{ $message }}</span> @enderror
+                                </div>
                                 <label class="block text-[12px] font-medium mb-2 text-black"
                                        for="barangay">BARANGAY <span class="text-red-500">*</span>
                                 </label>
@@ -343,19 +357,6 @@
                                     @endforeach
                                 </select>
                                 @error('purok_id') <span class="error">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="lot_name">LOT NAME/NUMBER <span class="text-red-500">*</span></label>
-                                <select wire:model.live="lot_id" id="lot_name" name="lot_name" :disabled="!isEditable" required
-                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Select Lot </option>
-                                    @foreach($lots as $lot)
-                                        <option value="{{ $lot->id }}">{{ $lot->lot_name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('lot_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- LotList Size Allocated Field -->
