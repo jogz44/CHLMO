@@ -15,7 +15,7 @@ class Awardee extends Model
     protected $fillable = [
         'tagged_and_validated_applicant_id',
         'address_id',
-        'lot_id',
+        'relocation_lot_id',
         'lot_size',
         'lot_size_unit_id',
         'grant_date',
@@ -27,7 +27,7 @@ class Awardee extends Model
         'id' => 'integer',
         'tagged_and_validated_applicant_id' => 'integer',
         'address_id' => 'integer',
-        'lot_id' => 'integer',
+        'relocation_lot_id' => 'integer',
         'grant_date' => 'datetime',
         'is_awarded' => 'boolean',
         'is_blacklisted' => 'boolean'
@@ -41,9 +41,9 @@ class Awardee extends Model
     {
         return $this->belongsTo(Address::class);
     }
-    public function lot(): BelongsTo
+    public function relocationLot(): BelongsTo
     {
-        return $this->belongsTo(LotList::class, 'lot_id');
+        return $this->belongsTo(RelocationSite::class, 'relocation_lot_id');
     }
     public function lotSizeUnit(): BelongsTo
     {
