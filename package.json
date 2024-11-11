@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "alpinejs": "^3.14.1",
+        "chart.js": "^4.4.6",
         "filepond": "^4.31.4",
         "filepond-plugin-file-validate-size": "^2.2.8",
         "filepond-plugin-image-preview": "^4.6.12",
