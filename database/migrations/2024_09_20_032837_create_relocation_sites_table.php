@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('relocation_sites', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
+            $table->string('relocation_site_name', 255);
+            $table->enum('status', ['vacant', 'full'])->default('vacant');
             $table->timestamps();
         });
     }

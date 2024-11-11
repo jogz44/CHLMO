@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tagged_and_validated_applicant_id')->constrained('tagged_and_validated_applicants')->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
-            $table->foreignId('lot_id')->constrained('lot_lists')->onDelete('cascade');
+            $table->foreignId('relocation_lot_id')->constrained('relocation_sites')->onDelete('cascade');
             $table->decimal('lot_size', 8, 2); // For the numeric value
             $table->foreignId('lot_size_unit_id')->constrained('lot_size_units')->onDelete('cascade');
             $table->dateTime('grant_date');
