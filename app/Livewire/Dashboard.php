@@ -32,14 +32,14 @@ class Dashboard extends Component
 
         return [
             'labels' => $labels,
-            'applicants' => $this->getMonthlyData(
+            'applicants' => $this->getApplicantsMonthlyData(
                 Applicant::where('transaction_type_id', 1)
                     ->whereNotNull('date_applied')
                     ->select('date_applied')
                     ->get(),
                 $labels
             ),
-            'applicantsViaRequest' => $this->getMonthlyData(
+            'applicantsViaRequest' => $this->getApplicantsMonthlyData(
                 Applicant::where('transaction_type_id', 2)
                     ->whereNotNull('date_applied')
                     ->select('date_applied')
@@ -72,18 +72,27 @@ class Dashboard extends Component
         // Return labels and monthly data arrays
         return [
             'labels' => $labels,
-            'informalSettlers' => $this->getMonthlyData(
+            'informalSettlers' => $this->getTaggedAndValidatedApplicantsMonthlyData(
                 TaggedAndValidatedApplicant::whereIn('living_situation_id', $livingSituationIds)
                     ->select('tagging_date')->get(),
                 $labels
             ),
         ];
     }
-    protected function getMonthlyData($data, $labels): array
+    protected function getApplicantsMonthlyData($data, $labels): array
     {
         $monthlyData = array_fill(0, 12, 0);
         foreach ($data as $item) {
-            $month = (int) date('m', strtotime($item->date));
+            $month = (int) date('m', strtotime($item->date_applied));
+            $monthlyData[$month - 1]++;
+        }
+        return $monthlyData;
+    }
+    protected function getTaggedAndValidatedApplicantsMonthlyData($data, $labels): array
+    {
+        $monthlyData = array_fill(0, 12, 0);
+        foreach ($data as $item) {
+            $month = (int) date('m', strtotime($item->tagging_date));
             $monthlyData[$month - 1]++;
         }
         return $monthlyData;
