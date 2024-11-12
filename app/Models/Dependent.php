@@ -18,6 +18,7 @@ class Dependent extends Model
     protected $fillable = [
         'tagged_and_validated_applicant_id',
         'dependent_civil_status_id',
+        'dependent_relationship_id',
         'dependent_first_name',
         'dependent_middle_name',
         'dependent_last_name',
@@ -46,5 +47,9 @@ class Dependent extends Model
     public function civilStatus(): BelongsTo
     {
         return $this->belongsTo(CivilStatus::class, 'dependent_civil_status_id', 'id');
+    }
+    public function dependentRelationship(): BelongsTo
+    {
+        return $this->belongsTo(DependentsRelationship::class, 'dependent_relationship_id', 'id');
     }
 }

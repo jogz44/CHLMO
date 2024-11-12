@@ -13,10 +13,10 @@ class TaggedAndValidatedApplicant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'applicant_id', 'civil_status_id', 'tribe_id', 'religion_id', 'living_situation_id', 'case_specification_id',
+        'applicant_id', 'civil_status_id', 'tribe', 'religion', 'living_situation_id', 'case_specification_id',
         'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id', 'wall_type_id',
-        'full_address', 'sex', 'date_of_birth', 'occupation', 'monthly_income', 'family_income', 'tagging_date', 'rent_fee',
-        'landlord', 'house_owner', 'tagger_name', 'remarks', 'is_tagged', 'is_awarding_on_going',
+        'full_address', 'sex', 'date_of_birth', 'occupation', 'monthly_income', 'tagging_date', 'rent_fee',
+        'landlord', 'house_owner', 'relationship_to_house_owner', 'tagger_name', 'remarks', 'is_tagged', 'is_awarding_on_going',
     ];
 
     protected $casts = [
@@ -40,27 +40,10 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(CivilStatus::class, 'civil_status_id');
     }
-    public function tribe(): BelongsTo
-    {
-        return $this->belongsTo(Tribe::class);
-    }
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
-
-    // Relationship with Religion
-    public function religion(): BelongsTo
-    {
-        return $this->belongsTo(Religion::class);
-    }
-
-    // Relationship with Spouse
-//    public function spouse(): BelongsTo
-//    {
-//        return $this->belongsTo(Spouse::class);
-//    }
-
     public function spouse(): HasOne
     {
         return $this->hasOne(Spouse::class, 'tagged_and_validated_applicant_id');
