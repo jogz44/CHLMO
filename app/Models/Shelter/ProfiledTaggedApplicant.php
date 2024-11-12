@@ -6,8 +6,9 @@ use App\Models\Address;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
-use App\Models\Shelter\ShelterLivingStatus;
+use App\Models\LivingSituation;
 use App\Models\Shelter\ShelterSpouse;
+use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Religion;
 use App\Models\Tribe;
 use App\Models\Shelter\OriginOfRequest;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ProfiledTaggedApplicant extends Model
 {
@@ -33,7 +35,7 @@ class ProfiledTaggedApplicant extends Model
         'address_id',
         'government_program_id',
         'tribe_id',
-        'shelter_living_status_id',
+        'living_situation_id',
         'case_specification_id',
         'living_situation_case_specification',
         'sex',
@@ -65,10 +67,7 @@ class ProfiledTaggedApplicant extends Model
         'address_id' => 'integer',
         'government_program_id' => 'integer',
         'year_of_residency' => 'integer',
-        'shelter_living_status_id' => 'integer',
         'tribe_id' => 'integer',
-        'living_situation_id' => 'integer',
-        'case_specification_id' => 'integer',
         'date_tagged' => 'date',
     ];
 
@@ -96,15 +95,25 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(Tribe::class);
     }
-    public function shelterLivingStatus(): BelongsTo
+    // Relationship with LivingSituation
+    public function livingSituation(): BelongsTo
     {
-        return $this->belongsTo(ShelterLivingStatus::class);
+        return $this->belongsTo(LivingSituation::class, 'living_situation_id');
     }
+
+    // Relationship with CaseSpecification
     public function caseSpecification(): BelongsTo
     {
         return $this->belongsTo(CaseSpecification::class);
     }
-
+    public function shelterSpouse(): HasOne
+    {
+        return $this->hasOne(ShelterSpouse::class, 'profiled_tagged_applicant_id');
+    }
+    public function shelterLiveInPartner(): HasOne
+    {
+        return $this->hasOne(ShelterLiveInPartner::class, 'profiled_tagged_applicant_id');
+    }
     public function originOfRequest(): BelongsTo
     {
         return $this->belongsTo(OriginOfRequest::class, 'request_origin_id', 'id');

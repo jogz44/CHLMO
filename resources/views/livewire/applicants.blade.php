@@ -9,7 +9,8 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative z-0">
-                    <button @click="isModalOpen = true" class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
+                    <button @click="isModalOpen = true"
+                            class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
                         Add Applicant
                     </button>
                     <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
@@ -19,7 +20,8 @@
             <div class="bg-white p-6 rounded shadow">
                 <div class="flex justify-between items-center">
                     <div class="flex space-x-2">
-                        <button @click="openFilters = !openFilters" class="flex space-x-2 items-center hover:bg-yellow-500 py-2 px-4 rounded bg-iroad-orange">
+                        <button @click="openFilters = !openFilters"
+                                class="flex space-x-2 items-center hover:bg-yellow-500 py-2 px-4 rounded bg-iroad-orange">
                             <div class="text-white">
                                 <!-- Filter Icon (You can use an icon from any library) -->
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
@@ -127,12 +129,20 @@
                     </div>
 
                     <div class="flex justify-end">
-                        <label class="text-center mt-2 mr-1" for="start_date">Date Applied From:</label>
-                        <input type="date" id="start_date" wire:model.live="startDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                               max="{{ now()->toDateString() }}">
-                        <label class="text-center mt-2 ml-2 mr-1" for="end_date">To:</label>
-                        <input type="date" id="end_date" wire:model.live="endDate" class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
-                               max="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 mr-1" for="start_date">
+                            Date Applied From:
+                        </label>
+                        <input type="date" id="start_date" wire:model.live="startDate"
+                               class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                               max="{{ now()->toDateString() }}"
+                               value="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 ml-2 mr-1" for="end_date">
+                            To:
+                        </label>
+                        <input type="date" id="end_date" wire:model.live="endDate"
+                               class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
+                               max="{{ now()->toDateString() }}"
+                               value="{{ now()->toDateString() }}">
 
                         <div class="relative group">
                             <button wire:click="resetFilters" class="flex items-center justify-center border border-gray-300 bg-gray-100 rounded w-8 h-8">
@@ -355,10 +365,28 @@
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">
                                     CONTACT NUMBER
                                 </label>
-                                <input type="text" wire:model="contact_number" id="contact_number"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
+                                <input type="text"
+                                       wire:model="contact_number"
+                                       id="contact_number"
+                                       pattern="^09\d{9}$"
+                                       title="Enter a valid phone number (e.g., 09123456789)"
+                                       maxlength="11"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase"
+                                       placeholder="09xxxxxxxxx"
+                                       oninput="validateNumberInput(this)">
                                 @error('contact_number') <span class="error">{{ $message }}</span> @enderror
                             </div>
+                            <script>
+                                function validatePhoneNumber(input) {
+                                    // Remove any characters that are not digits, parentheses, or spaces
+                                    input.value = input.value.replace(/[^0-9() ]/g, '');
+
+                                    // Optional: Automatically limit the length based on the type of number
+                                    if (input.value.startsWith('09')) {
+                                        input.maxLength = 11; // Mobile numbers
+                                    }
+                                }
+                            </script>
 
                             <!-- Interviewer Field -->
                             <div class="mb-6">
@@ -501,9 +529,14 @@
 
                             <!-- Contact Number Field -->
                             <div class="mb-6">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">CONTACT NUMBER</label>
-                                <input type="text" wire:model="edit_contact_number" id="contact_number"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" placeholder="Contact Number">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="contact_number">
+                                    CONTACT NUMBER
+                                </label>
+                                <input type="text"
+                                       wire:model="edit_contact_number"
+                                       id="contact_number"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase"
+                                       placeholder="Contact Number">
                             </div>
 
                             <div class="grid grid-cols-2 gap-4 mb-4">
@@ -568,5 +601,12 @@
         input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
             return char.toUpperCase();
         });
+    }
+</script>
+<script>
+    // Function to allow only numeric input
+    function validateNumberInput(input) {
+        // Remove any characters that are not digits
+        input.value = input.value.replace(/[^0-9]/g, '');
     }
 </script>

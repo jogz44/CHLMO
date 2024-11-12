@@ -1,46 +1,17 @@
 <div class="p-10 h-screen ml-[17%] mt-[70px]">
-    <div class="flex justify-end items-center mb-6 space-x-3">
+    <div class="flex justify-end items-center mb-6 space-x-3 mt-2">
+        <!-- Filter -->
         <div class="flex items-center space-x-2">
-            <label for="year" class="text-[13px] font-medium">Year:</label>
-            <select id="year" wire:model.live="selectedYear" class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">
+            <select id="year"
+                    wire:model.live="selectedYear"
+                    class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">
                 @foreach($years as $year)
-                    <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>{{ $year }}</option>
+                    <option value="{{ $year }}">{{ $year }}</option>
                 @endforeach
             </select>
         </div>
-
-{{--        <div class="flex items-center space-x-2">--}}
-{{--            <label for="barangay" class="text-[13px] font-medium">Barangay:</label>--}}
-{{--            <select id="barangay" class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">--}}
-{{--                <option value="barangay1">Barangay 1</option>--}}
-{{--                <option value="barangay2">Barangay 2</option>--}}
-{{--                <option value="barangay3">Barangay 3</option>--}}
-{{--                <option value="barangay4">Barangay 4</option>--}}
-{{--            </select>--}}
-{{--        </div>--}}
-
-{{--        <button class="bg-green-700 hover:bg-green-500 text-white text-[13px] font-medium py-2 px-6 rounded-lg">--}}
-{{--            Filter--}}
-{{--        </button>--}}
     </div>
     <div class="grid grid-cols-4 gap-10 mb-12">
-        <a href="{{ route('awardee-list') }}">
-            <div @click="window.location.href='{{ route('awardee-list') }}'" class="relative cursor-pointer bg-white shadow rounded-lg flex items-center">
-                <div class="flex-shrink-0 mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-6 h-6 ml-5 text-custom-yellow" stroke-width="0.5">
-                        <path d="M 21 4 C 15.494917 4 11 8.494921 11 14 C 11 19.505079 15.494917 24 21 24 C 26.505083 24 31 19.505079 31 14 C 31 8.494921 26.505083 4 21 4 z M 21 7 C 24.883764 7 28 10.116238 28 14 C 28 17.883762 24.883764 21 21 21 C 17.116236 21 14 17.883762 14 14 C 14 10.116238 17.116236 7 21 7 z M 35 24 C 28.925 24 24 28.925 24 35 C 24 41.075 28.925 46 35 46 C 41.075 46 46 41.075 46 35 C 46 28.925 41.075 24 35 24 z M 9.5 28 C 7.02 28 5 30.02 5 32.5 L 5 33.699219 C 5 39.479219 12.03 44 21 44 C 22.49 44 23.929062 43.870859 25.289062 43.630859 C 24.549063 42.800859 23.910391 41.880859 23.400391 40.880859 C 22.630391 40.960859 21.83 41 21 41 C 12.97 41 8 37.209219 8 33.699219 L 8 32.5 C 8 31.67 8.67 31 9.5 31 L 22.630859 31 C 22.970859 29.93 23.450781 28.93 24.050781 28 L 9.5 28 z M 35 28 C 35.48 28 35.908453 28.305766 36.064453 28.759766 L 37.177734 32 L 40.875 32 C 41.358 32 41.787406 32.308625 41.941406 32.765625 C 42.095406 33.223625 41.939687 33.729484 41.554688 34.021484 L 38.560547 36.292969 L 39.574219 39.539062 C 39.720219 40.005063 39.548391 40.510969 39.150391 40.792969 C 38.955391 40.930969 38.727 41 38.5 41 C 38.263 41 38.025172 40.925391 37.826172 40.775391 L 35 38.660156 L 32.173828 40.775391 C 31.783828 41.068391 31.248609 41.076922 30.849609 40.794922 C 30.451609 40.512922 30.279781 40.005063 30.425781 39.539062 L 31.439453 36.294922 L 28.445312 34.021484 C 28.060312 33.729484 27.904594 33.225578 28.058594 32.767578 C 28.213594 32.309578 28.642 32 29.125 32 L 32.822266 32 L 33.935547 28.759766 C 34.091547 28.305766 34.52 28 35 28 z"></path>
-                    </svg>
-                </div>
-                <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">{{ $totalAwardees }}</h3>
-                    <p class="text-[13px] text-gray-500">Total Awardees</p>
-                </div>
-                <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
-                </div>  
-            </div>
-        </a>
-
         <a href="{{ route('masterlist-applicants') }}">
             <div @click="window.location.href='{{ route('masterlist-applicants') }}'" class="relative cursor-pointer bg-white shadow rounded-lg flex items-center">
                 <div class="flex-shrink-0 mr-4">
@@ -49,7 +20,11 @@
                     </svg>
                 </div>
                 <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">{{ $totalApplicants }}</h3>
+                    <h3 class="text-md font-semibold">
+                        {!! $selectedYear === 'Overall Total'
+                            ? number_format($totalApplicants)
+                            : number_format($totalApplicants) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
+                    </h3>
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
                 <div class="flex-shrink-0">
@@ -67,8 +42,33 @@
                     </svg>
                 </div>
                 <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">452</h3>
-                    <p class="text-[13px] text-gray-500">Pending Tagging</p>
+                    <h3 class="text-md font-semibold">
+                        {!! $selectedYear === 'Overall Total'
+                            ? number_format($totalTagged)
+                            : number_format($totalTagged) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
+                    </h3>
+                    <p class="text-[13px] text-gray-500">Total Tagged</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ route('awardee-list') }}">
+            <div @click="window.location.href='{{ route('awardee-list') }}'" class="relative cursor-pointer bg-white shadow rounded-lg flex items-center">
+                <div class="flex-shrink-0 mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-6 h-6 ml-5 text-custom-yellow" stroke-width="0.5">
+                        <path d="M 21 4 C 15.494917 4 11 8.494921 11 14 C 11 19.505079 15.494917 24 21 24 C 26.505083 24 31 19.505079 31 14 C 31 8.494921 26.505083 4 21 4 z M 21 7 C 24.883764 7 28 10.116238 28 14 C 28 17.883762 24.883764 21 21 21 C 17.116236 21 14 17.883762 14 14 C 14 10.116238 17.116236 7 21 7 z M 35 24 C 28.925 24 24 28.925 24 35 C 24 41.075 28.925 46 35 46 C 41.075 46 46 41.075 46 35 C 46 28.925 41.075 24 35 24 z M 9.5 28 C 7.02 28 5 30.02 5 32.5 L 5 33.699219 C 5 39.479219 12.03 44 21 44 C 22.49 44 23.929062 43.870859 25.289062 43.630859 C 24.549063 42.800859 23.910391 41.880859 23.400391 40.880859 C 22.630391 40.960859 21.83 41 21 41 C 12.97 41 8 37.209219 8 33.699219 L 8 32.5 C 8 31.67 8.67 31 9.5 31 L 22.630859 31 C 22.970859 29.93 23.450781 28.93 24.050781 28 L 9.5 28 z M 35 28 C 35.48 28 35.908453 28.305766 36.064453 28.759766 L 37.177734 32 L 40.875 32 C 41.358 32 41.787406 32.308625 41.941406 32.765625 C 42.095406 33.223625 41.939687 33.729484 41.554688 34.021484 L 38.560547 36.292969 L 39.574219 39.539062 C 39.720219 40.005063 39.548391 40.510969 39.150391 40.792969 C 38.955391 40.930969 38.727 41 38.5 41 C 38.263 41 38.025172 40.925391 37.826172 40.775391 L 35 38.660156 L 32.173828 40.775391 C 31.783828 41.068391 31.248609 41.076922 30.849609 40.794922 C 30.451609 40.512922 30.279781 40.005063 30.425781 39.539062 L 31.439453 36.294922 L 28.445312 34.021484 C 28.060312 33.729484 27.904594 33.225578 28.058594 32.767578 C 28.213594 32.309578 28.642 32 29.125 32 L 32.822266 32 L 33.935547 28.759766 C 34.091547 28.305766 34.52 28 35 28 z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1 flex flex-col items-start">
+                    <h3 class="text-md font-semibold">
+                        {!! $selectedYear === 'Overall Total'
+                            ? number_format($totalAwardees)
+                            : number_format($totalAwardees) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
+                    </h3>
+                    <p class="text-[13px] text-gray-500">Total Awardees</p>
                 </div>
                 <div class="flex-shrink-0">
                     <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
@@ -85,8 +85,12 @@
                     </svg>
                 </div>
                 <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">356</h3>
-                    <p class="text-[13px] text-gray-500">Walk-in Applicants</p>
+                    <h3 class="text-md font-semibold">
+                        {!! $selectedYear === 'Overall Total'
+                            ? number_format($totalBlacklisted)
+                            : number_format($totalBlacklisted) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
+                    </h3>
+                    <p class="text-[13px] text-gray-500">Total Blacklisted</p>
                 </div>
                 <div class="flex-shrink-0">
                     <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
@@ -98,103 +102,89 @@
     <!-- Monthly Report Section -->
     <div class="grid grid-cols-2 gap-6">
         <div class="bg-white shadow rounded-lg p-6">
-            <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation Lot Applicants</h4>
+            <h4 class="text-[13px] mb-2 font-semibold text-center">
+                Applicants per Transaction Type
+            </h4>
             <div>
-                <canvas id="relocationLotChart"></canvas>
+                <canvas wire:ignore id="relocationLotChart"></canvas>
             </div>
         </div>
 
         <div class="bg-white shadow rounded-lg p-6">
-            <h4 class="text-[13px] mb-2 font-semibold text-center">Annual Report of Relocation Lot Applicants</h4>
-            <div class="w-full ml-[65%] md:w-1/3 px-2 mb-3">
-            </div>
+            <h4 class="text-[13px] mb-2 font-semibold text-center">
+                Summary of Identified Informal Settlers
+            </h4>
             <div>
-                <canvas id="housingApplicantsChart"></canvas>
+                <canvas wire:ignore id="informalSettlersChart"></canvas>
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener('alpine:init', () => {
-            // Relocation LotList Applicants Bar Chart
-            const ctx1 = document.getElementById('relocationLotChart').getContext('2d');
-            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Applicants',
-                        data: [12, 19, 3, 5, 2, 3, 4, 6, 8, 10, 12, 14],
-                        backgroundColor: 'rgba(255, 145, 0, 100)',
-                        borderColor: 'rgba(255, 145, 0, 100)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Tagged Validated',
-                        data: [2, 3, 20, 5, 1, 4, 8, 6, 4, 7, 8, 9],
-                        backgroundColor: 'rgba(0, 113, 45, 100)',
-                        borderColor: 'rgba(0, 113, 45, 100)',
-                        borderWidth: 1
-                    }, {
-                        label: 'Informal Settlers',
-                        data: [2, 3, 20, 5, 1, 4, 7, 5, 6, 8, 9, 12],
-                        backgroundColor: 'rgba(138, 25, 49, 100)',
-                        borderColor: 'rgba(138, 25, 49, 100)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                boxWidth: 20,
-                                padding: 10
+    @push('scripts')
+        <script>
+            document.addEventListener('alpine:init', () => {
+                // Relocation Lot Applicants Bar Chart
+                const ctx1 = document.getElementById('relocationLotChart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'line',
+                    data: {
+                        labels: @js($relocationLotData['labels']),
+                        datasets: [{
+                            label: 'Walk-in Applicants',
+                            data: @js($relocationLotData['applicants']),
+                            backgroundColor: 'rgba(255, 145, 0, 100)',
+                            borderColor: 'rgba(255, 145, 0, 100)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Applicants via Request',
+                            data: @js($relocationLotData['applicantsViaRequest']),
+                            backgroundColor: 'rgba(0, 113, 45, 100)',
+                            borderColor: 'rgba(0, 113, 45, 100)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 20,
+                                    padding: 10
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
 
-            // Housing Applicants Line Chart
-            const ctx2 = document.getElementById('housingApplicantsChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    datasets: [{
-                        label: 'Applicants',
-                        data: [12, 19, 3, 5, 2, 3, 4, 6, 8, 10, 12, 14],
-                        backgroundColor: 'rgba(255, 145, 0, 100)',
-                        borderColor: 'rgba(255, 145, 0, 100)',
-                        borderWidth: 2
-                    }, {
-                        label: 'Tagged Validated',
-                        data: [2, 3, 20, 5, 1, 4, 8, 6, 4, 7, 8, 9],
-                        backgroundColor: 'rgba(0, 113, 45, 100)',
-                        borderColor: 'rgba(0, 113, 45, 100)',
-                        borderWidth: 2
-                    }, {
-                        label: 'Awarded',
-                        data: [2, 3, 20, 5, 6, 4, 7, 5, 6, 8, 9, 12],
-                        backgroundColor: 'rgba(138, 25, 49, 100)',
-                        borderColor: 'rgba(138, 25, 49, 100)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                boxWidth: 20,
-                                padding: 20
+                // Housing Applicants Line Chart
+                const ctx2 = document.getElementById('informalSettlersChart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: @js($informalSettlersData['labels']),
+                        datasets: [{
+                            label: 'Informal Settlers',
+                            data: @js($informalSettlersData['informalSettlers']),
+                            backgroundColor: 'rgba(255, 145, 0, 100)',
+                            borderColor: 'rgba(255, 145, 0, 100)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 20,
+                                    padding: 10
+                                }
                             }
                         }
                     }
-                }
+                });
             });
-        });
-    </script>
+        </script>
+    @endpush
 </div>

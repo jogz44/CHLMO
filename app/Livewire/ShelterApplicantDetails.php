@@ -6,7 +6,6 @@ use Livewire\Component;
 use App\Models\Shelter\ShelterApplicant;
 use App\Models\Shelter\ProfiledTaggedApplicant;
 use App\Models\Shelter\OriginOfRequest;
-use App\Models\Shelter\ShelterLivingStatus;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Barangay;
@@ -15,6 +14,7 @@ use App\Models\Address;
 use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
+use App\Models\CaseSpecification;
 use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\WallType;
@@ -34,7 +34,7 @@ class ShelterApplicantDetails extends Component
     public $last_name;
     public $suffix_name;
     public $origin_name;  // Store the origin name
-    public $request_date; // Store the request date
+    public $date_request; // Store the request date
 
     // New fields
     public $age;
@@ -56,8 +56,7 @@ class ShelterApplicantDetails extends Component
     public $full_address;
     public $government_program_id; // Store selected Government Program ID
     public $governmentPrograms; // For populating the government programs dropdown
-    public $shelter_living_status_id;
-     public $shelterLivingStatuses;
+    public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification;
     public $date_tagged;
     public $remarks;
     public $applicantForSpouse;
@@ -80,8 +79,12 @@ class ShelterApplicantDetails extends Component
             return Tribe::all();  // Cache for 1 hour
         });
 
-        $this->shelterLivingStatuses = Cache::remember('shelterLivingStatuses', 60*60, function() {
-            return ShelterLivingStatus::all();  // Cache for 1 hour
+        $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
+            return LivingSituation::all();  // Cache for 1 hour
+        });
+
+        $this->caseSpecifications = Cache::remember('caseSpecifications', 60*60, function() {
+            return CaseSpecification::all();  // Cache for 1 hour
         });
 
         $this->governmentPrograms = Cache::remember('governmentPrograms', 60*60, function() {
@@ -99,7 +102,9 @@ class ShelterApplicantDetails extends Component
 
             // Fetch the related origin of request and request date
             $this->origin_name = $this->applicant->originOfRequest->name ?? 'N/A';
-            $this->request_date = $this->applicant->created_at ? $this->applicant->created_at->format('Y-m-d') : '';
+            $this->date_request = $this->applicant?->date_request
+            ? $this->applicant->date_request->format('Y-m-d')
+            : '--';
 
             // Initialize dropdowns
             $this->barangays = Barangay::all();
@@ -155,7 +160,18 @@ class ShelterApplicantDetails extends Component
             'occupation' => 'required|string|max:255',
             'year_of_residency' => 'required|integer',
             'contact_number' => 'required|string|max:255',
-            'shelter_living_status_id' => 'required|exists:shelter_living_statuses,id',
+            'living_situation_id' => 'required|exists:living_situations,id',
+            'living_situation_case_specification' => [
+                'nullable', // Allow it to be null if not required
+                'required_if:living_situation_id,1,2,3,4,5,6,7,9',
+                'string',
+                'max:255'
+            ],
+            'case_specification_id' => [
+                'nullable', // Allow it to be null if not required
+                'required_if:living_situation_id,8', // Only required if living_situation_id is 8
+                'exists:case_specifications,id'
+            ],
             'purok_id' => 'required|exists:puroks,id',
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
@@ -227,7 +243,9 @@ class ShelterApplicantDetails extends Component
                 'year_of_residency' => $this->year_of_residency,
                 'contact_number' => $this->contact_number ?: null,
                 'date_tagged' => now(),
-                'shelter_living_status_id' => $this->shelter_living_status_id,
+                'living_situation_id' => $this->living_situation_id,
+                'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
+                'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
                 'date_tagged' => $this->date_tagged,
                 'government_program_id' => $this->government_program_id,
                 'remarks' => $this->remarks ?: 'N/A',

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Shelter\ProfiledTaggedApplicant;
 
 class CaseSpecification extends Model
 {
@@ -30,5 +31,9 @@ class CaseSpecification extends Model
     public function taggedAndValidatedApplicants()
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
+    }
+    public function profiledTaggedApplicants()
+    {
+        return $this->hasMany(ProfiledTaggedApplicant::class);
     }
 }

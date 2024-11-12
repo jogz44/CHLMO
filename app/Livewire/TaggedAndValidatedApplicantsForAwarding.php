@@ -7,10 +7,12 @@ use App\Models\Awardee;
 use App\Models\AwardeeAttachmentsList;
 use App\Models\AwardeeDocumentsSubmission;
 use App\Models\Barangay;
+use App\Models\CaseSpecification;
 use App\Models\LivingSituation;
 use App\Models\LotList;
 use App\Models\LotSizeUnit;
 use App\Models\Purok;
+use App\Models\RelocationSite;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
@@ -30,13 +32,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public $search = '';
     public $isLoading = false;
-    public $transaction_type_id, $transaction_type_name;
+    public $tagging_date, $transaction_type_id, $transaction_type_name;
 
     // Filter properties:
     public $applicantId;
     public $startTaggingDate, $endTaggingDate, $selectedTaggingStatus;
     public $selectedPurok_id, $puroksFilter = [], $selectedBarangay_id, $barangaysFilter = [], $selectedLivingSituation_id,
-        $livingSituationsFilter = [];
+        $livingSituationsFilter = [], $selectedCaseSpecification_id, $caseSpecificationsFilter = [];
     public $taggingStatuses;
 
     // Tagged and validated applicant details
@@ -44,8 +46,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $occupation, $monthly_income, $transaction_type;
 
     // For awarding modal
-    public $grant_date, $taggedAndValidatedApplicantId, $purok_id, $puroks = [], $barangay_id, $barangays = [], $lot_id,
-        $lots = [], $lot_size, $lot_size_unit_id, $lotSizeUnits = [];
+    public $grant_date, $taggedAndValidatedApplicantId, $purok_id, $puroks = [], $barangay_id, $barangays = [], $relocation_lot_id,
+        $relocationSites = [], $lot_size, $lot_size_unit_id, $lotSizeUnits = [];
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $letterOfIntent, $votersID, $validID,
@@ -69,6 +71,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->selectedPurok_id = null;
         $this->selectedBarangay_id = null;
         $this->selectedLivingSituation_id = null;
+        $this->selectedCaseSpecification_id = null;
         $this->selectedTaggingStatus = null;
 
         // Reset pagination and any search terms
@@ -78,11 +81,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public function mount(): void
     {
-//        $viaRequest = TransactionType::where('type_name', 'Request')->first();
-//        if ($viaRequest) {
-//            $this->transaction_type_id = $viaRequest->id; // This can still be used internally for further logic if needed
-//            $this->transaction_type_name = $viaRequest->type_name; // Set the name to display
-//        }
+        $this->tagging_date = now()->toDateString();
 
         // Initialize filter options
         $this->puroksFilter = Cache::remember('puroks', 60*60, function() {
@@ -94,7 +93,10 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->livingSituationsFilter = Cache::remember('living_situations', 60*60, function() {
             return LivingSituation::all();
         });
-        $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
+        $this->caseSpecificationsFilter = Cache::remember('case_specifications', 60*60, function() {
+            return CaseSpecification::all();
+        });
+        $this->taggingStatuses = ['Award Pending', 'Awarded']; // Add your statuses here
 
         // For Awarding Modal
 
@@ -102,10 +104,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->grant_date = now()->toDateString(); // YYYY-MM-DD format
 
         // Initialize dropdowns
+        $this->relocationSites = RelocationSite::all(); // Fetch all relocation sites
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
-        // Fetch related LotSizeUnits
-        $this->lots = LotList::all(); // Fetch all lot size units
         $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
 
         // Fetch attachment types for the dropdown
@@ -126,17 +127,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         // Fetch the puroks based on the selected barangay
         $this->puroks = Purok::where('barangay_id', $barangayId)->get();
-        $this->lots = LotList::where('barangay_id', $barangayId)->get();
-
         $this->purok_id = null; // Reset selected purok when barangay changes
-        $this->lot_id = null; // Reset selected lot when barangay changes
-
         $this->isLoading = false; // Reset loading state
-
         logger()->info('Retrieved Puroks', [
             'barangay_id' => $barangayId,
-            'puroks' => $this->puroks,
-            'lots' => $this->lots
+            'puroks' => $this->puroks
         ]);
     }
     public function updatedSelectedBarangayId($barangayId): void
@@ -155,9 +150,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         return [
             // For Awarding Modal
             'grant_date' => 'required|date',
+            'relocation_lot_id' => 'required|exists:relocation_sites,id',
             'barangay_id' => 'required|exists:barangays,id',
             'purok_id' => 'required|exists:puroks,id',
-            'lot_id' => 'required|exists:lot_lists,id',
             'lot_size' => 'required|numeric',
             'lot_size_unit_id' => 'required|exists:lot_size_units,id',
         ];
@@ -176,8 +171,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         // Create the new awardee record and get the ID of the newly created awardee
         $awardee = Awardee::create([
             'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
+            'relocation_lot_id' => $this->relocation_lot_id,
             'address_id' => $address->id,
-            'lot_id' => $this->lot_id,
             'lot_size' => $this->lot_size,
             'lot_size_unit_id' => $this->lot_size_unit_id,
             'grant_date' => $this->grant_date,
@@ -212,7 +207,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date',
+            'relocation_lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date',
         ]);
     }
 
@@ -377,43 +372,84 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'applicant.transactionType',
             'livingSituation',
             'caseSpecification'
-        ])->whereHas('applicant', function($q) {
+        ]);
+
+//        ->whereHas('applicant', function($q) {
+//            $q->where('applicant_id', 'like', '%'.$this->search.'%')
+//                ->orWhere('first_name', 'like', '%'.$this->search.'%')
+//                ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+//                ->orWhere('last_name', 'like', '%'.$this->search.'%')
+//                ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
+//                ->orWhere('contact_number', 'like', '%'.$this->search.'%')
+//                ->orWhereHas('address.purok', function ($subQuery) {
+//                    $subQuery->where('name', 'like', '%'.$this->search.'%');
+//                })
+//                ->orWhereHas('address.barangay', function ($subQuery) {
+//                    $subQuery->where('name', 'like', '%'.$this->search.'%');
+//                });
+//            })
+//            ->orWhereHas('livingSituation', function($q) {
+//                $q->where('living_situation_description', 'like', '%' . $this->search . '%');
+//            })
+//            ->orWhereHas('caseSpecification', function($q) {
+//                $q->where('case_specification_name', 'like', '%' . $this->search . '%');
+//            })
+//            ->orWhere('living_situation_case_specification', 'like', '%'.$this->search.'%');
+        // Apply search filter
+        if ($this->search) {
+            $query->whereHas('applicant', function($q) {
                 $q->where('applicant_id', 'like', '%'.$this->search.'%')
                     ->orWhere('first_name', 'like', '%'.$this->search.'%')
                     ->orWhere('middle_name', 'like', '%'.$this->search.'%')
                     ->orWhere('last_name', 'like', '%'.$this->search.'%')
                     ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
                     ->orWhere('contact_number', 'like', '%'.$this->search.'%')
-                    ->orWhereHas('address.purok', function ($query) {
-                        $query->where('name', 'like', '%'.$this->search.'%');
+                    ->orWhereHas('address.purok', function ($subQuery) {
+                        $subQuery->where('name', 'like', '%'.$this->search.'%');
                     })
-                    ->orWhereHas('address.barangay', function ($query) {
-                        $query->where('name', 'like', '%'.$this->search.'%');
+                    ->orWhereHas('address.barangay', function ($subQuery) {
+                        $subQuery->where('name', 'like', '%'.$this->search.'%');
                     });
-            });
+            })->orWhereHas('livingSituation', function($q) {
+                $q->where('living_situation_description', 'like', '%' . $this->search . '%');
+            })->orWhereHas('caseSpecification', function($q) {
+                $q->where('case_specification_name', 'like', '%' . $this->search . '%');
+            })->orWhere('living_situation_case_specification', 'like', '%'.$this->search.'%');
+        }
 
         // Apply date range filter (if both dates are present)
         if ($this->startTaggingDate && $this->endTaggingDate) {
             $query->whereBetween('tagging_date', [$this->startTaggingDate, $this->endTaggingDate]);
         }
 
-        // Filter by selected Purok
+// Additional filters
         if ($this->selectedPurok_id) {
             $query->whereHas('applicant.address', function ($q) {
                 $q->where('purok_id', $this->selectedPurok_id);
             });
         }
 
-        // Filter by selected Barangay
         if ($this->selectedBarangay_id) {
             $query->whereHas('applicant.address', function ($q) {
                 $q->where('barangay_id', $this->selectedBarangay_id);
             });
         }
 
-//        if ($this->selectedTaggingStatus !== null) {
-//            $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
-//        }
+        if ($this->selectedLivingSituation_id) {
+            $query->whereHas('livingSituation', function ($q) {
+                $q->where('living_situation_id', $this->selectedLivingSituation_id);
+            });
+        }
+
+        if ($this->selectedCaseSpecification_id) {
+            $query->whereHas('caseSpecification', function ($q) {
+                $q->where('case_specification_id', $this->selectedCaseSpecification_id);
+            });
+        }
+
+        if ($this->selectedTaggingStatus !== null) {
+            $query->where('is_awarding_on_going', $this->selectedTaggingStatus === 'Awarded');
+        }
 
         // Paginate the filtered results
 //        $taggedAndValidatedApplicants = $query->paginate(10);

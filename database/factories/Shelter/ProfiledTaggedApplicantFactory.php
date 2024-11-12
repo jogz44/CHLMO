@@ -24,9 +24,8 @@ class ProfiledTaggedApplicantFactory extends Factory
         static $addressIds;
         static $governmentProgramIds;
         static $tribeIds;
-        static $shelterlivingStatusIds;
+        static $livingSituationIds;
         static $caseSpecificationIds;
-        static $shelterSpouseIds;
 
         if (!$shelterApplicantIds) {
             $shelterApplicantIds = ShelterApplicant::pluck('id')->shuffle()->toArray();
@@ -52,8 +51,8 @@ class ProfiledTaggedApplicantFactory extends Factory
             $tribeIds = Tribe::pluck('id')->shuffle()->toArray();
         }
 
-        if (!$shelterlivingStatusIds) {
-            $shelterlivingStatusIds = ShelterlivingStatus::pluck('id')->shuffle()->toArray();
+        if (!$livingSituationIds) {
+            $livingSituationIds = LivingSituation::pluck('id')->shuffle()->toArray();
         }
 
         if (!$caseSpecificationIds) {
@@ -67,7 +66,7 @@ class ProfiledTaggedApplicantFactory extends Factory
             'address_id' => $this->faker->randomElement($addressIds),
             'government_program_id' => $this->faker->randomElement($governmentProgramIds),
             'tribe_id' => $this->faker->randomElement($tribeIds),
-            'shelter_living_status_id' => $this->faker->randomElement($shelterlivingStatusIds),
+            'living_situation_id' => $this->faker->randomElement($livingSituationIds),
             'case_specification_id' => $this->faker->optional()->randomElement($caseSpecificationIds),
             'living_situation_case_specification' => $this->faker->optional()->sentence,
             'age' => $this->faker->numberBetween(1, 100),

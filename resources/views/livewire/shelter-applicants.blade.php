@@ -105,7 +105,7 @@
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $applicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->created_at->format('Y-m-d') }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->OriginOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b">
                                 <button wire:click="openModalEdit({{ $applicant->id }})" @click="isEditModalOpen = true" class="text-custom-red underline px-4 py-1.5">Edit</button>

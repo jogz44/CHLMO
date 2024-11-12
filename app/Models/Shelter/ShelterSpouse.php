@@ -24,6 +24,7 @@ class ShelterSpouse extends Model
 
     public function profiledTaggedApplicant(): BelongsTo
     {
-        return $this->belongsTo(ProfiledTaggedApplicant::class, 'profiled_tagged_applicant_id');
+        return $this->belongsTo(ProfiledTaggedApplicant::class, 'profiled_tagged_applicant_id', 'id');
     }
+
 }

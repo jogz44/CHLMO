@@ -1,6 +1,7 @@
 <div class="flex-1 flex flex-col ml-[17%] mt-[-50%]">
     <!-- Header for large screens -->
-    <header class="fixed top-0 left-0 bg-[#ffffff] p-3 hidden md:flex w-full justify-between items-center z-10" style="width: calc(100% - 17%); left: 17%; max-width: calc(100% - 17%);">
+    <header class="fixed top-0 left-0 bg-[#ffffff] p-3 hidden md:flex w-full justify-between items-center z-10"
+            style="width: calc(100% - 17%); left: 17%; max-width: calc(100% - 17%);">
         <!-- Navigation Links -->
 
         <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
@@ -25,13 +26,14 @@
         <!-- Right-aligned container for and Profile -->
         <div class="flex items-center ml-auto space-x-2">
             <!-- Search -->
-            <div class="relative hidden md:block mr-2">
-                <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <input type="search" name="search" id="search" class="rounded-full px-12 py-2 placeholder:text-[13px] outline-none border-none bg-[#f7f7f9] hover:ring-[#BA2C2C] focus:ring-[#BA2C2C]" placeholder="Search Anything">
-            </div>
+{{--            <div class="relative hidden md:block mr-2">--}}
+{{--                <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+{{--                    <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />--}}
+{{--                    <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />--}}
+{{--                </svg>--}}
+{{--                <input type="search" name="search" id="search" class="rounded-full px-12 py-2 placeholder:text-[13px] outline-none border-none bg-[#f7f7f9] hover:ring-[#BA2C2C] focus:ring-[#BA2C2C]" --}}
+{{--                       placeholder="Search Anything">--}}
+{{--            </div>--}}
 
             <!-- Profile Section -->
             <div x-data="{ showProfile: false }" class="relative rounded-full py-[-4px] px-2">

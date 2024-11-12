@@ -128,6 +128,7 @@
                             });
                         </script>
                     </div>
+
                     <div class="flex justify-end">
                         <label class="text-center mt-2 mr-1" for="start_date">Tagging Date From:</label>
                         <input type="date" id="start_date" wire:model.live="startTaggingDate" class="border text-[13px] border-gray-300 rounded px-2 py-1"
@@ -171,17 +172,12 @@
                             <option value="{{ $livingSituationFilter->id }}">{{ $livingSituationFilter->living_situation_description }}</option>
                         @endforeach
                     </select>
-                    <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                        <option value="">Occupation</option>
-                        <option value="barangay1">Barangay 1</option>
-                        <option value="barangay2">Barangay 2</option>
-                        <option value="barangay3">Barangay 3</option>
-                    </select>
-                    <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                    <select wire:model.live="selectedTaggingStatus"
+                            class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
-                        <option value="barangay1">Barangay 1</option>
-                        <option value="barangay2">Barangay 2</option>
-                        <option value="barangay3">Barangay 3</option>
+                        @foreach($taggingStatuses as $status)
+                            <option value="{{ $status }}">{{ $status }}</option>
+                        @endforeach
                     </select>
                     <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">Reset Filters</button>
                 </div>
@@ -202,7 +198,6 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-col">MONTHLY INCOME</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TRANSACTION TYPE</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TAGGING DATE</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">ACTIONS</th>
                         </tr>
@@ -219,7 +214,6 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap case-specification-description-col">{{ $applicant->living_situation_case_specification ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->contact_number ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->applicant->transactionType->type_name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
                                     @if(!$applicant->is_awarding_on_going)
@@ -320,10 +314,26 @@
                             <!-- Barangay Field -->
                             <div class="mb-4">
                                 <br>
-                                <label class="block text-sm font-medium mb-2 text-black" for="barangay">LOT
-                                    ALLOCATED</label>
+                                <label class="block text-sm font-medium mb-2 text-black" for="barangay">
+                                    LOT ALLOCATION
+                                </label>
+                                <div class="mb-4">
+                                    <label class="block text-[12px] font-medium mb-2 text-black"
+                                           for="lot_name">RELOCATION SITE <span class="text-red-500">*</span></label>
+                                    <select wire:model.live="relocation_lot_id" id="lot_name" name="lot_name" :disabled="!isEditable" required
+                                            class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
+                                        <option value="">Select Relocation Site </option>
+                                        @forelse($relocationSites as $relocationSite)
+                                            <option value="{{ $relocationSite->id }}">{{ $relocationSite->relocation_site_name }}</option>
+                                        @empty
+                                            <option disabled>There's no record available yet.</option>
+                                        @endforelse
+                                    </select>
+                                    @error('relocation_lot_id') <span class="error">{{ $message }}</span> @enderror
+                                </div>
                                 <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="barangay">BARANGAY <span class="text-red-500">*</span></label>
+                                       for="barangay">BARANGAY <span class="text-red-500">*</span>
+                                </label>
                                 <select wire:model.live="barangay_id" id="barangay" name="barangay" :disabled="!isEditable" required
                                         class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
                                     <option value="">Select Barangay</option>
@@ -337,7 +347,8 @@
                             <!-- Purok Field -->
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="purok">PUROK <span class="text-red-500">*</span></label>
+                                       for="purok">PUROK <span class="text-red-500">*</span>
+                                </label>
                                 <select wire:model.live="purok_id" id="purok" name="purok" :disabled="!isEditable" required
                                         class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
                                     <option value="">Select Purok </option>
@@ -346,19 +357,6 @@
                                     @endforeach
                                 </select>
                                 @error('purok_id') <span class="error">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="lot_name">LOT NAME/NUMBER <span class="text-red-500">*</span></label>
-                                <select wire:model.live="lot_id" id="lot_name" name="lot_name" :disabled="!isEditable" required
-                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Select Lot </option>
-                                    @foreach($lots as $lot)
-                                        <option value="{{ $lot->id }}">{{ $lot->lot_name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('lot_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- LotList Size Allocated Field -->
