@@ -3,12 +3,15 @@
 namespace App\Livewire;
 
 use App\Models\Shelter\Material;
+use App\Models\Shelter\PurchaseOrder;
+
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class ShelterMaterialsList extends Component
 {
     use WithPagination;
+ 
 
     public $search = '';
     public $purchaseOrderNo;
@@ -40,12 +43,14 @@ class ShelterMaterialsList extends Component
 
     public function render()
     {
+
         $materials = Material::query()
+        ->with('materialUnit') // Eager load the unit relationship
         ->when($this->purchaseOrderNo, fn($query) => $query->where('purchase_order_id', 'like', "%{$this->purchaseOrderNo}%"))
         ->when($this->purchaseRequisitionNo, fn($query) => $query->where('purchase_requisition_no', 'like', "%{$this->purchaseRequisitionNo}%"))
         ->when($this->itemsDescription, fn($query) => $query->where('item_description', 'like', "%{$this->itemsDescription}%"))
         ->when($this->quantity, fn($query) => $query->where('quantity', $this->quantity))
-        ->when($this->unit, fn($query) => $query->where('material_unit_id', $this->unit)) // Exact match for unit
+        ->when($this->unit, fn($query) => $query->where('material_unit_id', $this->unit))
         ->paginate($this->perPage);
         
         return view('livewire.shelter-materials-list', [

@@ -84,6 +84,10 @@ class ShelterMaterialInventory extends Component
             if (!str_starts_with($this->purchaseOrderNo, 'PO-')) {
                 $this->purchaseOrderNo = 'PO-' . strtoupper($this->purchaseOrderNo); // Add "PO" and make uppercase
             }
+            // Ensure the purchase order number starts with "PO"
+            if (!str_starts_with($this->purchaseRequisitionNo, 'PR-')) {
+                $this->purchaseRequisitionNo = 'PR-' . strtoupper($this->purchaseRequisitionNo); // Add "PR" and make uppercase
+            }
 
             // First, handle the Purchase Requisition
             $purchaseRequisition = PurchaseRequisition::firstOrCreate(
