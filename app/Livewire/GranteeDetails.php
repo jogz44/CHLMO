@@ -14,9 +14,12 @@ use App\Models\GovernmentProgram;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Shelter\ShelterSpouse;
+use App\Models\Shelter\Material;
 use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\Tribe;
+use App\Models\Shelter\DeliveredMaterial;
+use App\Models\Shelter\PurchaseOrder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
@@ -44,11 +47,14 @@ class GranteeDetails extends Component
         $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $remarks;
 
-    public $materialUnitId, $material_id, $purchaseOrderId;
+    public $materialUnitId, $material_id, $purchaseOrderId, $materialUnits = [], $purchaseOrders = [];
     public $quantity, $date_of_delivery, $date_of_ris;
-    public $photo = [], $photoForAwarding = [];
+    public $photo = [], $photoForGranting = [];
     public $selectedImage = null; // This is for the tagging image
     public $selectedAttachment = null; // this is for the awarding attachment
+    public $materials = [
+        ['material_id' => '', 'quantity' => '', 'purchase_order_id' => '']
+    ];
 
     public function mount($profileNo): void
     {
@@ -65,7 +71,7 @@ class GranteeDetails extends Component
             'profiledTaggedApplicant.address.purok',
             'profiledTaggedApplicant.address.barangay',
         ])->findOrFail($profileNo);
-
+        $this->grantee = Grantee::with(['deliveredMaterials.material'])->findOrFail($profileNo);
         $this->profiledTagged = $this->grantee->profiledTaggedApplicant;
         $this->shelterApplicant = $this->profiledTagged->shelterApplicant;
         $this->loadFormData();
@@ -104,7 +110,19 @@ class GranteeDetails extends Component
         $this->spouse_last_name = $this->profiledTagged?->shelterSpouse?->spouse_last_name ?? '--';
 
         $this->date_of_delivery = optional($this->grantee->date_of_delivery)->format('F d, Y') ?? '--';
-        
+        $this->date_of_ris = optional($this->grantee->date_of_ris)->format('F d, Y') ?? '--';
+
+        // Load delivered materials and map over them
+        $this->materials = $this->grantee->deliveredMaterials->map(function ($deliveredMaterial) {
+            return [
+                'material_id' => $deliveredMaterial->material_id,  // material ID from deliveredMaterial
+                'grantee_quantity' => $deliveredMaterial->grantee_quantity,  // Quantity given to the grantee
+                'purchase_order_id' => $deliveredMaterial->purchase_order_id,  // Purchase order ID from deliveredMaterial
+                'material_unit_id' => $deliveredMaterial->material->material_unit_id,  // material_unit_id from Material model
+            ];
+        })->toArray();
+
+
         // Load civil statuses here
         $this->civilStatuses = CivilStatus::all();
         // Load living situation
@@ -118,7 +136,7 @@ class GranteeDetails extends Component
             $this->living_situation_case_specification = $this->profiledTagged?->living_situation_case_specification ?? '';
         }
         $this->caseSpecifications = CaseSpecification::all();
-        
+
         // government programs
         $this->government_program_id = $this->profiledTagged?->government_program_id ?? '--';
         $this->governmentPrograms = GovernmentProgram::all();
@@ -134,9 +152,9 @@ class GranteeDetails extends Component
             $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
         }
 
-        $this->photo = $this->shelterApplicant->taggedAndValidated?->photo ?? [];
+        $this->photo = $this->shelterApplicant->profiledTagged?->photo ?? [];
 
-        $this->photoForAwarding = $this->shelterApplicant->taggedAndValidated?->grantees?->flatMap(function ($grantee) {
+        $this->photoForGranting = $this->shelterApplicant->profiledTagged?->grantees?->flatMap(function ($grantee) {
             return $grantee->granteeDocumentsSubmission()
                 ->get()
                 ->map(function ($submission) {
@@ -144,18 +162,33 @@ class GranteeDetails extends Component
                 })->filter();
         }) ?? collect();
     }
+     // For Awarding pictures
+     public function viewAttachment($fileName): void
+     {
+         $this->selectedAttachment = $fileName;
+     }
+     public function closeAttachment(): void
+     {
+         $this->selectedAttachment = null;
+     }
+    public function getPoNumber($purchaseOrderId)
+    {
+        $purchaseOrder = PurchaseOrder::find($purchaseOrderId);
+        return $purchaseOrder ? $purchaseOrder->po_number : null;
+    }
+
     public function updatedBarangayId($barangayId): void
     {
         $this->isLoading = true;
 
         try {
-            if ($barangayId){
+            if ($barangayId) {
                 $this->puroks = Purok::where('barangay_id', $barangayId)->get();
-            } else{
+            } else {
                 $this->puroks = [];
             }
             $this->purok_id = null; // Reset selected puroks when barangay changes
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             logger()->error('Error fetching puroks', [
                 'barangay_id' => $barangayId,
                 'error' => $e->getMessage()
@@ -165,13 +198,15 @@ class GranteeDetails extends Component
     }
     public function render()
     {
+        $materialsList = Material::all(); // Fetch all materials for the dropdown
         $OriginOfRequests = OriginOfRequest::all();
         return view('livewire.grantee-details', [
             'grantee' => $this->grantee,
             'OriginOfRequests' => $OriginOfRequests,
             'barangays' => Barangay::all(),
             'tribes' => Tribe::all(),
-            'religions' => Religion::all()
+            'religions' => Religion::all(),
+            'materialsList' => $materialsList, // Add materials list for the dropdown
         ])
             ->layout('layouts.adminshelter');
     }
