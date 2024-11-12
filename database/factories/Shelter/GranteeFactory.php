@@ -42,6 +42,7 @@ class GranteeFactory extends Factory
             'certificate_of_indigency_photo' => $this->faker->imageUrl(640, 480, 'identity', true, 'Certificate of Indigency'), // Realistic photo URL
             'consent_letter_if_the_land_is_not_theirs_photo)' => $this->faker->imageUrl(640, 480, 'business', true, 'Consent Letter (if the land is not theirs)'), // Realistic photo URL
             'photocopy_of_id_from_the_Land_Owner_if_the_land_is_not_theirs_photo) ' => $this->faker->imageUrl(640, 480, 'business', true, 'Photocopy of ID from the Land Owner (if the land is not theirs) '), // Realistic photo URL
+            'profiling_form_photo' => $this->faker->imageUrl(640, 480, 'business', true, 'Profiling Form'), // Realistic photo URL
         ];
     }
 

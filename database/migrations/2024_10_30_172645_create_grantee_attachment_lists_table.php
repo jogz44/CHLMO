@@ -26,6 +26,7 @@ return new class extends Migration
             ['attachment_name' => 'Certificate of Indigency (photo)'],
             ['attachment_name' => 'Consent Letter (if the land is not theirs) (photo)'],
             ['attachment_name' => 'photocopy of ID from the Land Owner (if the land is not theirs) (photo)'],
+            ['attachment_name' => 'Profiling Form (photo)'],
         ]);
     }
 

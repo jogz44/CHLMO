@@ -8,6 +8,7 @@ use App\Models\Shelter\ProfiledTaggedApplicant;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Shelter\ShelterLiveInPartner;
+use App\Models\Shelter\ShelterImagesForHousing;
 use App\Models\Barangay;
 use App\Models\Purok;
 use App\Models\Address;
@@ -24,9 +25,11 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Livewire\WithFileUploads;
 
 class ShelterApplicantDetails extends Component
 {
+    use WithFileUploads;
     public $profileNo;
     public $applicant;
     public $first_name;
@@ -64,6 +67,7 @@ class ShelterApplicantDetails extends Component
     public $spouse_middle_name;
     public $spouse_last_name;
     public $partner_first_name, $partner_middle_name, $partner_last_name;
+    public $photo = [], $renamedFileName = [];
 
     public function mount($profileNo)
     {
@@ -175,6 +179,8 @@ class ShelterApplicantDetails extends Component
             'purok_id' => 'required|exists:puroks,id',
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
+            'remarks' => 'nullable|string|max:255',
+            'photo.*' => 'required|file|mimes:jpeg,png,jpg,gif',
 
              // Live-in partner details
              'partner_first_name' => [
@@ -270,6 +276,16 @@ class ShelterApplicantDetails extends Component
                     'spouse_first_name' => $this->spouse_first_name,
                     'spouse_middle_name' => $this->spouse_middle_name,
                     'spouse_last_name' => $this->spouse_last_name,
+                ]);
+            }
+
+            foreach ($this->photo as $index => $image) {
+                $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
+                $path = $image->storeAs('photo', $renamedFileName, 'public');
+                ShelterImagesForHousing::create([
+                    'profiled_tagged_applicant_id' => $taggedApplicant->id,
+                    'image_path' => $path,
+                    'display_name' => $renamedFileName,
                 ]);
             }
             

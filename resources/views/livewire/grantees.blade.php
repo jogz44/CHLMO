@@ -76,11 +76,16 @@
                             <option value="{{ $origin->id }}">{{ $origin->name }}</option>
                             @endforeach
                         </select>
+                        <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">Select Status</option>
+                           
+                        </select>
                         <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
                             Reset Filter
                         </button>
                     </div>
                 </div>
+                
             </div>
 
 
@@ -96,6 +101,7 @@
                             <th class="py-2 px-2 border-b text-center font-medium">Date Request</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Date Profiled/Tagged</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Delivery Date</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Details</th>
                         </tr>
                     </thead>
@@ -103,7 +109,7 @@
                         @forelse($grantees as $grantee)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{  $grantee->profiledTaggedApplicant->shelterApplicant->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->middle_name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->middle_name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b"> {{ $grantee->profiledTaggedApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">
@@ -112,12 +118,32 @@
                             <td class="py-4 px-2 text-center border-b">
                                 {{ $grantee->date_of_delivery ? $grantee->date_of_delivery->format('Y-m-d') : '' }}
                             </td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                <button                           
-                                    @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details
-                                </button>
+                            <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
+                                <!-- Animated Confetti -->
+                                <div class="flex items-center">
+                                    @if($grantee->is_granted)
+                                    Granted
+                                    <span class="ml-1">
+                                        <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                        <lord-icon
+                                            src="https://cdn.lordicon.com/fkmafinl.json"
+                                            trigger="loop"
+                                            delay="2000"
+                                            style="width: 30px; height: 30px">
+                                        </lord-icon>
+                                    </span>
+                                    @else
+                                    <span class="text-red-500">Pending...</span>
+                                    @endif
+                                </div>
                             </td>
+                            <td class="py-4 px-2 text-center border-b space-x-2">
+                                @if($grantee->is_granted)
+                                <button @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
+                                @endif
+                            </td>
+
                         </tr>
                         @empty
                         <tr>

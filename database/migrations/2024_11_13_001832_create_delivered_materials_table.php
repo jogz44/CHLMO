@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('grantees', function (Blueprint $table) {
+        Schema::create('delivered_materials', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('profiled_tagged_applicant_id')->constrained('profiled_tagged_applicants')->onDelete('cascade');
-            $table->dateTime('date_of_delivery');
-            $table->dateTime('date_of_ris');
-            $table->boolean('is_granted')->default(false);
+            $table->foreignId('grantee_id')->constrained('grantees')->onDelete('cascade');
+            $table->foreignId('material_id')->constrained('materials')->onDelete('cascade');
+            $table->integer('grantee_quantity');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('grantees');
+        Schema::dropIfExists('delivered_materials');
     }
 };

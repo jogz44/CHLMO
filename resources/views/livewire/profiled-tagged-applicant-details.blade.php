@@ -3,17 +3,17 @@
         <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-5">
                 <div class="flex items-center">
-                    <a href="{{ route('shelter-grantees') }}">
+                    <a href="{{ route('shelter-profiled-tagged-applicants') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                             stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
                     </a>
-                    <h2 class="text-[13px] ml-2 items-center text-gray-700">Shelter Assistance Grantee's Details</h2>
+                    <h2 class="text-[13px] ml-2 items-center text-gray-700">Profiled/Tagged Applicant Details</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                <!-- <div x-data="{ saved: false }" class="flex space-x-2 z-0">
+                <div x-data="{ saved: false }" class="flex space-x-2 z-0">
                     <button
                         :disabled="!isEditable || saved"
                         class="bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white text-xs font-medium px-6 py-2 rounded"
@@ -26,24 +26,20 @@
                         class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
                         EDIT
                     </button>
-                </div> -->
+                </div>
             </div>
 
 
-            <div class="flex flex-col p-3 rounded mt-5">
-                @if($shelterApplicant)
-                <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $shelterApplicant->profile_no }}</h2>
+            <div class="flex flex-col p-3 rounded mt-11">
+                <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $profiledTaggedApplicant->shelterApplicant->profile_no }}</h2>
                 <h1 class="text-[25px] items-center font-bold text-gray-700">
-                    {{ $shelterApplicant->last_name }}, {{ $shelterApplicant->first_name }}
-                    @if($shelterApplicant->middle_name) {{ $shelterApplicant->middle_name }} @endif
+                    {{ $profiledTaggedApplicant->shelterApplicant->first_name }}
+                    @if($profiledTaggedApplicant->shelterApplicant->middle_name) {{ substr($profiledTaggedApplicant->shelterApplicant->middle_name, 0, 1) }}. @endif
+                    {{ $profiledTaggedApplicant->shelterApplicant->last_name }}
                 </h1>
-                @else
-                <p class="text-red-500">Shelter applicant not found.</p>
-                @endif
             </div>
 
-
-            <form wire:submit.prevent="saveChanges">
+            <form wire:submit.prevent="update">
                 <div class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
@@ -92,32 +88,35 @@
                             @error('request_origin_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                wire:model="request_origin_id"
+                                value="{{ $profiledTaggedApplicant->shelterApplicant->originOfRequest->name }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="requestDate" class="block text-[12px] font-medium text-gray-700 mb-1">REQUEST DATE</label>
-                            <input type="date" id="requestDate" name="requestDate" :disabled="!isEditable" wire:model="date_request"
+                            @if($isEditing)
+                            <input wire:model="date_request"
+                                type="date"
+                                id="date_request"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTaggedApplicant->shelterApplicant->date_request ? date('F d, Y', strtotime($profiledTaggedApplicant->shelterApplicant->date_request)) : 'N/A' }}"
+                                disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="date_tagged" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 DATE PROFILED/TAGGED
                             </label>
-                            @if($isEditing)
-                            <input wire:model="date_tagged"
-                                type="date"
-                                id="date_tagged"
-                                @disabled(!$isEditing)
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @else
+
                             <input type="text"
-                                value="{{ $profiledTagged->date_tagged ? date('F d, Y', strtotime($profiledTagged->date_tagged)) : 'N/A' }}"
+                                value="{{ $profiledTaggedApplicant->date_tagged ? date('F d, Y', strtotime($profiledTaggedApplicant->date_tagged)) : 'N/A' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @endif
                         </div>
                     </div>
                 </div>
@@ -143,7 +142,7 @@
                                 </div>
                                 @else
                                 <input type="text"
-                                    value="{{ $profiledTagged->sex }}"
+                                    value="{{ $profiledTaggedApplicant->sex }}"
                                     disabled
                                     class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 @endif
@@ -195,7 +194,7 @@
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTagged->civilStatus->civil_status }}"
+                                value="{{ $profiledTaggedApplicant->civilStatus->civil_status }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -290,7 +289,7 @@
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTagged->religion->religion_name }}"
+                                value="{{ $profiledTaggedApplicant->religion->religion_name }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -312,7 +311,7 @@
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTagged->tribe->tribe_name }}"
+                                value="{{ $profiledTaggedApplicant->tribe->tribe_name }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -354,7 +353,7 @@
                             @error('barangay_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTagged->address?->barangay?->name ?? '--' }}"
+                                value="{{  $profiledTaggedApplicant->address?->barangay?->name ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -377,7 +376,7 @@
                             @error('purok_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTagged->address?->purok?->name ?? '--' }}"
+                                value="{{  $profiledTaggedApplicant->address?->purok?->name ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -412,7 +411,7 @@
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTagged->governmentProgram->program_name }}"
+                                value="{{ $profiledTaggedApplicant->governmentProgram->program_name }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -440,7 +439,7 @@
                             @else
                             <textarea rows="2"
                                 disabled
-                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->livingSituation)->living_situation_description ?? '--' }}
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTaggedApplicant->livingSituation)->living_situation_description ?? '--' }}
                             </textarea>
                             @endif
                         </div>
@@ -476,15 +475,15 @@
                                 @enderror
                             </div>
                             @else
-                            @if($profiledTagged->living_situation_id == 8)
+                            @if($profiledTaggedApplicant->living_situation_id == 8)
                             <textarea rows="2"
                                 disabled
-                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->caseSpecification)->case_specification_name ?? '--' }}
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTaggedApplicant->caseSpecification)->case_specification_name ?? '--' }}
                             </textarea>
                             @else
                             <textarea rows="2"
                                 disabled
-                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ $profiledTagged->living_situation_case_specification ?? '--' }}
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ $profiledTaggedApplicant->living_situation_case_specification ?? '--' }}
                             </textarea>
                             @endif
                             @endif
@@ -511,163 +510,54 @@
                 </div>
 
 
-                <div class="flex flex-col p-3 rounded mt-5 mb-1">
-                    <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">DELIVERY DETAILS</h2>
+                <div class="p-3 rounded">
+                    <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">UPLOADED DOCUMENTS DURING TAGGING</h2>
                 </div>
-
+                <!-- Display images -->
                 <div class="bg-white p-6 rounded shadow mb-6">
-                    <div class="flex flex-wrap w-full">
-                        <div class="w-full pr-4">
-                            <div class="w-full flex flex-wrap -mx-2 mb-1">
-                                <div class="w-full md:w-1/2 px-2 mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="irs-date">DATE OF RIS</label>
-                                    @if($isEditing)
-                                    <input wire:model="date_of_ris"
-                                        type="date"
-                                        id="date_of_ris"
-                                        @disabled(!$isEditing)
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @else
-                                    <input type="text"
-                                        value="{{ $grantee->date_of_ris ? date('F d, Y', strtotime($grantee->date_of_ris)) : 'N/A' }}"
-                                        disabled
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @endif
-                                </div>
-                                <div class="w-full md:w-1/2 px-2 mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="delivery-date">DATE OF DELIVERY</label>
-                                    @if($isEditing)
-                                    <input wire:model="date_of_delivery"
-                                        type="date"
-                                        id="date_of_delivery"
-                                        @disabled(!$isEditing)
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @else
-                                    <input type="text"
-                                        value="{{ $grantee->date_of_delivery ? date('F d, Y', strtotime($grantee->date_of_delivery)) : 'N/A' }}"
-                                        disabled
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    @endif
-                                </div>
-
-                            </div>
-
-                            <label class="block text-[12px] font-medium text-gray-700 mb-4">MATERIALS DELIVERED</label>
-
-                            @foreach($materials as $index => $material)
-                            <div x-data="{ material: @entangle('materials.'.$index) }" class="flex flex-wrap -mx-2 mb-1">
-
-                                <!-- Material Select -->
-                                <div class="w-full md:w-2/4 px-2 mb-2">
-                                    <label for="material" class="block text-[12px] font-medium text-gray-700 mb-1">MATERIAL</label>
-                                    <select x-model="material.material_id" :disabled="!isEditable"
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                        <option value="">Select Material</option>
-                                        @foreach($materialsList as $materialOption)
-                                        <option value="{{ $materialOption['id'] }}"
-                                            @if($material['material_id']==$materialOption['id']) selected @endif>
-                                            {{ $materialOption['item_description'] }}
-                                        </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <!-- Quantity Input -->
-                                <div class="w-full md:w-1/4 px-2 mb-2">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="qty">QUANTITY</label>
-                                    <input type="number" x-model="material.grantee_quantity" :disabled="!isEditable"
-                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 rounded-md placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                        placeholder="Quantity">
-
-
-                                </div>
-
-                                <!-- PO Number Select -->
-                                <div class="w-full md:w-1/4 px-2 mb-2">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="PoNum">PO NUMBER</label>
-                                    <input type="text" x-model="material.purchase_order_id" :disabled="!isEditable"
-                                        class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 rounded-md placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                        value="{{ $this->getPoNumber($material['purchase_order_id']) }}">
-                                </div>
-                            </div>
-                            @endforeach
-
-
-                        </div>
-                    </div>
-
-                    <div class="p-3 rounded">
-                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">UPLOADED REQUIREMENTS DURING GRANTING</h2>
-                    </div>
-                    <!-- Display images -->
-                    <div class="bg-white p-6 rounded shadow mb-6">
-                        <!-- Image Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                            @forelse($photoForGranting as $fileName)
-                            @if($isEditing)
-                            <div class="relative group cursor-pointer" wire:click="viewAttachment('{{ $fileName }}')">
-                                <img
-                                    src="{{ asset('grantee-photo-requirements/documents/' . $fileName) }}"
-                                    alt="{{ $fileName }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                                    loading="lazy">
-                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                    {{ $fileName }}
-                                </div>
-                            </div>
-                            @else
-                            <div class="relative group cursor-not-allowed">
-                                <img
-                                    src="{{ asset('grantee-photo-requirements/documents/' . $fileName) }}"
-                                    alt="{{ $fileName }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                                    loading="lazy">
-                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                    {{ $fileName }}
-                                </div>
-                            </div>
-                            @endif
-
-                            @empty
-                            <div class="col-span-full text-center py-4 text-gray-500">
-                                No images available
-                            </div>
-                            @endforelse
-                        </div>
-
-                        <!-- Modal -->
-                        @if($isEditing)
-                        @if($selectedAttachment)
-                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
-                                <div class="flex justify-end mb-2">
-                                    <button wire:click="closeAttachment" class="text-gray-500 hover:text-gray-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <img src="{{ asset('grantee-photo-requirements/documents/' . $selectedAttachment) }}"
-                                    alt="{{ $selectedAttachment }}"
-                                    class="max-w-full h-auto">
-                                <div class="mt-2 text-center text-gray-700">
-                                    {{ $selectedAttachment }}
-                                </div>
+                    <!-- Image Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                        @forelse($photo as $image)
+                        <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
+                            <img
+                                src="{{ asset('storage/' . $image->image_path) }}"
+                                alt="{{ $image->display_name }}"
+                                class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                {{ $image->display_name }}
                             </div>
                         </div>
-                        @endif
-                        @endif
+                        @empty
+                        <div class="col-span-full text-center py-4 text-gray-500">
+                            No images available
+                        </div>
+                        @endforelse
                     </div>
+
+                    <!-- Modal -->
+                    @if($selectedImage)
+                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                            <div class="flex justify-end mb-2">
+                                <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
+                                alt="{{ $selectedImage->display_name }}"
+                                class="max-w-full h-auto">
+                            <div class="mt-2 text-center text-gray-700">
+                                {{ $selectedImage->display_name }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
-
+            </form>
         </div>
+
     </div>
 
-
-    </form>
-</div>
-
-</div>
 </div>

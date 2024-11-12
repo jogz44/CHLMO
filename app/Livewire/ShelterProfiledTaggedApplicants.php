@@ -13,11 +13,13 @@ use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\MaterialUnit;
 use App\Models\Shelter\ProfiledTaggedApplicant;
 use App\Models\Shelter\ShelterUploadedFiles;
+use App\Models\Shelter\DeliveredMaterial;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\ShelterUploadedFile;
+use Illuminate\Http\RedirectResponse;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
@@ -44,7 +46,7 @@ class ShelterProfiledTaggedApplicants extends Component
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $requestLetterAddressToCityMayor, $certificateOfIndigency, $consentLetterIfTheLandIsNotTheirs,
-        $photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs, $selectedGrantee, $files,
+        $photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs, $profilingForm, $selectedGrantee, $files,
         $granteeToPreview, $isUploading = false;
 
     public $attachment_id, $attachmentLists = [];
@@ -127,29 +129,29 @@ class ShelterProfiledTaggedApplicants extends Component
 
 
     public function updateMaterialInfo($index)
-{
-    $material = Material::with(['purchaseOrder', 'materialUnit'])->find($this->materials[$index]['material_id']);
-    
-    if ($material) {
-        // Store IDs for internal logic
-        $this->materials[$index]['material_unit_id'] = $material->materialUnit?->id ?? null;
-        $this->materials[$index]['purchase_order_id'] = $material->purchaseOrder?->id ?? null;
+    {
+        $material = Material::with(['purchaseOrder', 'materialUnit'])->find($this->materials[$index]['material_id']);
 
-        // Store readable values for display
-        $this->materials[$index]['materialUnitDisplay'] = $material->materialUnit?->unit ?? 'N/A';
-        $this->materials[$index]['purchaseOrderDisplay'] = $material->purchaseOrder?->po_number ?? 'N/A';
+        if ($material) {
+            // Store IDs for internal logic
+            $this->materials[$index]['material_unit_id'] = $material->materialUnit?->id ?? null;
+            $this->materials[$index]['purchase_order_id'] = $material->purchaseOrder?->id ?? null;
 
-        // Quantity is a straightforward value
-        $this->materials[$index]['quantity'] = $material->quantity;
-    } else {
-        // Set defaults if material not found
-        $this->materials[$index]['material_unit_id'] = null;
-        $this->materials[$index]['purchase_order_id'] = null;
-        $this->materials[$index]['materialUnitDisplay'] = 'N/A';
-        $this->materials[$index]['purchaseOrderDisplay'] = 'N/A';
-        $this->materials[$index]['quantity'] = 'N/A';
+            // Store readable values for display
+            $this->materials[$index]['materialUnitDisplay'] = $material->materialUnit?->unit ?? 'N/A';
+            $this->materials[$index]['purchaseOrderDisplay'] = $material->purchaseOrder?->po_number ?? 'N/A';
+
+            // Quantity is a straightforward value
+            $this->materials[$index]['quantity'] = $material->quantity;
+        } else {
+            // Set defaults if material not found
+            $this->materials[$index]['material_unit_id'] = null;
+            $this->materials[$index]['purchase_order_id'] = null;
+            $this->materials[$index]['materialUnitDisplay'] = 'N/A';
+            $this->materials[$index]['purchaseOrderDisplay'] = 'N/A';
+            $this->materials[$index]['quantity'] = 'N/A';
+        }
     }
-}
 
 
 
@@ -193,13 +195,91 @@ class ShelterProfiledTaggedApplicants extends Component
 
 
 
+    // public function grantApplicant()
+    // {
+    //     $this->validate();
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Loop over each material to create a grantee entry
+    //         foreach ($this->materials as $material) {
+    //             // Check if there's enough stock available for the material
+    //             $currentMaterial = Material::find($material['material_id']);
+    //             if ($currentMaterial->quantity < $material['grantee_quantity']) {
+    //                 throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
+    //             }
+
+    //             // Create the grantee entry
+    //             $grantee = Grantee::create([
+    //                 'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
+    //                 'material_id' => $material['material_id'],
+    //                 'grantee_quantity' => $material['grantee_quantity'],
+    //                 'material_unit_id' => $material['material_unit_id'],
+    //                 'purchase_order_id' => $material['purchase_order_id'],
+    //                 'date_of_delivery' => $this->date_of_delivery,
+    //                 'date_of_ris' => $this->date_of_ris,
+    //                 'is_granted' => false,
+    //             ]);
+
+    //             // Upload photos if any
+    //             foreach ($this->photo as $image) {
+    //                 $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
+    //                 ShelterUploadedFiles::create([
+    //                     'grantee_id' => $grantee->id,
+    //                     'image_path' => $path,
+    //                     'display_name' => $image->getClientOriginalName(),
+    //                 ]);
+    //             }
+
+    //             // Subtract the granted quantity from the available stock
+    //             $currentMaterial->decrement('quantity', $material['grantee_quantity']);
+
+    //             Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
+    //         }
+
+    //         // Update the applicant's status
+    //         ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
+    //             'is_awarding_on_going' => true
+    //         ]);
+
+    //         DB::commit();
+    //         $this->resetForm();
+    //         $this->dispatch('alert', [
+    //             'title' => 'Granting Pending!',
+    //             'message' => 'Applicant needs to submit necessary requirements.',
+    //             'type' => 'warning',
+    //         ]);
+
+    //         return redirect()->route('shelter-profiled-tagged-applicants');
+    //     } catch (QueryException $e) {
+    //         DB::rollBack();
+    //         $this->handleGrantingError($e);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error processing grant: ' . $e->getMessage());
+    //         $this->dispatch('alert', [
+    //             'title' => 'Insufficient Stock!',
+    //             'message' => 'There was not enough stock to fulfill this request.',
+    //             'type' => 'danger',
+    //         ]);
+    //     }
+    // }
+
     public function grantApplicant()
     {
         $this->validate();
         DB::beginTransaction();
 
         try {
-            // Loop over each material to create a grantee entry
+            // Create the grantee entry first
+            $grantee = Grantee::create([
+                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
+                'date_of_delivery' => $this->date_of_delivery,
+                'date_of_ris' => $this->date_of_ris,
+                'is_granted' => false,
+            ]);
+
+            // Now loop over the materials to create DeliveredMaterial entries for this grantee
             foreach ($this->materials as $material) {
                 // Check if there's enough stock available for the material
                 $currentMaterial = Material::find($material['material_id']);
@@ -207,33 +287,32 @@ class ShelterProfiledTaggedApplicants extends Component
                     throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
                 }
 
-                // Create the grantee entry
-                $grantee = Grantee::create([
-                    'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
+                // Create the DeliveredMaterial record for each material
+                DeliveredMaterial::create([
+                    'grantee_id' => $grantee->id,
                     'material_id' => $material['material_id'],
                     'grantee_quantity' => $material['grantee_quantity'],
-                    'material_unit_id' => $material['material_unit_id'],
-                    'purchase_order_id' => $material['purchase_order_id'],
-                    'date_of_delivery' => $this->date_of_delivery,
-                    'date_of_ris' => $this->date_of_ris,
-                    'is_granted' => false,
                 ]);
-
-                // Upload photos if any
-                foreach ($this->photo as $image) {
-                    $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
-                    ShelterUploadedFiles::create([
-                        'grantee_id' => $grantee->id,
-                        'image_path' => $path,
-                        'display_name' => $image->getClientOriginalName(),
-                    ]);
-                }
 
                 // Subtract the granted quantity from the available stock
                 $currentMaterial->decrement('quantity', $material['grantee_quantity']);
-
-                Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
             }
+
+            // Retrieve the delivered materials for logging or debugging purposes
+            $deliveredMaterials = $grantee->deliveredMaterials; // Will automatically load related delivered materials
+            Log::info('Materials delivered to grantee', ['granteeId' => $grantee->id, 'deliveredMaterials' => $deliveredMaterials]);
+
+           
+            foreach ($this->photo as $image) {
+                $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
+                ShelterUploadedFiles::create([
+                    'grantee_id' => $grantee->id,
+                    'image_path' => $path,
+                    'display_name' => $image->getClientOriginalName(),
+                ]);
+            }
+
+            Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
 
             // Update the applicant's status
             ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
@@ -309,6 +388,7 @@ class ShelterProfiledTaggedApplicants extends Component
             'certificateOfIndigency' => 'required|file|max:10240',
             'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
             'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
+            'profilingForm' => 'required|file|max:10240',
         ]);
     }
 
@@ -336,32 +416,16 @@ class ShelterProfiledTaggedApplicants extends Component
                 'certificateOfIndigency' => 'required|file|max:10240',
                 'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
                 'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
+                'profilingForm' => 'required|file|max:10240',
             ]);
 
             logger()->info('Validation passed', $validatedData);
-
-            // // Process the file
-            // $ext = $this->requestLetterAddressToCityMayor->getClientOriginalExtension();
-            // $toSave = 'grantee_' . $this->granteeId . '_' . uniqid() . '.' . $ext;
-            // $filePath = $this->requestLetterAddressToCityMayor->storeAs('documents', $toSave, 'grantee-photo-requirements');
-
-            // // Prepare document data for storage
-            // $documentData = [
-            //     'grantee_id' => $this->granteeId,
-            //     'attachment_id' => $this->attachment_id,
-            //     'description' => $this->description,
-            //     'file_path' => $filePath,
-            //     'file_name' => $this->requestLetterAddressToCityMayor->getClientOriginalName(),
-            //     'file_type' => $ext,
-            //     'file_size' => $this->requestLetterAddressToCityMayor->getSize(),
-            // ];
-
-            // $savedDocument = GranteeDocumentsSubmission::create($documentData);
 
             $this->storeAttachment('requestLetterAddressToCityMayor', 1);
             $this->storeAttachment('certificateOfIndigency', 2);
             $this->storeAttachment('consentLetterIfTheLandIsNotTheirs', 3);
             $this->storeAttachment('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', 4);
+            $this->storeAttachment('profilingForm', 5);
 
             DB::commit();
 
@@ -393,8 +457,6 @@ class ShelterProfiledTaggedApplicants extends Component
     {
         $file = $this->$fileInput;
         if ($file) {
-            //            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            //            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
             $fileName = $file->getClientOriginalName();
             $filePath = $file->storeAs('documents', $fileName, 'grantee-photo-requirements');
 
@@ -447,11 +509,16 @@ class ShelterProfiledTaggedApplicants extends Component
             'certificateOfIndigency',
             'consentLetterIfTheLandIsNotTheirs',
             'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs',
+            'profilingForm',
             'attachment_id',
         ]);
 
         $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
         $this->show = false;  // Close the modal or hide any UI related to uploads if needed
+    }
+    public function viewApplicantDetails($profileNo): RedirectResponse
+    {
+        return redirect()->route('profiled-tagged-applicant-details', ['profileNo' => $profileNo]);
     }
 
     public function render()
