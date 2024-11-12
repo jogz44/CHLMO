@@ -13,7 +13,7 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                <div x-data="{ saved: false }" class="flex space-x-2 z-0">
+                <!-- <div x-data="{ saved: false }" class="flex space-x-2 z-0">
                     <button
                         :disabled="!isEditable || saved"
                         class="bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white text-xs font-medium px-6 py-2 rounded"
@@ -26,7 +26,7 @@
                         class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
                         EDIT
                     </button>
-                </div>
+                </div> -->
             </div>
 
 
@@ -516,116 +516,158 @@
                 </div>
 
                 <div class="bg-white p-6 rounded shadow mb-6">
-                    <div class="flex flex-wrap ">
-                        <div class="w-full lg:w-1/2 pr-4">
-                            <div class="flex flex-wrap -mx-2 mb-1">
+                    <div class="flex flex-wrap w-full">
+                        <div class="w-full pr-4">
+                            <div class="w-full flex flex-wrap -mx-2 mb-1">
+                                <div class="w-full md:w-1/2 px-2 mb-4">
+                                    <label class="block text-[12px] font-medium mb-2 text-black"
+                                        for="irs-date">DATE OF RIS</label>
+                                    @if($isEditing)
+                                    <input wire:model="date_of_ris"
+                                        type="date"
+                                        id="date_of_ris"
+                                        @disabled(!$isEditing)
+                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    @else
+                                    <input type="text"
+                                        value="{{ $grantee->date_of_ris ? date('F d, Y', strtotime($grantee->date_of_ris)) : 'N/A' }}"
+                                        disabled
+                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    @endif
+                                </div>
                                 <div class="w-full md:w-1/2 px-2 mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="delivery-date">DATE OF DELIVERY</label>
-                                    <input type="date" id="delivery-date" :disabled="!isEditable"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-300 rounded-md placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
+                                    @if($isEditing)
+                                    <input wire:model="date_of_delivery"
+                                        type="date"
+                                        id="date_of_delivery"
+                                        @disabled(!$isEditing)
+                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    @else
+                                    <input type="text"
+                                        value="{{ $grantee->date_of_delivery ? date('F d, Y', strtotime($grantee->date_of_delivery)) : 'N/A' }}"
+                                        disabled
+                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                    @endif
                                 </div>
-                                <div class="w-full md:w-1/2 px-2 mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                        for="irs-date">DATE OF IRS</label>
-                                    <input type="date" id="irs-date" :disabled="!isEditable"
-                                        class="w-full px-3 py-1 bg-white-700 border border-gray-300 rounded-md placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
-                                </div>
+
                             </div>
 
                             <label class="block text-[12px] font-medium text-gray-700 mb-4">MATERIALS DELIVERED</label>
 
-                            <div class="flex flex-wrap -mx-2 mb-1">
+                            @foreach($materials as $index => $material)
+                            <div x-data="{ material: @entangle('materials.'.$index) }" class="flex flex-wrap -mx-2 mb-1">
+
                                 <!-- Material Select -->
                                 <div class="w-full md:w-2/4 px-2 mb-2">
-                                    <label for="material"
-                                        class="block text-[12px] font-medium text-gray-700 mb-1">MATERIAL</label>
-                                    <select x-model="material.material" :disabled="!isEditable"
+                                    <label for="material" class="block text-[12px] font-medium text-gray-700 mb-1">MATERIAL</label>
+                                    <select x-model="material.material_id" :disabled="!isEditable"
                                         class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                         <option value="">Select Material</option>
-                                        <option value="barangay1">Barangay 1</option>
+                                        @foreach($materialsList as $materialOption)
+                                        <option value="{{ $materialOption['id'] }}"
+                                            @if($material['material_id']==$materialOption['id']) selected @endif>
+                                            {{ $materialOption['item_description'] }}
+                                        </option>
+                                        @endforeach
                                     </select>
                                 </div>
 
                                 <!-- Quantity Input -->
                                 <div class="w-full md:w-1/4 px-2 mb-2">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="qty">QUANTITY</label>
-                                    <input type="number" x-model="material.qty" :disabled="!isEditable"
+                                    <input type="number" x-model="material.grantee_quantity" :disabled="!isEditable"
                                         class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 rounded-md placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
                                         placeholder="Quantity">
+
+
                                 </div>
 
                                 <!-- PO Number Select -->
                                 <div class="w-full md:w-1/4 px-2 mb-2">
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="PoNum">PO NUMBER</label>
-                                    <select x-model="material.poNum" :disabled="!isEditable"
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                        <option value="">Select</option>
-                                        <option value="barangay1">Barangay 1</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="flex flex-wrap -mx-2 mb-1">
-                                <!-- Material Select -->
-                                <div class="w-full md:w-2/4 px-2 mb-2">
-                                    <select x-model="material.material" :disabled="!isEditable"
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                        <option value="">Select Material</option>
-                                        <option value="barangay1">Barangay 1</option>
-                                    </select>
-                                </div>
-
-                                <!-- Quantity Input -->
-                                <div class="w-full md:w-1/4 px-2 mb-2">
-                                    <input type="number" x-model="material.qty" :disabled="!isEditable"
+                                    <input type="text" x-model="material.purchase_order_id" :disabled="!isEditable"
                                         class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 rounded-md placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                        placeholder="Quantity">
+                                        value="{{ $this->getPoNumber($material['purchase_order_id']) }}">
                                 </div>
+                            </div>
+                            @endforeach
 
-                                <!-- PO Number Select -->
-                                <div class="w-full md:w-1/4 px-2 mb-2">
-                                    <select x-model="material.poNum" :disabled="!isEditable"
-                                        class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                        <option value="">Select</option>
-                                        <option value="barangay1">Barangay 1</option>
-                                    </select>
+
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded">
+                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">UPLOADED REQUIREMENTS DURING GRANTING</h2>
+                    </div>
+                    <!-- Display images -->
+                    <div class="bg-white p-6 rounded shadow mb-6">
+                        <!-- Image Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                            @forelse($photoForGranting as $fileName)
+                            @if($isEditing)
+                            <div class="relative group cursor-pointer" wire:click="viewAttachment('{{ $fileName }}')">
+                                <img
+                                    src="{{ asset('grantee-photo-requirements/documents/' . $fileName) }}"
+                                    alt="{{ $fileName }}"
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                                    loading="lazy">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                    {{ $fileName }}
+                                </div>
+                            </div>
+                            @else
+                            <div class="relative group cursor-not-allowed">
+                                <img
+                                    src="{{ asset('grantee-photo-requirements/documents/' . $fileName) }}"
+                                    alt="{{ $fileName }}"
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                                    loading="lazy">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                    {{ $fileName }}
+                                </div>
+                            </div>
+                            @endif
+
+                            @empty
+                            <div class="col-span-full text-center py-4 text-gray-500">
+                                No images available
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Modal -->
+                        @if($isEditing)
+                        @if($selectedAttachment)
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                                <div class="flex justify-end mb-2">
+                                    <button wire:click="closeAttachment" class="text-gray-500 hover:text-gray-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <img src="{{ asset('grantee-photo-requirements/documents/' . $selectedAttachment) }}"
+                                    alt="{{ $selectedAttachment }}"
+                                    class="max-w-full h-auto">
+                                <div class="mt-2 text-center text-gray-700">
+                                    {{ $selectedAttachment }}
                                 </div>
                             </div>
                         </div>
-                        <div x-data="{ open: false, imgSrc: '' }" class="w-full lg:w-1/2 pl-4 mt-[10%]">
-                            <label class="block text-[12px] font-medium text-gray-700 mb-2">UPLOADED PHOTOS</label>
-                            <div class="flex space-x-4">
-                                <!-- Image 1 -->
-                                <div @click="open = true; imgSrc = '{{ asset('storage/images/designDasboard.png') }}';" class="relative w-1/2 border border-bg-gray-700">
-                                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="House Situation" class="w-full h-auto rounded-md cursor-pointer">
-                                    <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation.jpeg</span>
-                                </div>
-
-                                <!-- Image 2 -->
-                                <div @click="open = true; imgSrc = '{{ asset('storage/images/designDasboard.png') }}';" class="relative w-1/2 border border-bg-gray-700">
-                                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="House Situation 2" class="w-full h-auto rounded-md cursor-pointer">
-                                    <span class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white text-[12px] px-2 py-1 rounded-br-md">House Situation2.jpeg</span>
-                                </div>
-                            </div>
-
-                            <!-- Modal -->
-                            <div x-show="open" x-cloak class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
-                                <div @click.away="open = false" class="relative w-auto h-auto max-w-[90%] max-h-[90%] p-2 rounded-md">
-                                    <img :src="imgSrc" alt="Preview" class="w-auto h-auto max-w-full max-h-[80vh] object-cover rounded-md">
-
-                                </div>
-                            </div>
-                        </div>
-
-
-
+                        @endif
+                        @endif
                     </div>
                 </div>
+
         </div>
-
-
-        </form>
     </div>
+
+
+    </form>
+</div>
 
 </div>
 </div>
