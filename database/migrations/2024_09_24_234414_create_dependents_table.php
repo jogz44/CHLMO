@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('dependent_last_name', 50);
             $table->char('dependent_sex', 6);
             $table->date('dependent_date_of_birth');
-            $table->string('dependent_relationship', 255);
             $table->string('dependent_occupation');
             $table->integer('dependent_monthly_income');
             $table->timestamps();
