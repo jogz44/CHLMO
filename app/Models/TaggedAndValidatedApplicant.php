@@ -14,17 +14,18 @@ class TaggedAndValidatedApplicant extends Model
 
     protected $fillable = [
         'applicant_id', 'civil_status_id', 'tribe', 'religion', 'living_situation_id', 'case_specification_id',
-        'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id', 'wall_type_id',
-        'full_address', 'sex', 'date_of_birth', 'occupation', 'monthly_income', 'tagging_date', 'rent_fee',
-        'landlord', 'house_owner', 'relationship_to_house_owner', 'tagger_name', 'remarks', 'is_tagged', 'is_awarding_on_going',
+        'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id',
+        'wall_type_id', 'structure_status_id', 'full_address', 'sex', 'date_of_birth', 'occupation',
+        'monthly_income', 'tagging_date', 'rent_fee', 'landlord', 'house_owner', 'relationship_to_house_owner',
+        'tagger_name', 'years_of_residency', 'remarks', 'is_tagged', 'is_awarding_on_going',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
         'tagging_date'  => 'datetime',
         'monthly_income' => 'integer',
-        'family_income'  => 'integer',
-        'rent_fee'       => 'integer',
+        'rent_fee' => 'integer',
+        'years_of_residency' => 'integer'
     ];
 
     // Relationship with Applicant
@@ -93,6 +94,10 @@ class TaggedAndValidatedApplicant extends Model
     public function wallType(): BelongsTo
     {
         return $this->belongsTo(WallType::class);
+    }
+    public function structureStatus(): BelongsTo
+    {
+        return $this->belongsTo(StructureStatusType::class);
     }
     public function images()
     {

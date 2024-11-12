@@ -10,11 +10,6 @@ class Dependent extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'tagged_and_validated_applicant_id',
         'dependent_civil_status_id',
@@ -29,15 +24,11 @@ class Dependent extends Model
         'dependent_monthly_income',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'tagged_and_validated_applicant_id' => 'integer',
         'dependent_civil_status_id' => 'integer',
+        'dependent_relationship_id' => 'integer',
     ];
 
     public function taggedAndValidatedApplicant(): BelongsTo
