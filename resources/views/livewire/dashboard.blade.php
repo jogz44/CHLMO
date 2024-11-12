@@ -87,8 +87,8 @@
                 <div class="flex-1 flex flex-col items-start">
                     <h3 class="text-md font-semibold">
                         {!! $selectedYear === 'Overall Total'
-                            ? number_format($totalApplicants)
-                            : number_format($totalApplicants) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
+                            ? number_format($totalBlacklisted)
+                            : number_format($totalBlacklisted) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
                     </h3>
                     <p class="text-[13px] text-gray-500">Total Blacklisted</p>
                 </div>
@@ -114,8 +114,6 @@
             <h4 class="text-[13px] mb-2 font-semibold text-center">
                 Summary of Identified Informal Settlers
             </h4>
-            <div class="w-full ml-[65%] md:w-1/3 px-2 mb-3">
-            </div>
             <div>
                 <canvas wire:ignore id="informalSettlersChart"></canvas>
             </div>
@@ -180,7 +178,7 @@
                                 position: 'top',
                                 labels: {
                                     boxWidth: 20,
-                                    padding: 20
+                                    padding: 10
                                 }
                             }
                         }
