@@ -14,8 +14,8 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div class="flex space-x-2 z-[1000]">
-                        <div class="z-[2000]">
+                    <div class="flex space-x-2 z-10">
+                        <div>
                             <div class="alert"
                                  :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                  x-data="{ open:false, alert:{} }"
@@ -152,8 +152,9 @@
                                 <input wire:model="contact_number"
                                        type="text"
                                        id="contact_number"
-                                       required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default"
-                                       readonly oninput="validateNumberInput(this)">
+                                       required
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default"
+                                       readonly>
                                 @error('contact_number') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -241,6 +242,40 @@
                                        oninput="validateNumberInput(this)">
                                 @error('monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
+                            <div class="w-full md:w-1/4 px-2 mb-4">
+                                <label for="years_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    YEAR OF RESIDENCY <span class="text-red-500">*</span>
+                                </label>
+                                <input type="number"
+                                       id="years_of_residency"
+                                       wire:model="years_of_residency"
+                                       placeholder="2001"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       min="1900"
+                                       max="2099"
+                                       maxlength="4"
+                                       oninput="validateYearInput(this)">
+                                @error('years_of_residency') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            </div>
+                            <script>
+                                function validateYearInput(input) {
+                                    // Remove any non-numeric characters
+                                    input.value = input.value.replace(/[^0-9]/g, '');
+
+                                    // Limit the length to 4 digits
+                                    if (input.value.length > 4) {
+                                        input.value = input.value.slice(0, 4);
+                                    }
+
+                                    // Ensure the year is within the range
+                                    const year = parseInt(input.value, 10);
+                                    if (year < 1900 || year > 2099) {
+                                        input.setCustomValidity("Please enter a valid year between 1900 and 2099.");
+                                    } else {
+                                        input.setCustomValidity(""); // Clears the validation message
+                                    }
+                                }
+                            </script>
                         </div>
 
                         <template x-if="civilStatus === '2'">
@@ -667,7 +702,8 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="wall_type"
-                                   class="block text-[13px] font-semibold text-gray-700 mt-7 mb-1">WALL <span class="text-red-500">*</span>
+                                   class="block text-[13px] font-semibold text-gray-700 mt-7 mb-1">
+                                WALL <span class="text-red-500">*</span>
                             </label>
                             <select wire:model="wall_type_id"
                                     id="wall_type"
@@ -679,6 +715,22 @@
                                 @endforeach
                             </select>
                             @error('wall_type') <span class="error text-red-600">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="structure_status_id"
+                                   class="block text-[13px] font-semibold text-gray-700 mt-7 mb-1">
+                                STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="structure_status_id"
+                                    id="structure_status_id"
+                                    required
+                                    class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select type</option>
+                                @foreach($structureStatuses as $structureStatus)
+                                    <option value="{{ $structureStatus->id }}">{{ $structureStatus->structure_status }}</option>
+                                @endforeach
+                            </select>
+                            @error('structure_status_id') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
