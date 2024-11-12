@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CaseSpecification extends Model
 {
     use HasFactory;
-
+    protected $table = 'case_specifications';
     /**
      * The attributes that are mass assignable.
      *
