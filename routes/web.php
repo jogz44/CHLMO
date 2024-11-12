@@ -14,6 +14,7 @@ use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
 use App\Livewire\GranteeDetails;
 use App\Livewire\ShelterApplicantDetails;
+use App\Livewire\ProfiledTaggedApplicantDetails;
 use App\Livewire\TaggedAndValidatedApplicantDetails;
 use App\Livewire\TransactionWalkin;
 use App\Livewire\TransferHistories;
@@ -170,6 +171,7 @@ Route::middleware([
     // })->name('shelter-grantees-details');
 
     Route::get('/grantee-details/{profileNo}', GranteeDetails::class)->name('grantee-details');
+    Route::get('/profiled-tagged-applicant-details/{profileNo}', ProfiledTaggedApplicantDetails::class)->name('profiled-tagged-applicant-details');
     
     Route::get('/shelter-grantees', function () {
         return view('shelter-grantees');
