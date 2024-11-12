@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tagged_and_validated_applicant_id')->constrained('tagged_and_validated_applicants')->onDelete('cascade');
             $table->foreignId('dependent_civil_status_id')->constrained('civil_statuses')->onDelete('cascade');
+            $table->foreignId('dependent_relationship_id')->constrained('dependents_relationships')->onDelete('cascade');
             $table->string('dependent_first_name', 50);
             $table->string('dependent_middle_name', 50)->nullable();
             $table->string('dependent_last_name', 50);

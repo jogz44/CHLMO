@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('applicant_id')->constrained('applicants')->onDelete('cascade');
             $table->foreignId('civil_status_id')->constrained('civil_statuses')->onDelete('cascade');
-            $table->foreignId('tribe_id')->constrained('tribes')->onDelete('cascade');
-            $table->foreignId('religion_id')->constrained('religions')->onDelete('cascade');
             $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
             $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
             $table->text('living_situation_case_specification')->nullable();
@@ -27,13 +25,15 @@ return new class extends Migration
             $table->text('full_address')->nullable();
             $table->char('sex', 6);
             $table->date('date_of_birth');
+            $table->string('tribe', 255);
+            $table->string('religion', 255);
             $table->string('occupation', 255);
             $table->integer('monthly_income');
-            $table->integer('family_income');
             $table->date('tagging_date');
             $table->integer('rent_fee')->nullable();
             $table->string('landlord', 255)->nullable();
             $table->string('house_owner', 255)->nullable();
+            $table->string('relationship_to_house_owner', 255)->nullable();
             $table->string('tagger_name', 100)->nullable();
             $table->text('remarks')->nullable();
             $table->boolean('is_tagged')->default(false);

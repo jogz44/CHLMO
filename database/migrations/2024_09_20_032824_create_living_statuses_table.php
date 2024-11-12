@@ -24,7 +24,7 @@ return new class extends Migration
             ['living_status_name' => 'Own house but renting the land, without the owner\'s consent'],
             ['living_status_name' => 'Free to live in the house and land with the owner\'s permission'],
             ['living_status_name' => 'Free to live in the house and land without the owner\'s permission'],
-            ['living_status_name' => 'Just staying in someone\'s house'],
+            ['living_status_name' => 'Sharer'],
         ]);
 
         Schema::enableForeignKeyConstraints();
