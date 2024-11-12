@@ -17,6 +17,7 @@ use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\Spouse;
+use App\Models\StructureStatusType;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TransactionType;
 use App\Models\Tribe;
@@ -39,10 +40,11 @@ class ApplicantDetails extends Component
 
     // New fields
     public $full_address, $civil_status_id, $civil_statuses, $religion, $tribe;
-    public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
-        $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
-        $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $rent_fee, $landlord,
-        $house_owner, $relationship_to_house_owner, $tagger_name, $remarks;
+    public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications,
+        $living_situation_case_specification, $government_program_id, $governmentPrograms, $living_status_id,
+        $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes, $structure_status_id, $structureStatuses,
+        $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $rent_fee, $landlord, $house_owner,
+        $relationship_to_house_owner, $tagger_name, $years_of_residency, $remarks;
 
     // Live-in partner's details
     public $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
@@ -125,6 +127,9 @@ class ApplicantDetails extends Component
 
         $this->wallTypes = Cache::remember('wallTypes', 60*60, function() {
             return WallType::all();  // Cache for 1 hour
+        });
+        $this->structureStatuses = Cache::remember('structureStatuses', 60*60, function() {
+            return StructureStatusType::all();  // Cache for 1 hour
         });
 
         // Populate fields with applicant data
@@ -217,6 +222,13 @@ class ApplicantDetails extends Component
             ],
             'roof_type_id' => 'required|exists:roof_types,id',
             'wall_type_id' => 'required|exists:wall_types,id',
+            'structure_status_id' => 'required|exists:structure_status_types,id',
+            'years_of_residency' => [
+                'required',
+                'integer',
+                'digits:4', // Ensures it’s exactly 4 digits
+                'between:1900,2099' // Restricts the value between 1900 and 2099
+            ],
             'remarks' => 'nullable|string|max:255',
             'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
@@ -338,6 +350,8 @@ class ApplicantDetails extends Component
                 'relationship_to_house_owner' => $this->living_status_id == 5 ? $this->relationship_to_house_owner : null,
                 'roof_type_id' => $this->roof_type_id,
                 'wall_type_id' => $this->wall_type_id,
+                'structure_status_id' => $this->structure_status_id,
+                'years_of_residency' => $this->years_of_residency ?: 'N/A',
                 'remarks' => $this->remarks ?: 'N/A',
                 // These two are auto-generated
                 'is_tagged' => true,
