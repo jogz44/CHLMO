@@ -131,9 +131,9 @@
                         <select wire:model.live="itemsDescription" class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                             <option value="">Items Description</option>
                             <option value="Amakan">Amakan</option>
-                            <option value="Cement">Cement</option>
-                            <option value="Kahoy">Kahoy</option>
-                            <option value="Plywood">Plywood</option>
+                            <option value="Cement">CEMENT</option>
+                            <option value="Kahoy">KAHOY</option>
+                            <option value="Plywood">PLYWOOD</option>
                         </select>
                         <select wire:model.live="quantity" class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                             <option value="">Quantity</option>
@@ -146,11 +146,11 @@
                         </select>
                         <select wire:model.live="unit" class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                             <option value="">Unit</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
+                            <option value="1">SHEETS</option>
+                            <option value="2">BAGS</option>
+                            <option value="3">PCS</option>
+                            <option value="4">KLS</option>
+                           
                         </select>
 
                         <button class="bg-[#FFBF00] hover:bg-[#FFAF00] text-white px-4 py-2 rounded">Apply Filters</button>
@@ -163,8 +163,8 @@
                         <thead class="bg-gray-100">
                             <tr>
                                 <th class="py-3 px-2 border-b text-center font-medium">ID</th>
-                                <th class="py-3 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">PUCHASE ORDER ID</th>
-                                <th class="py-3 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">MATERIAL UNIT ID</th>
+                                <th class="py-3 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">PUCHASE ORDER </th>
+                                <th class="py-3 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">MATERIAL UNIT </th>
                                 <th class="py-3 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">ITEM DESCRIPTION</th>
                                 <th class="py-3 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">QUANTITY</th>
                             </tr>
@@ -175,12 +175,12 @@
                                 <!-- ID -->
                                 <td class="py-2 px-2 text-center border-b capitalize whitespace-nowrap">{{ $material->id }}</td>
 
-                                <!-- Purchase Order ID -->
-                                <td class="py-2 px-2 text-center border-b capitalize whitespace-nowrap">{{ $material->purchase_order_id }}</td>
+                                <!-- Purchase Order -->
+                                <td class="py-2 px-2 text-center border-b capitalize whitespace-nowrap">{{ $material->PurchaseOrder->po_number }}</td>
 
-                                <!-- Material Unit ID -->
-                                <td class="py-2 px-2 text-center border-b capitalize whitespace-nowrap">{{ $material->material_unit_id }}</td>
-
+                                <!-- Material Unit -->
+                                <td class="py-2 px-2 text-center border-b capitalize whitespace-nowrap">{{ $material->MaterialUnit->unit }}</td>
+                                
                                 <!-- Item Description -->
                                 <td class="py-2 px-2 text-center border-b capitalize whitespace-nowrap">{{ $material->item_description }}</td>
 
