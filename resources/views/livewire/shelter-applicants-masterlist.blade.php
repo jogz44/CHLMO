@@ -85,17 +85,22 @@
                                 <th class="py-2 px-2 border-b text-center font-medium">NAME</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">DATE REQUEST</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">ORIGIN OF REQUEST</th>
+                                <th class="py-2 px-2 border-b text-center font-medium">STATUS</th>
+                                <th class="py-2 px-2 border-b text-center font-medium">AGING</th>
                                 <th class="py-2 px-2 border-b text-center font-medium">ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($applicants as $applicant)
+                            @forelse($shelter_applicants as $shelterapplicant)
                             <tr>
-                                <td class="py-4 px-2 text-center border-b">{{ $applicant->profile_no }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->created_at->format('Y-m-d') }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->OriginOfRequest->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b">
+                                <td class="py-4 px-2 text-center border-b">{{ $shelterapplicant->profile_no }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->created_at->format('m-d-Y') }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->OriginOfRequest->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->Status ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->created_at->format('m-d-Y'), updated_at->format('m-d-Y') }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">
+
 
                                 </td>
                             </tr>
