@@ -7,6 +7,7 @@ use App\Models\Barangay;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\Dependent;
+use App\Models\DependentsRelationship;
 use App\Models\GovernmentProgram;
 use App\Models\ImagesForHousing;
 use App\Models\LiveInPartner;
@@ -37,11 +38,11 @@ class ApplicantDetails extends Component
     public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay, $purok;
 
     // New fields
-    public $full_address, $civil_status_id, $civil_statuses, $religion_id, $religions, $tribe_id, $tribes;
+    public $full_address, $civil_status_id, $civil_statuses, $religion, $tribe;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
-        $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $family_income, $tagging_date, $rent_fee, $landlord,
-        $house_owner, $tagger_name, $remarks;
+        $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $rent_fee, $landlord,
+        $house_owner, $relationship_to_house_owner, $tagger_name, $remarks;
 
     // Live-in partner's details
     public $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
@@ -49,7 +50,8 @@ class ApplicantDetails extends Component
     public $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income;
 
     // Dependent's details
-    public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $images = [], $renamedFileName = [];
+    public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $dependent_relationship_id, $dependentRelationships,
+    $images = [], $renamedFileName = [];
 
     public function mount($applicantId): void
     {
@@ -76,7 +78,7 @@ class ApplicantDetails extends Component
                     'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
                     'dependent_occupation' => $dependent->dependent_occupation,
                     'dependent_monthly_income' => $dependent->dependent_monthly_income,
-                    'dependent_relationship' => $dependent->dependent_relationship,
+                    'dependent_relationship_id' => $dependent->dependent_relationship_id,
                 ];
             })->toArray();
         }
@@ -96,13 +98,9 @@ class ApplicantDetails extends Component
         $this->dependent_civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
-
-        $this->religions = Cache::remember('religions', 60*60, function() {
-            return Religion::all();  // Cache for 1 hour
-        });
-
-        $this->tribes = Cache::remember('tribes', 60*60, function() {
-            return Tribe::all();  // Cache for 1 hour
+        // For Dependents
+        $this->dependentRelationships = Cache::remember('relationships', 60*60, function() {
+            return DependentsRelationship::all();  // Cache for 1 hour
         });
 
         $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
@@ -160,7 +158,7 @@ class ApplicantDetails extends Component
             'dependent_date_of_birth' => null,
             'dependent_occupation' => null,
             'dependent_monthly_income' => null,
-            'dependent_relationship' => null,
+            'dependent_relationship_id' => null,
         ];
     }
     public function remove($index): void
@@ -173,13 +171,12 @@ class ApplicantDetails extends Component
         return [
             'full_address' => 'nullable|string|max:255',
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'tribe_id' => 'required|exists:tribes,id',
+            'tribe' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'date_of_birth' => 'required|date',
-            'religion_id' => 'required|exists:religions,id',
+            'religion' => 'required|string|max:255',
             'occupation' => 'required|string|max:255',
             'monthly_income' => 'required|integer',
-            'family_income' => 'required|integer',
             'tagging_date' => 'required|date',
             'living_situation_id' => 'required|exists:living_situations,id',
             'living_situation_case_specification' => [
@@ -207,6 +204,12 @@ class ApplicantDetails extends Component
                 'max:255'
             ],
             'house_owner' => [
+                'nullable', // Allow it to be null if not required
+                'required_if:living_status_id,5',
+                'string',
+                'max:255'
+            ],
+            'relationship_to_house_owner' => [
                 'nullable', // Allow it to be null if not required
                 'required_if:living_status_id,5',
                 'string',
@@ -296,9 +299,9 @@ class ApplicantDetails extends Component
             'dependents.*.dependent_last_name' => 'required|string|max:50',
             'dependents.*.dependent_sex' => 'required|in:Male,Female',
             'dependents.*.dependent_date_of_birth' => 'required|date',
-            'dependents.*.dependent_relationship' => 'required|string|max:100',
             'dependents.*.dependent_occupation' => 'required|string|max:255',
-            'dependents.*.dependent_monthly_income' => 'required|integer',
+            'dependents.*.dependent_monthly_income' => 'required|integer|min:0',
+            'dependents.*.dependent_relationship_id' => 'required|exists:dependents_relationships,id',
         ];
     }
     public function store()
@@ -317,13 +320,12 @@ class ApplicantDetails extends Component
                 'transaction_type_id' => $this->transaction_type_id,
                 'full_address' => $this->full_address ?: null,
                 'civil_status_id' => $this->civil_status_id,
-                'tribe_id' => $this->tribe_id,
+                'tribe' => $this->tribe,
                 'sex' => $this->sex,
                 'date_of_birth' => $this->date_of_birth,
-                'religion_id' => $this->religion_id ?: null,
+                'religion' => $this->religion ?: null,
                 'occupation' => $this->occupation ?: null,
                 'monthly_income' => $this->monthly_income,
-                'family_income' => $this->family_income,
                 'tagging_date' => $this->tagging_date,
                 'living_situation_id' => $this->living_situation_id,
                 'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
@@ -333,6 +335,7 @@ class ApplicantDetails extends Component
                 'rent_fee' => $this->living_status_id == 1 ? $this->rent_fee : null, // Store rent fee only if living_status_id is 1,
                 'landlord' => $this->living_status_id == 1 ? $this->landlord : null, // Store landlord only if living_status_id is 1,
                 'house_owner' => $this->living_status_id == 5 ? $this->house_owner : null, // Store house owner only if living_status_id is 5,
+                'relationship_to_house_owner' => $this->living_status_id == 5 ? $this->relationship_to_house_owner : null,
                 'roof_type_id' => $this->roof_type_id,
                 'wall_type_id' => $this->wall_type_id,
                 'remarks' => $this->remarks ?: 'N/A',
@@ -379,7 +382,7 @@ class ApplicantDetails extends Component
                     'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
                     'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
                     'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?: null,
-                    'dependent_relationship' => $dependent['dependent_relationship'] ?: null,
+                    'dependent_relationship_id' => $dependent['dependent_relationship_id'] ?: null,
                 ]);
             }
 
