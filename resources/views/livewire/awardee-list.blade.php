@@ -83,7 +83,7 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Purok</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Barangay</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Relocation Site</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot Size</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot Size (m&sup2;)</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Grant Date</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Action</th>
@@ -97,7 +97,7 @@
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->purok->name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->barangay->name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->relocationLot->relocation_site_name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }} m&sup2;</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
                                         <!-- Animated Confetti -->
@@ -178,7 +178,7 @@
                                                     {{ $dependent->dependent_last_name }}, {{ $dependent->dependent_first_name }} {{ $dependent->dependent_middle_name }}
                                                 </div>
                                                 <div class="text-sm text-gray-600">
-                                                    Relationship: {{ $dependent->dependent_relationship }}
+                                                    Relationship: {{ $dependent->dependentRelationship->relationship }}
                                                 </div>
                                             </div>
                                         @endforeach
@@ -224,7 +224,7 @@
 
                                 <div class="bg-gray-50 p-4 rounded-lg mb-4">
                                     <p class="font-medium">{{ $selectedDependent->dependent_last_name }}, {{ $selectedDependent->dependent_first_name }} {{ $selectedDependent->dependent_middle_name }}</p>
-                                    <p class="text-sm text-gray-600">Relationship: {{ $selectedDependent->dependent_relationship }}</p>
+                                    <p class="text-sm text-gray-600">Relationship: {{ $dependent->dependentRelationship->relationship }}</p>
                                 </div>
 
                                 <p class="mb-4 text-gray-600">

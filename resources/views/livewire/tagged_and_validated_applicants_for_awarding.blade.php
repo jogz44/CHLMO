@@ -311,7 +311,6 @@
                             </div>
 
                             <!-- Main Fields -->
-                            <!-- Barangay Field -->
                             <div class="mb-4">
                                 <br>
                                 <label class="block text-sm font-medium mb-2 text-black" for="barangay">
@@ -331,32 +330,6 @@
                                     </select>
                                     @error('relocation_lot_id') <span class="error">{{ $message }}</span> @enderror
                                 </div>
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="barangay">BARANGAY <span class="text-red-500">*</span>
-                                </label>
-                                <select wire:model.live="barangay_id" id="barangay" name="barangay" :disabled="!isEditable" required
-                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Select Barangay</option>
-                                    @foreach($barangays as $barangay)
-                                        <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('barangay_id') <span class="error">{{ $message }}</span> @enderror
-                            </div>
-
-                            <!-- Purok Field -->
-                            <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="purok">PUROK <span class="text-red-500">*</span>
-                                </label>
-                                <select wire:model.live="purok_id" id="purok" name="purok" :disabled="!isEditable" required
-                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Select Purok </option>
-                                    @foreach($puroks as $purok)
-                                        <option value="{{ $purok->id }}">{{ $purok->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('purok_id') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- LotList Size Allocated Field -->
@@ -370,19 +343,18 @@
                                 @error('lot_size') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
-                            <!-- Lot Size Unit -->
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                       for="lot_size_unit">LOT SIZE UNIT <span class="text-red-500">*</span></label>
-                                <select wire:model.live="lot_size_unit_id" id="lot_size_unit" name="lot_size_unit" :disabled="!isEditable" required
-                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                    <option value="">Lot Size Unit </option>
-                                    @foreach($lotSizeUnits as $unit)
-                                        <option value="{{ $unit->id }}">{{ $unit->lot_size_unit_name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('lot_size_unit_id') <span class="error">{{ $message }}</span> @enderror
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="unit">
+                                    LOT SIZE UNIT <small class="text-red-500">(read only)</small>
+                                </label>
+                                <input wire:model="unit"
+                                       type="text"
+                                       id="unit"
+                                       disabled
+                                       class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-red-500 focus:outline-none text-[12px] cursor-not-allowed">
+                                @error('unit') <span class="error">{{ $message }}</span> @enderror
                             </div>
+
                             <br>
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
