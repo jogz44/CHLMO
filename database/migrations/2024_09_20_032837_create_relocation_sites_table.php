@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
             $table->string('relocation_site_name', 255);
-            $table->enum('status', ['vacant', 'full'])->default('vacant');
+            $table->integer('total_lot_size');
+            $table->boolean('is_full')->default(false);
             $table->timestamps();
         });
     }
