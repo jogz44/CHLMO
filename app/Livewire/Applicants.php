@@ -128,7 +128,10 @@ class Applicants extends Component
             'middle_name' => 'nullable|string|max:50',
             'last_name' => 'required|string|max:50',
             'suffix_name' => 'nullable|string|max:50',
-            'contact_number' => 'nullable|string|max:15',
+            'contact_number' => [
+                'required',
+                'regex:/^09\d{9}$/'
+            ],
             'barangay_id' => 'required|exists:barangays,id',
             'purok_id' => 'required|exists:puroks,id',
             'transaction_type_id' => 'required|exists:transaction_types,id',

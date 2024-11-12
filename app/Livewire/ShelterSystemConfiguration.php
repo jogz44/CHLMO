@@ -59,7 +59,6 @@ class ShelterSystemConfiguration extends Component
 
         // Update the tribes list and clear the input array
         $this->applicant_tribes = [];
-        $this->tribes = []; // Resetting the fields to an empty array
         session()->flash('message', 'Tribes added successfully!');
     }
 

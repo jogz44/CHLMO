@@ -14,8 +14,8 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div class="flex space-x-2 z-[1000]">
-                        <div class="z-[2000]">
+                    <div class="flex space-x-2 z-10">
+                        <div>
                             <div class="alert"
                                  :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                  x-data="{ open:false, alert:{} }"
@@ -122,7 +122,8 @@
                                 <input wire:model="full_address"
                                        type="text"
                                        id="full_address"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
                                 @error('full_address') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -151,23 +152,21 @@
                                 <input wire:model="contact_number"
                                        type="text"
                                        id="contact_number"
-                                       required class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default"
-                                       readonly oninput="validateNumberInput(this)">
+                                       required
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default"
+                                       readonly>
                                 @error('contact_number') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="tribe" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                    TRIBE/ETHNICITY <span class="text-red-500">*</span>
+                                    TRIBE/ETHNICITY <small>(Put N/A if none)</small> <span class="text-red-500">*</span>
                                 </label>
-                                <select wire:model="tribe_id"
-                                        id="tribe"
-                                        required
-                                        class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
-                                    <option value="">Select Tribe/Ethnicity</option>
-                                    @foreach($tribes as $tribe)
-                                        <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                    @endforeach
-                                </select>
+                                <input wire:model="tribe"
+                                       type="text"
+                                       id="tribe"
+                                       required
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize"
+                                       oninput="capitalizeInput(this)">
                                 @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -212,16 +211,14 @@
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="religion" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                    RELIGION
+                                    RELIGION <small>(Put N/A if none)</small> <span class="text-red-500">*</span>
                                 </label>
-                                <select wire:model="religion_id"
-                                        id="religion"
-                                        class="w-full p-1 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                    <option value="">Select Religion</option>
-                                    @foreach($religions as $religion)
-                                        <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
-                                    @endforeach
-                                </select>
+                                <input wire:model="religion"
+                                       type="text"
+                                       id="religion"
+                                       required
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize"
+                                       oninput="capitalizeInput(this)">
                                 @error('religion') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -232,7 +229,8 @@
                                 <input type="text"
                                        id="occupation"
                                        wire:model="occupation"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
                                 @error('occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -240,19 +238,44 @@
                                     MONTHLY INCOME <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number" id="monthly_income" wire:model="monthly_income"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                        oninput="validateNumberInput(this)">
                                 @error('monthly_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
-                                <label for="family_income" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                    FAMILY INCOME <span class="text-red-500">*</span>
+                                <label for="years_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                    YEAR OF RESIDENCY <span class="text-red-500">*</span>
                                 </label>
-                                <input type="number" id="family_income" wire:model="family_income"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)"
-                                       oninput="validateNumberInput(this)">
-                                @error('family_income') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                <input type="number"
+                                       id="years_of_residency"
+                                       wire:model="years_of_residency"
+                                       placeholder="2001"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       min="1900"
+                                       max="2099"
+                                       maxlength="4"
+                                       oninput="validateYearInput(this)">
+                                @error('years_of_residency') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
+                            <script>
+                                function validateYearInput(input) {
+                                    // Remove any non-numeric characters
+                                    input.value = input.value.replace(/[^0-9]/g, '');
+
+                                    // Limit the length to 4 digits
+                                    if (input.value.length > 4) {
+                                        input.value = input.value.slice(0, 4);
+                                    }
+
+                                    // Ensure the year is within the range
+                                    const year = parseInt(input.value, 10);
+                                    if (year < 1900 || year > 2099) {
+                                        input.setCustomValidity("Please enter a valid year between 1900 and 2099.");
+                                    } else {
+                                        input.setCustomValidity(""); // Clears the validation message
+                                    }
+                                }
+                            </script>
                         </div>
 
                         <template x-if="civilStatus === '2'">
@@ -267,7 +290,8 @@
                                         <input type="text"
                                                id="partner_first_name"
                                                wire:model="partner_first_name"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('partner_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
@@ -277,7 +301,8 @@
                                         <input type="text"
                                                id="partner_middle_name"
                                                wire:model="partner_middle_name"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('partner_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
@@ -287,7 +312,8 @@
                                         <input type="text"
                                                id="partner_last_name"
                                                wire:model="partner_last_name"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('partner_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
 
@@ -298,7 +324,8 @@
                                         <input type="text"
                                                id="partner_occupation"
                                                wire:model="partner_occupation"
-                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                               class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('partner_occupation') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
@@ -325,21 +352,24 @@
                                         <label for="spouse_first_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                             FIRST NAME <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        <input type="text" id="spouse_first_name" wire:model="spouse_first_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('spouse_first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
                                         <label for="spouse_middle_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                             MIDDLE NAME <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
                                     <div class="w-full md:w-1/3 px-2 mb-4">
                                         <label for="spouse_last_name" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                             LAST NAME <span class="text-red-500">*</span>
                                         </label>
-                                        <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                                        <input type="text" id="spouse_last_name" wire:model="spouse_last_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                               oninput="capitalizeInput(this)">
                                         @error('spouse_last_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                                     </div>
 
@@ -427,8 +457,7 @@
                                         </td>
                                         <td class="border px-1 py-2">
                                             <select wire:model="dependents.{{$index}}.dependent_civil_status_id"
-                                                    class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]"
-                                                    oninput="capitalizeInput(this)">
+                                                    class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]">
                                                 <option value="">Select Status</option>
                                                 @foreach($dependent_civil_statuses as $dependentStatus)
                                                     <option value="{{ $dependentStatus->id }}">{{ $dependentStatus->civil_status }}</option>
@@ -439,11 +468,14 @@
                                             <input type="date" wire:model="dependents.{{$index}}.dependent_date_of_birth"
                                                    class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]">
                                         </td>
-                                        <td class="border px-4 py-2">
-                                            <input type="text" wire:model="dependents.{{$index}}.dependent_relationship"
-                                                   placeholder="Mother..."
-                                                   class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]"
-                                                   oninput="capitalizeInput(this)">
+                                        <td class="border px-1 py-2">
+                                            <select wire:model="dependents.{{$index}}.dependent_relationship_id"
+                                                    class="capitalize w-full py-1 bg-transparent focus:outline-none text-[12px]">
+                                                <option value="">Select Relationship</option>
+                                                @foreach($dependentRelationships as $dependentRelationship)
+                                                    <option value="{{ $dependentRelationship->id }}">{{ $dependentRelationship->relationship }}</option>
+                                                @endforeach
+                                            </select>
                                         </td>
                                         <td class="border px-4 py-2">
                                             <input type="text" wire:model="dependents.{{$index}}.dependent_occupation"
@@ -455,7 +487,7 @@
                                             <input type="number" wire:model="dependents.{{$index}}.dependent_monthly_income"
                                                    placeholder="9000"
                                                    class="capitalize w-full px-3 py-1 bg-transparent focus:outline-none text-[12px]"
-                                                   oninput="capitalizeInput(this)">
+                                                   oninput="validateNumberInput(this)">
                                         </td>
                                         <td class="border px-4 py-2">
                                             <button type="button" wire:click="remove({{ $index }})"
@@ -526,7 +558,9 @@
                                           type="text"
                                           id="living_situation_case_specification"
                                           placeholder="Enter case details"
-                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required>
+                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                          required
+                                          oninput="capitalizeInput(this)">
                                 </textarea>
                                 @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
@@ -554,7 +588,7 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="government_program"
                                    class="block text-[13px] font-semibold text-gray-700 mb-1">
-                                GOVERNMENT PROGRAMS
+                                SOCIAL WELFARE CATEGORY
                             </label>
                             <select wire:model="government_program_id"
                                     id="government_program"
@@ -610,7 +644,8 @@
                                        type="text"
                                        id="landlord"
                                        placeholder="LANDLORD"
-                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
                                 @error('landlord') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </div>
@@ -625,10 +660,24 @@
                                 <input wire:model="house_owner"
                                        type="text"
                                        id="house_owner"
-                                       placeholder="HOUSE OWNER NAME"
+                                       class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
+                                @error('house owner') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="relationship_to_house_owner"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                    RELATIONSHIP <span class="text-red-500">*</span>
+                                </label>
+                                <input wire:model="relationship_to_house_owner"
+                                       type="text"
+                                       id="relationship_to_house_owner"
+                                       placeholder="Friend"
                                        required
-                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @error('house_owner') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
+                                @error('relationship_to_house_owner') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </template>
@@ -653,7 +702,8 @@
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="wall_type"
-                                   class="block text-[13px] font-semibold text-gray-700 mt-7 mb-1">WALL <span class="text-red-500">*</span>
+                                   class="block text-[13px] font-semibold text-gray-700 mt-7 mb-1">
+                                WALL <span class="text-red-500">*</span>
                             </label>
                             <select wire:model="wall_type_id"
                                     id="wall_type"
@@ -666,6 +716,22 @@
                             </select>
                             @error('wall_type') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="structure_status_id"
+                                   class="block text-[13px] font-semibold text-gray-700 mt-7 mb-1">
+                                STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="structure_status_id"
+                                    id="structure_status_id"
+                                    required
+                                    class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select type</option>
+                                @foreach($structureStatuses as $structureStatus)
+                                    <option value="{{ $structureStatus->id }}">{{ $structureStatus->structure_status }}</option>
+                                @endforeach
+                            </select>
+                            @error('structure_status_id') <span class="error text-red-600">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
@@ -677,7 +743,8 @@
                             <input wire:model="remarks"
                                    type="text"
                                    id="remarks"
-                                   class="w-full p-3 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                   class="capitalize w-full p-3 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                   oninput="capitalizeInput(this)">
                             @error('remarks') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
                     </div>

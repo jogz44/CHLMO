@@ -699,3 +699,63 @@
                     </div>
                 </div>
 </x-app-layout>
+
+
+// public function addCivilStatus()
+    // {
+    //     // Validate each civil status entry to ensure uniqueness
+    //     foreach ($this->civilStatuses as $status) {
+    //         if (!empty($status)) {
+    //             $this->validate([
+    //                 'civilStatuses.*' => 'string|unique:civil_statuses,civil_status',
+    //             ]);
+
+    //             // Add the civil status to the database
+    //             CivilStatus::create(['civil_status' => $status]);
+    //         }
+    //     }
+
+    //     // Clear the input array and show success message
+    //     $this->civilStatuses = [];
+    //     session()->flash('message', 'Civil statuses added successfully!');
+    // }
+
+
+
+    // public function addCivilStatus()
+    // {
+    //     // Validation (ensure the status isn't empty and is unique)
+    //     $this->validate([
+    //         'newStatus' => 'required|string|unique:civil_statuses,civil_status',
+    //     ]);
+
+    //     // Add the status to the database
+    //     CivilStatus::create(['civil_status' => $this->newStatus]);
+
+    //     // Update the local array and reset input
+    //     $this->civilStatuses[] = $this->newStatus;
+    //     $this->newStatus = '';
+    //     session()->flash('message', 'Civil Status added successfully!');
+    // }
+    // public function saveCivilStatuses()
+    // {
+    //     // Validate each status to ensure it's not empty and unique
+    //     foreach ($this->civilStatuses as $status) {
+    //         if (!empty($status)) {
+    //             $this->validate([
+    //                 'civilStatuses.*' => 'required|string|unique:civil_statuses,civil_status',
+    //             ]);
+
+    //             // Add the status to the database if it doesn't exist
+    //             CivilStatus::create(['civil_status' => $status]);
+    //         }
+    //     }
+    //     // Reset the input fields and show a success message
+    //     $this->civilStatuses = [''];
+    //     session()->flash('message', 'Civil Statuses added successfully!');
+    // }
+    // public function removeCivilStatusField($index)
+    // {
+    //     unset($this->civilStatuses[$index]);
+    //     $this->civilStatuses = array_values($this->civilStatuses); // Re-index the array
+    // }
