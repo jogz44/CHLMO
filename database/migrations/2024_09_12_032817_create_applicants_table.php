@@ -17,10 +17,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('transaction_type_id')->constrained('transaction_types')->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
-            $table->string('first_name', 50);
-            $table->string('middle_name', 50)->nullable();
-            $table->string('last_name', 50);
-            $table->string('suffix_name', 50)->nullable();
+            $table->string('first_name', 255);
+            $table->string('middle_name', 255)->nullable();
+            $table->string('last_name', 255);
+            $table->string('suffix_name', 255)->nullable();
             $table->string('contact_number', 15)->nullable();
             $table->date('date_applied');
             $table->string('initially_interviewed_by', 100);
