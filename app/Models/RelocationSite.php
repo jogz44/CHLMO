@@ -14,11 +14,14 @@ class RelocationSite extends Model
     protected $fillable = [
         'address_id',
         'relocation_site_name',
+        'total_lot_size',
+        'is_full'
     ];
 
     protected $casts = [
         'id' => 'integer',
         'address_id' => 'integer',
+        'total_lot_size' => 'integer'
     ];
 
     public function awardees(): HasMany

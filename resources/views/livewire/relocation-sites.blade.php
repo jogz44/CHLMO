@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            <!-- Table -->g
+            <!-- Table -->
             <div x-data="{openModalEditLot: false}" class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
@@ -80,8 +80,10 @@
                         <th class="py-2 px-2  text-center font-medium">Relocation Site Name</th>
                         <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
                         <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
-                        <th class="py-2 px-2 border-b text-center font-medium">Status</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size (m&sup2;)</th>
                         <th class="py-2 px-2 border-b text-center font-medium">No. of Awardees</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Lot Size Left (m&sup2;)</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Status</th>
 {{--                        <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size</th>--}}
                     </tr>
                     </thead>
@@ -92,30 +94,10 @@
                                 <td class="py-2 px-2 text-center border-b">{{ $relocationSite->address->purok->name ?? 'N/A' }}</td>
                                 <td class="py-2 px-2 text-center border-b">{{ $relocationSite->address->barangay->name ?? 'N/A' }}</td>
                                 <td class="py-2 px-2 text-center border-b">
-                                    <div class="flex justify-center space-x-4">
-                                        <label class="inline-flex items-center">
-                                            <input type="radio"
-                                                   name="status_{{ $relocationSite->id }}"
-                                                   value="vacant"
-                                                   {{ $relocationSite->status === 'vacant' ? 'checked' : '' }}
-                                                   wire:click="initiateStatusChange({{ $relocationSite->id }}, 'vacant')"
-                                                   class="form-radio text-blue-600"
-                                            >
-                                            <span class="ml-2">Vacant</span>
-                                        </label>
-                                        <label class="inline-flex items-center">
-                                            <input type="radio"
-                                                   name="status_{{ $relocationSite->id }}"
-                                                   value="full"
-                                                   {{ $relocationSite->status === 'full' ? 'checked' : '' }}
-                                                   wire:click="initiateStatusChange({{ $relocationSite->id }}, 'full')"
-                                                   class="form-radio text-blue-600">
-                                            <span class="ml-2">Full</span>
-                                        </label>
-                                    </div>
+                                    {{ $relocationSite->total_lot_size ?? 'N/A' }} m&sup2;
                                 </td>
                                 <td class="py-2 px-2 text-center border-b">{{ $relocationSite->awardees->count() }}</td>
-{{--                                <td class="py-2 px-2 text-center border-b">{{ $relocationSite->total_lot_size ?? 'N/A' }}</td>--}}
+                                <td class="py-2 px-2 text-center text-red-500 border-b">{{ $this->getRemainingLotSize($relocationSite->id) }} m&sup2;</td>
                             </tr>
                         @empty
                             <tr>
@@ -180,20 +162,22 @@
                     <form wire:submit.prevent="createRelocationSite">
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-black">
-                                LOT/RELOCATION NAME
+                                LOT/RELOCATION NAME <span class="text-red-500">*</span>
                             </label>
                             <input wire:model="relocation_site_name"
                                    type="text"
                                    id="relocation_name"
-                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                   placeholder="Canocotan Relocation Lot">
+                                   class="capitalize w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                                   placeholder="Canocotan Relocation Lot"
+                                   required
+                                   oninput="capitalizeInput(this)">
                             @error('relocation_site_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Barangay Field -->
                         <div class="mb-3">
                             <label class="block text-[12px] font-medium mb-2 text-black">
-                                BARANGAY
+                                BARANGAY <span class="text-red-500">*</span>
                             </label>
                             <select id="barangay" wire:model.live="barangay_id"
                                     class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase"
@@ -209,7 +193,7 @@
                         <!-- Purok Field -->
                         <div class="mb-3">
                             <label class="block text-[12px] font-medium mb-2 text-black">
-                                PUROK
+                                PUROK <span class="text-red-500">*</span>
                             </label>
                             <select id="purok" wire:model.live="purok_id"
                                     class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase"
@@ -220,6 +204,20 @@
                                 @endforeach
                             </select>
                             @error('purok_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black">
+                                TOTAL LOT SIZE (m&sup2;) <span class="text-red-500">*</span>
+                            </label>
+                            <input wire:model="total_lot_size"
+                                   type="number"
+                                   id="total_lot_size"
+                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
+                                   placeholder="1000"
+                                   required
+                                   oninput="validateNumberInput(this)">
+                            @error('total_lot_size') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         {{-- Modal Footer --}}
@@ -242,3 +240,17 @@
         @endif
     </div>
 </div>
+<script>
+    function capitalizeInput(input) {
+        input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
+            return char.toUpperCase();
+        });
+    }
+</script>
+<script>
+    // Function to allow only numeric input
+    function validateNumberInput(input) {
+        // Remove any characters that are not digits
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+</script>

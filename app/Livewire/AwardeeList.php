@@ -66,11 +66,19 @@ class AwardeeList extends Component
     }
     public function loadEligibleDependents(): void
     {
-        // Get the awardee's dependents who are either children or spouse
+        // Get the awardee's dependents who are children or parents
         $awardee = Awardee::with([
             'taggedAndValidatedApplicant.dependents' => function ($query) {
-                $query->whereIn('dependent_relationship', ['Son', 'son', 'Daughter', 'daughter', 'Spouse', 'spouse']);
-            }])->findOrFail($this->selectedAwardeeId);
+                $query->whereHas('dependentRelationship', function ($query) {
+                    $query->whereIn('relationship', [
+                        'Child (Biological)',
+                        'Mother',
+                        'Father'
+                    ]);
+                });
+            },
+            'taggedAndValidatedApplicant.dependents.dependentRelationship'  // Eager load the relationship
+        ])->findOrFail($this->selectedAwardeeId);
 
         $this->eligibleDependents = $awardee->taggedAndValidatedApplicant->dependents;
     }
@@ -82,11 +90,12 @@ class AwardeeList extends Component
 
             // Get the current awardee
             $currentAwardee = Awardee::with([
-                'taggedAndValidatedApplicant.dependents',
+                'taggedAndValidatedApplicant.dependents.dependentRelationship',
             ])->findOrFail($this->selectedAwardeeId);
 
             // Get the dependent
             $dependent = $currentAwardee->taggedAndValidatedApplicant->dependents()
+                ->with('dependentRelationship')
                 ->where('id', $dependentId)
                 ->firstOrFail();
 
@@ -110,9 +119,9 @@ class AwardeeList extends Component
                 'previous_awardee_id' => $currentAwardee->id,
                 'transfer_date' => now(),
                 'transfer_reason' => 'Death of previous awardee',
-                'relationship' => $dependent->dependent_relationship,
+                'relationship' => $dependent->dependentRelationship->relationship, // Get relationship from the relationship table
                 'processed_by' => auth()->id(),
-                'remarks' => 'Award transferred to ' . $dependent->dependent_first_name . ' ' . $dependent->dependent_last_name
+                'remarks' => $dependent->dependent_first_name . ' ' . $dependent->dependent_last_name
             ]);
 
             DB::commit();

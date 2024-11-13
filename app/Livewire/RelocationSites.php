@@ -14,12 +14,14 @@ class RelocationSites extends Component
     public $selectedSiteId, $password = '', $newStatus = '', $showPasswordModal = false;
     public $relocation_site_name = '';
     public $barangay_id, $barangays = [], $purok_id, $puroks = [];
+    public $total_lot_size;
     public $isModalOpen = false, $isLoading = false;
 
     protected $rules = [
         'relocation_site_name' => 'required|string|max:255|unique:relocation_sites,relocation_site_name',
         'barangay_id' => 'required|exists:barangays,id',
         'purok_id' => 'required|exists:puroks,id',
+        'total_lot_size' => 'required|integer|min:0',
     ];
     protected $messages = [
         'relocation_site_name.required' => 'Relocation site name is required.',
@@ -37,7 +39,7 @@ class RelocationSites extends Component
     }
     public function resetForm()
     {
-        $this->reset(['relocation_site_name', 'barangay_id', 'purok_id']);
+        $this->reset(['relocation_site_name', 'barangay_id', 'purok_id', 'total_lot_size']);
         $this->resetValidation();
     }
     public function mount()
@@ -108,7 +110,21 @@ class RelocationSites extends Component
         $this->newStatus = '';
         $this->resetValidation();
     }
-    public function createRelocationSite()
+    public function getRemainingLotSize($relocationSiteId)
+    {
+        $relocationSite = RelocationSite::with('awardees')->find($relocationSiteId);
+
+        if (!$relocationSite) {
+            return 'N/A';
+        }
+
+        // Sum up the lot sizes of all awarded applicants for this relocation site
+        $allocatedLotSize = $relocationSite->awardees->sum('lot_size');
+
+        // Calculate the remaining lot size
+        return $relocationSite->total_lot_size - $allocatedLotSize;
+    }
+    public function createRelocationSite(): void
     {
         try {
             // Validate the input
@@ -124,6 +140,8 @@ class RelocationSites extends Component
             RelocationSite::create([
                 'relocation_site_name' => $this->relocation_site_name,
                 'address_id' => $address->id,
+                'total_lot_size' => $this->total_lot_size,
+                'is_full' => false,
             ]);
 
             // Show success message

@@ -46,8 +46,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $occupation, $monthly_income, $transaction_type;
 
     // For awarding modal
-    public $grant_date, $taggedAndValidatedApplicantId, $purok_id, $puroks = [], $barangay_id, $barangays = [], $relocation_lot_id,
-        $relocationSites = [], $lot_size, $lot_size_unit_id, $lotSizeUnits = [];
+    public $grant_date,
+        $taggedAndValidatedApplicantId,
+        $relocation_lot_id,
+        $relocationSites = [],
+        $lot_size,
+//        $lot_size_unit_id,
+        $unit;
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $letterOfIntent, $votersID, $validID,
@@ -82,6 +87,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function mount(): void
     {
         $this->tagging_date = now()->toDateString();
+//        $this->unit = 'm&sup2;';
+//        $this->unit = "square meters (m\u{00B2})";
+        $this->unit = "m²";
 
         // Initialize filter options
         $this->puroksFilter = Cache::remember('puroks', 60*60, function() {
@@ -105,9 +113,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
         // Initialize dropdowns
         $this->relocationSites = RelocationSite::all(); // Fetch all relocation sites
-        $this->barangays = Barangay::all();
-        $this->puroks = Purok::all();
-        $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
+//        $this->barangays = Barangay::all();
+//        $this->puroks = Purok::all();
+//        $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
 
         // Fetch attachment types for the dropdown
         $this->attachmentLists = AwardeeAttachmentsList::all(); // Fetch all attachment lists
@@ -121,18 +129,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function updatingPurok(): void
     {
         $this->resetPage();
-    }
-    // For Awarding Modal
-    public function updatedBarangayId($barangayId): void
-    {
-        // Fetch the puroks based on the selected barangay
-        $this->puroks = Purok::where('barangay_id', $barangayId)->get();
-        $this->purok_id = null; // Reset selected purok when barangay changes
-        $this->isLoading = false; // Reset loading state
-        logger()->info('Retrieved Puroks', [
-            'barangay_id' => $barangayId,
-            'puroks' => $this->puroks
-        ]);
     }
     public function updatedSelectedBarangayId($barangayId): void
     {
@@ -151,10 +147,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             // For Awarding Modal
             'grant_date' => 'required|date',
             'relocation_lot_id' => 'required|exists:relocation_sites,id',
-            'barangay_id' => 'required|exists:barangays,id',
-            'purok_id' => 'required|exists:puroks,id',
             'lot_size' => 'required|numeric',
-            'lot_size_unit_id' => 'required|exists:lot_size_units,id',
+            'unit' => 'in:m²', // Matches what is set in mount
         ];
     }
     public function awardApplicant(): void
@@ -162,19 +156,12 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         // Validate the input data
         $this->validate();
 
-        // Create the address entry first
-        $address = Address::create([
-            'barangay_id' => $this->barangay_id,
-            'purok_id' => $this->purok_id,
-        ]);
-
         // Create the new awardee record and get the ID of the newly created awardee
         $awardee = Awardee::create([
             'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
             'relocation_lot_id' => $this->relocation_lot_id,
-            'address_id' => $address->id,
             'lot_size' => $this->lot_size,
-            'lot_size_unit_id' => $this->lot_size_unit_id,
+            'unit' => $this->unit,
             'grant_date' => $this->grant_date,
             'is_awarded' => false, // Update awardee table for status tracking
             'is_blacklisted' => false, // Update awardee table for status tracking
@@ -207,7 +194,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'relocation_lot_id', 'lot_size', 'lot_size_unit_id', 'grant_date',
+            'relocation_lot_id', 'lot_size', 'grant_date',
         ]);
     }
 

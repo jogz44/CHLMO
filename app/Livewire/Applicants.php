@@ -148,6 +148,7 @@ class Applicants extends Component
             'purok_id' => $this->purok_id,
         ]);
 
+
         // Generate the unique applicant ID
         $applicantId = Applicant::generateApplicantId();
 
