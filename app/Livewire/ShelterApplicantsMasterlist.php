@@ -29,6 +29,8 @@ class ShelterApplicantsMasterlist extends Component
     public $origin_name;
     public $selectedTaggingStatus;
     public $taggingStatuses;
+    public $shelterApplicants;
+
 
     public function openModal()
     {
@@ -87,7 +89,7 @@ class ShelterApplicantsMasterlist extends Component
     public function render()
     {
         // Use the correct model name
-        $query = ShelterApplicant::query();
+        $query = shelterApplicant::query();
 
         // Apply search conditions if there is a search term
         $query->when($this->search, function ($query) {
@@ -113,13 +115,13 @@ class ShelterApplicantsMasterlist extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        $applicants = $query->paginate(5);
+        // $shelterApplicants = $query->paginate(5);
         $originOfRequests = OriginOfRequest::all();
 
         // Return the view with the filtered applicants and originOfRequests
         return view('livewire.shelter-applicants-masterlist', [
-            'applicants' => $applicants,
+            // 'shelterApplicants' => $shelterApplicants,
             'originOfRequests' => $originOfRequests,
         ]);
-    }
+}
 }
