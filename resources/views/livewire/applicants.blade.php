@@ -298,7 +298,11 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">
                                         FIRST NAME <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" wire:model="first_name" id="first_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
+                                    <input type="text"
+                                           wire:model="first_name"
+                                           id="first_name"
+                                           maxlength="256"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                     @error('first_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
@@ -307,7 +311,11 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="middle_name">
                                         MIDDLE NAME <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" wire:model="middle_name" id="middle_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
+                                    <input type="text"
+                                           wire:model="middle_name"
+                                           id="middle_name"
+                                           maxlength="256"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                     @error('middle_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
@@ -316,7 +324,11 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="last_name">
                                         LAST NAME <span class="text-red-500">*</span>
                                     </label>
-                                    <input type="text" wire:model="last_name" id="last_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
+                                    <input type="text"
+                                           wire:model="last_name"
+                                           id="last_name"
+                                           maxlength="256"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" required>
                                     @error('last_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
 
@@ -325,7 +337,11 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix_name">
                                         SUFFIX NAME
                                     </label>
-                                    <input type="text" wire:model="suffix_name" id="suffix_name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
+                                    <input type="text"
+                                           wire:model="suffix_name"
+                                           id="suffix_name"
+                                           maxlength="256"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase">
                                     @error('suffix_name') <span class="error">{{ $message }}</span> @enderror
                                 </div>
                             </div>

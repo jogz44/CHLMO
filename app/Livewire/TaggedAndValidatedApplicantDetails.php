@@ -33,7 +33,7 @@ class TaggedAndValidatedApplicantDetails extends Component
 
 
     // New fields
-    public $full_address, $civil_status_id, $civilStatuses, $religion_id, $religions, $tribe_id, $tribes;
+    public $full_address, $civil_status_id, $civilStatuses, $religion, $tribe;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
         $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $family_income, $tagging_date, $rent_fee, $landlord,
@@ -62,8 +62,6 @@ class TaggedAndValidatedApplicantDetails extends Component
             'governmentProgram',
             'livingStatus',
             'civilStatus',
-            'tribe',
-            'religion',
             'liveInPartner',
             'spouse',
             'roofType',
@@ -80,12 +78,6 @@ class TaggedAndValidatedApplicantDetails extends Component
         // For Dependents
         $this->dependent_civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
-        });
-        $this->tribes = Cache::remember('tribes', 60*60, function() {
-            return Tribe::all();  // Cache for 1 hour
-        });
-        $this->religions = Cache::remember('religions', 60*60, function() {
-            return Religion::all();  // Cache for 1 hour
         });
         $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
             return LivingSituation::all();  // Cache for 1 hour
@@ -298,7 +290,7 @@ class TaggedAndValidatedApplicantDetails extends Component
 
             'full_address' => 'nullable|string|max:255',
             'civil_status_id' => 'required|integer',
-            'tribe_id' => 'required|integer',
+            'tribe' => 'required|integer',
             'sex' => 'required|in:Male,Female',
             'date_of_birth' => 'required|date',
             'religion_id' => 'required|integer',
@@ -426,10 +418,10 @@ class TaggedAndValidatedApplicantDetails extends Component
             'dependents.*.dependent_monthly_income' => 'required|integer',
         ]);
 
-        dd([
-            'form_data' => $this->all(),
-            'original_applicant' => $this->taggedAndValidatedApplicant
-        ]);
+//        dd([
+//            'form_data' => $this->all(),
+//            'original_applicant' => $this->taggedAndValidatedApplicant
+//        ]);
 
         $this->taggedAndValidatedApplicant->applicant->first_name = $this->first_name;
         $this->taggedAndValidatedApplicant->applicant->middle_name = $this->middle_name;
@@ -448,10 +440,10 @@ class TaggedAndValidatedApplicantDetails extends Component
         }
         $this->taggedAndValidatedApplicant->full_address = $this->full_address;
         $this->taggedAndValidatedApplicant->civilStatus->civil_status_id = $this->civil_status_id;
-        $this->taggedAndValidatedApplicant->tribe->tribe_id = $this->tribe_id;
+        $this->taggedAndValidatedApplicant->tribe = $this->tribe;
         $this->taggedAndValidatedApplicant->sex = $this->sex;
         $this->taggedAndValidatedApplicant->date_of_birth = $this->date_of_birth;
-        $this->taggedAndValidatedApplicant->religion->religion_id = $this->religion_id;
+        $this->taggedAndValidatedApplicant->religion = $this->religion;
         $this->taggedAndValidatedApplicant->occupation = $this->occupation;
         $this->taggedAndValidatedApplicant->monthly_income = $this->monthly_income;
         $this->taggedAndValidatedApplicant->family_income = $this->family_income;

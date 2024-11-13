@@ -1123,22 +1123,13 @@
                                 <label for="tribe" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                     TRIBE/ETHNICITY
                                 </label>
-                                @if($isEditing)
-                                    <select wire:model="tribe_id"
-                                            id="tribe_id"
-                                            class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                        @foreach($tribes as $tribe)
-                                            <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                        @endforeach
-                                    </select>
-                                @else
-                                    <input type="text"
-                                           value="{{ $taggedAndValidatedApplicant->tribe->tribe_name }}"
-                                           disabled
-                                           class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @endif
-                                @error('tribe_id')
-                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                                <input wire:model="tribe"
+                                        type="text"
+                                       value="{{ $taggedAndValidatedApplicant->tribe }}"
+                                       disabled
+                                       class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @error('tribe')
+                                    <span class="text-red-500 text-xs">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
@@ -1192,22 +1183,13 @@
                                        class="block text-[12px] font-semibold text-gray-700 mb-1">
                                     RELIGION
                                 </label>
-                                @if($isEditing)
-                                    <select wire:model="religion_id"
-                                            id="religion_id"
-                                            class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                        @foreach($religions as $religion)
-                                            <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
-                                        @endforeach
-                                    </select>
-                                @else
-                                    <input type="text"
-                                           value="{{ $taggedAndValidatedApplicant->religion->religion_name }}"
-                                           disabled
-                                           class="uppercase w-full p-1 border-b text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @endif
-                                @error('religion_id')
-                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                                <input wire:model="religion"
+                                        type="text"
+                                       value="{{ $taggedAndValidatedApplicant->religion }}"
+                                       disabled
+                                       class="uppercase w-full p-1 border-b text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @error('religion')
+                                    <span class="text-red-500 text-xs">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
