@@ -11,9 +11,7 @@ use Spatie\Permission\Models\Role;
 class UserSeeder extends Seeder
 {
     protected static ?string $password;
-    /**
-     * Run the database seeds.
-     */
+
     public function run(): void
     {
         User::create([
@@ -24,11 +22,12 @@ class UserSeeder extends Seeder
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
+            'role_id' => 1,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
         ])->assignRole('Admin');
-
+//
         User::create([
             'username' => 'editor_1',
             'first_name' => 'Missy',
@@ -37,11 +36,12 @@ class UserSeeder extends Seeder
             'email' => 'user@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role_id' => 2,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
         ])->assignRole('Editor');
-
+//
         User::create([
             'username' => 'shelterAdmin_1',
             'first_name' => 'Sheila',
@@ -50,6 +50,7 @@ class UserSeeder extends Seeder
             'email' => 'shelter@example.com',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role_id' => 3,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
