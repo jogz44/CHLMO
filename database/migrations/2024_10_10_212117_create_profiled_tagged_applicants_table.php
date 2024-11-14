@@ -15,13 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('profile_no')->constrained('shelter_applicants')->onDelete('cascade');
             $table->foreignId('civil_status_id')->constrained('civil_statuses')->onDelete('cascade');
-            $table->foreignId('religion_id')->constrained('religions')->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
             $table->foreignId('government_program_id')->constrained('government_programs')->onDelete('cascade');
-            $table->foreignId('tribe_id')->constrained('tribes')->onDelete('cascade');
+            $table->foreignId('structure_status_id')->nullable()->constrained('structure_status_types')->onDelete('cascade');
             $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
             $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
             $table->text('living_situation_case_specification')->nullable();
+            $table->string('tribe', 255);
+            $table->string('religion', 255);
             $table->integer('age');
             $table->char('sex', 6);
             $table->string('occupation', 255);

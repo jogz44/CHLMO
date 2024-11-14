@@ -35,7 +35,7 @@ class GranteeDetails extends Component
     public $last_name;
     public $originOfRequest, $request_origin_id, $origin_name;
     public $age, $sex, $occupation, $contact_number, $barangay_id, $purok_id, $full_address, $year_of_residency;
-    public $puroks = [], $tribe_id, $religion_id,
+    public $puroks = [], $tribe, $religion,
         $spouse_first_name, $spouse_middle_name, $spouse_last_name,
         $partner_first_name, $partner_middle_name, $partner_last_name;
     public $marriedStatusId = 3; // ID for married status
@@ -60,9 +60,7 @@ class GranteeDetails extends Component
     {
         $this->grantee = Grantee::with([
             'profiledTaggedApplicant.civilStatus',
-            'profiledTaggedApplicant.tribe',
             'profiledTaggedApplicant.originOfRequest',
-            'profiledTaggedApplicant.religion',
             'profiledTaggedApplicant.livingSituation',
             'profiledTaggedApplicant.caseSpecification',
             'profiledTaggedApplicant.governmentProgram',
@@ -89,12 +87,12 @@ class GranteeDetails extends Component
 
         // Load Tagged and Validated Applicant Information
         $this->civil_status_id = $this->profiledTagged?->civil_status_id ?? '--';
-        $this->tribe_id = $this->profiledTagged?->tribe_id ?? '--';
+        $this->tribe= $this->profiledTagged?->tribe ?? '--';
         $this->age = $this->profiledTagged?->age ?? '--';
         $this->sex = $this->profiledTagged?->sex ?? '--';
         $this->year_of_residency = $this->profiledTagged?->year_of_residency ?? '--';
         $this->contact_number = $this->profiledTagged?->contact_number ?? '--';
-        $this->religion_id = $this->profiledTagged?->religion_id ?? '--';
+        $this->religion = $this->profiledTagged?->religion ?? '--';
         $this->occupation = $this->profiledTagged?->occupation ?? '--';
         $this->date_tagged = optional($this->profiledTagged?->date_tagged)
             ->format('Y-m-d') ?? '--';
@@ -204,8 +202,6 @@ class GranteeDetails extends Component
             'grantee' => $this->grantee,
             'OriginOfRequests' => $OriginOfRequests,
             'barangays' => Barangay::all(),
-            'tribes' => Tribe::all(),
-            'religions' => Religion::all(),
             'materialsList' => $materialsList, // Add materials list for the dropdown
         ])
             ->layout('layouts.adminshelter');
