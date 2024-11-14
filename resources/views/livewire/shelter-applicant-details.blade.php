@@ -254,30 +254,27 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="religion" class="block text-[13px] font-medium text-gray-700 mb-1">RELIGION</label>
-                            <select wire:model="religion_id" id="religion" name="religion" class="w-full p-1.5 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Religion</option>
-                                @foreach($religions as $religion)
-                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('religion') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            <input type="text" id="religion" name="religion" wire:model="religion"
+                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="tribe" class="block text-[13px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                            <select wire:model="tribe_id" id="tribe" name="tribe" required class="w-full p-1.5 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
-                                <option value="">Select Tribe/Ethnicity</option>
-                                @foreach($tribes as $tribe)
-                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            <input type="text" id="tribe" name="tribe" wire:model="tribe"
+                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="contactNo" class="block text-[13px] font-medium text-gray-700 mb-1">CONTACT
                                 NUMBER</label>
-                            <input type="number" id="contactNo" name="contactNo" wire:model="contact_number"
+                                <input type="text"
+                                       wire:model="contact_number"
+                                       id="contact_number"
+                                       pattern="^09\d{9}$"
+                                       title="Enter a valid phone number (e.g., 09123456789)"
+                                       maxlength="11"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase"
+                                       placeholder="09xxxxxxxxx"
+                                       oninput="validateNumberInput(this)">
 
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                     </div>
 
@@ -320,13 +317,21 @@
                     <div x-data="{
                     livingSituation: @entangle('living_situation_id')" class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="structureStatus" class="block text-[13px] font-medium text-gray-700 mb-1">STRUCTURE STATUS</label>
-                            <select id="structureStatus" name="structureStatus"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Status</option>
-                               
+                            <label for="structure_status_id"
+                                class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="structure_status_id"
+                                id="structure_status_id"
+                                required
+                                class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select type</option>
+                                @foreach($structureStatuses as $structureStatus)
+                                <option value="{{ $structureStatus->id }}">{{ $structureStatus->structure_status }}</option>
+                                @endforeach
                             </select>
-                            
+                            @error('structure_status_id') <span class="error text-red-600">{{ $message }}</span> @enderror
+
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION (CASE) <span class="text-red-500">*</span></label>
@@ -343,7 +348,7 @@
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span></label>
                                 <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification" name="living_situation_case_specification" placeholder="Enter case details"
-                                    class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required>
+                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required oninput="capitalizeInput(this)">
                                 </textarea>
                                 @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>

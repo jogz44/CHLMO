@@ -123,12 +123,32 @@
 
                 <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="age" class="block text-[12px] font-medium text-gray-700 mb-1">AGE</label>
                             <input type="number" id="age" name="age" :disabled="!isEditable" wire:model="age"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
-                        <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="civil_status_id" class="block text-[12px] font-semibold text-gray-700 mb-1">CIVIL STATUS</label>
+                            @if($isEditing)
+                            <select wire:model="civil_status_id"
+                                id="civil_status_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($civilStatuses as $status)
+                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                @endforeach
+                            </select>
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTaggedApplicant->civilStatus->civil_status }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
+                            @error('civil_status_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="sex" class="block text-[12px] font-semibold text-gray-700 mb-1">SEX</label>
                             <div class="flex items-center">
                                 @if($isEditing)
@@ -153,57 +173,7 @@
                         </div>
 
                     </div>
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                OCCUPATION
-                            </label>
-                            <input wire:model="occupation"
-                                type="text"
-                                id="occupation"
-                                @disabled(!$isEditing)
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                oninput="capitalizeInput(this)">
-                            @error('occupation')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="year_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                YEARS OF RESIDENCY
-                            </label>
-                            <input wire:model="year_of_residency"
-                                type="number"
-                                id="year_of_residency"
-                                @disabled(!$isEditing)
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                oninput="capitalizeInput(this)">
-                            @error('year_of_residency')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="civil_status_id" class="block text-[12px] font-semibold text-gray-700 mb-1">CIVIL STATUS</label>
-                            @if($isEditing)
-                            <select wire:model="civil_status_id"
-                                id="civil_status_id"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($civilStatuses as $status)
-                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
-                                @endforeach
-                            </select>
-                            @else
-                            <input type="text"
-                                value="{{ $profiledTaggedApplicant->civilStatus->civil_status }}"
-                                disabled
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @endif
-                            @error('civil_status_id')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    </div>
-
+                    
                     @if ($civil_status_id == $liveInPartnerStatusId)
                     <div class="bg-gray-100 p-2 mb-4">
                         <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
@@ -275,25 +245,71 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="religion"
-                                class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                RELIGION
+                            <label for="occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                OCCUPATION
+                            </label>
+                            <input wire:model="occupation"
+                                type="text"
+                                id="occupation"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('occupation')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="year_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                YEARS OF RESIDENCY
+                            </label>
+                            <input wire:model="year_of_residency"
+                                type="number"
+                                id="year_of_residency"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('year_of_residency')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="govAssistance" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                SOCIAL WELFARE SECTOR
                             </label>
                             @if($isEditing)
-                            <select wire:model="religion_id"
-                                id="religion_id"
-                                class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($religions as $religion)
-                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                            <select wire:model="government_program_id"
+                                id="government_program_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($governmentPrograms as $governmentProgram)
+                                <option value="{{ $governmentProgram->id }}">{{ $governmentProgram->program_name }}</option>
                                 @endforeach
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTaggedApplicant->religion->religion_name }}"
+                                value="{{ $profiledTaggedApplicant->governmentProgram->program_name }}"
                                 disabled
-                                class="uppercase w-full p-1 border-b text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
-                            @error('religion_id')
+                            @error('government_program_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="religion"
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                RELIGION
+                            </label>
+                            <input wire:model="religion"
+                                type="text"
+                                id="religion"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('religion')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
@@ -301,21 +317,13 @@
                             <label for="tribe" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 TRIBE/ETHNICITY
                             </label>
-                            @if($isEditing)
-                            <select wire:model="tribe_id"
-                                id="tribe_id"
-                                class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($tribes as $tribe)
-                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                @endforeach
-                            </select>
-                            @else
-                            <input type="text"
-                                value="{{ $profiledTaggedApplicant->tribe->tribe_name }}"
-                                disabled
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @endif
-                            @error('tribe_id')
+                            <input wire:model="tribe"
+                                type="text"
+                                id="tribe"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('tribe')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
@@ -397,27 +405,29 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="govAssistance" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                SOCIAL WELFARE SECTOR
+                    <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="structure_status_id"
+                                class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
                             </label>
                             @if($isEditing)
-                            <select wire:model="government_program_id"
-                                id="government_program_id"
+                            <select wire:model="structure_status_id"
+                                id="structure_status_id"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($governmentPrograms as $governmentProgram)
-                                <option value="{{ $governmentProgram->id }}">{{ $governmentProgram->program_name }}</option>
+                                @foreach($structureStatuses as $structureStatus)
+                                <option value="{{ $structureStatus->id }}">{{ $structureStatus->structure_status }}</option>
                                 @endforeach
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTaggedApplicant->governmentProgram->program_name }}"
+                                value="{{ $profiledTaggedApplicant->structureStatus->structure_status }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
-                            @error('government_program_id')
+                            @error('structure_status_id')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
+
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">

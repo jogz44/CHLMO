@@ -16,6 +16,7 @@ use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Purok;
 use App\Models\Religion;
+use App\Models\StructureStatusType;
 use App\Models\Tribe;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class ProfiledTaggedApplicantDetails extends Component
     public $last_name;
     public $originOfRequest, $request_origin_id, $origin_name;
     public $age, $sex, $occupation, $contact_number, $barangay_id, $purok_id, $full_address, $year_of_residency;
-    public $puroks = [], $tribe_id, $religion_id, $tribes, $religions,  
+    public $puroks = [], $tribe, $religion,  
         $spouse_first_name, $spouse_middle_name, $spouse_last_name,
         $partner_first_name, $partner_middle_name, $partner_last_name;
     public $marriedStatusId = 3; // ID for married status
@@ -42,7 +43,7 @@ class ProfiledTaggedApplicantDetails extends Component
 
 
     public $date_request;
-    public $civil_status_id, $civilStatuses, $date_tagged,
+    public $civil_status_id, $civilStatuses, $date_tagged, $structure_status_id, $structureStatuses,
         $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $remarks;
 
@@ -62,10 +63,9 @@ class ProfiledTaggedApplicantDetails extends Component
             'caseSpecification',
             'governmentProgram',
             'civilStatus',
-            'tribe',
-            'religion',
             'shelterLiveInPartner',
             'shelterSpouse',
+            'structureStatus'
            
         ])->findOrFail($profileNo);
 
@@ -76,12 +76,6 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
-        $this->tribes = Cache::remember('tribes', 60*60, function() {
-            return Tribe::all();  // Cache for 1 hour
-        });
-        $this->religions = Cache::remember('religions', 60*60, function() {
-            return Religion::all();  // Cache for 1 hour
-        });
         $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
             return LivingSituation::all();  // Cache for 1 hour
         });
@@ -90,6 +84,9 @@ class ProfiledTaggedApplicantDetails extends Component
         });
         $this->governmentPrograms = Cache::remember('governmentPrograms', 60*60, function() {
             return GovernmentProgram::all();  // Cache for 1 hour
+        });
+        $this->structureStatuses = Cache::remember('structureStatuses', 60*60, function() {
+            return StructureStatusType::all();  // Cache for 1 hour
         });
 
         // Applicant basic information
@@ -106,12 +103,15 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->purok_id = $this->profiledTaggedApplicant->address?->purok?->id;
         $this->full_address = $this->profiledTaggedApplicant->full_address ?? null;
         $this->occupation = $this->profiledTaggedApplicant->occupation ?? null;
+        $this->tribe = $this->profiledTaggedApplicant->tribe ?? null;
+        $this->religion = $this->profiledTaggedApplicant->religion ?? null;
         $this->age = $this->profiledTaggedApplicant->age ?? null;
         // Load initial puroks if barangay is selected
         if ($this->barangay_id) {
             $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
         }
         $this->civil_status_id = $this->profiledTaggedApplicant?->civilStatus?->civil_status_id ?? null;
+        $this->structure_status_id = $this->profiledTaggedApplicant?->structureStatus?->structure_status_id ?? null;
         // Live in partner details
         $this->partner_first_name = $this->profiledTaggedApplicant->liveInPartner->partner_first_name ?? null;
         $this->partner_middle_name = $this->profiledTaggedApplicant->liveInPartner->partner_middle_name ?? null;
@@ -170,13 +170,13 @@ class ProfiledTaggedApplicantDetails extends Component
             'date_request' => 'required|date',
             'origin_of_request_id' => 'required|integer',
             'year_of_residency' => 'required|integer',
-
+            'structure_status_id' => 'required|integer',
             'full_address' => 'nullable|string|max:255',
             'civil_status_id' => 'required|integer',
-            'tribe_id' => 'required|integer',
+            'tribe' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'date_of_birth' => 'required|date',
-            'religion_id' => 'required|integer',
+            'religion' => 'required|string|max:255',
             'occupation' => 'required|string|max:255',
             'monthly_income' => 'required|integer',
             'family_income' => 'required|integer',
@@ -255,10 +255,11 @@ class ProfiledTaggedApplicantDetails extends Component
         }
         $this->profiledTaggedApplicant->full_address = $this->full_address;
         $this->profiledTaggedApplicant->civilStatus->civil_status_id = $this->civil_status_id;
-        $this->profiledTaggedApplicant->tribe->tribe_id = $this->tribe_id;
+        $this->profiledTaggedApplicant->structureStatus->structure_status_id = $this->structure_status_id;
+        $this->profiledTaggedApplicant->tribe = $this->tribe;
         $this->profiledTaggedApplicant->sex = $this->sex;
         $this->profiledTaggedApplicant->date_of_birth = $this->date_of_birth;
-        $this->profiledTaggedApplicant->religion->religion_id = $this->religion_id;
+        $this->profiledTaggedApplicant->religion = $this->religion;
         $this->profiledTaggedApplicant->occupation = $this->occupation;
         $this->profiledTaggedApplicant->contact_number = $this->contact_number;
         $this->profiledTaggedApplicant->year_of_residency = $this->year_of_residency;
@@ -304,8 +305,6 @@ class ProfiledTaggedApplicantDetails extends Component
             'profiledTaggedApplicant' => $this->profiledTaggedApplicant,
             'OriginOfRequests' => $OriginOfRequests,
             'barangays' => Barangay::all(),
-            'tribes' => Tribe::all(),
-            'religions' => Religion::all()
         ]) ->layout('layouts.adminshelter');
     }
 }
