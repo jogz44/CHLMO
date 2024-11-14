@@ -13,6 +13,7 @@ use App\Http\Controllers\PurokController;
 use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
 use App\Livewire\GranteeDetails;
+use App\Livewire\PermissionsManager;
 use App\Livewire\ShelterApplicantDetails;
 use App\Livewire\ProfiledTaggedApplicantDetails;
 use App\Livewire\TaggedAndValidatedApplicantDetails;
@@ -47,13 +48,16 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // GET Requests
-//    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-//    Route::get('/get-puroks/{barangay}', [PurokController::class, 'getPuroks']);
-
     Route::get('/activity-logs', function () {
         return view('activity-logs');
     })->name('activity-logs');
+
+//    Route::get('/permissions', PermissionsManager::class)
+//        ->name('permissions');
+//    Route::get('/permissions', PermissionsManager::class)
+//        ->middleware(['auth', 'can:manage permissions']);
+        Route::get('/user-management', \App\Livewire\UserManagement::class)
+        ->name('user-management');
 
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 
