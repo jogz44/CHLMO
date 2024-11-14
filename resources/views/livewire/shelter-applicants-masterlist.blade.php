@@ -91,31 +91,40 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($shelter_applicants as $shelterapplicant)
+                            @isset($shelterApplicants)
+                            @forelse($shelterApplicants as $shelterApplicant)
                             <tr>
-                                <td class="py-4 px-2 text-center border-b">{{ $shelterapplicant->profile_no }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->created_at->format('m-d-Y') }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->OriginOfRequest->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->Status ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterapplicant->created_at->format('m-d-Y'), updated_at->format('m-d-Y') }}</td>
+                                <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->profile_no }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->last_name }}, {{ $shelterApplicant->first_name }} {{ $shelterApplicant->middle_name }} {{ $applicant->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->created_at->format('m-d-Y') }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->OriginOfRequest->name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center capitalize border-b">
-
-
+                                    <!-- Animated Confetti -->
+                                    <div class="flex items-center">
+                                        @if($grantee->is_granted)
+                                        Granted
+                                        <span class="ml-1">
+                                            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                            <lord-icon src="https://cdn.lordicon.com/fkmafinl.json" trigger="loop" delay="2000" style="width: 30px; height: 30px">
+                                            </lord-icon>
+                                        </span>
+                                        @else
+                                        <span class="text-red-500">Pending...</span>
+                                        @endif
+                                    </div>
+                                    {{ $shelterApplicant->Status ?? 'N/A' }}
                                 </td>
+                                <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->created_at->format('m-d-Y'), updated_at->format('m-d-Y') }}</td>
+                                <td class="py-4 px-2 text-center capitalize border-b"></td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4">No applicants found.</td>
+                                <td colspan="7" class="text-center py-4">No Applicants Found.</td>
                             </tr>
                             @endforelse
+                            @endisset
                         </tbody>
                     </table>
-
-                    <!-- Pagination Links -->
-                    <div class="py-4 px-3">
-                        {{ $applicants->links() }}
-                    </div>
                 </div>
             </div>
         </div>

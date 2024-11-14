@@ -65,6 +65,14 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(LivingSituation::class, 'living_situation_id');
     }
+//    public function tribe(): BelongsTo
+//    {
+//        return $this->belongsTo(Tribe::class, 'living_situation_id');
+//    }
+//    public function religion(): BelongsTo
+//    {
+//        return $this->belongsTo(Religion::class, 'living_situation_id');
+//    }
 
     // Relationship with CaseSpecification
     public function caseSpecification(): BelongsTo
