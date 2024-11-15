@@ -23,6 +23,7 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'role_id' => 1,
+            'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
@@ -35,8 +36,9 @@ class UserSeeder extends Seeder
             'last_name' => 'Cooper',
             'email' => 'user@example.com',
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => Hash::make('password'), // Make consistent with admin
             'role_id' => 2,
+            'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
@@ -49,8 +51,9 @@ class UserSeeder extends Seeder
             'last_name' => 'Cooper',
             'email' => 'shelter@example.com',
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => Hash::make('password'), // Make consistent with admin
             'role_id' => 3,
+            'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
