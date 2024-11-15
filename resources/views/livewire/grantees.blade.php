@@ -95,29 +95,39 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="py-2 px-2  text-center font-medium">Profile No.</th>
-                            <th class="py-2 px-2 border-b text-center  font-medium">Name</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Origin of Request</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Request</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Profiled/Tagged</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Delivery Date</th>
+                            <th class="py-2 px-2  text-center font-medium whitespace-nowrap">Profile No.</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">Name</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">Purok</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">House No/Street</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">Contact No</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">Spouse Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Origin of Request</th>
+                            <th class="py-2 px-2 border-b text-center  font-medium whitespace-nowrap">Social Welfare Sector</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Date Request</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Date Profiled/Tagged</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Delivery Date</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Remarks</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Details</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Details</th>
                         </tr>
                     </thead>
                     <tbody x-data>
                         @forelse($grantees as $grantee)
-                        <tr>
-                            <td class="py-4 px-2 text-center border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->middle_name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{ $grantee->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b"> {{ $grantee->profiledTaggedApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
-                            <td class="py-4 px-2 text-center border-b">
-                                {{ optional($grantee->profiledTaggedApplicant)->date_tagged ? $grantee->profiledTaggedApplicant->date_tagged->format('Y-m-d') : '' }}
-                            </td>
-                            <td class="py-4 px-2 text-center border-b">
-                                {{ $grantee->date_of_delivery ? $grantee->date_of_delivery->format('Y-m-d') : '' }}
-                            </td>
+                        <tr @if($grantee->is_granted) @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'" class="cursor-pointer" @endif>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->middle_name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->barangay->name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->purok->name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->full_address ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->contact_number ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap"></td>
+                            <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->governmentProgram->program_name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap"> {{ $grantee->profiledTaggedApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ optional($grantee->profiledTaggedApplicant)->date_tagged ? $grantee->profiledTaggedApplicant->date_tagged->format('Y-m-d') : '' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->date_of_delivery ? $grantee->date_of_delivery->format('Y-m-d') : '' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->remarks ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
                                 <!-- Animated Confetti -->
                                 <div class="flex items-center">
@@ -137,17 +147,11 @@
                                     @endif
                                 </div>
                             </td>
-                            <td class="py-4 px-2 text-center border-b space-x-2">
-                                @if($grantee->is_granted)
-                                <button @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
-                                @endif
-                            </td>
 
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center py-4">No applicants found.</td>
+                            <td colspan="15" class="text-center py-4">No applicants found.</td>
                         </tr>
                         @endforelse
                     </tbody>
