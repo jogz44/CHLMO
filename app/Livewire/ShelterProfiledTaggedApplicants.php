@@ -42,7 +42,7 @@ class ShelterProfiledTaggedApplicants extends Component
     public $materialUnitId, $material_id, $purchaseOrderId;
     public $quantity, $date_of_delivery, $date_of_ris;
     public $grantee_quantity = [];
-    public $photo = [];
+    public $images = [];
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $requestLetterAddressToCityMayor, $certificateOfIndigency, $consentLetterIfTheLandIsNotTheirs,
@@ -188,9 +188,9 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public function updatedPhoto()
     {
-        Log::info('Photo uploaded:', $this->photo);
-        // Validate the uploaded photo immediately after selection
-        $this->validateOnly('photo');
+        Log::info('Photo uploaded:', $this->images);
+        // Validate the uploaded images immediately after selection
+        $this->validateOnly('images');
     }
 
 
@@ -303,8 +303,8 @@ class ShelterProfiledTaggedApplicants extends Component
             Log::info('Materials delivered to grantee', ['granteeId' => $grantee->id, 'deliveredMaterials' => $deliveredMaterials]);
 
            
-            foreach ($this->photo as $image) {
-                $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
+            foreach ($this->images as $image) {
+                $path = $image->storeAs('images', $image->getClientOriginalName(), 'public');
                 ShelterUploadedFiles::create([
                     'grantee_id' => $grantee->id,
                     'image_path' => $path,
@@ -368,7 +368,7 @@ class ShelterProfiledTaggedApplicants extends Component
             'date_of_delivery',
             'date_of_ris',
             'grantee_quantity',
-            'photo',
+            'images',
         ]);
     }
 
@@ -554,7 +554,8 @@ class ShelterProfiledTaggedApplicants extends Component
         $OriginOfRequests = OriginOfRequest::all();
 
         $query = $query->with(['originOfRequest', 'shelterApplicant']);
-        $profiledTaggedApplicants = $query->paginate(5);
+        // $profiledTaggedApplicants = $query->paginate(5);
+        $profiledTaggedApplicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
         return view('livewire.shelter-profiled-tagged-applicants', [
             'profiledTaggedApplicants' => $profiledTaggedApplicants,
