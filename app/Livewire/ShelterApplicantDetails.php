@@ -108,6 +108,7 @@ class ShelterApplicantDetails extends Component
             // Initialize dropdowns
             $this->barangays = Barangay::all();
             $this->puroks = Purok::all();
+            $this->governmentPrograms = GovernmentProgram::all();
 
             // Populate other new fields from the applicant
             $this->age = $this->applicant->age;
@@ -115,13 +116,6 @@ class ShelterApplicantDetails extends Component
             $this->occupation = $this->applicant->occupation;
             $this->contact_number = $this->applicant->contact_number;
             $this->year_of_residency = $this->applicant->year_of_residency;
-
-             // Check if address exists before accessing it
-        if ($this->applicant && $this->applicant->address) {
-            $this->full_address = $this->applicant->address->full_address;
-        } else {
-            $this->full_address = '';  // Default value if no address is found
-        }
 
         $this->date_tagged = now()->toDateString(); // YYYY-MM-DD format
 
@@ -180,6 +174,7 @@ class ShelterApplicantDetails extends Component
             'government_program_id' => 'required|exists:government_programs,id',
             'remarks' => 'nullable|string|max:255',
             'photo.*' => 'required|file|mimes:jpeg,png,jpg,gif',
+            'full_address' => 'nullable|string|max:255',
 
              // Live-in partner details
              'partner_first_name' => [
@@ -247,6 +242,7 @@ class ShelterApplicantDetails extends Component
                 'occupation' => $this->occupation ?: null,
                 'year_of_residency' => $this->year_of_residency,
                 'contact_number' => $this->contact_number ?: null,
+                'full_address' => $this->full_address ?: null,
                 'date_tagged' => now(),
                 'living_situation_id' => $this->living_situation_id,
                 'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
@@ -254,7 +250,7 @@ class ShelterApplicantDetails extends Component
                 'structure_status_id' => $this->structure_status_id,
                 'date_tagged' => $this->date_tagged,
                 'government_program_id' => $this->government_program_id,
-                'remarks' => $this->remarks ?: 'N/A',
+                'remarks' => $this->remarks ?: null,
                 'is_tagged' => true,
             ]);
             // dd($taggedApplicant);
