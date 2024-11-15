@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
@@ -12,19 +13,53 @@ use Spatie\Permission\Models\Role;
 class UserManagement extends Component
 {
     use WithPagination;
+    public $selectedRolePermissions = [];
     public $isModalOpen = false, $isEditing = false;
 
     // User Management Properties
     public $userId, $username, $firstName, $middleName, $lastName, $email, $password, $roleId;
 
-    // New properties for permissions management
+    // For search and filter
+    public $search = '', $roleFilter = '';
+
+    // Permissions Management Properties
     public $selectedPermissions = [], $showPermissionsModal = false, $managingPermissionsFor = null,
         $selectedRoleId, $selectedUserId;
 
-    protected $listeners = ['permissionsUpdated' => '$refresh'];
+    protected $listeners = [
+        'permissionUpdated' => 'handlePermissionUpdate',
+        'roleUpdated' => 'handleRoleUpdate',
+        'refreshComponent' => '$refresh'
+    ];
 
-    // For search and filter
-    public $search = '', $roleFilter = '';
+    public $showDisableModal = false, $userToDisable = null, $confirmationPassword = '';
+    public function handlePermissionUpdate(): void
+    {
+        // Refresh permissions data
+        $this->dispatch('$refresh');
+
+        // If permissions modal is open, refresh the permissions list
+        if ($this->showPermissionsModal) {
+            if ($this->managingPermissionsFor === 'role' && $this->selectedRoleId) {
+                $role = Role::findById($this->selectedRoleId);
+                $this->selectedPermissions = $role->permissions->pluck('name')->toArray();
+            } elseif ($this->managingPermissionsFor === 'user' && $this->selectedUserId) {
+                $user = User::findOrFail($this->selectedUserId);
+                $this->selectedPermissions = $user->permissions->pluck('name')->toArray();
+            }
+        }
+    }
+    public function handleRoleUpdate(): void
+    {
+        // Refresh the entire component to get updated role data
+        $this->dispatch('$refresh');
+
+        // If editing a user, refresh the role data
+        if ($this->isModalOpen && $this->isEditing && $this->userId) {
+            $user = User::findOrFail($this->userId);
+            $this->roleId = $user->role_id;
+        }
+    }
     public function mount()
     {
         $this->resetInputFields();
@@ -36,7 +71,7 @@ class UserManagement extends Component
         'lastName' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8',
-        'roleId' => 'required|exists:roles,id'
+        'roleId' => 'required|exists:roles,id',
     ];
     public function openPermissionsModal($type, $id): void
     {
@@ -58,15 +93,32 @@ class UserManagement extends Component
             if ($this->managingPermissionsFor === 'role'){
                 $role = Role::findById($this->selectedRoleId);
                 $role->syncPermissions($this->selectedPermissions);
-                session()->flash('message', 'Role permissions updated successfully.');
+//                session()->flash('message', 'Role permissions updated successfully.');
+                $this->dispatch('alert', [
+                    'title' => 'Role permissions updated successfully!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'success'
+                ]);
             } else {
                 $user = User::findOrFail($this->selectedUserId);
                 $user->syncPermissions($this->selectedPermissions);
-                session()->flash('message', 'User permissions updated successfully.');
+//                session()->flash('message', 'User permissions updated successfully.');
+                $this->dispatch('alert', [
+                    'title' => 'User permissions updated successfully!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'success'
+                ]);
             }
             $this->closePermissionsModal();
+            $this->dispatch('role-management', 'roleUpdated');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error: ' . $e->getMessage());
+//            session()->flash('error', 'Error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Something went wrong!',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
+
         }
     }
     public function closePermissionsModal(): void
@@ -94,6 +146,7 @@ class UserManagement extends Component
         $this->isModalOpen = true;
         $this->resetInputFields();
     }
+
     public function closeModal(): void
     {
         $this->isModalOpen = false;
@@ -116,13 +169,29 @@ class UserManagement extends Component
     }
     public function save(): void
     {
-        $validatedData = $this->validate($this->isEditing
-            ? $this->getUpdateRules()
-            : $this->rules
-        );
+        Log::info('Starting save process', ['isEditing' => $this->isEditing]);
 
         try {
+            // Log data before validation to verify values
+            Log::info('Data before validation', [
+                'username' => $this->username,
+                'email' => $this->email,
+                'role_id' => $this->roleId,
+                'first_name' => $this->firstName,
+                'last_name' => $this->lastName,
+                'password' => $this->password
+            ]);
+
+            $validatedData = $this->validate($this->isEditing
+                ? $this->getUpdateRules()
+                : $this->rules
+            );
+
+            Log::info('Validation passed', ['validatedData' => $validatedData]);
+
             if ($this->isEditing) {
+                Log::info('Editing user', ['userId' => $this->userId]);
+
                 $user = User::findOrFail($this->userId);
                 $user->update([
                     'username' => $this->username,
@@ -131,20 +200,26 @@ class UserManagement extends Component
                     'last_name' => $this->lastName,
                     'email' => $this->email,
                     'role_id' => $this->roleId,
+                    'is_disabled' => false,
                 ]);
 
                 if ($this->password) {
+                    Log::info('Updating password for user', ['userId' => $this->userId]);
                     $user->update(['password' => Hash::make($this->password)]);
                 }
 
-                // Update role
                 $role = Role::findById($this->roleId);
                 $user->syncRoles([$role->name]);
+                Log::info('Role updated for user', ['userId' => $this->userId, 'role' => $role->name]);
 
-                session()->flash('message', 'User updated successfully.');
+                $this->dispatch('alert', [
+                    'title' => 'User updated successfully!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'success'
+                ]);
+
             } else {
-
-                \Log::info('Creating new user with data:', [
+                Log::info('Creating new user', [
                     'username' => $this->username,
                     'email' => $this->email,
                     'role_id' => $this->roleId
@@ -158,24 +233,48 @@ class UserManagement extends Component
                     'email' => $this->email,
                     'password' => Hash::make($this->password),
                     'role_id' => $this->roleId,
+                    'is_disabled' => false,
                     'email_verified_at' => now(),
                 ]);
 
-                \Log::info('User created with ID: ' . $user->id);
+                Log::info('User created successfully', ['userId' => $user->id]);
 
-                // Assign role
                 $role = Role::findById($this->roleId);
                 $user->assignRole($role->name);
+                Log::info('Role assigned to new user', ['userId' => $user->id, 'role' => $role->name]);
 
-                session()->flash('message', 'User created successfully.');
+                $this->dispatch('alert', [
+                    'title' => 'User created successfully!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'success'
+                ]);
             }
 
             $this->closeModal();
+            $this->dispatch('role-management', 'roleUpdated');
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            Log::error('Validation failed', [
+                'errors' => $ve->errors(),
+                'message' => $ve->getMessage()
+            ]);
+            $this->dispatch('alert', [
+                'title' => 'Validation Error!',
+                'message' => 'Please check your inputs.',
+                'type' => 'warning'
+            ]);
         } catch (\Exception $e) {
-            \Log::error('Failed to create user: ' . $e->getMessage());
-            session()->flash('error', 'Error: ' . $e->getMessage());
+            Log::error('Error in save process', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            $this->dispatch('alert', [
+                'title' => 'Something went wrong!',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
         }
     }
+
     protected function getUpdateRules(): array
     {
         return [
@@ -193,11 +292,110 @@ class UserManagement extends Component
         try {
             $user = User::findOrFail($userId);
             $user->delete();
-            session()->flash('message', 'User deleted successfully.');
+//            session()->flash('message', 'User deleted successfully.');
+            $this->dispatch('alert', [
+                'title' => 'User deleted successfully!',
+                'message' => '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
+            $this->dispatch('role-management', 'roleUpdated');
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting user: ' . $e->getMessage());
+//            session()->flash('error', 'Error deleting user: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Something went wrong!',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
         }
     }
+
+    public function updateRoleOptions(): void
+    {
+        $this->dispatch('refreshRoleOptions');
+    }
+
+    public function confirmDisable($userId): void
+    {
+        $this->userToDisable = $userId;
+        $this->showDisableModal = true;
+    }
+
+    public function closeDisableModal(): void
+    {
+        $this->showDisableModal = false;
+        $this->userToDisable = null;
+        $this->confirmationPassword = '';
+        $this->resetValidation('confirmationPassword');
+    }
+
+    public function disableUser(): void
+    {
+        $this->validate([
+            'confirmationPassword' => 'required|string'
+        ]);
+
+        try {
+            // Verify the password matches the authenticated user's password
+            if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
+//                session()->flash('error', 'Invalid password.');
+                $this->dispatch('alert', [
+                    'title' => 'Invalid password!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'danger'
+                ]);
+                return;
+            }
+
+            $user = User::findOrFail($this->userToDisable);
+
+            // Prevent disabling your own account
+            if ($user->id === auth()->id()) {
+//                session()->flash('error', 'You cannot disable your own account.');
+                $this->dispatch('alert', [
+                    'title' => 'You cannot disable your own account!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'danger'
+                ]);
+                return;
+            }
+
+            // Prevent disabling admin accounts (role_id = 1)
+            if ($user->role_id === 1) {
+//                session()->flash('error', 'Administrator accounts cannot be disabled.');
+                $this->dispatch('alert', [
+                    'title' => 'Administrator accounts cannot be disabled!',
+                    'message' => '<br><small>' . now()->calendar() . '</small>',
+                    'type' => 'danger'
+                ]);
+                return;
+            }
+
+            $user->update(['is_disabled' => true]);
+
+            // Log the action for audit purposes
+//            activity()
+//                ->performedOn($user)
+//                ->causedBy(auth()->user())
+//                ->log('disabled user account');
+
+//            session()->flash('message', 'User disabled successfully.');
+            $this->dispatch('alert', [
+                'title' => 'User disabled successfully!',
+                'message' => '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'succes'
+            ]);
+            $this->closeDisableModal();
+            $this->dispatch('role-management', 'roleUpdated');
+        } catch (\Exception $e) {
+//            session()->flash('error', 'Error disabling user: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Error disabling user!',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
+        }
+    }
+
     public function render()
     {
         $users = User::query()
@@ -212,12 +410,16 @@ class UserManagement extends Component
             ->when($this->roleFilter, function ($query) {
                 $query->where('role_id', $this->roleFilter);
             })
+            ->with(['role' => function ($query) {
+                $query->with('permissions')->withoutGlobalScopes();
+            }])
             ->paginate(5);
 
         return view('livewire.user-management', [
             'users' => $users,
-            'roles' => Role::all(),
-            'permissions' => Permission::all(),
+            'roles' => Role::with('permissions')->withoutGlobalScopes()->get(),
+            'permissions' => Permission::withoutGlobalScopes()->get(),
+            'selectedRolePermissions' => $this->selectedRolePermissions
         ])->layout('layouts.app');
     }
 }
