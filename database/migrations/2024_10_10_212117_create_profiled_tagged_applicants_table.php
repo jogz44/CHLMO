@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
             $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
             $table->text('living_situation_case_specification')->nullable();
+            $table->text('full_address')->nullable();
             $table->string('tribe', 255);
             $table->string('religion', 255);
             $table->integer('age');
@@ -31,7 +32,7 @@ return new class extends Migration
             $table->dateTime('date_tagged');
             $table->boolean('is_tagged')->default(false);
             $table->boolean('is_awarding_on_going')->default(false);
-            $table->text('remarks')->nullable();
+            $table->text('remarks', 255)->nullable();
             $table->timestamps();
         });
     }
