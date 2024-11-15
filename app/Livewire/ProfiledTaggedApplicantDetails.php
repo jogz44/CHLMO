@@ -49,7 +49,7 @@ class ProfiledTaggedApplicantDetails extends Component
 
     public $materialUnitId, $material_id, $purchaseOrderId;
     public $quantity, $date_of_delivery, $date_of_ris;
-    public $photo = [], $photoForTagging = [];
+    public $photo = [], $images = [];
     public $selectedImage = null; // This is for the tagging image
     public $selectedAttachment = null; // this is for the awarding attachment
 
@@ -141,11 +141,13 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->remarks = $this->profiledTaggedApplicant?->remarks ?? null;
 
         $this->photo = $this->profiledTaggedApplicant?->photo ?? [];
+        $this->images = $this->profiledTaggedApplicant?->images ?? [];
     }
  
     public function viewImage($imageId): void
     {
         $this->selectedImage = $this->profiledTaggedApplicant->photo->find($imageId);
+        $this->selectedImage = $this->profiledTaggedApplicant->images->find($imageId);
     }
     public function closeImage(): void
     {
@@ -197,6 +199,7 @@ class ProfiledTaggedApplicantDetails extends Component
 
             'remarks' => 'nullable|string|max:255',
             'photo.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
 
             // Live-in partner details
             'partner_first_name' => [
