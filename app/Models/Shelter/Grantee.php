@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Address;
 use App\Models\Barangay;
 use App\Models\Purok;
+use App\Models\GovernmentProgram;
 
 class Grantee extends Model
 {
@@ -53,7 +54,6 @@ class Grantee extends Model
     {
         return $this->belongsTo(ShelterApplicant::class, 'profile_no', 'id');
     }
-
     public function originOfRequest(): BelongsTo
     {
         return $this->belongsTo(OriginOfRequest::class, 'request_origin_id', 'id');
@@ -75,7 +75,10 @@ class Grantee extends Model
     {
         return $this->belongsTo(Barangay::class, 'barangay_id');
     }
-
+    public function governmentProgram(): BelongsTo
+    {
+        return $this->belongsTo(GovernmentProgram::class);
+    }
     public function purok()
     {
         return $this->belongsTo(Purok::class, 'purok_id');
