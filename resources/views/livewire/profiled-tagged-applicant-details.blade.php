@@ -173,7 +173,7 @@
                         </div>
 
                     </div>
-                    
+
                     @if ($civil_status_id == $liveInPartnerStatusId)
                     <div class="bg-gray-100 p-2 mb-4">
                         <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
@@ -399,13 +399,13 @@
                                 @disabled(!$isEditing)
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                 oninput="capitalizeInput(this)">
-                            @error('full-address')
+                            @error('full_address')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-2">
-                    <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="structure_status_id"
                                 class="block text-[13px] font-semibold text-gray-700 mb-1">
                                 STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
@@ -525,45 +525,92 @@
                 </div>
                 <!-- Display images -->
                 <div class="bg-white p-6 rounded shadow mb-6">
-                    <!-- Image Grid -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                        @forelse($photo as $image)
-                        <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
-                            <img
-                                src="{{ asset('storage/' . $image->image_path) }}"
-                                alt="{{ $image->display_name }}"
-                                class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                {{ $image->display_name }}
+                    <div>
+                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">BEFORE</h2>
+                        <!-- Image Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                            @forelse($photo as $image)
+                            <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
+                                <img
+                                    src="{{ asset('storage/' . $image->image_path) }}"
+                                    alt="{{ $image->display_name }}"
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                    {{ $image->display_name }}
+                                </div>
+                            </div>
+                            @empty
+                            <div class="col-span-full text-center py-4 text-gray-500">
+                                No images available
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Modal -->
+                        @if($selectedImage)
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                                <div class="flex justify-end mb-2">
+                                    <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
+                                    alt="{{ $selectedImage->display_name }}"
+                                    class="max-w-full h-auto">
+                                <div class="mt-2 text-center text-gray-700">
+                                    {{ $selectedImage->display_name }}
+                                </div>
                             </div>
                         </div>
-                        @empty
-                        <div class="col-span-full text-center py-4 text-gray-500">
-                            No images available
-                        </div>
-                        @endforelse
+                        @endif
                     </div>
 
-                    <!-- Modal -->
-                    @if($selectedImage)
-                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
-                            <div class="flex justify-end mb-2">
-                                <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
+                    <!-- Display images -->
+                    <div>
+                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">AFTER</h2>
+                        <!-- Image Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                            @forelse($images as $image)
+                            <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
+                                <img
+                                    src="{{ asset('storage/' . $image->image_path) }}"
+                                    alt="{{ $image->display_name }}"
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                    {{ $image->display_name }}
+                                </div>
                             </div>
-                            <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
-                                alt="{{ $selectedImage->display_name }}"
-                                class="max-w-full h-auto">
-                            <div class="mt-2 text-center text-gray-700">
-                                {{ $selectedImage->display_name }}
+                            @empty
+                            <div class="col-span-full text-center py-4 text-gray-500">
+                                No images available
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Modal -->
+                        @if($selectedImage)
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                                <div class="flex justify-end mb-2">
+                                    <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
+                                    alt="{{ $selectedImage->display_name }}"
+                                    class="max-w-full h-auto">
+                                <div class="mt-2 text-center text-gray-700">
+                                    {{ $selectedImage->display_name }}
+                                </div>
                             </div>
                         </div>
+                        @endif
                     </div>
-                    @endif
                 </div>
             </form>
         </div>

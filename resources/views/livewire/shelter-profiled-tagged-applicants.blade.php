@@ -119,13 +119,18 @@
                                     Grant
                                 </button>
                                 @elseif($shelterApplicant->grantees->isNotEmpty() && $shelterApplicant->grantees->first()->is_granted)
+                                <!-- Details Button -->
+                                <button @click="window.location.href = '{{ route('profiled-tagged-applicant-details', ['profileNo' => $shelterApplicant->id]) }}'"
+                                    class="text-custom-red text-bold underline px-4 py-1.5">
+                                    Details
+                                </button>
                                 <!-- Granted Button -->
                                 <button class="bg-gray-400 text-white px-12 py-1.5 rounded-full cursor-not-allowed">
                                     Granted
                                 </button>
                                 @else
                                 <!-- Grant Pending Button (disabled) -->
-                                <div class="relative flex items-center space-x-2">
+                                <div class="relative flex items-center space-x-2 ml-16">
                                     <!-- Details Button -->
                                     <button @click="window.location.href = '{{ route('profiled-tagged-applicant-details', ['profileNo' => $shelterApplicant->id]) }}'"
                                         class="text-custom-red text-bold underline px-4 py-1.5">
@@ -291,9 +296,9 @@
                                         </button>
 
                                         <!-- Hidden File Input -->
-                                        <input type="file" x-ref="fileInput" wire:model="photo" class="hidden"
+                                        <input type="file" x-ref="fileInput" wire:model="images" class="hidden"
                                             @change="addFiles($refs.fileInput.files)" multiple />
-                                        @error('photo')
+                                        @error('images')
                                         <span class="text-red-400 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
@@ -331,7 +336,7 @@
                                                     <input type="text" x-model="selectedFile.displayName"
                                                         class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0"
                                                         placeholder="Rename file">
-                                                    @error('photo') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                                    @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
                                                 </template>
                                                 <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
                                                     &times;

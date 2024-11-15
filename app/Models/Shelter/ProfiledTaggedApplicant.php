@@ -9,8 +9,8 @@ use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Shelter\ShelterLiveInPartner;
-use App\Models\Religion;
-use App\Models\Tribe;
+use App\Models\Purok;
+use App\Models\Barangay;
 use App\Models\StructureStatusType;
 use App\Models\Shelter\OriginOfRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,6 +40,7 @@ class ProfiledTaggedApplicant extends Model
         'case_specification_id',
         'living_situation_case_specification',
         'sex',
+        'full_address',
         'occupation',
         'year_of_residency',
         'contact_number',
@@ -83,9 +84,17 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(Address::class, 'address_id');
     }
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class, 'barangay_id');
+    }
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
+    }
+    public function purok()
+    {
+        return $this->belongsTo(Purok::class, 'purok_id');
     }
     // Relationship with LivingSituation
     public function livingSituation(): BelongsTo
@@ -117,5 +126,13 @@ class ProfiledTaggedApplicant extends Model
     public function grantees(): HasMany
     {
         return $this->hasMany(Grantee::class);
+    }
+    public function photo()
+    {
+        return $this->hasMany(ShelterImagesForHousing::class, 'profiled_tagged_applicant_id');
+    }
+    public function images()
+    {
+        return $this->hasMany(ShelterImagesForHousing::class, 'profiled_tagged_applicant_id');
     }
 }

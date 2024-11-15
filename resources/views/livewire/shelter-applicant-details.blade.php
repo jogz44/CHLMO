@@ -372,7 +372,7 @@
                         <div class="w-full md:w-full px-2 mb-4">
                             <label for="remarks"
                                 class="block text-[13px] font-medium text-gray-700 mb-1">REMARKS</label>
-                            <input type="text" id="remarks" name="remarks" whire:model="remarks"
+                            <input type="text" id="remarks" name="remarks" wire:model="remarks"
                                 class="capitalize w-full p-3 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
 

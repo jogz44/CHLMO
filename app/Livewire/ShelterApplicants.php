@@ -218,7 +218,7 @@ class ShelterApplicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        $applicants = $query->paginate(5);
+        $applicants = $query->orderBy('created_at', 'desc')->paginate(5);
         $OriginOfRequests = OriginOfRequest::all();
 
         // Return the view with the filtered applicants
