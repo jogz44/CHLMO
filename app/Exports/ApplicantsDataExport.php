@@ -3,7 +3,11 @@
 namespace App\Exports;
 
 use App\Models\Applicant;
+use App\Models\Barangay;
+use App\Models\Purok;
+use App\Models\TransactionType;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -22,10 +26,51 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading, WithStyles, WithDrawings, WithEvents
 {
     use Exportable;
+    protected $transactionType;
     private $filters;
     public function __construct($filters = null)
     {
         $this->filters = $filters;
+    }
+
+    private function getTitle(): string
+    {
+        $title = 'LIST OF';
+
+        // aAdd Transaction Type to title
+        if (!empty($this->filters['transaction_type_id'])) {
+            $transactionType = TransactionType::find($this->filters['transaction_type_id']);
+            $title .= 'APPLICANTS VIA ' . strtoupper($transactionType->type_name);
+        } else {
+            $title .= ' HOUSING APPLICANTS';
+        }
+
+        return $title;
+    }
+
+    private function getSubtitle(): array
+    {
+        $subtitle = [];
+
+        // Add Barangay info
+        if (!empty($this->filters['barangay_id'])) {
+            $barangay = Barangay::find($this->filters['barangay_id']);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        // Add Purok info
+        if (!empty($this->filters['purok_id'])) {
+            $purok = Purok::find($this->filters['purok_id']);
+            $subtitle[] = "PUROK: All Purok";
+        }
+
+        // Add Date Range
+        if (!empty($this->filters['start_date']) && !empty($this->filters['end_date'])) {
+            $startDate = Carbon::parse($this->filters['start_date'])->format('m/d/Y');
+            $endDate = Carbon::parse($this->filters['end_date'])->format('m/d/Y');
+            $subtitle[] = "Date From: {$startDate} To: {$endDate}";
+        }
+        return $subtitle;
     }
 
     public function view(): View
@@ -67,9 +112,15 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
 
         $applicants = $query->get();
 
+        // Get the dynamic title and subtitle
+        $title = $this->getTitle();
+        $subtitle = $this->getSubtitle();
+
         // Make sure you have a corresponding export view
         return view('exports.applicants', [
-            'applicants' => $applicants
+            'applicants' => $applicants,
+            'title' => $title,
+            'subtitle' => $subtitle
         ]);
     }
 
@@ -104,7 +155,7 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
     /**
      * @throws Exception
      */
-    public function drawings()
+    public function drawings(): Drawing
     {
         $drawing = new Drawing();
         $drawing->setName('Logo');
