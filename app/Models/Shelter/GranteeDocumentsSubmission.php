@@ -11,7 +11,7 @@ class GranteeDocumentsSubmission extends Model
     use HasFactory;
 
     protected $fillable = [
-        'grantee_id',
+        'profiled_tagged_applicant_id',
         'attachment_id',
         'file_path',
         'file_name',
@@ -21,18 +21,18 @@ class GranteeDocumentsSubmission extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'grantee_id' => 'integer',
-        'grantee_attachments_list_id' => 'integer'
+        'profiled_tagged_applicant_id' => 'integer',
+        'profiled_tagged_attachments_list_id' => 'integer'
     ];
 
-    public function grantee(): BelongsTo
+    public function profiledTaggedApplicant(): BelongsTo
     {
-        return $this->belongsTo(Grantee::class);
+        return $this->belongsTo(ProfiledTaggedApplicant::class);
     }
 
     public function attachmentType(): BelongsTo
     {
-        return $this->belongsTo(GranteeAttachmentList::class, 'grantee_attachment_list_id');
+        return $this->belongsTo(GranteeAttachmentList::class, 'profiled_tagged_attachments_list_id');
     }
 
 }
