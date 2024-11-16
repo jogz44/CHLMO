@@ -158,7 +158,7 @@ class Grantees extends Component
     $GovernmentPrograms = GovernmentProgram::all();
 
     // $grantees = $query->paginate(5);
-    $grantees = $query->orderBy('created_at', 'desc')->paginate(5);
+    $grantees = $query->orderBy('date_of_delivery', 'desc')->paginate(5);
 
         return view('livewire.grantees', [
             'grantees' => $grantees,

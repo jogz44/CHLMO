@@ -132,6 +132,8 @@
                                 <!-- Animated Confetti -->
                                 <div class="flex items-center">
                                     @if($grantee->is_granted)
+                                    <span class="text-red-500">Pending...</span>
+                                    @else
                                     Granted
                                     <span class="ml-1">
                                         <script src="https://cdn.lordicon.com/lordicon.js"></script>
@@ -142,8 +144,6 @@
                                             style="width: 30px; height: 30px">
                                         </lord-icon>
                                     </span>
-                                    @else
-                                    <span class="text-red-500">Pending...</span>
                                     @endif
                                 </div>
                             </td>
