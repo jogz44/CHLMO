@@ -33,9 +33,9 @@
             <div class="flex flex-col p-3 rounded mt-11">
                 <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $profiledTaggedApplicant->shelterApplicant->profile_no }}</h2>
                 <h1 class="text-[25px] items-center font-bold text-gray-700">
-                    {{ $profiledTaggedApplicant->shelterApplicant->first_name }}
-                    @if($profiledTaggedApplicant->shelterApplicant->middle_name) {{ substr($profiledTaggedApplicant->shelterApplicant->middle_name, 0, 1) }}. @endif
-                    {{ $profiledTaggedApplicant->shelterApplicant->last_name }}
+                    {{ $profiledTaggedApplicant->shelterApplicant->person->first_name }}
+                    @if($profiledTaggedApplicant->shelterApplicant->person->middle_name) {{ substr($profiledTaggedApplicant->shelterApplicant->person->middle_name, 0, 1) }}. @endif
+                    {{ $profiledTaggedApplicant->shelterApplicant->person->last_name }}
                 </h1>
             </div>
 
