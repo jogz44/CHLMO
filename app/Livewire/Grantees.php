@@ -95,77 +95,88 @@ class Grantees extends Component
      $this->resetPage();
  }
 
-    public function render()
-    {
-        $query = Grantee::query();
+ public function render()
+{
+    $query = Grantee::with([
+        'originOfRequest', 
+        'profiledTaggedApplicant.shelterApplicant.person',
+        'profiledTaggedApplicant.shelterApplicant.originOfRequest',
+        'profiledTaggedApplicant.governmentProgram', // Make sure the governmentProgram relationship is defined here
+        'profiledTaggedApplicant.address.purok', // Correct path for address.purok
+        'profiledTaggedApplicant.address.barangay' // Correct path for address.barangay
+    ])
+    ->where(function($query) {
+        // Search within shelterApplicant's person relationship
+        $query->whereHas('profiledTaggedApplicant.shelterApplicant.person', function($q) {
+            $q->where('first_name', 'like', '%'.$this->search.'%')
+                ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                ->orWhere('last_name', 'like', '%'.$this->search.'%');
+        })
+        // Search within shelterApplicant's own fields
+        ->orWhereHas('profiledTaggedApplicant.shelterApplicant', function($q) {
+            $q->where('request_origin_id', 'like', '%'.$this->search.'%')
+                ->orWhere('profile_no', 'like', '%'.$this->search.'%')
+                ->orWhere('contact_number', 'like', '%'.$this->search.'%')
+                ->orWhere('full_address', 'like', '%'.$this->search.'%');
+        })
+        ->orWhereHas('profiledTaggedApplicant.shelterApplicant.originOfRequest', function ($q) {
+            $q->where('name', 'like', '%'.$this->search.'%');
+        })
+        ->orWhereHas('profiledTaggedApplicant.governmentProgram', function ($q) {
+            $q->where('program_name', 'like', '%'.$this->search.'%');
+        })
+        ->orWhereHas('profiledTaggedApplicant.address.purok', function ($q) {
+            $q->where('name', 'like', '%'.$this->search.'%');
+        })
+        ->orWhereHas('profiledTaggedApplicant.address.barangay', function ($q) {
+            $q->where('name', 'like', '%'.$this->search.'%');
+        });
+    });
 
-        // Apply search conditions if there is a search term
-        $query->when($this->search, function ($query) {
-            return $query->where(function ($query) {
-                $query->where('profile_no', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('profiledTaggedApplicant.shelterApplicant', function ($query) {
-                        $query->where('first_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('middle_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('contact_number', 'like', '%' . $this->search . '%')
-                            ->orWhere('address.full_address', 'like', '%' . $this->search . '%');
-                    })
-                    ->orWhereHas('shelterApplicant.originOfRequest', function ($query) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
-                    })
-                    ->orWhereHas(' shelterApplicant.governmentProgram', function ($query) {
-                        $query->where('program_name', 'like', '%' . $this->search . '%');
-                    })
-                    ->orWhereHas('shelterApplicant.address.purok', function ($query) {
-                        $query->where('name', 'like', '%'.$this->search.'%');
-                    })
-                    ->orWhereHas('shelterApplicant.address.barangay', function ($query) {
-                        $query->where('name', 'like', '%'.$this->search.'%');
-                    });
-            });
-        });        
-        $query = $query->with(['shelterApplicant', 'originOfRequest', 'material', 'governmentProgram']);
-        $query = $query->with(['profiledTaggedApplicant']);
-        $query = $query->with(['profiledTaggedApplicant.barangay', 'profiledTaggedApplicant.purok']);
-        
-       // Apply date range filter (if both dates are present)
-       if ($this->startGrantingDate && $this->endGrantingDate) {
+    // Apply date range filter
+    if ($this->startGrantingDate && $this->endGrantingDate) {
         $query->whereBetween('date_of_delivery', [$this->startGrantingDate, $this->endGrantingDate]);
     }
+
+    // Apply filters for related fields
     if ($this->selectedOriginOfRequest) {
-        $query->whereHas('profiledTaggedApplicant.shelterApplicant.originOfRequest', function ($query) {
-            $query->where('id', $this->selectedOriginOfRequest);
+        $query->whereHas('profiledTaggedApplicant.shelterApplicant.originOfRequest', function ($q) {
+            $q->where('id', $this->selectedOriginOfRequest);
         });
     }
+
     if ($this->selectedGovernmentProgram) {
-        $query->whereHas('profiledTaggedApplicant.shelterApplicant.governmentProgram', function ($query) {
-            $query->where('id', $this->selectedGovernmentProgram);
+        $query->whereHas('profiledTaggedApplicant.governmentProgram', function ($q) {
+            $q->where('id', $this->selectedGovernmentProgram);
         });
     }
+
     if ($this->selectedPurok_id) {
-        $query->whereHas('profiledTaggedApplicant.shelterApplicant.address.purok', function ($query) {
-            $query->where('id', $this->selectedPurok_id);
+        $query->whereHas('profiledTaggedApplicant.shelterApplicant.address.purok', function ($q) {
+            $q->where('id', $this->selectedPurok_id);
         });
     }
 
     if ($this->selectedBarangay_id) {
-        $query->whereHas('profiledTaggedApplicant.shelterApplicant.address.barangay', function ($query) {
-            $query->where('id', $this->selectedBarangay_id);
+        $query->whereHas('profiledTaggedApplicant.shelterApplicant.address.barangay', function ($q) {
+            $q->where('id', $this->selectedBarangay_id);
         });
     }
 
     $OriginOfRequests = OriginOfRequest::all();
     $GovernmentPrograms = GovernmentProgram::all();
 
-    // $grantees = $query->paginate(5);
     $grantees = $query->orderBy('date_of_delivery', 'desc')->paginate(5);
 
-        return view('livewire.grantees', [
-            'grantees' => $grantees,
-            'OriginOfRequests' => $OriginOfRequests,
-            'GovernmentPrograms' => $GovernmentPrograms,
-            'puroks' => $this->puroks,
-            'barangays' => $this->barangays,
-            'puroksFilter' => $this->puroksFilter]);
-    }
+    return view('livewire.grantees', [
+        'grantees' => $grantees,
+        'OriginOfRequests' => $OriginOfRequests,
+        'GovernmentPrograms' => $GovernmentPrograms,
+        'puroks' => $this->puroks,
+        'barangays' => $this->barangays,
+        'puroksFilter' => $this->puroksFilter
+    ]);
+}
+
+ 
 }
