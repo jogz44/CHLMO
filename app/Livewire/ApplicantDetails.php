@@ -53,25 +53,13 @@ class ApplicantDetails extends Component
 
     // Dependent's details
     public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $dependent_relationship_id, $dependentRelationships,
-    $images = [], $renamedFileName = [];
+    $images, $renamedFileName = [];
 
     public function mount($applicantId): void
     {
         $this->applicantId = $applicantId;
-        $this->applicantId = $applicantId;
-
-        // Eager load the necessary relationships for the People model
-        $this->people = People::with([
-            'applicants' => function ($query) {
-                $query->with([
-                    'address.purok',
-                    'address.barangay',
-                    'transactionType',
-                    'taggedAndValidated',
-                    // other related models here
-                ]);
-            }
-        ])->findOrFail($applicantId);
+        $this->applicant = Applicant::with(['person'])->findOrFail($applicantId);
+        $person = $this->applicant->person;
 
         // Clear dependents array before populating it again
         $this->dependents = [];
@@ -146,11 +134,11 @@ class ApplicantDetails extends Component
         });
 
         // Populate fields with applicant data
-        $this->first_name = $this->person->applicant->first_name;
-        $this->middle_name = $this->person->applicant->middle_name;
-        $this->last_name = $this->person->applicant->last_name;
-        $this->suffix_name = $this->person->applicant->suffix_name;
-        $this->contact_number = $this->person->applicant->contact_number;
+        $this->first_name = $person->first_name ?? '';
+        $this->middle_name = $person->middle_name ?? '';
+        $this->last_name = $person->last_name ?? '';
+        $this->suffix_name = $person->suffix_name ?? '';
+        $this->contact_number = $person->contact_number ?? '';
 
         // Access the barangay and purok through the address relation
         $this->barangay = $this->applicant->address->barangay->name ?? '';
@@ -243,7 +231,7 @@ class ApplicantDetails extends Component
                 'between:1900,2099' // Restricts the value between 1900 and 2099
             ],
             'remarks' => 'nullable|string|max:255',
-            'images.*' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'required|image|max:2048',
 
             // Live-in partner details
             'partner_first_name' => [
@@ -415,13 +403,12 @@ class ApplicantDetails extends Component
 
             Dependent::insert($dependentData);
 
-            foreach ($this->images as $index => $image) {
-                $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
-                $path = $image->storeAs('images', $renamedFileName, 'public');
+            if ($this->images) {
+                $path = $this->images->store('images', 'public');
                 ImagesForHousing::create([
                     'tagged_and_validated_applicant_id' => $taggedApplicant->id,
                     'image_path' => $path,
-                    'display_name' => $renamedFileName,
+                    'display_name' => $this->images->getClientOriginalName(),
                 ]);
             }
 
