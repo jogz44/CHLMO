@@ -234,7 +234,11 @@
                                         </button>
                                     @else
                                         <!-- Edit Button -->
-                                        <button wire:click="edit({{ $applicant->id }})" @click="openEditModal = true" class="text-custom-red text-bold underline px-4 py-1.5">Edit</button>
+                                        <button wire:click="edit({{ $applicant->id }})"
+                                                @click="openEditModal = true"
+                                                class="text-custom-red text-bold underline px-4 py-1.5">
+                                            Edit
+                                        </button>
                                         <!-- Tag Button -->
                                         <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
                                                 class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full">
