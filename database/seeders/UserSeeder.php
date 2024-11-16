@@ -52,7 +52,7 @@ class UserSeeder extends Seeder
             'email' => 'shelter@example.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password'), // Make consistent with admin
-            'role_id' => 3,
+            'role_id' => 4,
             'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
