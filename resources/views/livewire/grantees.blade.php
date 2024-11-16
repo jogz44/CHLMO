@@ -114,9 +114,9 @@
                     </thead>
                     <tbody x-data>
                         @forelse($grantees as $grantee)
-                        <tr @if($grantee->is_granted) @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'" class="cursor-pointer" @endif>
+                        <tr @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'" class="cursor-pointer">
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->middle_name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->person->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->person->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->person->middle_name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->barangay->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->purok->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->full_address ?? 'N/A' }}</td>
