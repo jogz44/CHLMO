@@ -33,11 +33,16 @@
     <!-- Report Title -->
     <tr>
         <td colspan="8" style="text-align: center; font-size: 14px; font-weight: bold;">
-            HOUSING APPLICANTS LIST
+            <strong>{{ $title ?? 'HOUSING APPLICANTS LIST' }}</strong>
         </td>
     </tr>
     <tr>
         <td colspan="8" style="text-align: center; font-size: 12px;">
+            @if(!empty($subtitle))
+                @foreach($subtitle as $line)
+                    {{ $line }}<br>
+                @endforeach
+            @endif
             As of {{ now()->format('F d, Y') }}
         </td>
     </tr>

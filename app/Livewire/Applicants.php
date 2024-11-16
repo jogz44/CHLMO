@@ -11,7 +11,9 @@ use App\Models\People;
 use App\Models\Purok;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TransactionType;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
@@ -281,6 +283,104 @@ class Applicants extends Component
             ]);
             return null;
         }
+    }
+
+    public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        ini_set('default_charset', 'UTF-8');
+
+        // Fetch Applicants based on filters
+        $query = Applicant::with([
+            'person',
+            'address.barangay',
+            'address.purok',
+            'transactionType'
+        ]);
+
+        // Create filters array matching your Excel export
+        $filters = array_filter([
+            'start_date' => $this->startDate,
+            'end_date' => $this->endDate,
+            'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
+            'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
+            'transaction_type_id' => $this->selectedTransactionType_id,  // Changed from transaction_type_id
+            'tagging_status' => $this->selectedTaggingStatus  // Added to match Excel export
+        ]);
+
+        // Fetch Applicants based on filters
+        $query = Applicant::with([
+            'person',
+            'address.barangay',
+            'address.purok',
+            'transactionType'
+        ]);
+
+        // Apply filters
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('date_applied', [
+                $this->startDate,
+                $this->endDate
+            ]);
+        }
+
+        if ($this->selectedBarangay_id) {    // Changed from barangay_id
+            $query->whereHas('address', function($q) {
+                $q->where('barangay_id', $this->selectedBarangay_id);
+            });
+        }
+
+        if ($this->selectedPurok_id) {       // Changed from purok_id
+            $query->whereHas('address', function($q) {
+                $q->where('purok_id', $this->selectedPurok_id);
+            });
+        }
+
+        if ($this->selectedTransactionType_id) {  // Changed from transaction_type_id
+            $query->where('transaction_type_id', $this->selectedTransactionType_id);
+        }
+
+        if ($this->selectedTaggingStatus) {   // Added to match Excel export
+            $query->where('tagging_status', $this->selectedTaggingStatus);
+        }
+
+        $applicants = $query->get();
+
+        // Build Subtitle from Filters
+        $subtitle = [];
+
+        if ($this->selectedBarangay_id) {     // Changed from barangay_id
+            $barangay = Barangay::find($this->selectedBarangay_id);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        if ($this->selectedPurok_id) {        // Changed from purok_id
+            $purok = Purok::find($this->selectedPurok_id);
+            $subtitle[] = "PUROK: {$purok->name}";
+        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
+            $subtitle[] = "PUROK: All Purok";
+        }
+
+        if ($this->startDate && $this->endDate) {
+            $startDate = Carbon::parse($this->startDate)->format('m/d/Y');
+            $endDate = Carbon::parse($this->endDate)->format('m/d/Y');
+            $subtitle[] = "Date From: {$startDate} To: {$endDate}";
+        }
+
+        $subtitleText = implode(' | ', $subtitle);
+
+        $html = view('pdfs.applicants', [
+            'applicants' => $applicants,
+            'subtitle' => $subtitleText,
+        ])->render();
+
+        // Load the PDF with the generated HTML
+        $pdf = Pdf::loadHTML($html);
+        $pdf->setPaper('legal', 'portrait');
+
+        // Stream the PDF for download
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'applicants.pdf');
     }
 
     public function render()

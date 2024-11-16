@@ -58,7 +58,20 @@ class ApplicantDetails extends Component
     public function mount($applicantId): void
     {
         $this->applicantId = $applicantId;
-        $this->applicant = Applicant::findOrFail($applicantId);
+        $this->applicantId = $applicantId;
+
+        // Eager load the necessary relationships for the People model
+        $this->people = People::with([
+            'applicants' => function ($query) {
+                $query->with([
+                    'address.purok',
+                    'address.barangay',
+                    'transactionType',
+                    'taggedAndValidated',
+                    // other related models here
+                ]);
+            }
+        ])->findOrFail($applicantId);
 
         // Clear dependents array before populating it again
         $this->dependents = [];
