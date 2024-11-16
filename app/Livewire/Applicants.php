@@ -297,6 +297,24 @@ class Applicants extends Component
             'transactionType'
         ]);
 
+        // Create filters array matching your Excel export
+        $filters = array_filter([
+            'start_date' => $this->startDate,
+            'end_date' => $this->endDate,
+            'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
+            'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
+            'transaction_type_id' => $this->selectedTransactionType_id,  // Changed from transaction_type_id
+            'tagging_status' => $this->selectedTaggingStatus  // Added to match Excel export
+        ]);
+
+        // Fetch Applicants based on filters
+        $query = Applicant::with([
+            'person',
+            'address.barangay',
+            'address.purok',
+            'transactionType'
+        ]);
+
         // Apply filters
         if ($this->startDate && $this->endDate) {
             $query->whereBetween('date_applied', [
@@ -305,36 +323,40 @@ class Applicants extends Component
             ]);
         }
 
-        if ($this->barangay_id) {
+        if ($this->selectedBarangay_id) {    // Changed from barangay_id
             $query->whereHas('address', function($q) {
-                $q->where('barangay_id', $this->barangay_id);
+                $q->where('barangay_id', $this->selectedBarangay_id);
             });
         }
 
-        if ($this->purok_id) {
+        if ($this->selectedPurok_id) {       // Changed from purok_id
             $query->whereHas('address', function($q) {
-                $q->where('purok_id', $this->purok_id);
+                $q->where('purok_id', $this->selectedPurok_id);
             });
         }
 
-        if ($this->transaction_type_id) {
-            $query->where('transaction_type_id', $this->transaction_type_id);
+        if ($this->selectedTransactionType_id) {  // Changed from transaction_type_id
+            $query->where('transaction_type_id', $this->selectedTransactionType_id);
         }
 
-         $applicants = $query->get();
+        if ($this->selectedTaggingStatus) {   // Added to match Excel export
+            $query->where('tagging_status', $this->selectedTaggingStatus);
+        }
+
+        $applicants = $query->get();
 
         // Build Subtitle from Filters
         $subtitle = [];
 
-        if ($this->barangay_id) {
-            $barangay = Barangay::find($this->barangay_id);
+        if ($this->selectedBarangay_id) {     // Changed from barangay_id
+            $barangay = Barangay::find($this->selectedBarangay_id);
             $subtitle[] = "BARANGAY: {$barangay->name}";
         }
 
-        if ($this->purok_id) {
-            $purok = Purok::find($this->purok_id);
+        if ($this->selectedPurok_id) {        // Changed from purok_id
+            $purok = Purok::find($this->selectedPurok_id);
             $subtitle[] = "PUROK: {$purok->name}";
-        } else if ($this->barangay_id) {
+        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
             $subtitle[] = "PUROK: All Purok";
         }
 
@@ -352,7 +374,6 @@ class Applicants extends Component
         ])->render();
 
         // Load the PDF with the generated HTML
-
         $pdf = Pdf::loadHTML($html);
         $pdf->setPaper('legal', 'portrait');
 
