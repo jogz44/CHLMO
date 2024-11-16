@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('grantee_documents_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('grantee_id')->constrained('grantees')->onDelete('cascade');
-            $table->foreignId('attachment_id')->constrained('grantee_attachment_lists')->onDelete('cascade');
+            $table->foreignId('profiled_tagged_applicant_id')
+                ->constrained('profiled_tagged_applicants')
+                ->onDelete('cascade')
+                ->name('fk_tagged_applicant'); // Shorter name for the foreign key constraint
+            $table->foreignId('attachment_id')
+                ->constrained('grantee_attachment_lists')
+                ->onDelete('cascade')
+                ->name('fk_attachment'); // Shorter name for the foreign key constraint
             $table->string('file_path');
             $table->string('file_name');
             $table->string('file_type');
