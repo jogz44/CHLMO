@@ -27,7 +27,14 @@
                     </svg>
                 </div>
                 <x-label for="username" value="{{ __('Username') }}" />
-                <x-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')" required autofocus placeholder="Username"/>
+                <x-input id="username"
+                         class="block mt-1 w-full"
+                         type="text"
+                         name="username"
+                         :value="old('username')"
+                         required
+                         autofocus
+                         placeholder="Username"/>
             </div>
 
             <div class="mt-4 mb-5 relative">

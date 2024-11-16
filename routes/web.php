@@ -56,8 +56,9 @@ Route::middleware([
 //        ->name('permissions');
 //    Route::get('/permissions', PermissionsManager::class)
 //        ->middleware(['auth', 'can:manage permissions']);
-        Route::get('/user-management', \App\Livewire\UserManagement::class)
-        ->name('user-management');
+    Route::get('/user-role-management', function () {
+        return view('user-role-management');
+    })->name('user-role-management');
 
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 

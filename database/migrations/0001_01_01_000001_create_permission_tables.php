@@ -20,7 +20,8 @@ return new class extends Migration
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name'); // For example: 'edit articles'
-            $table->string('guard_name'); // For example: 'web'
+//            $table->string('guard_name'); // For example: 'web'
+            $table->string('guard_name')->default('web');
             $table->timestamps();
             $table->unique(['name', 'guard_name']);
         });
@@ -28,7 +29,8 @@ return new class extends Migration
         Schema::create($tableNames['roles'], function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name'); // For example: 'editor'
-            $table->string('guard_name'); // For example: 'web'
+//            $table->string('guard_name'); // For example: 'web'
+            $table->string('guard_name')->default('web');
             $table->timestamps();
             $table->unique(['name', 'guard_name']);
         });
@@ -83,8 +85,6 @@ return new class extends Migration
         app('cache')
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
             ->forget(config('permission.cache.key'));
-
-
     }
     public function down(): void
     {
