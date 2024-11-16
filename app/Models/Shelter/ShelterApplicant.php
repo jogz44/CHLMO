@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
+use App\Models\People;
 
 
 class ShelterApplicant extends Model
@@ -22,11 +23,12 @@ class ShelterApplicant extends Model
      */
     protected $fillable = [
         'user_id',
+        'person_id',
         'request_origin_id',
         'profile_no',
-        'first_name',
-        'middle_name',
-        'last_name',
+        // 'first_name',
+        // 'middle_name',
+        // 'last_name',
         'date_request',
         'is_tagged',
     ];
@@ -59,6 +61,11 @@ class ShelterApplicant extends Model
         ]);
 
         return $profileNo;
+    }
+
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(People::class, 'person_id', 'id');
     }
 
     public function originOfRequest(): BelongsTo

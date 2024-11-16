@@ -104,7 +104,7 @@
                         @forelse($applicants as $applicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $applicant->profile_no }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b">{{ optional($applicant->person)->full_name }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->OriginOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b">
