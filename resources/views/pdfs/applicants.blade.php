@@ -94,7 +94,7 @@
     <div class="page-number"></div>
 </div>
 
-<div style="margin-top: 30%;">
+<div style="margin-top: 40%;">
     <table>
         <thead>
         <tr>
