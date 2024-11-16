@@ -13,12 +13,19 @@ class Applicant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'transaction_type_id', 'first_name', 'middle_name', 'last_name', 'suffix_name', 'contact_number', 'date_applied',
-        'initially_interviewed_by', 'address_id', 'applicant_id', 'is_tagged',
+        'applicant_id',
+        'person_id',
+        'user_id',
+        'transaction_type_id',
+        'address_id',
+        'date_applied',
+        'initially_interviewed_by',
+        'is_tagged',
     ];
 
     protected $casts = [
         'id' => 'integer',
+        'person_id' => 'integer',
         'user_id' => 'integer',
         'transaction_type_id' => 'integer',
         'date_applied' => 'date',
@@ -47,6 +54,10 @@ class Applicant extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(People::class, 'person_id', 'id');
     }
 
     public function transactionType(): BelongsTo
