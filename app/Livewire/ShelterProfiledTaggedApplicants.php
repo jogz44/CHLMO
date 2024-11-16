@@ -522,43 +522,43 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public function render()
     {
-        $query = ProfiledTaggedApplicant::query();
-
-        // Apply search conditions if there is a search term
-        $query->when($this->search, function ($query) {
-            return $query->where(function ($query) {
-                $query->where('profile_no', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('shelterApplicant', function ($query) { // Access shelterApplicant relationship
-                        $query->where('first_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('middle_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('last_name', 'like', '%' . $this->search . '%');
-                    })
-                    ->orWhereHas('shelterApplicant.originOfRequest', function ($query) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
-                    });
+        // Fetch applicants with their related data
+        $query = ProfiledTaggedApplicant::with(['originOfRequest', 'shelterApplicant.person'])
+            ->where(function($query) {
+                // Search within shelterApplicant's person relationship
+                $query->whereHas('shelterApplicant.person', function($q) {
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%');
+                })
+                // Search within shelterApplicant's own fields
+                ->orWhereHas('shelterApplicant', function($q) {
+                    $q->where('request_origin_id', 'like', '%'.$this->search.'%')
+                        ->orWhere('profile_no', 'like', '%'.$this->search.'%');
+                });
             });
-        });
-
+    
         // Apply date range filter (if both dates are present)
         if ($this->startTaggingDate && $this->endTaggingDate) {
             $query->whereBetween('date_tagged', [$this->startTaggingDate, $this->endTaggingDate]);
         }
-
+    
+        // Filter by selected origin of request
         if ($this->selectedOriginOfRequest) {
-            $query->whereHas('shelterApplicant.originOfRequest', function ($query) {
-                $query->where('id', $this->selectedOriginOfRequest);
+            $query->whereHas('shelterApplicant.originOfRequest', function ($q) {
+                $q->where('id', $this->selectedOriginOfRequest);
             });
         }
-
+    
+        // Fetch all origin of requests for filter dropdown
         $OriginOfRequests = OriginOfRequest::all();
-
-        $query = $query->with(['originOfRequest', 'shelterApplicant']);
-
+    
+        // Fetch and paginate the results
         $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate(5);
-
+    
         return view('livewire.shelter-profiled-tagged-applicants', [
             'profiledTaggedApplicants' => $profiledTaggedApplicants,
             'OriginOfRequests' => $OriginOfRequests,
         ]);
     }
-}
+}    

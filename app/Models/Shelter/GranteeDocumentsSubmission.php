@@ -27,7 +27,7 @@ class GranteeDocumentsSubmission extends Model
 
     public function profiledTaggedApplicant(): BelongsTo
     {
-        return $this->belongsTo(ProfiledTaggedApplicant::class);
+        return $this->belongsTo(ProfiledTaggedApplicant::class, 'profiled_tagged_applicant_id');
     }
 
     public function attachmentType(): BelongsTo

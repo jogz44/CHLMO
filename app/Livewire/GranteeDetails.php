@@ -77,9 +77,9 @@ class GranteeDetails extends Component
     public function loadFormData(): void
     {
         // Load Applicant Information
-        $this->first_name = $this->shelterApplicant->first_name ?? '--';
-        $this->middle_name = $this->shelterApplicant->middle_name ?? '--';
-        $this->last_name = $this->shelterApplicant->last_name ?? '--';
+        $this->first_name = $this->shelterApplicant->person->first_name ?? '--';
+        $this->middle_name = $this->shelterApplicant->person->middle_name ?? '--';
+        $this->last_name = $this->shelterApplicant->person->last_name ?? '--';
         $this->request_origin_id = $this->shelterApplicant->originOfRequest->name ?? '--';
         $this->date_request = $this->shelterApplicant?->date_request
             ? $this->shelterApplicant->date_request->format('Y-m-d')
@@ -87,7 +87,7 @@ class GranteeDetails extends Component
 
         // Load Tagged and Validated Applicant Information
         $this->civil_status_id = $this->profiledTagged?->civil_status_id ?? '--';
-        $this->tribe= $this->profiledTagged?->tribe ?? '--';
+        $this->tribe = $this->profiledTagged?->tribe ?? '--';
         $this->age = $this->profiledTagged?->age ?? '--';
         $this->sex = $this->profiledTagged?->sex ?? '--';
         $this->year_of_residency = $this->profiledTagged?->year_of_residency ?? '--';
@@ -152,23 +152,25 @@ class GranteeDetails extends Component
 
         $this->photo = $this->shelterApplicant->profiledTagged?->photo ?? [];
 
-        $this->photoForGranting = $this->shelterApplicant->profiledTagged?->grantees?->flatMap(function ($grantee) {
-            return $grantee->granteeDocumentsSubmission()
-                ->get()
-                ->map(function ($submission) {
-                    return $submission->file_name;
-                })->filter();
-        }) ?? collect();
+        $this->photoForGranting = $this->shelterApplicant->profiledTagged
+            ? collect([$this->shelterApplicant->profiledTagged])->flatMap(function ($profiledTagged) {
+                return $profiledTagged->granteeDocumentsSubmission()
+                    ->get()
+                    ->map(function ($submission) {
+                        return $submission->file_name;
+                    })->filter();
+            })
+            : collect();
     }
-     // For Awarding pictures
-     public function viewAttachment($fileName): void
-     {
-         $this->selectedAttachment = $fileName;
-     }
-     public function closeAttachment(): void
-     {
-         $this->selectedAttachment = null;
-     }
+    // For Awarding pictures
+    public function viewAttachment($fileName): void
+    {
+        $this->selectedAttachment = $fileName;
+    }
+    public function closeAttachment(): void
+    {
+        $this->selectedAttachment = null;
+    }
     public function getPoNumber($purchaseOrderId)
     {
         $purchaseOrder = PurchaseOrder::find($purchaseOrderId);

@@ -94,9 +94,9 @@ class ShelterApplicantDetails extends Component
         $this->applicant = ShelterApplicant::find($profileNo);
 
         if ($this->applicant) {
-            $this->first_name = $this->applicant->first_name;
-            $this->middle_name = $this->applicant->middle_name;
-            $this->last_name = $this->applicant->last_name;
+            $this->first_name = $this->applicant->person->first_name;
+            $this->middle_name = $this->applicant->person->middle_name;
+            $this->last_name = $this->applicant->person->last_name;
             $this->suffix_name = $this->applicant->suffix_name;
 
             // Fetch the related origin of request and request date

@@ -57,6 +57,7 @@ class ProfiledTaggedApplicantDetails extends Component
     {
         $this->profiledTaggedApplicant = ProfiledTaggedApplicant::with([
             'address.purok',
+            'shelterApplicant.person',
             'shelterApplicant.originOfRequest',
             'address.barangay',
             'livingSituation',
@@ -90,9 +91,9 @@ class ProfiledTaggedApplicantDetails extends Component
         });
 
         // Applicant basic information
-        $this->first_name = $this->profiledTaggedApplicant->shelterApplicant->first_name ?? null;
-        $this->middle_name = $this->profiledTaggedApplicant->shelterApplicant->middle_name ?? null;
-        $this->last_name = $this->profiledTaggedApplicant->shelterApplicant->last_name ?? null;
+        $this->first_name = $this->profiledTaggedApplicant->shelterApplicant->person->first_name ?? null;
+        $this->middle_name = $this->profiledTaggedApplicant->shelterApplicant->person->middle_name ?? null;
+        $this->last_name = $this->profiledTaggedApplicant->shelterApplicant->person->last_name ?? null;
         $this->origin_name = $this->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? null;
         $this->date_request = optional($this->profiledTaggedApplicant->shelterApplicant->date_request)
             ->format('F d, Y') ?? null;
@@ -163,9 +164,7 @@ class ProfiledTaggedApplicantDetails extends Component
     public function update(): void
     {
         $this->validate([
-            'first_name' => 'required|string|max:255',
-            'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'person_id' => 'required|integer',
             'contact_number' => 'nullable|string|max:15',
             'barangay_id' => 'required|integer',
             'purok_id' => 'required|integer',
@@ -243,9 +242,9 @@ class ProfiledTaggedApplicantDetails extends Component
            
         ]);
 
-        $this->profiledTaggedApplicant->shelterApplicant->first_name = $this->first_name;
-        $this->profiledTaggedApplicant->shelterApplicant->middle_name = $this->middle_name;
-        $this->profiledTaggedApplicant->shelterApplicant->last_name = $this->last_name;
+        $this->profiledTaggedApplicant->shelterApplicant->person->first_name = $this->first_name;
+        $this->profiledTaggedApplicant->shelterApplicant->person->middle_name = $this->middle_name;
+        $this->profiledTaggedApplicant->shelterApplicant->person->last_name = $this->last_name;
         $this->profiledTaggedApplicant->shelterApplicant->request_origin_id = $this->originOfRequest->name;
         $this->profiledTaggedApplicant->shelterApplicant->date_request = $this->date_request;
 

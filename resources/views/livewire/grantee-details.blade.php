@@ -34,8 +34,8 @@
                 @if($shelterApplicant)
                 <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $shelterApplicant->profile_no }}</h2>
                 <h1 class="text-[25px] items-center font-bold text-gray-700">
-                    {{ $shelterApplicant->last_name }}, {{ $shelterApplicant->first_name }}
-                    @if($shelterApplicant->middle_name) {{ $shelterApplicant->middle_name }} @endif
+                    {{ $shelterApplicant->person->last_name }}, {{ $shelterApplicant->person->first_name }}
+                    @if($shelterApplicant->person->middle_name) {{ $shelterApplicant->person->middle_name }} @endif
                 </h1>
                 @else
                 <p class="text-red-500">Shelter applicant not found.</p>

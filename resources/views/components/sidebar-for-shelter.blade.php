@@ -14,76 +14,8 @@
                     activeLink: localStorage.getItem('activeLink') || '',
                     activeChildLink: localStorage.getItem('activeChildLink') || ''}">
 
-                <div x-data="{ isDashboardOpen: false }">
-                    <!-- Main Dashboard Menu -->
-                    <a href="#" @click="isDashboardOpen = !isDashboardOpen; activeLink = 'dashboard'; localStorage.setItem('activeLink', 'dashboard')"
-                       :class="{ 'bg-[#D9D9D9] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'dashboard' }"
-                       class="mx-2 flex items-center justify-between py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
-                                <path d=""></path>
-                            </svg>
-                            <p class="ml-2">Dashboard</p>
-                        </div>
-                        <svg :class="{ 'transform rotate-180': isDashboardOpen }" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </a>
 
-                    <!-- Dashboard Submenus -->
-                    <div x-show="isDashboardOpen" x-transition class="ml-4">
-                        <!-- Housing Submenu -->
-                        <a href="{{ route('dashboard') }}" @click="activeChildLink = 'dashboard'; localStorage.setItem('activeChildLink', 'dashboard')"
-                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard' }"
-                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor"
-                                 stroke-width="2"
-                                 class="w-5 h-5">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                            </svg>
-                            <span class="ml-2">Housing</span>
-                        </a>
-
-                        <!-- Shelter Submenu -->
-                        <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
-                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"
-                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor"
-                                 stroke-width="2"
-                                 class="w-5 h-5">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
-                            </svg>
-                            <span class="ml-2">Shelter</span>
-                        </a>
-
-                        <!-- User Management Submenu -->
-                        <a href="{{ route('user-role-management') }}" @click="activeChildLink = 'user-role-management'; localStorage.setItem('activeChildLink', 'user-role-management')"
-                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'user-role-management' }"
-                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke="currentColor"
-                                 stroke-width="2"
-                                 class="w-5 h-5">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                            </svg>
-                            <span class="ml-2">User Management</span>
-                        </a>
-                    </div>
-                </div>
+        
 
                 <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
                     :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"

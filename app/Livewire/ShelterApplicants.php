@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\People;
 use Livewire\Component;
 use App\Models\Shelter\ShelterApplicant;
 use Livewire\WithPagination;
@@ -63,9 +64,9 @@ class ShelterApplicants extends Component
         $this->editingApplicantId = $applicantId;
         $this->profileNo = $applicant->profileNo;
         $this->date_request = $applicant->date_request;
-        $this->first_name = $applicant->first_name;
-        $this->middle_name = $applicant->middle_name;
-        $this->last_name = $applicant->last_name;
+        $this->first_name = $applicant->person->first_name;
+        $this->middle_name = $applicant->person->middle_name;
+        $this->last_name = $applicant->person->last_name;
         $this->suffix_name = $applicant->suffix_name;
         $this->request_origin_id = $applicant->request_origin_id;
 
@@ -88,6 +89,8 @@ class ShelterApplicants extends Component
         'request_origin_id' => 'required|exists:origin_of_requests,id', // Ensure the request origin is valid
     ]);
 
+  
+
     if ($this->editingApplicantId) {
         // Update existing applicant
         $applicant = ShelterApplicant::findOrFail($this->editingApplicantId);
@@ -103,17 +106,22 @@ class ShelterApplicants extends Component
         session()->flash('message', 'Applicant updated successfully!');
         $this->closeEditApplicantModal(); // Close the EDIT modal
     } else {
+        $people = People::firstOrCreate([
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'last_name' => $this->last_name,
+            'application_type' => 'Shelter Applicant',
+        ]);
+
         // Generate profile number and assign it
         $this->profileNo = ShelterApplicant::generateProfileNo();
-
+        
         // Create new applicant
         ShelterApplicant::create([
             'user_id' => Auth::id(),
             'profile_no' => $this->profileNo, // Use the generated profile number
+            'person_id' => $people->id,
             'date_request' => $this->date_request,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
             'suffix_name' => $this->suffix_name,
             'request_origin_id' => $this->request_origin_id,
         ]);
@@ -192,36 +200,32 @@ class ShelterApplicants extends Component
 
     public function render()
     {
-
-        $query = ShelterApplicant::query();
-
-        // Apply search conditions if there is a search term
-        $query->when($this->search, function ($query) {
-            return $query->where(function ($query) {
-                $query->where('request_origin_id', 'like', '%' . $this->search . '%')
-                    ->orWhere('first_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('middle_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('profile_no', 'like', '%' . $this->search . '%');
+        // Fetch applicants with their related data
+        $query = ShelterApplicant::with(['originOfRequest', 'profiledTagged', 'person'])
+            ->where(function($query) {
+                $query->whereHas('person', function($q) {
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%');
+                })
+                ->orWhere('request_origin_id', 'like', '%'.$this->search.'%')
+                ->orWhere('profile_no', 'like', '%'.$this->search.'%');
             });
-        });
 
         if ($this->startDate && $this->endDate) {
-            $query->whereDate('created_at', '>=', $this->startDate)
-                ->whereDate('created_at', '<=', $this->endDate);
+            $query->whereBetween('date_request', [$this->startDate, $this->endDate]);
         }
         if ($this->selectedOriginOfRequest) {
             $query->where('request_origin_id', $this->selectedOriginOfRequest);
         }
-
         if ($this->selectedTaggingStatus !== null) {
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
-
+        
         $applicants = $query->orderBy('created_at', 'desc')->paginate(5);
         $OriginOfRequests = OriginOfRequest::all();
 
-        // Return the view with the filtered applicants
+                // // Return the view with the filtered applicants
         return view('livewire.shelter-applicants', [
             'applicants' => $applicants,
             'OriginOfRequests' => $OriginOfRequests,
