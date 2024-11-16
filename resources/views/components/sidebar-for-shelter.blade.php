@@ -14,7 +14,6 @@
                     activeLink: localStorage.getItem('activeLink') || '',
                     activeChildLink: localStorage.getItem('activeChildLink') || ''}">
 
-                @role('Super Admin')
                 <div x-data="{ isDashboardOpen: false }">
                     <!-- Main Dashboard Menu -->
                     <a href="#" @click="isDashboardOpen = !isDashboardOpen; activeLink = 'dashboard'; localStorage.setItem('activeLink', 'dashboard')"
@@ -85,9 +84,7 @@
                         </a>
                     </div>
                 </div>
-                @endrole
 
-                @role('ShelterAdmin')
                 <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
                     :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"
                     class="flex items-center py-2 px-4 hover:text-[#FF9100]">
@@ -103,7 +100,6 @@
                     </svg>
                     <span class="ml-2">Dashboard</span>
                 </a>
-                @endrole
 
                 @role('Admin')
                     <div x-data="{ isDashboardOpen: false }">
@@ -142,7 +138,7 @@
                             </a>
 
                             <!-- Shelter Submenu -->
-                            <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
+                            <a href="{{ route('shelter-admin.shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
                                 :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"
                                 class="flex items-center py-2 px-4 hover:text-[#FF9100]">
                                 <svg xmlns="http://www.w3.org/2000/svg"
