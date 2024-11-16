@@ -207,12 +207,12 @@
                                         <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">
                                             <div class="flex items-center justify-center">
                                                 <!-- Details Button -->
-{{--                                                <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $applicant->id]) }}'"--}}
-{{--                                                        class="text-custom-red px-2 py-1.5">--}}
-{{--                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
-{{--                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>--}}
-{{--                                                    </svg>--}}
-{{--                                                </button>--}}
+                                                <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                        class="text-custom-red px-2 py-1.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                                                    </svg>
+                                                </button>
                                                 <!-- Applicant ID -->
                                                 <span>{{ $applicant->applicant_id }}</span>
                                             </div>

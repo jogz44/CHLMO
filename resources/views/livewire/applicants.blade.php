@@ -13,9 +13,15 @@
                             class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
                         Add Applicant
                     </button>
-                    <button wire:click="export" wire:loading.attr="disabled"
-                            class="bg-custom-green text-white px-4 py-2 rounded">
-                        <span wire:loading wire:target="export">Exporting...</span>
+                    <button wire:click="exportPDF" wire:loading.attr="disabled"
+                            class="bg-gradient-to-r from-custom-blue to-custom-purple hover:bg-gradient-to-r hover:from-custom-blue hover:to-custom-dark-purple text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="exportPDF">Exporting PDF...</span>
+                        <span wire:loading.remove>Export to PDF</span>
+                    </button>
+
+                    <button wire:click="export" wire:ignore wire:loading.attr="disabled"
+                            class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="export">Exporting Excel...</span>
                         <span wire:loading.remove>Export to Excel</span>
                     </button>
                 </div>
