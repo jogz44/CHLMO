@@ -11,7 +11,9 @@ use App\Models\People;
 use App\Models\Purok;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TransactionType;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
@@ -281,6 +283,83 @@ class Applicants extends Component
             ]);
             return null;
         }
+    }
+
+    public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        ini_set('default_charset', 'UTF-8');
+
+        // Fetch Applicants based on filters
+        $query = Applicant::with([
+            'person',
+            'address.barangay',
+            'address.purok',
+            'transactionType'
+        ]);
+
+        // Apply filters
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('date_applied', [
+                $this->startDate,
+                $this->endDate
+            ]);
+        }
+
+        if ($this->barangay_id) {
+            $query->whereHas('address', function($q) {
+                $q->where('barangay_id', $this->barangay_id);
+            });
+        }
+
+        if ($this->purok_id) {
+            $query->whereHas('address', function($q) {
+                $q->where('purok_id', $this->purok_id);
+            });
+        }
+
+        if ($this->transaction_type_id) {
+            $query->where('transaction_type_id', $this->transaction_type_id);
+        }
+
+         $applicants = $query->get();
+
+        // Build Subtitle from Filters
+        $subtitle = [];
+
+        if ($this->barangay_id) {
+            $barangay = Barangay::find($this->barangay_id);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        if ($this->purok_id) {
+            $purok = Purok::find($this->purok_id);
+            $subtitle[] = "PUROK: {$purok->name}";
+        } else if ($this->barangay_id) {
+            $subtitle[] = "PUROK: All Purok";
+        }
+
+        if ($this->startDate && $this->endDate) {
+            $startDate = Carbon::parse($this->startDate)->format('m/d/Y');
+            $endDate = Carbon::parse($this->endDate)->format('m/d/Y');
+            $subtitle[] = "Date From: {$startDate} To: {$endDate}";
+        }
+
+        $subtitleText = implode(' | ', $subtitle);
+
+        $html = view('pdfs.applicants', [
+            'applicants' => $applicants,
+            'subtitle' => $subtitleText,
+        ])->render();
+
+        // Load the PDF with the generated HTML
+
+        $pdf = Pdf::loadHTML($html);
+        $pdf->setPaper('legal', 'portrait');
+
+        // Stream the PDF for download
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'applicants.pdf');
     }
 
     public function render()
