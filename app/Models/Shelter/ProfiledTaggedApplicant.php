@@ -135,4 +135,9 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->hasMany(ShelterImagesForHousing::class, 'profiled_tagged_applicant_id');
     }
+    // In ProfiledTaggedApplicant model
+    public function granteeDocumentsSubmission()
+    {
+        return $this->hasMany(GranteeDocumentsSubmission::class, 'profiled_tagged_applicant_id');
+    }
 }
