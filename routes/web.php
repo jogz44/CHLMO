@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\IndexController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Shelter\ShelterIndexController;
 use App\Http\Controllers\Admin\PermissionCOntroller;
 use App\Http\Controllers\Admin\RoleController;
@@ -205,8 +206,6 @@ Route::middleware([
     Route::get('/shelter-system-configuration', function () {
         return view('shelter-system-configuration');
     })->name('shelter-system-configuration');
-
-    
 });
 
 
@@ -240,7 +239,7 @@ Route::middleware([
 // Shelter Admin routes
 Route::middleware([
     'auth:web', // Session-based authentication via web guard
-    'role:ShelterAdmin', // Spatie permission middleware to check if the user has the 'admin' role
+    'role:ShelterAdmin', // Spatie permission middleware to check if the user has the 'ShelterAdmin' role
     'verified', // Ensures the user has verified their email
 ])->name('shelter-admin.')->prefix('shelter-admin')->group(function () {
     Route::get('/', [ShelterIndexController::class, 'index'])->name('index');
