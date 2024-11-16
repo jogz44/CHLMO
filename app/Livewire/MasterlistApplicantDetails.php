@@ -3,11 +3,13 @@
 namespace App\Livewire;
 
 use App\Models\Applicant;
+use App\Models\People;
 use Livewire\Component;
 
 class MasterlistApplicantDetails extends Component
 {
     public $applicantId;
+    public $people;
     public $applicant;
 
     public $transaction_type, $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $contact_number, $date_applied;
@@ -26,33 +28,38 @@ class MasterlistApplicantDetails extends Component
     public function mount($applicantId): void
     {
         $this->applicantId = $applicantId;
-        $this->applicant = Applicant::with([
-            'address.purok',
-            'address.barangay',
-            'transactionType',
-            'taggedAndValidated.livingSituation',
-            'taggedAndValidated.caseSpecification',
-            'taggedAndValidated.awardees.awardeeDocumentsSubmissions',
-            'taggedAndValidated.tribe',
-            'taggedAndValidated.religion',
-            'taggedAndValidated.spouse',
-            'taggedAndValidated.liveInPartner',
-            'taggedAndValidated.dependents.civilStatus',
-            'taggedAndValidated.governmentProgram',
-            'taggedAndValidated.livingStatus',
-            'taggedAndValidated.roofType',
-            'taggedAndValidated.wallType',
-            'taggedAndValidated.images',
-
+        $this->people = People::with([
+            'applicants' => function($query) {
+                $query->with([
+                    'address.purok',
+                    'address.barangay',
+                    'transactionType',
+                    'taggedAndValidated.livingSituation',
+                    'taggedAndValidated.caseSpecification',
+                    'taggedAndValidated.awardees.awardeeDocumentsSubmissions',
+                    'taggedAndValidated.tribe',
+                    'taggedAndValidated.religion',
+                    'taggedAndValidated.spouse',
+                    'taggedAndValidated.liveInPartner',
+                    'taggedAndValidated.dependents.civilStatus',
+                    'taggedAndValidated.governmentProgram',
+                    'taggedAndValidated.livingStatus',
+                    'taggedAndValidated.roofType',
+                    'taggedAndValidated.wallType',
+                    'taggedAndValidated.images',
+                ]);
+            }
         ])->findOrFail($this->applicantId);
 
+        $this->applicant = $this->people->applicants->first();
+
         // Populate the form fields with applicant data
-        $this->transaction_type = $this->applicant->transactionType->type_name;
-        $this->first_name = $this->applicant->first_name;
-        $this->middle_name = $this->applicant->middle_name;
-        $this->last_name = $this->applicant->last_name;
-        $this->suffix_name = $this->applicant->suffix_name;
-        $this->contact_number = $this->applicant->contact_number;
+        $this->transaction_type = $this->people->applicants->first()?->transactionType?->type_name ?? '--';
+        $this->first_name = $this->people->first_name;
+        $this->middle_name = $this->people->middle_name;
+        $this->last_name = $this->people->last_name;
+        $this->suffix_name = $this->people->suffix_name;
+        $this->contact_number = $this->people->contact_number;
 
         // Access the barangay and purok through the address relation
         $this->barangay = $this->applicant->address?->barangay?->name ?? '--';
@@ -141,7 +148,7 @@ class MasterlistApplicantDetails extends Component
     public function render()
     {
         return view('livewire.masterlist-applicant-details', [
-            'applicant' => $this->applicant
+            'people' => $this->people
         ])->layout('layouts.app');
     }
 }

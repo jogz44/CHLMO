@@ -58,7 +58,7 @@ class ApplicantDetails extends Component
     public function mount($applicantId): void
     {
         $this->applicantId = $applicantId;
-        $this->applicant = Applicant::find($applicantId);
+        $this->applicant = Applicant::findOrFail($applicantId);
 
         // Clear dependents array before populating it again
         $this->dependents = [];
@@ -133,11 +133,11 @@ class ApplicantDetails extends Component
         });
 
         // Populate fields with applicant data
-        $this->first_name = $this->applicant->first_name;
-        $this->middle_name = $this->applicant->middle_name;
-        $this->last_name = $this->applicant->last_name;
-        $this->suffix_name = $this->applicant->suffix_name;
-        $this->contact_number = $this->applicant->contact_number;
+        $this->first_name = $this->person->applicant->first_name;
+        $this->middle_name = $this->person->applicant->middle_name;
+        $this->last_name = $this->person->applicant->last_name;
+        $this->suffix_name = $this->person->applicant->suffix_name;
+        $this->contact_number = $this->person->applicant->contact_number;
 
         // Access the barangay and purok through the address relation
         $this->barangay = $this->applicant->address->barangay->name ?? '';
@@ -432,7 +432,7 @@ class ApplicantDetails extends Component
             \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
             $this->dispatch('alert', [
                 'title' => 'Something went wrong!',
-                'message' => 'An error occurred while tagging the applicant. Please try again. <br><small>'. now()->calendar() .'</small>',
+                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
                 'type' => 'danger'
             ]);
         }

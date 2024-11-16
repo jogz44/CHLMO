@@ -3,16 +3,20 @@
 namespace App\Livewire;
 
 use AllowDynamicProperties;
+use App\Exports\ApplicantsDataExport;
 use App\Models\Address;
 use App\Models\Applicant;
 use App\Models\Barangay;
+use App\Models\People;
 use App\Models\Purok;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TransactionType;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
 
 class Applicants extends Component
@@ -23,7 +27,7 @@ class Applicants extends Component
     public $isModalOpen = false, $isLoading = false;
     public $date_applied, $transaction_type_id;
     public $transactionTypes = [];
-    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
+    public $person_id, $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
         $purok_id, $puroks = [], $interviewer;
 
     // Filter properties:
@@ -31,7 +35,7 @@ class Applicants extends Component
         $selectedBarangay_id, $barangaysFilter = [], $selectedTransactionType_id, $transactionTypesFilter = [],
         $taggingStatuses;
 
-    public $selectedApplicantId, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
+    public $selectedApplicantId, $edit_person_id, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
         $edit_transaction_type_id, $edit_contact_number, $edit_barangay_id, $edit_purok_id;
 
     // For export
@@ -89,15 +93,6 @@ class Applicants extends Component
         });
         $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
     }
-
-    public function updatingBarangay()
-    {
-        $this->resetPage();
-    }
-    public function updatingPurok()
-    {
-        $this->resetPage();
-    }
     public function updatedBarangayId($barangayId): void
     {
         // Fetch the puroks based on the selected barangay
@@ -142,29 +137,34 @@ class Applicants extends Component
         // Validate the input data
         $this->validate();
 
+        $people = People::firstOrCreate([
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'last_name' => $this->last_name,
+            'suffix_name' => $this->suffix_name,
+            'contact_number' => $this->contact_number,
+            'application_type' => 'Housing Applicant'
+        ]);
+
         // Create the address entry first
         $address = Address::create([
             'barangay_id' => $this->barangay_id,
             'purok_id' => $this->purok_id,
         ]);
 
-
         // Generate the unique applicant ID
         $applicantId = Applicant::generateApplicantId();
 
         // Create the new applicant record and get the ID of the newly created applicant
         $applicant = Applicant::create([
+            'applicant_id' => $applicantId,
+            'person_id' => $people->id,
             'user_id' => Auth::id(),
             'date_applied' => $this->date_applied,
             'transaction_type_id' => $this->transaction_type_id,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
-            'suffix_name' => $this->suffix_name,
-            'contact_number' => $this->contact_number,
             'initially_interviewed_by' => $this->interviewer,
             'address_id' => $address->id,
-            'applicant_id' => $applicantId,
+
         ]);
 
         $this->resetForm();
@@ -183,7 +183,7 @@ class Applicants extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'date_applied', 'transaction_type_id', 'first_name', 'middle_name', 'last_name',
+            'date_applied', 'transaction_type_id', 'person_id', 'first_name', 'middle_name', 'last_name',
             'suffix_name', 'barangay_id', 'purok_id', 'contact_number',
         ]);
     }
@@ -192,11 +192,12 @@ class Applicants extends Component
         $applicant = Applicant::findOrFail($id);
 
         $this->selectedApplicantId = $applicant->id;
-        $this->edit_first_name = $applicant->first_name;
-        $this->edit_middle_name = $applicant->middle_name;
-        $this->edit_last_name = $applicant->last_name;
-        $this->edit_suffix_name = $applicant->suffix_name;
-        $this->edit_contact_number = $applicant->contact_number;
+        $this->edit_person_id = $applicant->person_id;
+        $this->edit_first_name = $applicant->person->first_name;
+        $this->edit_middle_name = $applicant->person->middle_name;
+        $this->edit_last_name = $applicant->person->last_name;
+        $this->edit_suffix_name = $applicant->person->suffix_name;
+        $this->edit_contact_number = $applicant->person->contact_number;
         $this->edit_barangay_id = $applicant->address->barangay_id ?? null;
         $this->edit_purok_id = $applicant->address->purok_id ?? null;
         $this->edit_date_applied = $applicant->date_applied->format('Y-m-d');
@@ -217,13 +218,19 @@ class Applicants extends Component
         ]);
 
         $applicant = Applicant::findOrFail($this->selectedApplicantId);
-        $applicant->first_name = $this->edit_first_name;
-        $applicant->middle_name = $this->edit_middle_name;
-        $applicant->last_name = $this->edit_last_name;
-        $applicant->suffix_name = $this->edit_suffix_name;
-        $applicant->contact_number = $this->edit_contact_number;
+        $person = $applicant->person;
+        $address = $applicant->address;
+
+        $person->first_name = $this->edit_first_name;
+        $person->middle_name = $this->edit_middle_name;
+        $person->last_name = $this->edit_last_name;
+        $person->suffix_name = $this->edit_suffix_name;
+        $person->contact_number = $this->edit_contact_number;
+        $person->save();
+
         $applicant->date_applied = $this->edit_date_applied;
         $applicant->transaction_type_id = $this->edit_transaction_type_id;
+        $applicant->save();
 
         // Update address
         $address = $applicant->address;
@@ -232,8 +239,6 @@ class Applicants extends Component
             $address->purok_id = $this->edit_purok_id;
             $address->save(); // Don't forget to save the address
         }
-
-        $applicant->save();
 
         $this->dispatch('alert', [
             'title' => 'Details Updated!',
@@ -250,16 +255,46 @@ class Applicants extends Component
         $applicant->is_tagged = true;
         $applicant->save();
     }
+    // Add this export method
+    public function export()
+    {
+        try {
+            $filters =  array_filter([
+                'start_date' => $this->startDate,
+                'end_date' => $this->endDate,
+                'barangay_id' => $this->selectedBarangay_id,
+                'purok_id' => $this->selectedPurok_id,
+                'transaction_type_id' => $this->selectedTransactionType_id,
+                'tagging_status' => $this->selectedTaggingStatus
+            ]);
+
+            return Excel::download(
+                new ApplicantsDataExport($filters),
+                'applicants-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed: ',
+                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
+            return null;
+        }
+    }
+
     public function render()
     {
-        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'transactionType'])
+        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'transactionType', 'person'])
             ->where(function($query) {
-                $query->where('applicant_id', 'like', '%'.$this->search.'%')
-                    ->orWhere('first_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('last_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('contact_number', 'like', '%'.$this->search.'%')
+                $query->whereHas('person', function($q) {
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('contact_number', 'like', '%'.$this->search.'%');
+                })
+                    ->orWhere('applicant_id', 'like', '%'.$this->search.'%')
                     ->orWhereHas('address.purok', function ($query) {
                         $query->where('name', 'like', '%'.$this->search.'%');
                     })
