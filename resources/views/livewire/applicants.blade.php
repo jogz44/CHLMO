@@ -13,7 +13,11 @@
                             class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
                         Add Applicant
                     </button>
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
+                    <button wire:click="export" wire:loading.attr="disabled"
+                            class="bg-custom-green text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="export">Exporting...</span>
+                        <span wire:loading.remove>Export to Excel</span>
+                    </button>
                 </div>
             </div>
             <!-- Search and Filters -->
@@ -195,9 +199,6 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-{{--                            <th class="py-2 px-2 border-b text-center font-semibold">--}}
-{{--                                <input type="checkbox">--}}
-{{--                            </th>--}}
                             <th class="py-2 px-2 border-b text-center font-medium">ID</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">Name</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">Suffix Name</th>
@@ -212,17 +213,14 @@
                     <tbody>
                         @forelse($applicants as $applicant)
                             <tr>
-{{--                                <td class="py-4 px-2 text-center border-b uppercase font-semibold">--}}
-{{--                                    <input type="checkbox" wire:model="selectedApplicantsForExport.{{ $applicant->applicant_id }}">--}}
-{{--                                </td>--}}
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant_id }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">{{ $applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->transactionType->type_name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ optional($applicant)->applicant_id }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words name-col">{{ optional($applicant->person)->full_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words suffix-col">{{ optional($applicant->person)->suffix_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words contact-col">{{ optional($applicant->person)->contact_number }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">{{ optional($applicant->address->purok)->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">{{ optional($applicant->address->barangay)->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words transaction-type-col">{{ optional($applicant->transactionType)->type_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b whitespace-normal break-words date-applied-col">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2 actions-col">
                                     @if ($applicant->taggedAndValidated)
                                         <button class="bg-gray-400 text-white px-14 py-1.5 rounded-full cursor-not-allowed">

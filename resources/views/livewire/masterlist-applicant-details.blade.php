@@ -31,12 +31,12 @@
                 </div>
 
                 <div class="flex flex-col p-3 rounded mt-11">
-                    <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
+                    <h2 class="text-[30px] items-center font-bold text-gray-700 underline"> {{ $applicant->applicant_id }}</h2>
                     <h1 class="text-[25px] items-center font-bold text-gray-700">
-                        {{ $applicant->first_name }}
-                        @if($applicant->middle_name) {{ substr($applicant->middle_name, 0, 1) }}. @endif
-                        {{ $applicant->last_name }}
-                        {{ $applicant->suffix_name }}
+                        {{ $people->first_name }}
+                        @if($people->middle_name) {{ substr($people->middle_name, 0, 1) }}. @endif
+                        {{ $people->last_name }}
+                        {{ $people->suffix_name }}
                     </h1>
                 </div>
 

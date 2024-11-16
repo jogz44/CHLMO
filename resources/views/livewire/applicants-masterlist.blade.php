@@ -3,7 +3,7 @@
         <div x-data="{ openModal: false, openFilters: false}" class="flex bg-gray-100 text-[12px]">
 
             <!-- Main Content -->
-            <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
+            <div class="flex-1 h-screen p-6 overflow-auto">
 
                 <!-- Container for the Title -->
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
@@ -11,9 +11,9 @@
                         <h2 class="text-[13px] ml-5 text-gray-700">MASTERLIST OF APPLICANTS</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div x-data class="relative z-0">
-                        <button class="bg-[#2B7A0B] text-white px-4 py-2 rounded">Export</button>
-                    </div>
+{{--                    <div x-data class="relative z-0">--}}
+{{--                        <button class="bg-[#2B7A0B] text-white px-4 py-2 rounded">Export</button>--}}
+{{--                    </div>--}}
                 </div>
 
                 <!-- Search and Filters -->
@@ -184,146 +184,99 @@
                 </div>
 
                 <!-- Table for Applicants Master   list -->
-                <div x-data="{openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
-                     class="overflow-x-auto">
+                <div x-data="{ openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: '' }" class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
-                            <tr>
-                                <th class="py-2 px-2 border-b text-center font-medium">ID</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">Name</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Sex</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Contact Number</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">Barangay</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">Purok</th>
-{{--                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column occupation-col">Occupation</th>--}}
-{{--                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-income-col">Monthly Income</th>--}}
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">Transaction Type</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column date-applied-col">Date Applied</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Tagged</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Awarding Status</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Awarded</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Blacklisted</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Aging</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">Actions</th>
-                            </tr>
+                        <tr>
+                            <th class="py-2 px-2 border-b text-center font-medium">ID</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column name-col">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Sex</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">Contact Number</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column barangay-col">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column purok-col">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">Transaction Type</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column date-applied-col">Date Applied</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Tagged</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column status-col">Aging</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @forelse($applicants as $applicant)
-                                <tr>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant_id}}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->last_name }}, {{ $applicant->first_name }} {{ $applicant->middle_name }} {{ $applicant->suffix_name }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->taggedAndValidated?->sex ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->contact_number}}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->address->barangay->name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->address->purok->name ?? 'N/A' }}</td>
-{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap occupation-col">{{ optional($applicant->taggedAndValidated)->occupation ?? 'N/A' }}</td>--}}
-{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-income-col">{{ optional($applicant->taggedAndValidated)->monthly_income ?? 'N/A' }}</td>--}}
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ $applicant->transactionType->type_name }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap date-applied-col">{{ $applicant->date_applied ? date('M d, Y', strtotime($applicant->date_applied)) : 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
-                                        <!-- Tagging Status -->
-                                        <div class="flex items-center justify-center w-full">
-                                            @if($applicant->is_tagged)
-                                                <span class="ml-1 text-center justify-center">
-                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                    <lord-icon
-                                                            src="https://cdn.lordicon.com/guqkthkk.json"
-                                                            trigger="loop"
-                                                            delay="2000"
-                                                            colors="primary:#16c72e"
-                                                            style="width:20px;height:20px">
-                                                    </lord-icon>
-                                                </span>
-                                            @else
-                                                --
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <!-- Awarding Status -->
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
-                                        <!-- Awarding Status -->
-                                        <div class="flex items-center justify-center w-full">
-                                            @if($applicant->taggedAndValidated?->is_awarding_on_going)
-                                                <span class="ml-1 text-red-500 text-center justify-center">
-                                                    Pending...
-                                                </span>
-                                            @else
-                                                --
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <!-- Awarding Status -->
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
-                                        <!-- Awarding Status -->
-                                        <div class="flex items-center justify-center w-full">
-                                            @if($applicant->taggedAndValidated?->awardees->where('is_awarded', true)->count() > 0)
-                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                <lord-icon
-                                                        src="https://cdn.lordicon.com/guqkthkk.json"
-                                                        trigger="loop"
-                                                        delay="2000"
-                                                        colors="primary:#16c72e"
-                                                        style="width:20px;height:20px">
-                                                </lord-icon>
-                                            @else
-                                                --
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <!-- Blacklisted -->
-                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap status-col">
-                                        <!-- Blacklisted -->
-                                        <div class="flex items-center justify-center w-full">
-                                            @if($applicant->is_blacklisted)
-                                                <span class="ml-1 text-center justify-center">
-                                                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                    <lord-icon
-                                                            src="https://cdn.lordicon.com/guqkthkk.json"
-                                                            trigger="loop"
-                                                            delay="2000"
-                                                            colors="primary:#16c72e"
-                                                            style="width:20px;height:20px">
-                                                    </lord-icon>
-                                                </span>
-                                            @else
-                                                --
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-2 text-center text-red-600 border-b whitespace-nowrap status-col">
-                                        <div class="flex items-center justify-center w-full">
-                                            {{ $applicant->date_applied->shortAbsoluteDiffForHumans() }}
-                                            <span class="ml-1">
+                            @forelse($people as $person)
+                                @foreach($person->applicants as $applicant)
+                                    <tr>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">
+                                            <div class="flex items-center justify-center">
+                                                <!-- Details Button -->
+{{--                                                <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $applicant->id]) }}'"--}}
+{{--                                                        class="text-custom-red px-2 py-1.5">--}}
+{{--                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
+{{--                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>--}}
+{{--                                                    </svg>--}}
+{{--                                                </button>--}}
+                                                <!-- Applicant ID -->
+                                                <span>{{ $applicant->applicant_id }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words name-col">
+                                            {{ $person->last_name }},
+                                            {{ $person->first_name }}
+                                            {{ $person->middle_name }}
+                                            {{ $person->suffix_name }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words contact-col">
+                                            {{ $applicant->taggedAndValidated?->sex ?? 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words contact-col">
+                                            {{ $applicant->contact_number }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">
+                                            {{ $applicant->address->barangay->name ?? 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">
+                                            {{ $applicant->address->purok->name ?? 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words transaction-type-col">
+                                            {{ $applicant->transactionType->type_name }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words date-applied-col">
+                                            {{ $applicant->date_applied ? date('M d, Y', strtotime($applicant->date_applied)) : 'N/A' }}
+                                        </td>
+                                        <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words status-col">
+                                            <div class="flex items-center justify-center w-full">
+                                                @if($applicant->is_tagged)
+                                                    <span class="ml-1 text-center justify-center">
                                             <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                            <lord-icon
-                                                    src="https://cdn.lordicon.com/lzgqzxrq.json"
-                                                    trigger="loop"
-                                                    delay="3000"
-                                                    style="width: 20px; height: 20px">
-                                            </lord-icon>
+                                            <lord-icon src="https://cdn.lordicon.com/guqkthkk.json" trigger="loop" delay="2000" colors="primary:#16c72e" style="width:20px;height:20px"></lord-icon>
                                         </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
-                                        <div class="flex items-center justify-center w-full">
-                                            <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $applicant->id]) }}'"
-                                                    class="text-custom-red text-bold underline px-4 py-1.5">
-                                                Details
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                                @else
+                                                    --
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td class="py-4 px-2 text-center text-red-600 border-b whitespace-normal break-words status-col">
+                                            <div class="flex items-center justify-center w-full">
+                                                {{ $applicant->date_applied->shortAbsoluteDiffForHumans() }}
+                                                <span class="ml-1">
+                                        <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                        <lord-icon src="https://cdn.lordicon.com/lzgqzxrq.json" trigger="loop" delay="3000" style="width: 20px; height: 20px"></lord-icon>
+                                    </span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             @empty
                                 <tr>
-                                    <td colspan="14" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                    <td colspan="10" class="py-4 px-2 text-center border-b">No applicants found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
+
                 <div class="mt-4">
-                    {{ $applicants->links() }}
+                    {{ $people->links() }}
                 </div>
+
             </div>
         </div>
     </div>
