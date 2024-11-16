@@ -102,7 +102,7 @@
                         @forelse($profiledTaggedApplicants as $shelterApplicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->shelterApplicant->profile_no }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->last_name }}, {{ $shelterApplicant->shelterApplicant->first_name }} {{ $shelterApplicant->shelterApplicant->middle_name }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->person->last_name }}, {{ $shelterApplicant->shelterApplicant->person->first_name }} {{ $shelterApplicant->shelterApplicant->person->middle_name }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b"> {{ $shelterApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ optional($shelterApplicant->date_tagged)->format('Y-m-d') }}</td>
