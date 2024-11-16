@@ -140,10 +140,13 @@ Route::middleware([
         return view('system-configuration');
     })->name('system-configuration');
 
-    //shelter assistance program
+//    shelter assistance program
     Route::get('/shelter-dashboard', function () {
         return view('shelter-dashboard');
     })->name('shelter-dashboard');
+//    Route::middleware(['role.shelterAdmin'])->get('/shelter-dashboard', function () {
+//        return view('shelter-dashboard');
+//    })->name('shelter-dashboard');
 
     Route::get('/shelter-transaction-applicants', function () {
         return view('shelter-transaction-applicants');
