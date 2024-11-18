@@ -146,7 +146,10 @@ class AwardeeList extends Component
     public function render()
     {
         $awardees = Awardee::with([
-            'taggedAndValidatedApplicant', 'address', 'relocationLot', 'lotSizeUnit'
+            'taggedAndValidatedApplicant.applicant.person',
+            'address',
+            'relocationLot',
+            'lotSizeUnit'
         ])->orderBy('created_at', 'desc')->paginate( 10);
 
         return view('livewire.awardee-list', [
