@@ -13,11 +13,17 @@
                      alt="Design"
                      class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative">
-                    <button @click="openModal = true" class="bg-gradient-to-r from-custom-red to-custom-green text-white px-4 py-2 rounded">
-                        Add Applicant
+                    <button @click="openModal = true" class="bg-gradient-to-r from-custom-red to-custom-green text-white px-4 py-2 rounded">Add Applicant</button>
+                    <button wire:click="exportPDF" wire:loading.attr="disabled"
+                        class="bg-gradient-to-r from-custom-blue to-custom-purple hover:bg-gradient-to-r hover:from-custom-blue hover:to-custom-dark-purple text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="exportPDF">Exporting PDF...</span>
+                        <span wire:loading.remove>Export to PDF</span>
                     </button>
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">
-                        Export
+
+                    <button wire:click="export" wire:ignore wire:loading.attr="disabled"
+                        class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="export">Exporting Excel...</span>
+                        <span wire:loading.remove>Export to Excel</span>
                     </button>
                 </div>
             </div>
@@ -89,7 +95,7 @@
                     <select wire:model.live="selectedTaggingStatus" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
                         @foreach($taggingStatuses as $status)
-                            <option value="{{ $status }}">{{ $status }}</option>
+                        <option value="{{ $status }}">{{ $status }}</option>
                         @endforeach
                     </select>
                     <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
