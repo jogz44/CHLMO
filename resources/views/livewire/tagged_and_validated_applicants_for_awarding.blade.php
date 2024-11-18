@@ -193,11 +193,11 @@
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">NAME</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">PUROK</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">BARANGAY</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column living-situation-col">LIVING SITUATION (CASE)</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column case-specification-col">CASE SPECIFICATION</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column living-situation-col">LIVING SITUATION (CASE)</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-col">CASE SPECIFICATION</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-col">MONTHLY INCOME</th>
+{{--                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-col">MONTHLY INCOME</th>--}}
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TAGGING DATE</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">ACTIONS</th>
                         </tr>
@@ -206,44 +206,57 @@
                         @forelse($taggedAndValidatedApplicants as $applicant)
                             <tr>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant->applicant_id}}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">{{ $applicant->applicant->last_name }}, {{ $applicant->applicant->first_name }} {{ $applicant->applicant->middle_name }} {{ $applicant->applicant->suffix_name }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap living-situation-col">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap case-specification-col">{{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap case-specification-description-col">{{ $applicant->living_situation_case_specification ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words name-col">{{ $applicant->applicant->person->full_name }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words living-situation-col">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-col">{{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}</td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-description-col">{{ $applicant->living_situation_case_specification ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->contact_number ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income ?? 'N/A' }}</td>
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income ?? 'N/A' }}</td>--}}
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
-                                <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap actions-col">
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap actions-col">
                                     @if(!$applicant->is_awarding_on_going)
-                                        <!-- button to the -> Tagged and Validated Applicant details -->
+                                        <!-- Details button -->
                                         <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
                                                 class="text-custom-red text-bold underline px-4 py-1.5">
                                             Details
                                         </button>
-                                        <!-- Award Button -->
+                                        <!-- Submit Requirements Button -->
+                                        <button @click="openModalDocumentsChecklist = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
+                                            Submit Requirements
+                                        </button>
+                                    @elseif($applicant->awardees && $applicant->awardees->isNotEmpty() && $applicant->awardees->first()->documents_submitted && !$applicant->awardees->first()->is_awarded)
+                                        <!-- Submitted Button (disabled) -->
+                                        <button disabled class="bg-gray-400 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
+                                            Submitted
+                                        </button>
+                                        <!-- Award Button (for relocation) -->
                                         <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
-                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-14 py-1.5 rounded-full">
+                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
                                             Award
                                         </button>
-                                    @elseif($applicant->awardees->isNotEmpty() && $applicant->awardees->first()->is_awarded)
-                                        <!-- Awarded Button -->
-                                        <button class="bg-gray-400 text-white px-12 py-1.5 rounded-full cursor-not-allowed">
+                                    @elseif($applicant->awardees && $applicant->awardees->isNotEmpty() && $applicant->awardees->first()->is_awarded)
+                                        <!-- Details button -->
+                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                class="text-custom-red text-bold underline px-4 py-1.5">
+                                            Details
+                                        </button>
+                                        <!-- Awarded Button (disabled) -->
+                                        <button disabled class="bg-gray-400 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
                                             Awarded
                                         </button>
                                     @else
-                                        <!-- Award Pending Button (disabled) -->
+                                        <!-- Details button -->
+                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                                class="text-custom-red text-bold underline px-4 py-1.5">
+                                            Details
+                                        </button>
+                                        <!-- Requirements Pending Button -->
                                         <div class="relative flex items-center space-x-2">
-                                            <!-- Details Button -->
-                                            <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
-                                                    class="text-custom-red text-bold underline px-4 py-1.5">
-                                                Details
-                                            </button>
-                                            <!-- Award Pending Button -->
-                                            <button disabled
-                                                    class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
-                                                Award Pending
+                                            <button disabled class="bg-amber-500 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
+                                                Requirements Pending
                                             </button>
 
                                             <!-- Info Icon with Hover Tooltip -->
@@ -257,19 +270,20 @@
 
                                                     <!-- Tooltip content -->
                                                     <div class="absolute right-6 top-5 mb-2 w-max bg-custom-dark-green text-white text-xs rounded-lg py-2 px-3 opacity-0 group-hover:opacity-100 group-hover:visible group-hover:transition-opacity duration-200 z-50">
-                                                        Award is pending for this applicant. <br> Requirements are needed to be uploaded.
-                                                        <br>
-                                                        <small>Documents are ready.
-                                                            @if($applicant->is_awarding_on_going && $applicant->awardees->isNotEmpty())
+                                                        Requirements submission is pending for this applicant.
+                                                        @if($applicant->awardees && $applicant->awardees->isNotEmpty())
+                                                            <br>
+                                                            <small>
+                                                                Documents are ready.
                                                                 <button type="button" class="underline"
                                                                         @click="
-                                                                            openModalDocumentsChecklist = true;
-                                                                            $wire.set('awardeeId', {{ $applicant->awardees->first()->id }});
-                                                                        ">
+                                                                                openModalDocumentsChecklist = true;
+                                                                                $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }});
+                                                                            ">
                                                                     Upload now.
                                                                 </button>
-                                                            @endif
-                                                        </small>
+                                                            </small>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
@@ -285,7 +299,7 @@
                     </tbody>
                 </table>
 
-                <!-- Modal Relocate -->
+                <!-- Modal for Relocation -->
                 <div x-show="openModalRelocate"
                      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" x-cloak
                      style="font-family: 'Poppins', sans-serif;">
@@ -409,7 +423,7 @@
                     </div>
                 </div>
 
-                <!-- Modal Relocate - Checklist for uploading documents -->
+                <!-- Modal Relocate - Requirements -->
                 <div x-show="openModalDocumentsChecklist"
                      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
                      x-cloak
