@@ -282,9 +282,7 @@ class ApplicantDetails extends Component
                     if ($this->civil_status_id == 3) {
                         if (empty($value)) {
                             $fail('Spouse last name is required.');
-                        } elseif ($value !== $this->last_name) {
-                            $fail('The spouse\'s last name must match the applicant\'s last name.');
-                        }
+                        } 
                     }
                 },
             ],
