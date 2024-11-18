@@ -21,6 +21,8 @@ use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
 
+
+
 class Applicants extends Component
 {
     use WithPagination;
@@ -40,21 +42,18 @@ class Applicants extends Component
     public $selectedApplicantId, $edit_person_id, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
         $edit_transaction_type_id, $edit_contact_number, $edit_barangay_id, $edit_purok_id;
 
-    // For export
-    public Collection $applicantsForExport;
-    public Collection $selectedApplicantsForExport;
-    public $designTemplate = 'tailwind';
+    // For checking duplicate applicants
+    public $showHousingDuplicateWarning = false, $housingDuplicateData = null, $proceedWithDuplicate = false;
 
     public function updatingSearch(): void
     {
         // This ensures that the search query is updated dynamically as the user types
         $this->resetPage();
     }
-    public function clearSearch()
+    public function clearSearch(): void
     {
         $this->search = ''; // Clear the search input
     }
-
     public function resetFilters(): void
     {
         $this->startDate = null;
@@ -70,7 +69,9 @@ class Applicants extends Component
     }
     public function mount()
     {
-//        dd('Component mounted');
+        // Initialize modal states
+        $this->isModalOpen = false;
+        $this->showHousingDuplicateWarning = false;
 
         // Set today's date as the default value for date_applied
         $this->date_applied = now()->toDateString(); // YYYY-MM-DD format
@@ -134,54 +135,132 @@ class Applicants extends Component
             'transaction_type_id' => 'required|exists:transaction_types,id',
         ];
     }
+    // Add this method to check for duplicates when name fields change
+    public function updated($propertyName)
+    {
+        if (!$this->showHousingDuplicateWarning &&
+            in_array($propertyName, ['first_name', 'last_name', 'middle_name']) &&
+            $this->first_name && $this->last_name) {
+
+            $people = new People();
+            $result = $people->checkExistingApplications(
+                $this->first_name,
+                $this->last_name,
+                $this->middle_name,
+                'Housing Applicant'
+            );
+
+            if ($result['exists']) {
+                $this->housingDuplicateData = $result;
+                $this->showHousingDuplicateWarning = true;
+            }
+        }
+    }
+    public function closeDuplicateWarning(): void
+    {
+        $this->showHousingDuplicateWarning = false;
+        $this->housingDuplicateData = null;
+    }
+    public function proceedWithApplication(): void
+    {
+        // Only mark as safe to proceed, don't store yet
+        $this->proceedWithDuplicate = true;
+        $this->showHousingDuplicateWarning = false;
+        // Remove this line as we don't want to store immediately
+        // $this->storeApplicant();
+    }
     public function store()
     {
         // Validate the input data
         $this->validate();
 
-        $people = People::firstOrCreate([
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
-            'suffix_name' => $this->suffix_name,
-            'contact_number' => $this->contact_number,
-            'application_type' => 'Housing Applicant'
-        ]);
+        if (!$this->proceedWithDuplicate) {
+            $people = new People();
+            $result = $people->checkExistingApplications(
+                $this->first_name,
+                $this->last_name,
+                $this->middle_name,
+                'Housing Applicant'
+            );
 
-        // Create the address entry first
-        $address = Address::create([
-            'barangay_id' => $this->barangay_id,
-            'purok_id' => $this->purok_id,
-        ]);
+            if ($result['exists']) {
+                if ($result['applications']['housing']) {
+                    $this->addError('duplicate', 'Cannot proceed - Applicant already has a Housing Application');
+                    return;
+                }
 
-        // Generate the unique applicant ID
-        $applicantId = Applicant::generateApplicantId();
+                $this->housingDuplicateData = $result;
+                $this->showHousingDuplicateWarning = true;
+                return;
+            }
+        }
 
-        // Create the new applicant record and get the ID of the newly created applicant
-        $applicant = Applicant::create([
-            'applicant_id' => $applicantId,
-            'person_id' => $people->id,
-            'user_id' => Auth::id(),
-            'date_applied' => $this->date_applied,
-            'transaction_type_id' => $this->transaction_type_id,
-            'initially_interviewed_by' => $this->interviewer,
-            'address_id' => $address->id,
-
-        ]);
-
-        $this->resetForm();
-        $this->isModalOpen = false; // Close the modal
-
-        // Trigger the alert message
-        $this->dispatch('alert', [
-            'title' => 'Applicant Added!',
-            'message' => 'Applicant successfully added at <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
-        ]);
-
-        $this->redirect('applicants');
+        // Only store when form is submitted via "+ ADD APPLICANT" button
+        $this->storeApplicant();
     }
+    private function storeApplicant(): void
+    {
+        try {
+            // Log the start of the storage process
+            logger()->info('Starting applicant storage process', [
+                'first_name' => $this->first_name,
+                'last_name' => $this->last_name
+            ]);
 
+            $people = People::firstOrCreate([
+                'first_name' => $this->first_name,
+                'middle_name' => $this->middle_name,
+                'last_name' => $this->last_name,
+                'suffix_name' => $this->suffix_name,
+                'contact_number' => $this->contact_number,
+                'application_type' => 'Housing Applicant'
+            ]);
+
+            // Create the address entry first
+            $address = Address::create([
+                'barangay_id' => $this->barangay_id,
+                'purok_id' => $this->purok_id,
+            ]);
+
+            // Generate the unique applicant ID
+            $applicantId = Applicant::generateApplicantId();
+
+            // Create the new applicant record
+            $applicant = Applicant::create([
+                'applicant_id' => $applicantId,
+                'person_id' => $people->id,
+                'user_id' => Auth::id(),
+                'date_applied' => $this->date_applied,
+                'transaction_type_id' => $this->transaction_type_id,
+                'initially_interviewed_by' => $this->interviewer,
+                'address_id' => $address->id,
+            ]);
+
+            logger()->info('Applicant stored successfully', [
+                'applicant_id' => $applicantId
+            ]);
+
+            $this->resetForm();
+            $this->isModalOpen = false;
+            $this->proceedWithDuplicate = false;
+
+            $this->dispatch('alert', [
+                'title' => 'Applicant Added!',
+                'message' => 'Applicant successfully added at <br><small>'. now()->calendar() .'</small>',
+                'type' => 'success'
+            ]);
+
+            $this->redirect('applicants');
+
+        } catch (\Exception $e) {
+            logger()->error('Error storing applicant', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $this->addError('general', 'Failed to save applicant. Please try again.');
+        }
+    }
     public function resetForm(): void
     {
         $this->reset([
