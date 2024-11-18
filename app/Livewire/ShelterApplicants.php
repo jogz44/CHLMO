@@ -25,15 +25,15 @@ class ShelterApplicants extends Component
     public $search = '';
 
     public $openModal = false;
-   
+
 
     public Collection $shelterApplicantsForExport;
     public Collection $selectedApplicantsForExport;
     public $designTemplate = 'tailwind';
 
     public $isEditModalOpen = false, $isLoading = false, $startDate, $endDate;
-    public $selectedOriginOfRequest = null, $profileNo, $date_request, $first_name, $middle_name, $last_name,
-        $suffix_name, $request_origin_id, $editingApplicantId = null, $origin_name, $selectedTaggingStatus, $taggingStatuses;
+    public $selectedOriginOfRequest = null, $profileNo, $date_request, $first_name, $middle_name, $last_name, $person_id,
+        $suffix_name, $request_origin_id, $editingProfileNo = null, $origin_name, $selectedTaggingStatus, $taggingStatuses;
 
     // FOR CHECKING DUPLICATE APPLICANTS
     public $showShelterDuplicateWarning = false, $shelterDuplicateData = null, $proceedWithDuplicate = false;
@@ -51,7 +51,7 @@ class ShelterApplicants extends Component
 
     public function resetForm()
     {
-        if (!$this->editingApplicantId) {
+        if (!$this->editingProfileNo) {
             $this->profileNo = '';
         }
         $this->date_request = '';
@@ -62,22 +62,22 @@ class ShelterApplicants extends Component
         $this->request_origin_id = null;
     }
 
-    public function openModalEdit($applicantId)
+    public function openModalEdit($profileNo)
     {
-        $applicant = ShelterApplicant::findOrFail($applicantId);
-        $this->editingApplicantId = $applicantId;
-        $this->profileNo = $applicant->profileNo;
-        $this->date_request = $applicant->date_request;
-        $this->first_name = $applicant->person->first_name;
-        $this->middle_name = $applicant->person->middle_name;
-        $this->last_name = $applicant->person->last_name;
-        $this->suffix_name = $applicant->suffix_name;
-        $this->request_origin_id = $applicant->request_origin_id;
+        $applicant = ShelterApplicant::with('person', 'originOfRequest')->findOrFail($profileNo);
 
+        $this->editingProfileNo = $applicant->id;
+        $this->date_request = $applicant->date_request;
+        $this->first_name = $applicant->person->first_name ?? null;
+        $this->middle_name = $applicant->person->middle_name ?? null;
+        $this->last_name = $applicant->person->last_name ?? null;
+        $this->suffix_name = $applicant->suffix_name ?? null;
+        $this->request_origin_id = $applicant->request_origin_id;
         $this->origin_name = $applicant->originOfRequest->name ?? 'Unknown';
 
         $this->isEditModalOpen = true; // Open the modal
     }
+
 
     public function closeEditApplicantModal()
     {
@@ -85,9 +85,11 @@ class ShelterApplicants extends Component
     }
     public function updated($propertyName)
     {
-        if (!$this->showShelterDuplicateWarning &&
+        if (
+            !$this->showShelterDuplicateWarning &&
             in_array($propertyName, ['first_name', 'last_name', 'middle_name']) &&
-            $this->first_name && $this->last_name) {
+            $this->first_name && $this->last_name
+        ) {
 
             $people = new People();
             $result = $people->checkExistingApplications(
@@ -122,7 +124,7 @@ class ShelterApplicants extends Component
             'last_name' => 'required|string|max:255',
             'request_origin_id' => 'required|exists:origin_of_requests,id',
         ]);
-
+        
         if (!$this->proceedWithDuplicate) {
             $people = new People();
             $result = $people->checkExistingApplications(
@@ -154,7 +156,7 @@ class ShelterApplicants extends Component
                 'last_name' => $this->last_name
             ]);
 
-            if ($this->editingApplicantId) {
+            if ($this->editingProfileNo) {
                 $this->updateExistingApplicant();
             } else {
                 $this->createNewApplicant();
@@ -165,7 +167,6 @@ class ShelterApplicants extends Component
             $this->proceedWithDuplicate = false;
 
             $this->redirect('shelter-transaction-applicants');
-
         } catch (\Exception $e) {
             logger()->error('Error storing shelter applicant', [
                 'error' => $e->getMessage(),
@@ -177,49 +178,55 @@ class ShelterApplicants extends Component
     }
     private function updateExistingApplicant(): void
     {
-        $applicant = ShelterApplicant::findOrFail($this->editingApplicantId);
+        $applicant = ShelterApplicant::findOrFail($this->editingProfileNo);
+
         $applicant->update([
             'date_request' => $this->date_request,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
             'suffix_name' => $this->suffix_name,
             'request_origin_id' => $this->request_origin_id,
         ]);
 
+        // Update related 'person' record
+        $applicant->person()->update([
+            'first_name' => $this->first_name,
+            'middle_name' => $this->middle_name,
+            'last_name' => $this->last_name,
+        ]);
+
         $this->dispatch('alert', [
             'title' => 'Applicant Updated!',
-            'message' => 'Applicant updated successfully! <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
+            'message' => 'Applicant details updated successfully!',
+            'type' => 'success',
         ]);
     }
 
-//    private function createNewApplicant(): void
-//    {
-//        $people = People::create([
-//            'first_name' => $this->first_name,
-//            'middle_name' => $this->middle_name,
-//            'last_name' => $this->last_name,
-//            'application_type' => 'Shelter Applicant',
-//        ]);
-//
-//        $this->profileNo = ShelterApplicant::generateProfileNo();
-//
-//        ShelterApplicant::create([
-//            'user_id' => Auth::id(),
-//            'profile_no' => $this->profileNo,
-//            'person_id' => $people->id,
-//            'date_request' => $this->date_request,
-//            'suffix_name' => $this->suffix_name,
-//            'request_origin_id' => $this->request_origin_id,
-//        ]);
-//
-//        $this->dispatch('alert', [
-//            'title' => 'Applicant Added!',
-//            'message' => 'Applicant added successfully! <br><small>'. now()->calendar() .'</small>',
-//            'type' => 'success'
-//        ]);
-//    }
+
+    //    private function createNewApplicant(): void
+    //    {
+    //        $people = People::create([
+    //            'first_name' => $this->first_name,
+    //            'middle_name' => $this->middle_name,
+    //            'last_name' => $this->last_name,
+    //            'application_type' => 'Shelter Applicant',
+    //        ]);
+    //
+    //        $this->profileNo = ShelterApplicant::generateProfileNo();
+    //
+    //        ShelterApplicant::create([
+    //            'user_id' => Auth::id(),
+    //            'profile_no' => $this->profileNo,
+    //            'person_id' => $people->id,
+    //            'date_request' => $this->date_request,
+    //            'suffix_name' => $this->suffix_name,
+    //            'request_origin_id' => $this->request_origin_id,
+    //        ]);
+    //
+    //        $this->dispatch('alert', [
+    //            'title' => 'Applicant Added!',
+    //            'message' => 'Applicant added successfully! <br><small>'. now()->calendar() .'</small>',
+    //            'type' => 'success'
+    //        ]);
+    //    }
     private function createNewApplicant(): void
     {
         try {
@@ -251,10 +258,9 @@ class ShelterApplicants extends Component
 
             $this->dispatch('alert', [
                 'title' => 'Applicant Added!',
-                'message' => "Applicant added successfully with Profile No: {$profileNo}! <br><small>". now()->calendar() .'</small>',
+                'message' => "Applicant added successfully with Profile No: {$profileNo}! <br><small>" . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -323,7 +329,7 @@ class ShelterApplicants extends Component
                 'request_origin_id' => $this->selectedOriginOfRequest,
                 'tagging_status' => $this->selectedTaggingStatus,
             ]);
-    
+
             return Excel::download(
                 new ShelterApplicantDataExport($filters),
                 'shelter-applicants-' . now()->format('Y-m-d') . '.xlsx'

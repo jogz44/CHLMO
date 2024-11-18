@@ -226,7 +226,7 @@
                                     </div>
                                     <!-- Available quantity -->
                                     <div class="w-full md:w-2/12 px-2 mb-2">
-                                        <input type="text" wire:model="materials.{{ $index }}.quantity" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="available">
+                                        <input type="text" wire:model="materials.{{ $index }}.available_quantity" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="available">
                                     </div>
 
                                     <!-- Quantity Input -->

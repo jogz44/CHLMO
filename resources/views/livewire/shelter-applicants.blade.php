@@ -226,7 +226,7 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME</label>
                                     <input type="text" id="first-name" wire:model="first_name"
                                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="First Name">
+                                           placeholder="First Name" oninput="capitalizeInput(this)">
                                     @error('first_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
@@ -234,7 +234,7 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE NAME</label>
                                     <input type="text" id="middle-name" wire:model="middle_name"
                                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="Middle Name">
+                                           placeholder="Middle Name" oninput="capitalizeInput(this)">
                                     @error('middle_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
@@ -242,7 +242,7 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME</label>
                                     <input type="text" id="last-name" wire:model="last_name"
                                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="Last Name">
+                                           placeholder="Last Name" oninput="capitalizeInput(this)">
                                     @error('last_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
@@ -250,7 +250,7 @@
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
                                     <input type="text" id="suffix-name" wire:model="suffix_name"
                                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="Suffix Name">
+                                           placeholder="Suffix Name" oninput="capitalizeInput(this)">
                                     @error('suffix_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
@@ -297,22 +297,22 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME</label>
-                                    <input type="text" id="first-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="first_name">
+                                    <input type="text" id="first-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="first_name" oninput="capitalizeInput(this)">
                                 </div>
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE NAME</label>
-                                    <input type="text" id="middle-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="middle_name">
+                                    <input type="text" id="middle-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="middle_name" oninput="capitalizeInput(this)">
                                 </div>
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME</label>
-                                    <input type="text" id="last-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="last_name">
+                                    <input type="text" id="last-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="last_name" oninput="capitalizeInput(this)">
                                 </div>
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
-                                    <input type="text" id="suffix-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="suffix_name">
+                                    <input type="text" id="suffix-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="suffix_name" oninput="capitalizeInput(this)">
                                 </div>
                             </div>
 
@@ -338,7 +338,7 @@
                                         </div>
                                         <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
                                     </div>
-                                    <!-- SAVE Button -->
+                                   
                                     <button type="submit" wire:click.prevent="submitForm"
                                         class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                         <span class="text-[12px]"> SAVE </span>
