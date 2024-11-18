@@ -16,6 +16,7 @@ use App\Models\RelocationSite;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
+use Barryvdh\DomPDF\Facade\Pdf;
 use http\Env\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
@@ -51,7 +52,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $relocation_lot_id,
         $relocationSites = [],
         $lot_size,
-        $unit;
+        $unit = 'm²';
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $letterOfIntent, $votersID, $validID,
@@ -86,8 +87,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function mount(): void
     {
         $this->tagging_date = now()->toDateString();
-//        $this->unit = 'm&sup2;';
-//        $this->unit = "square meters (m\u{00B2})";
         $this->unit = "m²";
 
         // Initialize filter options
@@ -112,9 +111,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
         // Initialize dropdowns
         $this->relocationSites = RelocationSite::all(); // Fetch all relocation sites
-//        $this->barangays = Barangay::all();
-//        $this->puroks = Purok::all();
-//        $this->lotSizeUnits = LotSizeUnit::all(); // Fetch all lot size units
 
         // Fetch attachment types for the dropdown
         $this->attachmentLists = AwardeeAttachmentsList::all(); // Fetch all attachment lists
@@ -143,53 +139,67 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     protected function rules(): array
     {
         return [
-            // For Awarding Modal
+            'letterOfIntent' => 'required|file|max:10240',
+            'votersID' => 'required|file|max:10240',
+            'validID' => 'required|file|max:10240',
+            'certOfNoLandHolding' => 'required|file|max:10240',
+            'marriageCert' => 'nullable|file|max:10240',
+            'birthCert' => 'required|file|max:10240',
+            // Relocation rules
             'grant_date' => 'required|date',
             'relocation_lot_id' => 'required|exists:relocation_sites,id',
             'lot_size' => 'required|numeric',
-            'unit' => 'in:m²', // Matches what is set in mount
+            'unit' => 'in:m²',
         ];
     }
     public function awardApplicant(): void
     {
-        // Validate the input data
-        $this->validate();
+        DB::beginTransaction();
+        try {
+            // Validate the input data
+            $this->validate([
+                'grant_date' => 'required|date',
+                'relocation_lot_id' => 'required|exists:relocation_sites,id',
+                'lot_size' => 'required|numeric',
+                'unit' => 'in:m²',
+            ]);
 
-        // Create the new awardee record and get the ID of the newly created awardee
-        $awardee = Awardee::create([
-            'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
-            'relocation_lot_id' => $this->relocation_lot_id,
-            'lot_size' => $this->lot_size,
-            'unit' => $this->unit,
-            'grant_date' => $this->grant_date,
-            'is_awarded' => false, // Update awardee table for status tracking
-            'is_blacklisted' => false, // Update awardee table for status tracking
-            'documents_submitted' => false, // Add new state tracking
-        ]);
+            // Verify documents exist
+            $applicant = TaggedAndValidatedApplicant::findOrFail($this->taggedAndValidatedApplicantId);
+            if (!$applicant->documents->count()) {
+                throw new \Exception('Documents must be submitted before awarding.');
+            }
 
-        // Check if the awardee was created successfully
-        if ($awardee) {
-            $this->awardeeId = $awardee->id;
-            \Log::info('Awardee created successfully', ['awardeeId' => $this->awardeeId]);
-        } else {
-            \Log::error('Failed to create awardee');
+            // Create awardee record
+            $awardee = Awardee::create([
+                'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
+                'relocation_lot_id' => $this->relocation_lot_id,
+                'lot_size' => $this->lot_size,
+                'unit' => $this->unit,
+                'grant_date' => $this->grant_date,
+                'documents_submitted' => true,
+                'is_awarded' => true,
+                'is_blacklisted' => false,
+            ]);
+
+            // Update applicant status
+            $applicant->update([
+                'is_awarding_on_going' => true,
+            ]);
+
+            DB::commit();
+
+            $this->dispatch('alert', [
+                'title' => 'Award Complete!',
+                'message' => 'Applicant has been successfully awarded. <br><small>'. now()->calendar() .'</small>',
+                'type' => 'success'
+            ]);
+
+            $this->redirect('transaction-request');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->handleError('Failed to complete award process', $e);
         }
-
-        // Update the 'tagged_and_validated_applicants' table
-        TaggedAndValidatedApplicant::where('id', $this->taggedAndValidatedApplicantId)->update([
-            'is_awarding_on_going' => true,
-        ]);
-
-        $this->resetForm();
-
-        // Trigger the alert message
-        $this->dispatch('alert', [
-            'title' => 'Awarding Pending!',
-            'message' => 'Applicant needs to submit necessary requirements.',
-            'type' => 'warning'
-        ]);
-
-        $this->redirect('transaction-request');
     }
     public function resetForm(): void
     {
@@ -222,15 +232,14 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         DB::beginTransaction();
         try {
-            // We don't need to check for awardeeId anymore since we're using applicant_id
-            logger()->info('Starting submission for applicant', [
+            logger()->info('Starting document submission for applicant', [
                 'applicant_id' => $this->taggedAndValidatedApplicantId,
             ]);
 
             $this->isFilePonduploading = false;
 
-            // Validate inputs
-            $validatedData = $this->validate([
+            // Validate and store documents
+            $this->validate([
                 'letterOfIntent' => 'required|file|max:10240',
                 'votersID' => 'required|file|max:10240',
                 'validID' => 'required|file|max:10240',
@@ -239,25 +248,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'birthCert' => 'required|file|max:10240',
             ]);
 
-            logger()->info('Validation passed', $validatedData);
-
-            // Process the file
-
-            // Store files and create document records per attachment
+            // Store each document
             $this->storeAttachment('letterOfIntent', 1);
             $this->storeAttachment('votersID', 2);
             $this->storeAttachment('validID', 3);
             $this->storeAttachment('certOfNoLandHolding', 4);
             $this->storeAttachment('marriageCert', 5);
             $this->storeAttachment('birthCert', 6);
-
-            // Update the applicant's status or related awardee if exists
-            $applicant = TaggedAndValidatedApplicant::find($this->taggedAndValidatedApplicantId);
-            if ($applicant->awardees()->exists()) {
-                $applicant->awardees()->first()->update([
-                    'documents_submitted' => true,
-                ]);
-            }
 
             DB::commit();
 
@@ -270,15 +267,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $this->redirect('transaction-request');
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error('Submission failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->dispatch('alert', [
-                'title' => 'Failed!',
-                'message' => 'Submission of requirements failed. Please try again. <br><small>'. now()->calendar() .'</small>',
-                'type' => 'danger'
-            ]);
+            $this->handleError('Document submission failed', $e);
         }
     }
     /**
@@ -299,57 +288,53 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'file_type' => $file->extension(),
                 'file_size' => $file->getSize(),
             ]);
+        }
+    }
 
-//            logger()->info('Searching for awardee with ID', ['id' => $this->awardeeId]);
-//
-//            $awardee = Awardee::findOrFail($this->awardeeId);
-//
-//            logger()->info('Found awardee', [
-//                'awardee_id' => $awardee->id,
-//                'tagged_and_validated_applicant_id' => $awardee->tagged_and_validated_applicant_id
+    public function exportCertificate($applicantId)
+    {
+        try {
+            // Find the awardee directly
+            $awardee = Awardee::where('tagged_and_validated_applicant_id', $applicantId)
+                ->where('is_awarded', true)
+                ->firstOrFail();
+
+            // Generate the certificate
+//            $pdf = PDF::loadView('pdfs.awarding-certificate', [
+//                'awardee' => $awardee,
+//                'applicant' => $awardee->taggedAndValidatedApplicant->applicant
 //            ]);
 //
-//            $awardee->update(['is_awarded' => true]);
-        }
-    }
-    public function completeAward()
-    {
-        DB::beginTransaction();
-        try {
-            $awardee = Awardee::findOrFail($this->awardeeId);
+//            // Return the PDF for download
+//            return $pdf->download('Award_Certificate_' . $applicantId . '.pdf');
 
-            // Verify documents are submitted before completing award
-            if (!$awardee->documents_submitted) {
-                throw new \Exception('Documents must be submitted before completing the award process.');
-            }
-            $awardee->update([
-                'is_awarded' => true
-            ]);
+            $html = view('pdfs.awarding-certificate', [
+                'awardee' => $awardee,
+               'applicant' => $awardee->taggedAndValidatedApplicant->applicant
+            ])->render();
 
-            DB::commit();
+            // Load the PDF with the generated HTML
+            $pdf = Pdf::loadHTML($html);
+            $pdf->setPaper('legal', 'portrait');
 
-            $this->dispatch('alert', [
-                'title' => 'Award Completed!',
-                'message' => 'Applicant has been successfully awarded. <br><small>'. now()->calendar() .'</small>',
-                'type' => 'success'
-            ]);
-
-            $this->redirect('transaction-request');
+            // Stream the PDF for download
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->stream();
+            }, 'Award_Certificate_' . $applicantId . '.pdf');
         } catch (\Exception $e) {
-            DB::rollBack();
-            $this->handleError('Failed to complete award process: ' . $e->getMessage());
+            $this->handleError('Failed to export certificate: ' . $e->getMessage());
         }
     }
+
     private function handleError(string $message, \Exception $e = null): void
     {
         if ($e) {
-            logger()->error('Document submission failed', [
+            logger()->error($message, [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-        } else {
-            logger()->error('Document submission failed', ['error' => $message]);
         }
+
         $this->dispatch('alert', [
             'title' => 'Error',
             'message' => $message,
@@ -385,7 +370,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'applicant.address.barangay',
             'applicant.transactionType',
             'livingSituation',
-            'caseSpecification'
+            'caseSpecification',
         ]);
         // Apply search filter
         if ($this->search) {
