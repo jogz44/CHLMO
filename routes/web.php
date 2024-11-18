@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\IndexController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Shelter\ShelterIndexController;
 use App\Http\Controllers\Admin\PermissionCOntroller;
 use App\Http\Controllers\Admin\RoleController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\PurokController;
 use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
 use App\Livewire\GranteeDetails;
+use App\Livewire\PermissionsManager;
 use App\Livewire\ShelterApplicantDetails;
 use App\Livewire\ProfiledTaggedApplicantDetails;
 use App\Livewire\TaggedAndValidatedApplicantDetails;
@@ -47,13 +49,17 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // GET Requests
-//    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-//    Route::get('/get-puroks/{barangay}', [PurokController::class, 'getPuroks']);
-
     Route::get('/activity-logs', function () {
         return view('activity-logs');
     })->name('activity-logs');
+
+//    Route::get('/permissions', PermissionsManager::class)
+//        ->name('permissions');
+//    Route::get('/permissions', PermissionsManager::class)
+//        ->middleware(['auth', 'can:manage permissions']);
+    Route::get('/user-role-management', function () {
+        return view('user-role-management');
+    })->name('user-role-management');
 
     Route::get('/applicant-details/{applicantId}', ApplicantDetails::class)->name('applicant-details');
 
@@ -134,10 +140,13 @@ Route::middleware([
         return view('system-configuration');
     })->name('system-configuration');
 
-    //shelter assistance program
+//    shelter assistance program
     Route::get('/shelter-dashboard', function () {
         return view('shelter-dashboard');
     })->name('shelter-dashboard');
+//    Route::middleware(['role.shelterAdmin'])->get('/shelter-dashboard', function () {
+//        return view('shelter-dashboard');
+//    })->name('shelter-dashboard');
 
     Route::get('/shelter-transaction-applicants', function () {
         return view('shelter-transaction-applicants');
@@ -200,8 +209,6 @@ Route::middleware([
     Route::get('/shelter-system-configuration', function () {
         return view('shelter-system-configuration');
     })->name('shelter-system-configuration');
-
-    
 });
 
 
@@ -235,7 +242,7 @@ Route::middleware([
 // Shelter Admin routes
 Route::middleware([
     'auth:web', // Session-based authentication via web guard
-    'role:ShelterAdmin', // Spatie permission middleware to check if the user has the 'admin' role
+    'role:ShelterAdmin', // Spatie permission middleware to check if the user has the 'ShelterAdmin' role
     'verified', // Ensures the user has verified their email
 ])->name('shelter-admin.')->prefix('shelter-admin')->group(function () {
     Route::get('/', [ShelterIndexController::class, 'index'])->name('index');

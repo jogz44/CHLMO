@@ -51,7 +51,12 @@ export default {
                 'custom-yellow': '#FFBF00',
                 'iroad-green': '#6AA76F',
                 'iroad-orange': '#FF9100',
-                'custom-green-light': 'rgba(163, 214, 163, 0.5)'
+                'custom-green-light': 'rgba(163, 214, 163, 0.5)',
+                'custom-blue': '#007AFF',
+                'custom-purple': '#5856D6',
+                'custom-dark-purple': '#4B4EC1',
+                'custom-orange': '#FF9500',
+                'custom-dark-orange': '#E58800',
             },
             fontSize: {
                 xxs: [

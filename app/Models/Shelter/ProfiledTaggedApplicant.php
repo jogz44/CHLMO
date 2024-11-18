@@ -9,8 +9,9 @@ use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Shelter\ShelterLiveInPartner;
-use App\Models\Religion;
-use App\Models\Tribe;
+use App\Models\Purok;
+use App\Models\Barangay;
+use App\Models\StructureStatusType;
 use App\Models\Shelter\OriginOfRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,19 +32,21 @@ class ProfiledTaggedApplicant extends Model
         'request_origin_id',
         'age',
         'civil_status_id',
-        'religion_id',
+        'religion',
         'address_id',
         'government_program_id',
-        'tribe_id',
+        'tribe',
         'living_situation_id',
         'case_specification_id',
         'living_situation_case_specification',
         'sex',
+        'full_address',
         'occupation',
         'year_of_residency',
         'contact_number',
         'date_tagged',
         'remarks',
+        'structure_status_id',
         'is_tagged',
         'first_name',
         'middle_name',
@@ -63,11 +66,9 @@ class ProfiledTaggedApplicant extends Model
         'age' => 'integer',
         'civil_status_id' => 'integer',
         'request_origin_id' => 'integer',
-        'religion_id' => 'integer',
         'address_id' => 'integer',
         'government_program_id' => 'integer',
         'year_of_residency' => 'integer',
-        'tribe_id' => 'integer',
         'date_tagged' => 'date',
     ];
 
@@ -79,21 +80,21 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(CivilStatus::class);
     }
-    public function religion(): BelongsTo
-    {
-        return $this->belongsTo(Religion::class);
-    }
     public function address()
     {
         return $this->belongsTo(Address::class, 'address_id');
+    }
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class, 'barangay_id');
     }
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
     }
-    public function tribe(): BelongsTo
+    public function purok()
     {
-        return $this->belongsTo(Tribe::class);
+        return $this->belongsTo(Purok::class, 'purok_id');
     }
     // Relationship with LivingSituation
     public function livingSituation(): BelongsTo
@@ -118,8 +119,25 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(OriginOfRequest::class, 'request_origin_id', 'id');
     }
+    public function structureStatus(): BelongsTo
+    {
+        return $this->belongsTo(StructureStatusType::class);
+    }
     public function grantees(): HasMany
     {
         return $this->hasMany(Grantee::class);
+    }
+    public function photo()
+    {
+        return $this->hasMany(ShelterImagesForHousing::class, 'profiled_tagged_applicant_id');
+    }
+    public function images()
+    {
+        return $this->hasMany(ShelterImagesForHousing::class, 'profiled_tagged_applicant_id');
+    }
+    // In ProfiledTaggedApplicant model
+    public function granteeDocumentsSubmission()
+    {
+        return $this->hasMany(GranteeDocumentsSubmission::class, 'profiled_tagged_applicant_id');
     }
 }

@@ -33,9 +33,9 @@
             <div class="flex flex-col p-3 rounded mt-11">
                 <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $profiledTaggedApplicant->shelterApplicant->profile_no }}</h2>
                 <h1 class="text-[25px] items-center font-bold text-gray-700">
-                    {{ $profiledTaggedApplicant->shelterApplicant->first_name }}
-                    @if($profiledTaggedApplicant->shelterApplicant->middle_name) {{ substr($profiledTaggedApplicant->shelterApplicant->middle_name, 0, 1) }}. @endif
-                    {{ $profiledTaggedApplicant->shelterApplicant->last_name }}
+                    {{ $profiledTaggedApplicant->shelterApplicant->person->first_name }}
+                    @if($profiledTaggedApplicant->shelterApplicant->person->middle_name) {{ substr($profiledTaggedApplicant->shelterApplicant->person->middle_name, 0, 1) }}. @endif
+                    {{ $profiledTaggedApplicant->shelterApplicant->person->last_name }}
                 </h1>
             </div>
 
@@ -123,12 +123,32 @@
 
                 <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="age" class="block text-[12px] font-medium text-gray-700 mb-1">AGE</label>
                             <input type="number" id="age" name="age" :disabled="!isEditable" wire:model="age"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
-                        <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="civil_status_id" class="block text-[12px] font-semibold text-gray-700 mb-1">CIVIL STATUS</label>
+                            @if($isEditing)
+                            <select wire:model="civil_status_id"
+                                id="civil_status_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($civilStatuses as $status)
+                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
+                                @endforeach
+                            </select>
+                            @else
+                            <input type="text"
+                                value="{{ $profiledTaggedApplicant->civilStatus->civil_status }}"
+                                disabled
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            @endif
+                            @error('civil_status_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="sex" class="block text-[12px] font-semibold text-gray-700 mb-1">SEX</label>
                             <div class="flex items-center">
                                 @if($isEditing)
@@ -152,56 +172,6 @@
                             </div>
                         </div>
 
-                    </div>
-                    <div class="flex flex-wrap -mx-2">
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                OCCUPATION
-                            </label>
-                            <input wire:model="occupation"
-                                type="text"
-                                id="occupation"
-                                @disabled(!$isEditing)
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                oninput="capitalizeInput(this)">
-                            @error('occupation')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="year_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                YEARS OF RESIDENCY
-                            </label>
-                            <input wire:model="year_of_residency"
-                                type="number"
-                                id="year_of_residency"
-                                @disabled(!$isEditing)
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                oninput="capitalizeInput(this)">
-                            @error('year_of_residency')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="civil_status_id" class="block text-[12px] font-semibold text-gray-700 mb-1">CIVIL STATUS</label>
-                            @if($isEditing)
-                            <select wire:model="civil_status_id"
-                                id="civil_status_id"
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($civilStatuses as $status)
-                                <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
-                                @endforeach
-                            </select>
-                            @else
-                            <input type="text"
-                                value="{{ $profiledTaggedApplicant->civilStatus->civil_status }}"
-                                disabled
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @endif
-                            @error('civil_status_id')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
                     </div>
 
                     @if ($civil_status_id == $liveInPartnerStatusId)
@@ -275,25 +245,71 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="religion"
-                                class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                RELIGION
+                            <label for="occupation" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                OCCUPATION
+                            </label>
+                            <input wire:model="occupation"
+                                type="text"
+                                id="occupation"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('occupation')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="year_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                YEARS OF RESIDENCY
+                            </label>
+                            <input wire:model="year_of_residency"
+                                type="number"
+                                id="year_of_residency"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('year_of_residency')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="govAssistance" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                SOCIAL WELFARE SECTOR
                             </label>
                             @if($isEditing)
-                            <select wire:model="religion_id"
-                                id="religion_id"
-                                class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($religions as $religion)
-                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                            <select wire:model="government_program_id"
+                                id="government_program_id"
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
+                                @foreach($governmentPrograms as $governmentProgram)
+                                <option value="{{ $governmentProgram->id }}">{{ $governmentProgram->program_name }}</option>
                                 @endforeach
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTaggedApplicant->religion->religion_name }}"
+                                value="{{ $profiledTaggedApplicant->governmentProgram->program_name }}"
                                 disabled
-                                class="uppercase w-full p-1 border-b text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
-                            @error('religion_id')
+                            @error('government_program_id')
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="w-full md:w-1/3 px-2 mb-4">
+                            <label for="religion"
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">
+                                RELIGION
+                            </label>
+                            <input wire:model="religion"
+                                type="text"
+                                id="religion"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('religion')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
@@ -301,21 +317,13 @@
                             <label for="tribe" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 TRIBE/ETHNICITY
                             </label>
-                            @if($isEditing)
-                            <select wire:model="tribe_id"
-                                id="tribe_id"
-                                class="uppercase w-full p-1 border text-[12px] bg-white border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($tribes as $tribe)
-                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                @endforeach
-                            </select>
-                            @else
-                            <input type="text"
-                                value="{{ $profiledTaggedApplicant->tribe->tribe_name }}"
-                                disabled
-                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                            @endif
-                            @error('tribe_id')
+                            <input wire:model="tribe"
+                                type="text"
+                                id="tribe"
+                                @disabled(!$isEditing)
+                                class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                oninput="capitalizeInput(this)">
+                            @error('tribe')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
@@ -391,33 +399,35 @@
                                 @disabled(!$isEditing)
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                 oninput="capitalizeInput(this)">
-                            @error('full-address')
+                            @error('full_address')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="govAssistance" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                SOCIAL WELFARE SECTOR
+                            <label for="structure_status_id"
+                                class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
                             </label>
                             @if($isEditing)
-                            <select wire:model="government_program_id"
-                                id="government_program_id"
+                            <select wire:model="structure_status_id"
+                                id="structure_status_id"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
-                                @foreach($governmentPrograms as $governmentProgram)
-                                <option value="{{ $governmentProgram->id }}">{{ $governmentProgram->program_name }}</option>
+                                @foreach($structureStatuses as $structureStatus)
+                                <option value="{{ $structureStatus->id }}">{{ $structureStatus->structure_status }}</option>
                                 @endforeach
                             </select>
                             @else
                             <input type="text"
-                                value="{{ $profiledTaggedApplicant->governmentProgram->program_name }}"
+                                value="{{ $profiledTaggedApplicant->structureStatus->structure_status }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
-                            @error('government_program_id')
+                            @error('structure_status_id')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
+
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">
@@ -515,45 +525,92 @@
                 </div>
                 <!-- Display images -->
                 <div class="bg-white p-6 rounded shadow mb-6">
-                    <!-- Image Grid -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                        @forelse($photo as $image)
-                        <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
-                            <img
-                                src="{{ asset('storage/' . $image->image_path) }}"
-                                alt="{{ $image->display_name }}"
-                                class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                {{ $image->display_name }}
+                    <div>
+                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">BEFORE</h2>
+                        <!-- Image Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                            @forelse($photo as $image)
+                            <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
+                                <img
+                                    src="{{ asset('storage/' . $image->image_path) }}"
+                                    alt="{{ $image->display_name }}"
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                    {{ $image->display_name }}
+                                </div>
+                            </div>
+                            @empty
+                            <div class="col-span-full text-center py-4 text-gray-500">
+                                No images available
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Modal -->
+                        @if($selectedImage)
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                                <div class="flex justify-end mb-2">
+                                    <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
+                                    alt="{{ $selectedImage->display_name }}"
+                                    class="max-w-full h-auto">
+                                <div class="mt-2 text-center text-gray-700">
+                                    {{ $selectedImage->display_name }}
+                                </div>
                             </div>
                         </div>
-                        @empty
-                        <div class="col-span-full text-center py-4 text-gray-500">
-                            No images available
-                        </div>
-                        @endforelse
+                        @endif
                     </div>
 
-                    <!-- Modal -->
-                    @if($selectedImage)
-                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
-                            <div class="flex justify-end mb-2">
-                                <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </button>
+                    <!-- Display images -->
+                    <div>
+                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">AFTER</h2>
+                        <!-- Image Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                            @forelse($images as $image)
+                            <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
+                                <img
+                                    src="{{ asset('storage/' . $image->image_path) }}"
+                                    alt="{{ $image->display_name }}"
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                    {{ $image->display_name }}
+                                </div>
                             </div>
-                            <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
-                                alt="{{ $selectedImage->display_name }}"
-                                class="max-w-full h-auto">
-                            <div class="mt-2 text-center text-gray-700">
-                                {{ $selectedImage->display_name }}
+                            @empty
+                            <div class="col-span-full text-center py-4 text-gray-500">
+                                No images available
+                            </div>
+                            @endforelse
+                        </div>
+
+                        <!-- Modal -->
+                        @if($selectedImage)
+                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                                <div class="flex justify-end mb-2">
+                                    <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
+                                    alt="{{ $selectedImage->display_name }}"
+                                    class="max-w-full h-auto">
+                                <div class="mt-2 text-center text-gray-700">
+                                    {{ $selectedImage->display_name }}
+                                </div>
                             </div>
                         </div>
+                        @endif
                     </div>
-                    @endif
                 </div>
             </form>
         </div>

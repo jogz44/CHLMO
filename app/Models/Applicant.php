@@ -13,40 +13,70 @@ class Applicant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'transaction_type_id', 'first_name', 'middle_name', 'last_name', 'suffix_name', 'contact_number', 'date_applied',
-        'initially_interviewed_by', 'address_id', 'applicant_id', 'is_tagged',
+        'applicant_id',
+        'person_id',
+        'user_id',
+        'transaction_type_id',
+        'address_id',
+        'date_applied',
+        'initially_interviewed_by',
+        'is_tagged',
     ];
 
     protected $casts = [
         'id' => 'integer',
+        'person_id' => 'integer',
         'user_id' => 'integer',
         'transaction_type_id' => 'integer',
         'date_applied' => 'date',
     ];
 
+//    public static function generateApplicantId(): string
+//    {
+//        $currentYear = Carbon::now()->year;
+//
+//        // Increment the count for the current year
+//        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+//
+//        // Format the ID: "YYYY-000XXX"
+//        $applicantId = sprintf('%d-%06d', $currentYear, $countForYear);
+//
+//        // Log the generated values for debugging
+//        logger()->info('Generating applicant ID', [
+//            'year' => $currentYear,
+//            'count' => $countForYear
+//        ]);
+//
+//        return $applicantId;
+//    }
     public static function generateApplicantId(): string
     {
         $currentYear = Carbon::now()->year;
 
-        // Increment the count for the current year
-        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+        // Use the same constant as defined in People model
+        $countForYear = ApplicantCounter::incrementCountForYear(
+            $currentYear,
+            ApplicantCounter::TYPE_HOUSING
+        );
 
         // Format the ID: "YYYY-000XXX"
         $applicantId = sprintf('%d-%06d', $currentYear, $countForYear);
 
-        // Log the generated values for debugging
         logger()->info('Generating applicant ID', [
             'year' => $currentYear,
-            'count' => $countForYear
+            'count' => $countForYear,
+            'type' => ApplicantCounter::TYPE_HOUSING
         ]);
 
         return $applicantId;
     }
-
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function person(): BelongsTo
+    {
+        return $this->belongsTo(People::class, 'person_id', 'id');
     }
 
     public function transactionType(): BelongsTo

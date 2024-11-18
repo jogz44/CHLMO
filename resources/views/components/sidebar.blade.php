@@ -12,27 +12,127 @@
             <nav class="space-y-2 mt-15 flex-1 text-[13px] h-[calc(100vh-4rem)] overflow-auto scrollbar-hidden" x-data="{
                     activeLink: localStorage.getItem('activeLink') || '',
                     activeChildLink: localStorage.getItem('activeChildLink') || ''}">
+                <div x-data="{ isDashboardOpen: false }">
+                    <!-- Main Dashboard Menu -->
+                    <a href="#" @click="isDashboardOpen = !isDashboardOpen; activeLink = 'dashboard'; localStorage.setItem('activeLink', 'dashboard')"
+                       :class="{ 'bg-[#D9D9D9] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'dashboard' }"
+                       class="mx-2 flex items-center justify-between py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d=""></path>
+                            </svg>
+                            <p class="ml-2">Dashboard</p>
+                        </div>
+                        <svg :class="{ 'transform rotate-180': isDashboardOpen }"
+                             class="w-4 h-4 transition-transform duration-200"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </a>
 
-                <a href="{{ route('dashboard') }}" @click="activeLink = 'dashboard'; activeChildLink = ''; localStorage.setItem('activeLink', 'dashboard'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'dashboard' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
-                        <path d="M 10.5 6 C 8.0324991 6 6 8.0324991 6 10.5 L 6 13.5 C 6 15.967501 8.0324991 18 10.5 18 L 18.5 18 C 20.967501 18 23 15.967501 23 13.5 L 23 10.5 C 23 8.0324991 20.967501 6 18.5 6 L 10.5 6 z M 29.5 6 C 27.032499 6 25 8.0324991 25 10.5 L 25 23.5 C 25 25.967501 27.032499 28 29.5 28 L 37.5 28 C 39.967501 28 42 25.967501 42 23.5 L 42 10.5 C 42 8.0324991 39.967501 6 37.5 6 L 29.5 6 z M 10.5 9 L 18.5 9 C 19.346499 9 20 9.6535009 20 10.5 L 20 13.5 C 20 14.346499 19.346499 15 18.5 15 L 10.5 15 C 9.6535009 15 9 14.346499 9 13.5 L 9 10.5 C 9 9.6535009 9.6535009 9 10.5 9 z M 29.5 9 L 37.5 9 C 38.346499 9 39 9.6535009 39 10.5 L 39 23.5 C 39 24.346499 38.346499 25 37.5 25 L 29.5 25 C 28.653501 25 28 24.346499 28 23.5 L 28 10.5 C 28 9.6535009 28.653501 9 29.5 9 z M 10.5 20 C 8.0324991 20 6 22.032499 6 24.5 L 6 37.5 C 6 39.967501 8.0324991 42 10.5 42 L 18.5 42 C 20.967501 42 23 39.967501 23 37.5 L 23 24.5 C 23 22.032499 20.967501 20 18.5 20 L 10.5 20 z M 10.5 23 L 18.5 23 C 19.346499 23 20 23.653501 20 24.5 L 20 37.5 C 20 38.346499 19.346499 39 18.5 39 L 10.5 39 C 9.6535009 39 9 38.346499 9 37.5 L 9 24.5 C 9 23.653501 9.6535009 23 10.5 23 z M 29.5 30 C 27.032499 30 25 32.032499 25 34.5 L 25 37.5 C 25 39.967501 27.032499 42 29.5 42 L 37.5 42 C 39.967501 42 42 39.967501 42 37.5 L 42 34.5 C 42 32.032499 39.967501 30 37.5 30 L 29.5 30 z M 29.5 33 L 37.5 33 C 38.346499 33 39 33.653501 39 34.5 L 39 37.5 C 39 38.346499 38.346499 39 37.5 39 L 29.5 39 C 28.653501 39 28 38.346499 28 37.5 L 28 34.5 C 28 33.653501 28.653501 33 29.5 33 z"></path>
-                    </svg>
-                    <p class="ml-2">Dashboard</p>
-                </a>
+                    <!-- Dashboard Submenus -->
+                    <div x-show="isDashboardOpen" x-transition class="ml-4">
+                        <!-- Housing Submenu -->
+                        @role('Admin')
+                            <!-- Housing menu will be shown for Housing System Admin only -->
+                            <a href="{{ route('dashboard') }}"
+                               @click="activeChildLink = 'dashboard';
+                               localStorage.setItem('activeChildLink', 'dashboard')"
+                               :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard' }"
+                               class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     class="w-5 h-5">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                </svg>
+                                <span class="ml-2">Housing</span>
+                            </a>
+                        @endrole
 
-                <a href="{{ route('applicants') }}" @click="activeLink = 'admin-applicants'; activeChildLink = ''; localStorage.setItem('activeLink', 'admin-applicants'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'admin-applicants' }" class="mx-2 flex items-center  py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100]">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
-                        <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 26.539062 44 C 26.189063 43.4 26 42.73 26 42 L 26 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 L 35.5 7 C 36.33 7 37 7.67 37 8.5 L 37 24 C 38.01 24 39.02 24.070938 40 24.210938 L 40 8.5 C 40 6.02 37.98 4 35.5 4 L 12.5 4 z M 24 10 A 3.5 3.5 0 1 0 24 17 A 3.5 3.5 0 1 0 24 10 z M 19.5 19 C 18.672 19 18 19.672 18 20.5 L 18 21.5 C 18 23.433 20.686 25 24 25 C 27.314 25 30 23.433 30 21.5 L 30 20.5 C 30 19.672 29.328 19 28.5 19 L 19.5 19 z M 37 26 C 32.029 26 28 27.791 28 30 C 28 32.209 32.029 34 37 34 C 41.971 34 46 32.209 46 30 C 46 27.791 41.971 26 37 26 z M 16.5 28 C 15.67 28 15 28.67 15 29.5 C 15 30.33 15.67 31 16.5 31 L 26 31 L 26 30 C 26 29.27 26.189063 28.6 26.539062 28 L 16.5 28 z M 28 33 L 28 36 C 28 38.21 32.03 40 37 40 C 41.97 40 46 38.21 46 36 L 46 33 C 46 35.21 41.97 37 37 37 C 32.03 37 28 35.21 28 33 z M 16.5 34 C 15.67 34 15 34.67 15 35.5 C 15 36.33 15.67 37 16.5 37 L 26 37 L 26 34 L 16.5 34 z M 28 39 L 28 42 C 28 44.21 32.03 46 37 46 C 41.97 46 46 44.21 46 42 L 46 39 C 46 41.21 41.97 43 37 43 C 32.03 43 28 41.21 28 39 z"></path>
-                    </svg>
-                    <p class="ml-2">Applicants</p>
-                </a>
+                        <!-- Shelter Submenu will be hidden for Housing System Admin role -->
+{{--                        @role('ShelterAdmin')--}}
+{{--                            <a href="{{ route('shelter-dashboard') }}"--}}
+{{--                               @click="activeChildLink = 'shelter-dashboard';--}}
+{{--                                localStorage.setItem('activeChildLink', 'shelter-dashboard')"--}}
+{{--                               :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'shelter-dashboard' }"--}}
+{{--                               class="flex items-center py-2 px-4 hover:text-[#FF9100]">--}}
+{{--                                <svg xmlns="http://www.w3.org/2000/svg"--}}
+{{--                                     fill="none"--}}
+{{--                                     viewBox="0 0 24 24"--}}
+{{--                                     stroke="currentColor"--}}
+{{--                                     stroke-width="2"--}}
+{{--                                     class="w-5 h-5">--}}
+{{--                                    <path stroke-linecap="round"--}}
+{{--                                          stroke-linejoin="round"--}}
+{{--                                          d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />--}}
+{{--                                </svg>--}}
+{{--                                <span class="ml-2">Shelter</span>--}}
+{{--                            </a>--}}
+{{--                        @endrole--}}
 
-                <a href="{{ route('transaction-request') }}" @click="activeLink = 'admin-transactions-request'; activeChildLink = ''; localStorage.setItem('activeLink', 'admin-transactions-request'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[rgb(217,217,217)] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'admin-transactions-request' }" class="mx-2 flex items-center text-[12px] py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100] ">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
-                        <path d="M 24 5.0273438 C 22.851301 5.0273438 21.70304 5.4009945 20.753906 6.1484375 A 1.50015 1.50015 0 0 0 20.658203 6.2304688 L 4.5546875 21.255859 C 2.8485365 22.847233 2.8013499 25.586506 4.4511719 27.236328 C 6.036957 28.822113 8.6399476 28.853448 10.261719 27.304688 A 1.50015 1.50015 0 0 0 10.265625 27.300781 L 24.003906 14.085938 L 37.734375 27.298828 A 1.50015 1.50015 0 0 0 37.738281 27.302734 C 39.359795 28.852802 41.963043 28.824063 43.548828 27.238281 C 45.19865 25.588459 45.151465 22.849186 43.445312 21.257812 L 27.341797 6.2304688 A 1.50015 1.50015 0 0 0 27.246094 6.1484375 C 26.296957 5.4009942 25.148699 5.0273438 24 5.0273438 z M 24 8.0195312 C 24.485694 8.0195312 24.970178 8.1837987 25.378906 8.5019531 L 41.400391 23.451172 C 41.89424 23.911798 41.905915 24.63901 41.427734 25.117188 C 40.971519 25.573401 40.277033 25.580696 39.810547 25.134766 L 25.044922 10.923828 A 1.50015 1.50015 0 0 0 22.964844 10.923828 L 8.1894531 25.134766 C 7.723224 25.580006 7.0284805 25.571449 6.5722656 25.115234 C 6.0940876 24.637056 6.1057604 23.909845 6.5996094 23.449219 L 22.621094 8.5019531 C 23.029822 8.1837987 23.514306 8.0195312 24 8.0195312 z M 7.4765625 30.978516 A 1.50015 1.50015 0 0 0 6 32.5 L 6 33.5 A 1.50015 1.50015 0 1 0 9 33.5 L 9 32.5 A 1.50015 1.50015 0 0 0 7.4765625 30.978516 z M 40.476562 30.978516 A 1.50015 1.50015 0 0 0 39 32.5 L 39 33.5 A 1.50015 1.50015 0 1 0 42 33.5 L 42 32.5 A 1.50015 1.50015 0 0 0 40.476562 30.978516 z M 40.322266 38.175781 L 39.222656 38.851562 L 38.990234 39.515625 L 38.980469 39.607422 L 38.955078 39.693359 L 38.908203 39.777344 L 38.849609 39.849609 L 38.777344 39.908203 L 38.666016 39.96875 L 37.90625 41.013672 L 38.238281 42.259766 L 39.417969 42.787109 L 40.095703 42.605469 L 40.333984 42.476562 L 40.572266 42.316406 L 40.869141 42.072266 L 41.072266 41.869141 L 41.316406 41.572266 L 41.476562 41.333984 L 41.662109 40.994141 L 41.775391 40.722656 L 41.892578 40.347656 L 41.951172 40.052734 L 41.976562 39.816406 L 41.539062 38.601562 L 40.322266 38.175781 z M 6.9433594 38.275391 L 6.0722656 39.228516 L 6.03125 39.929688 L 6.0976562 40.302734 L 6.1738281 40.576172 L 6.3046875 40.921875 L 6.4277344 41.171875 L 6.6191406 41.482422 L 6.7832031 41.701172 L 7.0273438 41.972656 L 7.2265625 42.15625 L 7.515625 42.378906 L 7.7480469 42.525391 L 7.9355469 42.621094 L 9.2246094 42.658203 L 10.066406 41.677734 L 9.8339844 40.408203 L 9.3007812 39.951172 L 9.2382812 39.919922 L 9.1621094 39.861328 L 9.1054688 39.798828 L 9.0566406 39.71875 L 9.0273438 39.638672 L 8.984375 39.402344 L 8.2324219 38.353516 L 6.9433594 38.275391 z M 14.75 40 L 13.583984 40.554688 L 13.283203 41.810547 L 14.066406 42.835938 L 14.75 43 L 16.804688 43 L 17.970703 42.445312 L 18.273438 41.189453 L 17.488281 40.164062 L 16.804688 40 L 14.75 40 z M 22.970703 40 L 21.806641 40.554688 L 21.503906 41.810547 L 22.289062 42.835938 L 22.970703 43 L 25.027344 43 L 26.191406 42.445312 L 26.494141 41.189453 L 25.710938 40.164062 L 25.027344 40 L 22.970703 40 z M 31.193359 40 L 30.027344 40.554688 L 29.726562 41.810547 L 30.509766 42.835938 L 31.193359 43 L 33.248047 43 L 34.414062 42.445312 L 34.716797 41.189453 L 33.931641 40.164062 L 33.248047 40 L 31.193359 40 z"></path>
-                    </svg>
-                    <p class="ml-2">Tagged/Validated</p>
-                </a>
+                        <!-- User Management Submenu -->
+
+                            <a href="{{ route('dashboard') }}" @click="activeChildLink = 'dashboard'; localStorage.setItem('activeChildLink', 'dashboard')"
+                               :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard' }"
+                               class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     class="w-5 h-5">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                </svg>
+                                <span class="ml-2">Housing</span>
+                            </a>
+                            <a href="{{ route('shelter-dashboard') }}"
+                               @click="activeChildLink = 'shelter-dashboard';
+                                    localStorage.setItem('activeChildLink', 'shelter-dashboard')"
+                               :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'shelter-dashboard' }"
+                               class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     class="w-5 h-5">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
+                                </svg>
+                                <span class="ml-2">Shelter</span>
+                            </a>
+                            <a href="{{ route('user-role-management') }}"
+                               @click="activeChildLink = 'user-role-management';
+                               localStorage.setItem('activeChildLink', 'user-role-management')"
+                               :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'user-role-management' }"
+                               class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none"
+                                     viewBox="0 0 24 24"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     class="w-5 h-5">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                                </svg>
+                                <span class="ml-2">User Management</span>
+                            </a>
+                    </div>
+                </div>
 
                 <a href="{{ route('masterlist-applicants') }}" @click="activeLink = 'applicants'; activeChildLink = ''; localStorage.setItem('activeLink', 'applicants'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'applicants' }" class="mx-2 flex items-center  py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100]">
 
@@ -41,12 +141,89 @@
                     </svg>
                     <p class="ml-2">Masterlist of Applicants</p>
                 </a>
-                <a href="{{ route('awardee-list') }}" @click="activeLink = 'awardee'; activeChildLink = ''; localStorage.setItem('activeLink', 'awardee'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'awardee' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
-                        <path d="M 21 4 C 15.494917 4 11 8.494921 11 14 C 11 19.505079 15.494917 24 21 24 C 26.505083 24 31 19.505079 31 14 C 31 8.494921 26.505083 4 21 4 z M 21 7 C 24.883764 7 28 10.116238 28 14 C 28 17.883762 24.883764 21 21 21 C 17.116236 21 14 17.883762 14 14 C 14 10.116238 17.116236 7 21 7 z M 35 24 C 28.925 24 24 28.925 24 35 C 24 41.075 28.925 46 35 46 C 41.075 46 46 41.075 46 35 C 46 28.925 41.075 24 35 24 z M 9.5 28 C 7.02 28 5 30.02 5 32.5 L 5 33.699219 C 5 39.479219 12.03 44 21 44 C 22.49 44 23.929062 43.870859 25.289062 43.630859 C 24.549063 42.800859 23.910391 41.880859 23.400391 40.880859 C 22.630391 40.960859 21.83 41 21 41 C 12.97 41 8 37.209219 8 33.699219 L 8 32.5 C 8 31.67 8.67 31 9.5 31 L 22.630859 31 C 22.970859 29.93 23.450781 28.93 24.050781 28 L 9.5 28 z M 35 28 C 35.48 28 35.908453 28.305766 36.064453 28.759766 L 37.177734 32 L 40.875 32 C 41.358 32 41.787406 32.308625 41.941406 32.765625 C 42.095406 33.223625 41.939687 33.729484 41.554688 34.021484 L 38.560547 36.292969 L 39.574219 39.539062 C 39.720219 40.005063 39.548391 40.510969 39.150391 40.792969 C 38.955391 40.930969 38.727 41 38.5 41 C 38.263 41 38.025172 40.925391 37.826172 40.775391 L 35 38.660156 L 32.173828 40.775391 C 31.783828 41.068391 31.248609 41.076922 30.849609 40.794922 C 30.451609 40.512922 30.279781 40.005063 30.425781 39.539062 L 31.439453 36.294922 L 28.445312 34.021484 C 28.060312 33.729484 27.904594 33.225578 28.058594 32.767578 C 28.213594 32.309578 28.642 32 29.125 32 L 32.822266 32 L 33.935547 28.759766 C 34.091547 28.305766 34.52 28 35 28 z"></path>
-                    </svg>
-                    <p class="ml-2">Awardee List</p>
-                </a>
+
+                <div x-data="{ isApplicationsOpen: false }">
+                    <!-- Applications Menu -->
+                    <a href="#" @click="isApplicationsOpen = !isApplicationsOpen; activeLink = 'applications'; localStorage.setItem('activeLink', 'applications')"
+                       :class="{ 'bg-[#D9D9D9] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'applications' }"
+                       class="mx-2 flex items-center justify-between py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d=""></path>
+                            </svg>
+                            <p class="ml-2">Applications</p>
+                        </div>
+                        <svg :class="{ 'transform rotate-180': isApplicationsOpen }"
+                             class="w-4 h-4 transition-transform duration-200"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </a>
+
+                    <!-- Applications Submenus -->
+                    <div x-show="isApplicationsOpen" x-transition class="ml-4">
+                        <!-- Applicants -->
+                        <a href="{{ route('applicants') }}"
+                           @click="activeChildLink = 'admin-applicants'; localStorage.setItem('activeChildLink', 'admin-applicants')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'admin-applicants' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 26.539062 44 C 26.189063 43.4 26 42.73 26 42 L 26 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 L 35.5 7 C 36.33 7 37 7.67 37 8.5 L 37 24 C 38.01 24 39.02 24.070938 40 24.210938 L 40 8.5 C 40 6.02 37.98 4 35.5 4 L 12.5 4 z M 24 10 A 3.5 3.5 0 1 0 24 17 A 3.5 3.5 0 1 0 24 10 z M 19.5 19 C 18.672 19 18 19.672 18 20.5 L 18 21.5 C 18 23.433 20.686 25 24 25 C 27.314 25 30 23.433 30 21.5 L 30 20.5 C 30 19.672 29.328 19 28.5 19 L 19.5 19 z M 37 26 C 32.029 26 28 27.791 28 30 C 28 32.209 32.029 34 37 34 C 41.971 34 46 32.209 46 30 C 46 27.791 41.971 26 37 26 z M 16.5 28 C 15.67 28 15 28.67 15 29.5 C 15 30.33 15.67 31 16.5 31 L 26 31 L 26 30 C 26 29.27 26.189063 28.6 26.539062 28 L 16.5 28 z M 28 33 L 28 36 C 28 38.21 32.03 40 37 40 C 41.97 40 46 38.21 46 36 L 46 33 C 46 35.21 41.97 37 37 37 C 32.03 37 28 35.21 28 33 z M 16.5 34 C 15.67 34 15 34.67 15 35.5 C 15 36.33 15.67 37 16.5 37 L 26 37 L 26 34 L 16.5 34 z M 28 39 L 28 42 C 28 44.21 32.03 46 37 46 C 41.97 46 46 44.21 46 42 L 46 39 C 46 41.21 41.97 43 37 43 C 32.03 43 28 41.21 28 39 z"></path>
+                            </svg>
+                            <span class="ml-2">Applicants</span>
+                        </a>
+
+                        <!-- Tagged/Validated -->
+                        <a href="{{ route('transaction-request') }}"
+                           @click="activeChildLink = 'admin-transactions-request'; localStorage.setItem('activeChildLink', 'admin-transactions-request')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'admin-transactions-request' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 24 5.0273438 C 22.851301 5.0273438 21.70304 5.4009945 20.753906 6.1484375 A 1.50015 1.50015 0 0 0 20.658203 6.2304688 L 4.5546875 21.255859 C 2.8485365 22.847233 2.8013499 25.586506 4.4511719 27.236328 C 6.036957 28.822113 8.6399476 28.853448 10.261719 27.304688 A 1.50015 1.50015 0 0 0 10.265625 27.300781 L 24.003906 14.085938 L 37.734375 27.298828 A 1.50015 1.50015 0 0 0 37.738281 27.302734 C 39.359795 28.852802 41.963043 28.824063 43.548828 27.238281 C 45.19865 25.588459 45.151465 22.849186 43.445312 21.257812 L 27.341797 6.2304688 A 1.50015 1.50015 0 0 0 27.246094 6.1484375 C 26.296957 5.4009942 25.148699 5.0273438 24 5.0273438 z M 24 8.0195312 C 24.485694 8.0195312 24.970178 8.1837987 25.378906 8.5019531 L 41.400391 23.451172 C 41.89424 23.911798 41.905915 24.63901 41.427734 25.117188 C 40.971519 25.573401 40.277033 25.580696 39.810547 25.134766 L 25.044922 10.923828 A 1.50015 1.50015 0 0 0 22.964844 10.923828 L 8.1894531 25.134766 C 7.723224 25.580006 7.0284805 25.571449 6.5722656 25.115234 C 6.0940876 24.637056 6.1057604 23.909845 6.5996094 23.449219 L 22.621094 8.5019531 C 23.029822 8.1837987 23.514306 8.0195312 24 8.0195312 z"></path>
+                            </svg>
+                            <span class="ml-2">Tagged/Validated</span>
+                        </a>
+
+                        <!-- Awardee List -->
+                        <a href="{{ route('awardee-list') }}"
+                           @click="activeChildLink = 'awardee'; localStorage.setItem('activeChildLink', 'awardee')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'awardee' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 21 4 C 15.494917 4 11 8.494921 11 14 C 11 19.505079 15.494917 24 21 24 C 26.505083 24 31 19.505079 31 14 C 31 8.494921 26.505083 4 21 4 z M 21 7 C 24.883764 7 28 10.116238 28 14 C 28 17.883762 24.883764 21 21 21 C 17.116236 21 14 17.883762 14 14 C 14 10.116238 17.116236 7 21 7 z M 35 24 C 28.925 24 24 28.925 24 35 C 24 41.075 28.925 46 35 46 C 41.075 46 46 41.075 46 35 C 46 28.925 41.075 24 35 24 z M 9.5 28 C 7.02 28 5 30.02 5 32.5 L 5 33.699219 C 5 39.479219 12.03 44 21 44 C 22.49 44 23.929062 43.870859 25.289062 43.630859 C 24.549063 42.800859 23.910391 41.880859 23.400391 40.880859 C 22.630391 40.960859 21.83 41 21 41 C 12.97 41 8 37.209219 8 33.699219 L 8 32.5 C 8 31.67 8.67 31 9.5 31 L 22.630859 31 C 22.970859 29.93 23.450781 28.93 24.050781 28 L 9.5 28 z"></path>
+                            </svg>
+                            <span class="ml-2">Awardee List</span>
+                        </a>
+                    </div>
+                </div>
+
+
+{{--                <a href="{{ route('applicants') }}" @click="activeLink = 'admin-applicants'; activeChildLink = ''; localStorage.setItem('activeLink', 'admin-applicants'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'admin-applicants' }" class="mx-2 flex items-center  py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100]">--}}
+{{--                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">--}}
+{{--                        <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 26.539062 44 C 26.189063 43.4 26 42.73 26 42 L 26 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 L 35.5 7 C 36.33 7 37 7.67 37 8.5 L 37 24 C 38.01 24 39.02 24.070938 40 24.210938 L 40 8.5 C 40 6.02 37.98 4 35.5 4 L 12.5 4 z M 24 10 A 3.5 3.5 0 1 0 24 17 A 3.5 3.5 0 1 0 24 10 z M 19.5 19 C 18.672 19 18 19.672 18 20.5 L 18 21.5 C 18 23.433 20.686 25 24 25 C 27.314 25 30 23.433 30 21.5 L 30 20.5 C 30 19.672 29.328 19 28.5 19 L 19.5 19 z M 37 26 C 32.029 26 28 27.791 28 30 C 28 32.209 32.029 34 37 34 C 41.971 34 46 32.209 46 30 C 46 27.791 41.971 26 37 26 z M 16.5 28 C 15.67 28 15 28.67 15 29.5 C 15 30.33 15.67 31 16.5 31 L 26 31 L 26 30 C 26 29.27 26.189063 28.6 26.539062 28 L 16.5 28 z M 28 33 L 28 36 C 28 38.21 32.03 40 37 40 C 41.97 40 46 38.21 46 36 L 46 33 C 46 35.21 41.97 37 37 37 C 32.03 37 28 35.21 28 33 z M 16.5 34 C 15.67 34 15 34.67 15 35.5 C 15 36.33 15.67 37 16.5 37 L 26 37 L 26 34 L 16.5 34 z M 28 39 L 28 42 C 28 44.21 32.03 46 37 46 C 41.97 46 46 44.21 46 42 L 46 39 C 46 41.21 41.97 43 37 43 C 32.03 43 28 41.21 28 39 z"></path>--}}
+{{--                    </svg>--}}
+{{--                    <p class="ml-2">Applicants</p>--}}
+{{--                </a>--}}
+
+{{--                <a href="{{ route('transaction-request') }}" @click="activeLink = 'admin-transactions-request'; activeChildLink = ''; localStorage.setItem('activeLink', 'admin-transactions-request'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[rgb(217,217,217)] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'admin-transactions-request' }" class="mx-2 flex items-center text-[12px] py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100] ">--}}
+{{--                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">--}}
+{{--                        <path d="M 24 5.0273438 C 22.851301 5.0273438 21.70304 5.4009945 20.753906 6.1484375 A 1.50015 1.50015 0 0 0 20.658203 6.2304688 L 4.5546875 21.255859 C 2.8485365 22.847233 2.8013499 25.586506 4.4511719 27.236328 C 6.036957 28.822113 8.6399476 28.853448 10.261719 27.304688 A 1.50015 1.50015 0 0 0 10.265625 27.300781 L 24.003906 14.085938 L 37.734375 27.298828 A 1.50015 1.50015 0 0 0 37.738281 27.302734 C 39.359795 28.852802 41.963043 28.824063 43.548828 27.238281 C 45.19865 25.588459 45.151465 22.849186 43.445312 21.257812 L 27.341797 6.2304688 A 1.50015 1.50015 0 0 0 27.246094 6.1484375 C 26.296957 5.4009942 25.148699 5.0273438 24 5.0273438 z M 24 8.0195312 C 24.485694 8.0195312 24.970178 8.1837987 25.378906 8.5019531 L 41.400391 23.451172 C 41.89424 23.911798 41.905915 24.63901 41.427734 25.117188 C 40.971519 25.573401 40.277033 25.580696 39.810547 25.134766 L 25.044922 10.923828 A 1.50015 1.50015 0 0 0 22.964844 10.923828 L 8.1894531 25.134766 C 7.723224 25.580006 7.0284805 25.571449 6.5722656 25.115234 C 6.0940876 24.637056 6.1057604 23.909845 6.5996094 23.449219 L 22.621094 8.5019531 C 23.029822 8.1837987 23.514306 8.0195312 24 8.0195312 z M 7.4765625 30.978516 A 1.50015 1.50015 0 0 0 6 32.5 L 6 33.5 A 1.50015 1.50015 0 1 0 9 33.5 L 9 32.5 A 1.50015 1.50015 0 0 0 7.4765625 30.978516 z M 40.476562 30.978516 A 1.50015 1.50015 0 0 0 39 32.5 L 39 33.5 A 1.50015 1.50015 0 1 0 42 33.5 L 42 32.5 A 1.50015 1.50015 0 0 0 40.476562 30.978516 z M 40.322266 38.175781 L 39.222656 38.851562 L 38.990234 39.515625 L 38.980469 39.607422 L 38.955078 39.693359 L 38.908203 39.777344 L 38.849609 39.849609 L 38.777344 39.908203 L 38.666016 39.96875 L 37.90625 41.013672 L 38.238281 42.259766 L 39.417969 42.787109 L 40.095703 42.605469 L 40.333984 42.476562 L 40.572266 42.316406 L 40.869141 42.072266 L 41.072266 41.869141 L 41.316406 41.572266 L 41.476562 41.333984 L 41.662109 40.994141 L 41.775391 40.722656 L 41.892578 40.347656 L 41.951172 40.052734 L 41.976562 39.816406 L 41.539062 38.601562 L 40.322266 38.175781 z M 6.9433594 38.275391 L 6.0722656 39.228516 L 6.03125 39.929688 L 6.0976562 40.302734 L 6.1738281 40.576172 L 6.3046875 40.921875 L 6.4277344 41.171875 L 6.6191406 41.482422 L 6.7832031 41.701172 L 7.0273438 41.972656 L 7.2265625 42.15625 L 7.515625 42.378906 L 7.7480469 42.525391 L 7.9355469 42.621094 L 9.2246094 42.658203 L 10.066406 41.677734 L 9.8339844 40.408203 L 9.3007812 39.951172 L 9.2382812 39.919922 L 9.1621094 39.861328 L 9.1054688 39.798828 L 9.0566406 39.71875 L 9.0273438 39.638672 L 8.984375 39.402344 L 8.2324219 38.353516 L 6.9433594 38.275391 z M 14.75 40 L 13.583984 40.554688 L 13.283203 41.810547 L 14.066406 42.835938 L 14.75 43 L 16.804688 43 L 17.970703 42.445312 L 18.273438 41.189453 L 17.488281 40.164062 L 16.804688 40 L 14.75 40 z M 22.970703 40 L 21.806641 40.554688 L 21.503906 41.810547 L 22.289062 42.835938 L 22.970703 43 L 25.027344 43 L 26.191406 42.445312 L 26.494141 41.189453 L 25.710938 40.164062 L 25.027344 40 L 22.970703 40 z M 31.193359 40 L 30.027344 40.554688 L 29.726562 41.810547 L 30.509766 42.835938 L 31.193359 43 L 33.248047 43 L 34.414062 42.445312 L 34.716797 41.189453 L 33.931641 40.164062 L 33.248047 40 L 31.193359 40 z"></path>--}}
+{{--                    </svg>--}}
+{{--                    <p class="ml-2">Tagged/Validated</p>--}}
+{{--                </a>--}}
+
+
+{{--                <a href="{{ route('awardee-list') }}" @click="activeLink = 'awardee'; activeChildLink = ''; localStorage.setItem('activeLink', 'awardee'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'awardee' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">--}}
+{{--                        <path d="M 21 4 C 15.494917 4 11 8.494921 11 14 C 11 19.505079 15.494917 24 21 24 C 26.505083 24 31 19.505079 31 14 C 31 8.494921 26.505083 4 21 4 z M 21 7 C 24.883764 7 28 10.116238 28 14 C 28 17.883762 24.883764 21 21 21 C 17.116236 21 14 17.883762 14 14 C 14 10.116238 17.116236 7 21 7 z M 35 24 C 28.925 24 24 28.925 24 35 C 24 41.075 28.925 46 35 46 C 41.075 46 46 41.075 46 35 C 46 28.925 41.075 24 35 24 z M 9.5 28 C 7.02 28 5 30.02 5 32.5 L 5 33.699219 C 5 39.479219 12.03 44 21 44 C 22.49 44 23.929062 43.870859 25.289062 43.630859 C 24.549063 42.800859 23.910391 41.880859 23.400391 40.880859 C 22.630391 40.960859 21.83 41 21 41 C 12.97 41 8 37.209219 8 33.699219 L 8 32.5 C 8 31.67 8.67 31 9.5 31 L 22.630859 31 C 22.970859 29.93 23.450781 28.93 24.050781 28 L 9.5 28 z M 35 28 C 35.48 28 35.908453 28.305766 36.064453 28.759766 L 37.177734 32 L 40.875 32 C 41.358 32 41.787406 32.308625 41.941406 32.765625 C 42.095406 33.223625 41.939687 33.729484 41.554688 34.021484 L 38.560547 36.292969 L 39.574219 39.539062 C 39.720219 40.005063 39.548391 40.510969 39.150391 40.792969 C 38.955391 40.930969 38.727 41 38.5 41 C 38.263 41 38.025172 40.925391 37.826172 40.775391 L 35 38.660156 L 32.173828 40.775391 C 31.783828 41.068391 31.248609 41.076922 30.849609 40.794922 C 30.451609 40.512922 30.279781 40.005063 30.425781 39.539062 L 31.439453 36.294922 L 28.445312 34.021484 C 28.060312 33.729484 27.904594 33.225578 28.058594 32.767578 C 28.213594 32.309578 28.642 32 29.125 32 L 32.822266 32 L 33.935547 28.759766 C 34.091547 28.305766 34.52 28 35 28 z"></path>--}}
+{{--                    </svg>--}}
+{{--                    <p class="ml-2">Awardee List</p>--}}
+{{--                </a>--}}
                 <a href="{{ route('transfer-histories') }}" @click="activeLink = 'transfer'; activeChildLink = ''; localStorage.setItem('activeLink', 'transfer'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'transfer' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
                         <path d="M 21 4 C 15.494917 4 11 8.494921 11 14 C 11 19.505079 15.494917 24 21 24 C 26.505083 24 31 19.505079 31 14 C 31 8.494921 26.505083 4 21 4 z M 21 7 C 24.883764 7 28 10.116238 28 14 C 28 17.883762 24.883764 21 21 21 C 17.116236 21 14 17.883762 14 14 C 14 10.116238 17.116236 7 21 7 z M 35 24 C 28.925 24 24 28.925 24 35 C 24 41.075 28.925 46 35 46 C 41.075 46 46 41.075 46 35 C 46 28.925 41.075 24 35 24 z M 9.5 28 C 7.02 28 5 30.02 5 32.5 L 5 33.699219 C 5 39.479219 12.03 44 21 44 C 22.49 44 23.929062 43.870859 25.289062 43.630859 C 24.549063 42.800859 23.910391 41.880859 23.400391 40.880859 C 22.630391 40.960859 21.83 41 21 41 C 12.97 41 8 37.209219 8 33.699219 L 8 32.5 C 8 31.67 8.67 31 9.5 31 L 22.630859 31 C 22.970859 29.93 23.450781 28.93 24.050781 28 L 9.5 28 z M 35 28 C 35.48 28 35.908453 28.305766 36.064453 28.759766 L 37.177734 32 L 40.875 32 C 41.358 32 41.787406 32.308625 41.941406 32.765625 C 42.095406 33.223625 41.939687 33.729484 41.554688 34.021484 L 38.560547 36.292969 L 39.574219 39.539062 C 39.720219 40.005063 39.548391 40.510969 39.150391 40.792969 C 38.955391 40.930969 38.727 41 38.5 41 C 38.263 41 38.025172 40.925391 37.826172 40.775391 L 35 38.660156 L 32.173828 40.775391 C 31.783828 41.068391 31.248609 41.076922 30.849609 40.794922 C 30.451609 40.512922 30.279781 40.005063 30.425781 39.539062 L 31.439453 36.294922 L 28.445312 34.021484 C 28.060312 33.729484 27.904594 33.225578 28.058594 32.767578 C 28.213594 32.309578 28.642 32 29.125 32 L 32.822266 32 L 33.935547 28.759766 C 34.091547 28.305766 34.52 28 35 28 z"></path>

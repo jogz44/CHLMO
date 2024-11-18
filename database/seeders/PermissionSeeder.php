@@ -20,9 +20,11 @@ class PermissionSeeder extends Seeder
 //        $member = Role::create(['name' => 'member']);
 
         // Define permissions
-        Permission::create(['name' => 'View Dashboard']);
-        Permission::create(['name' => 'Edit User Details']);
-        Permission::create(['name' => 'Edit Applicant Details']);
+//        Permission::create(['name' => 'View Dashboard']);
+//        Permission::create(['name' => 'Edit User Details']);
+//        Permission::create(['name' => 'Edit Applicant Details']);
+        Permission::create(['name' => 'manage permissions']);
+        Permission::create(['name' => 'manage users']);
 
         // Assign permissions to roles
 //        $admin->givePermissionTo([$viewDashboard, $editUsers, $editApplicantDetails]);

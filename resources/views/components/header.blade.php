@@ -4,24 +4,24 @@
             style="width: calc(100% - 17%); left: 17%; max-width: calc(100% - 17%);">
         <!-- Navigation Links -->
 
-        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-            <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('HOUSING') }}
-            </x-nav-link>
-            @role('ShelterAdmin')
-            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">
-                {{ __('SHELTER ASSISTANCE') }}
-            </x-nav-link>
-            @endrole
-            @role('Admin')
-            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">
-                {{ __('SHELTER ASSISTANCE') }}
-            </x-nav-link>
-            <x-nav-link href="{{ route('admin.index') }}" :active="request()->routeIs('admin.index')">
-                {{ __('USER MANAGEMENT') }}
-            </x-nav-link>
-            @endrole
-        </div>
+{{--        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">--}}
+{{--            <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">--}}
+{{--                {{ __('HOUSING') }}--}}
+{{--            </x-nav-link>--}}
+{{--            @role('ShelterAdmin')--}}
+{{--            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">--}}
+{{--                {{ __('SHELTER ASSISTANCE') }}--}}
+{{--            </x-nav-link>--}}
+{{--            @endrole--}}
+{{--            @role('Admin')--}}
+{{--            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">--}}
+{{--                {{ __('SHELTER ASSISTANCE') }}--}}
+{{--            </x-nav-link>--}}
+{{--            <x-nav-link href="{{ route('admin.index') }}" :active="request()->routeIs('admin.index')">--}}
+{{--                {{ __('USER MANAGEMENT') }}--}}
+{{--            </x-nav-link>--}}
+{{--            @endrole--}}
+{{--        </div>--}}
 
         <!-- Right-aligned container for and Profile -->
         <div class="flex items-center ml-auto space-x-2">

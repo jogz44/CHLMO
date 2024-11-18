@@ -62,8 +62,8 @@
                 <div class="flex flex-col p-3 rounded mt-5">
                     <h2 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline">{{ $applicant->profile_no }}</h2>
                     <h1 class="text-[25px] ml-2 items-center font-bold text-gray-700 mb-3">
-                        {{ $applicant->last_name }}, {{ $applicant->first_name }}
-                        @if($applicant->middle_name) {{ $applicant->middle_name }} @endif
+                        {{ $applicant->person->last_name }}, {{ $applicant->person->first_name }}
+                        @if($applicant->person->middle_name) {{ $applicant->person->middle_name }} @endif
                     </h1>
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PERSONAL INFORMATION</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Encode here the personal information of the
@@ -116,7 +116,7 @@
                                 class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" readonly>
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="taggedDate" class="block text-[13px] font-medium text-gray-700 mb-1">DATE PROFILED/TAGGED</label>
+                            <label for="taggedDate" class="block text-[13px] font-medium text-gray-700 mb-1">DATE PROFILED/TAGGED <span class="text-red-500">*</span></label>
                             <input type="date" id="taggedDate" name="taggedDate" wire:model="date_tagged" max="{{ date('Y-m-d') }}"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @error('date_tagged') <span class="text-red-600 error">{{ $message }}</span> @enderror
@@ -128,12 +128,12 @@
                 <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-2">
-                            <label for="age" class="block text-[13px] font-medium text-gray-700 mb-1">AGE</label>
+                            <label for="age" class="block text-[13px] font-medium text-gray-700 mb-1">AGE <span class="text-red-500">*</span></label>
                             <input type="number" id="age" name="age" wire:model="age"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-2">
-                            <label for="civil_status" class="block text-[13px] font-medium text-gray-700 mb-1">CIVIL STATUS</label>
+                            <label for="civil_status" class="block text-[13px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
                             <select id="civil_status" name="civil_status" wire:model="civil_status_id" x-model="civilStatus"
                                 class="w-full p-1.5 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
@@ -174,7 +174,7 @@
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME <span class="text-red-500">*</span>
+                                        MIDDLE NAME 
                                     </label>
                                     <input type="text"
                                         id="partner_middle_name"
@@ -209,7 +209,7 @@
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="spouse_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME <span class="text-red-500">*</span>
+                                        MIDDLE NAME
                                     </label>
                                     <input type="text" id="spouse_middle_name" wire:model="spouse_middle_name" class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                                     @error('spouse_middle_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
@@ -228,18 +228,18 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="occupation"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">OCCUPATION</label>
+                                class="block text-[13px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
                             <input type="text" id="occupation" name="occupation" wire:model="occupation"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="years-residency"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">YEARS OF RESIDENCY</label>
+                                class="block text-[13px] font-medium text-gray-700 mb-1">YEARS OF RESIDENCY <span class="text-red-500">*</span></label>
                             <input type="number" id="years-residency" name="years-residency" wire:model="year_of_residency"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR</label>
+                            <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR <span class="text-red-500">*</span></label>
                             <select id="govAssistance" name="govAssistance" wire:model="government_program_id"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of assistance</option>
@@ -253,38 +253,35 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="religion" class="block text-[13px] font-medium text-gray-700 mb-1">RELIGION</label>
-                            <select wire:model="religion_id" id="religion" name="religion" class="w-full p-1.5 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Religion</option>
-                                @foreach($religions as $religion)
-                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('religion') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            <label for="religion" class="block text-[13px] font-medium text-gray-700 mb-1">RELIGION <span class="text-red-500">*</span></label>
+                            <input type="text" id="religion" name="religion" wire:model="religion"
+                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="tribe" class="block text-[13px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                            <select wire:model="tribe_id" id="tribe" name="tribe" required class="w-full p-1.5 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
-                                <option value="">Select Tribe/Ethnicity</option>
-                                @foreach($tribes as $tribe)
-                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                            <input type="text" id="tribe" name="tribe" wire:model="tribe"
+                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="contactNo" class="block text-[13px] font-medium text-gray-700 mb-1">CONTACT
-                                NUMBER</label>
-                            <input type="number" id="contactNo" name="contactNo" wire:model="contact_number"
+                                NUMBER <span class="text-red-500">*</span></label>
+                                <input type="text"
+                                       wire:model="contact_number"
+                                       id="contact_number"
+                                       pattern="^09\d{9}$"
+                                       title="Enter a valid phone number (e.g., 09123456789)"
+                                       maxlength="11"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase"
+                                       placeholder="09xxxxxxxxx"
+                                       oninput="validateNumberInput(this)">
 
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                     </div>
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="barangay" class="block text-[13px] font-medium text-gray-700 mb-1">
-                                BARANGAY
+                                BARANGAY <span class="text-red-500">*</span>
                             </label>
                             <select id="barangay" name="barangay" wire:model.live="barangay_id"
                                 class="w-full p-1.5 border text-gray-800 text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
@@ -298,7 +295,7 @@
 
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">
-                                PUROK
+                                PUROK <span class="text-red-500">*</span>
                             </label>
                             <select id="purok" name="purok" wire:model.live="purok_id"
                                 class="w-full p-1.5 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
@@ -320,13 +317,21 @@
                     <div x-data="{
                     livingSituation: @entangle('living_situation_id')" class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="structureStatus" class="block text-[13px] font-medium text-gray-700 mb-1">STRUCTURE STATUS</label>
-                            <select id="structureStatus" name="structureStatus"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Status</option>
-                               
+                            <label for="structure_status_id"
+                                class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                STRUCTURE TYPE STATUS <span class="text-red-500">*</span>
+                            </label>
+                            <select wire:model="structure_status_id"
+                                id="structure_status_id"
+                                required
+                                class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                <option value="">Select type</option>
+                                @foreach($structureStatuses as $structureStatus)
+                                <option value="{{ $structureStatus->id }}">{{ $structureStatus->structure_status }}</option>
+                                @endforeach
                             </select>
-                            
+                            @error('structure_status_id') <span class="error text-red-600">{{ $message }}</span> @enderror
+
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION (CASE) <span class="text-red-500">*</span></label>
@@ -343,7 +348,7 @@
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span></label>
                                 <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification" name="living_situation_case_specification" placeholder="Enter case details"
-                                    class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required>
+                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required oninput="capitalizeInput(this)">
                                 </textarea>
                                 @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
@@ -367,7 +372,7 @@
                         <div class="w-full md:w-full px-2 mb-4">
                             <label for="remarks"
                                 class="block text-[13px] font-medium text-gray-700 mb-1">REMARKS</label>
-                            <input type="text" id="remarks" name="remarks" whire:model="remarks"
+                            <input type="text" id="remarks" name="remarks" wire:model="remarks"
                                 class="capitalize w-full p-3 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
 

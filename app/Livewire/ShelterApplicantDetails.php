@@ -16,10 +16,9 @@ use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\CaseSpecification;
-use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\WallType;
-use App\Models\Tribe;
+use App\Models\StructureStatusType;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
@@ -47,11 +46,10 @@ class ShelterApplicantDetails extends Component
     public $occupation;
     public $contact_number;
     public $isLoading = false;
+    public $tribe, $religion;
     public $year_of_residency;
-    public $religion_id; // Store selected Religion ID
-    public $religions; // For populating the religions dropdown
-    public $tribe_id; // Store selected Tribe ID
-    public $tribes; // For populating the tribes dropdown
+
+
     public $barangay_id; // Store selected 
     public $purok_id; // Store selected 
     public $puroks = [];
@@ -67,7 +65,7 @@ class ShelterApplicantDetails extends Component
     public $spouse_middle_name;
     public $spouse_last_name;
     public $partner_first_name, $partner_middle_name, $partner_last_name;
-    public $photo = [], $renamedFileName = [];
+    public $photo = [], $renamedFileName = [], $structure_status_id, $structureStatuses;
 
     public function mount($profileNo)
     {
@@ -75,14 +73,7 @@ class ShelterApplicantDetails extends Component
             return CivilStatus::all();  // Cache for 1 hour
         });
 
-        $this->religions = Cache::remember('religions', 60 * 60, function () {
-            return Religion::all();  // Cache for 1 hour
-        });
-
-        $this->tribes = Cache::remember('tribes', 60 * 60, function () {
-            return Tribe::all();  // Cache for 1 hour
-        });
-
+       
         $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
             return LivingSituation::all();  // Cache for 1 hour
         });
@@ -94,14 +85,18 @@ class ShelterApplicantDetails extends Component
         $this->governmentPrograms = Cache::remember('governmentPrograms', 60*60, function() {
             return GovernmentProgram::all();  // Cache for 1 hour
         });
+        $this->structureStatuses = Cache::remember('structureStatuses', 60*60, function() {
+            return StructureStatusType::all();  // Cache for 1 hour
+        });
+
 
         // Fetch the applicant
         $this->applicant = ShelterApplicant::find($profileNo);
 
         if ($this->applicant) {
-            $this->first_name = $this->applicant->first_name;
-            $this->middle_name = $this->applicant->middle_name;
-            $this->last_name = $this->applicant->last_name;
+            $this->first_name = $this->applicant->person->first_name;
+            $this->middle_name = $this->applicant->person->middle_name;
+            $this->last_name = $this->applicant->person->last_name;
             $this->suffix_name = $this->applicant->suffix_name;
 
             // Fetch the related origin of request and request date
@@ -113,6 +108,7 @@ class ShelterApplicantDetails extends Component
             // Initialize dropdowns
             $this->barangays = Barangay::all();
             $this->puroks = Purok::all();
+            $this->governmentPrograms = GovernmentProgram::all();
 
             // Populate other new fields from the applicant
             $this->age = $this->applicant->age;
@@ -120,13 +116,6 @@ class ShelterApplicantDetails extends Component
             $this->occupation = $this->applicant->occupation;
             $this->contact_number = $this->applicant->contact_number;
             $this->year_of_residency = $this->applicant->year_of_residency;
-
-             // Check if address exists before accessing it
-        if ($this->applicant && $this->applicant->address) {
-            $this->full_address = $this->applicant->address->full_address;
-        } else {
-            $this->full_address = '';  // Default value if no address is found
-        }
 
         $this->date_tagged = now()->toDateString(); // YYYY-MM-DD format
 
@@ -156,14 +145,18 @@ class ShelterApplicantDetails extends Component
     {
         return [
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'tribe_id' => 'required|exists:tribes,id',
+            'tribe' => 'required|string|max:255',
+            'religion' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer',
-            'religion_id' => 'required|exists:religions,id',
             'barangay_id' => 'required|exists:barangays,id',
             'occupation' => 'required|string|max:255',
             'year_of_residency' => 'required|integer',
-            'contact_number' => 'required|string|max:255',
+            'structure_status_id' => 'required|exists:structure_status_types,id',
+            'contact_number' => [
+                'required',
+                'regex:/^09\d{9}$/'
+            ],
             'living_situation_id' => 'required|exists:living_situations,id',
             'living_situation_case_specification' => [
                 'nullable', // Allow it to be null if not required
@@ -181,6 +174,7 @@ class ShelterApplicantDetails extends Component
             'government_program_id' => 'required|exists:government_programs,id',
             'remarks' => 'nullable|string|max:255',
             'photo.*' => 'required|file|mimes:jpeg,png,jpg,gif',
+            'full_address' => 'nullable|string|max:255',
 
              // Live-in partner details
              'partner_first_name' => [
@@ -240,21 +234,23 @@ class ShelterApplicantDetails extends Component
             $taggedApplicant = ProfiledTaggedApplicant::create([
                 'profile_no' => $this->profileNo,
                 'civil_status_id' => $this->civil_status_id,
-                'tribe_id' => $this->tribe_id,
+                'tribe' => $this->tribe,
                 'sex' => $this->sex,
                 'age' => $this->age,
-                'religion_id' => $this->religion_id ?: null,
+                'religion' => $this->religion,
                 'address_id' => $address->id,
                 'occupation' => $this->occupation ?: null,
                 'year_of_residency' => $this->year_of_residency,
                 'contact_number' => $this->contact_number ?: null,
+                'full_address' => $this->full_address ?: null,
                 'date_tagged' => now(),
                 'living_situation_id' => $this->living_situation_id,
                 'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
                 'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
+                'structure_status_id' => $this->structure_status_id,
                 'date_tagged' => $this->date_tagged,
                 'government_program_id' => $this->government_program_id,
-                'remarks' => $this->remarks ?: 'N/A',
+                'remarks' => $this->remarks ?: null,
                 'is_tagged' => true,
             ]);
             // dd($taggedApplicant);

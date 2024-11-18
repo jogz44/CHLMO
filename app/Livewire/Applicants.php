@@ -3,17 +3,25 @@
 namespace App\Livewire;
 
 use AllowDynamicProperties;
+use App\Exports\ApplicantsDataExport;
 use App\Models\Address;
 use App\Models\Applicant;
 use App\Models\Barangay;
+use App\Models\People;
 use App\Models\Purok;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TransactionType;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
+
+
 
 class Applicants extends Component
 {
@@ -23,7 +31,7 @@ class Applicants extends Component
     public $isModalOpen = false, $isLoading = false;
     public $date_applied, $transaction_type_id;
     public $transactionTypes = [];
-    public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
+    public $person_id, $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
         $purok_id, $puroks = [], $interviewer;
 
     // Filter properties:
@@ -31,24 +39,21 @@ class Applicants extends Component
         $selectedBarangay_id, $barangaysFilter = [], $selectedTransactionType_id, $transactionTypesFilter = [],
         $taggingStatuses;
 
-    public $selectedApplicantId, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
+    public $selectedApplicantId, $edit_person_id, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
         $edit_transaction_type_id, $edit_contact_number, $edit_barangay_id, $edit_purok_id;
 
-    // For export
-    public Collection $applicantsForExport;
-    public Collection $selectedApplicantsForExport;
-    public $designTemplate = 'tailwind';
+    // For checking duplicate applicants
+    public $showHousingDuplicateWarning = false, $housingDuplicateData = null, $proceedWithDuplicate = false;
 
     public function updatingSearch(): void
     {
         // This ensures that the search query is updated dynamically as the user types
         $this->resetPage();
     }
-    public function clearSearch()
+    public function clearSearch(): void
     {
         $this->search = ''; // Clear the search input
     }
-
     public function resetFilters(): void
     {
         $this->startDate = null;
@@ -64,7 +69,9 @@ class Applicants extends Component
     }
     public function mount()
     {
-//        dd('Component mounted');
+        // Initialize modal states
+        $this->isModalOpen = false;
+        $this->showHousingDuplicateWarning = false;
 
         // Set today's date as the default value for date_applied
         $this->date_applied = now()->toDateString(); // YYYY-MM-DD format
@@ -88,15 +95,6 @@ class Applicants extends Component
             return TransactionType::all();
         });
         $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
-    }
-
-    public function updatingBarangay()
-    {
-        $this->resetPage();
-    }
-    public function updatingPurok()
-    {
-        $this->resetPage();
     }
     public function updatedBarangayId($barangayId): void
     {
@@ -137,53 +135,136 @@ class Applicants extends Component
             'transaction_type_id' => 'required|exists:transaction_types,id',
         ];
     }
+    // Add this method to check for duplicates when name fields change
+    public function updated($propertyName)
+    {
+        if (!$this->showHousingDuplicateWarning &&
+            in_array($propertyName, ['first_name', 'last_name', 'middle_name']) &&
+            $this->first_name && $this->last_name) {
+
+            $people = new People();
+            $result = $people->checkExistingApplications(
+                $this->first_name,
+                $this->last_name,
+                $this->middle_name,
+                'Housing Applicant'
+            );
+
+            if ($result['exists']) {
+                $this->housingDuplicateData = $result;
+                $this->showHousingDuplicateWarning = true;
+            }
+        }
+    }
+    public function closeDuplicateWarning(): void
+    {
+        $this->showHousingDuplicateWarning = false;
+        $this->housingDuplicateData = null;
+    }
+    public function proceedWithApplication(): void
+    {
+        // Only mark as safe to proceed, don't store yet
+        $this->proceedWithDuplicate = true;
+        $this->showHousingDuplicateWarning = false;
+        // Remove this line as we don't want to store immediately
+        // $this->storeApplicant();
+    }
     public function store()
     {
         // Validate the input data
         $this->validate();
 
-        // Create the address entry first
-        $address = Address::create([
-            'barangay_id' => $this->barangay_id,
-            'purok_id' => $this->purok_id,
-        ]);
+        if (!$this->proceedWithDuplicate) {
+            $people = new People();
+            $result = $people->checkExistingApplications(
+                $this->first_name,
+                $this->last_name,
+                $this->middle_name,
+                'Housing Applicant'
+            );
 
+            if ($result['exists']) {
+                if ($result['applications']['housing']) {
+                    $this->addError('duplicate', 'Cannot proceed - Applicant already has a Housing Application');
+                    return;
+                }
 
-        // Generate the unique applicant ID
-        $applicantId = Applicant::generateApplicantId();
+                $this->housingDuplicateData = $result;
+                $this->showHousingDuplicateWarning = true;
+                return;
+            }
+        }
 
-        // Create the new applicant record and get the ID of the newly created applicant
-        $applicant = Applicant::create([
-            'user_id' => Auth::id(),
-            'date_applied' => $this->date_applied,
-            'transaction_type_id' => $this->transaction_type_id,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
-            'suffix_name' => $this->suffix_name,
-            'contact_number' => $this->contact_number,
-            'initially_interviewed_by' => $this->interviewer,
-            'address_id' => $address->id,
-            'applicant_id' => $applicantId,
-        ]);
-
-        $this->resetForm();
-        $this->isModalOpen = false; // Close the modal
-
-        // Trigger the alert message
-        $this->dispatch('alert', [
-            'title' => 'Applicant Added!',
-            'message' => 'Applicant successfully added at <br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
-        ]);
-
-        $this->redirect('applicants');
+        // Only store when form is submitted via "+ ADD APPLICANT" button
+        $this->storeApplicant();
     }
+    private function storeApplicant(): void
+    {
+        try {
+            // Log the start of the storage process
+            logger()->info('Starting applicant storage process', [
+                'first_name' => $this->first_name,
+                'last_name' => $this->last_name
+            ]);
 
+            $people = People::firstOrCreate([
+                'first_name' => $this->first_name,
+                'middle_name' => $this->middle_name,
+                'last_name' => $this->last_name,
+                'suffix_name' => $this->suffix_name,
+                'contact_number' => $this->contact_number,
+                'application_type' => 'Housing Applicant'
+            ]);
+
+            // Create the address entry first
+            $address = Address::create([
+                'barangay_id' => $this->barangay_id,
+                'purok_id' => $this->purok_id,
+            ]);
+
+            // Generate the unique applicant ID
+            $applicantId = Applicant::generateApplicantId();
+
+            // Create the new applicant record
+            $applicant = Applicant::create([
+                'applicant_id' => $applicantId,
+                'person_id' => $people->id,
+                'user_id' => Auth::id(),
+                'date_applied' => $this->date_applied,
+                'transaction_type_id' => $this->transaction_type_id,
+                'initially_interviewed_by' => $this->interviewer,
+                'address_id' => $address->id,
+            ]);
+
+            logger()->info('Applicant stored successfully', [
+                'applicant_id' => $applicantId
+            ]);
+
+            $this->resetForm();
+            $this->isModalOpen = false;
+            $this->proceedWithDuplicate = false;
+
+            $this->dispatch('alert', [
+                'title' => 'Applicant Added!',
+                'message' => 'Applicant successfully added at <br><small>'. now()->calendar() .'</small>',
+                'type' => 'success'
+            ]);
+
+            $this->redirect('applicants');
+
+        } catch (\Exception $e) {
+            logger()->error('Error storing applicant', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $this->addError('general', 'Failed to save applicant. Please try again.');
+        }
+    }
     public function resetForm(): void
     {
         $this->reset([
-            'date_applied', 'transaction_type_id', 'first_name', 'middle_name', 'last_name',
+            'date_applied', 'transaction_type_id', 'person_id', 'first_name', 'middle_name', 'last_name',
             'suffix_name', 'barangay_id', 'purok_id', 'contact_number',
         ]);
     }
@@ -192,11 +273,12 @@ class Applicants extends Component
         $applicant = Applicant::findOrFail($id);
 
         $this->selectedApplicantId = $applicant->id;
-        $this->edit_first_name = $applicant->first_name;
-        $this->edit_middle_name = $applicant->middle_name;
-        $this->edit_last_name = $applicant->last_name;
-        $this->edit_suffix_name = $applicant->suffix_name;
-        $this->edit_contact_number = $applicant->contact_number;
+        $this->edit_person_id = $applicant->person_id;
+        $this->edit_first_name = $applicant->person->first_name;
+        $this->edit_middle_name = $applicant->person->middle_name;
+        $this->edit_last_name = $applicant->person->last_name;
+        $this->edit_suffix_name = $applicant->person->suffix_name;
+        $this->edit_contact_number = $applicant->person->contact_number;
         $this->edit_barangay_id = $applicant->address->barangay_id ?? null;
         $this->edit_purok_id = $applicant->address->purok_id ?? null;
         $this->edit_date_applied = $applicant->date_applied->format('Y-m-d');
@@ -217,13 +299,19 @@ class Applicants extends Component
         ]);
 
         $applicant = Applicant::findOrFail($this->selectedApplicantId);
-        $applicant->first_name = $this->edit_first_name;
-        $applicant->middle_name = $this->edit_middle_name;
-        $applicant->last_name = $this->edit_last_name;
-        $applicant->suffix_name = $this->edit_suffix_name;
-        $applicant->contact_number = $this->edit_contact_number;
+        $person = $applicant->person;
+        $address = $applicant->address;
+
+        $person->first_name = $this->edit_first_name;
+        $person->middle_name = $this->edit_middle_name;
+        $person->last_name = $this->edit_last_name;
+        $person->suffix_name = $this->edit_suffix_name;
+        $person->contact_number = $this->edit_contact_number;
+        $person->save();
+
         $applicant->date_applied = $this->edit_date_applied;
         $applicant->transaction_type_id = $this->edit_transaction_type_id;
+        $applicant->save();
 
         // Update address
         $address = $applicant->address;
@@ -232,8 +320,6 @@ class Applicants extends Component
             $address->purok_id = $this->edit_purok_id;
             $address->save(); // Don't forget to save the address
         }
-
-        $applicant->save();
 
         $this->dispatch('alert', [
             'title' => 'Details Updated!',
@@ -250,16 +336,144 @@ class Applicants extends Component
         $applicant->is_tagged = true;
         $applicant->save();
     }
+    // Add this export method
+    public function export()
+    {
+        try {
+            $filters =  array_filter([
+                'start_date' => $this->startDate,
+                'end_date' => $this->endDate,
+                'barangay_id' => $this->selectedBarangay_id,
+                'purok_id' => $this->selectedPurok_id,
+                'transaction_type_id' => $this->selectedTransactionType_id,
+                'tagging_status' => $this->selectedTaggingStatus
+            ]);
+
+            return Excel::download(
+                new ApplicantsDataExport($filters),
+                'applicants-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed: ',
+                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
+            return null;
+        }
+    }
+
+    public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        ini_set('default_charset', 'UTF-8');
+
+        // Fetch Applicants based on filters
+        $query = Applicant::with([
+            'person',
+            'address.barangay',
+            'address.purok',
+            'transactionType'
+        ]);
+
+        // Create filters array matching your Excel export
+        $filters = array_filter([
+            'start_date' => $this->startDate,
+            'end_date' => $this->endDate,
+            'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
+            'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
+            'transaction_type_id' => $this->selectedTransactionType_id,  // Changed from transaction_type_id
+            'tagging_status' => $this->selectedTaggingStatus  // Added to match Excel export
+        ]);
+
+        // Fetch Applicants based on filters
+        $query = Applicant::with([
+            'person',
+            'address.barangay',
+            'address.purok',
+            'transactionType'
+        ]);
+
+        // Apply filters
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('date_applied', [
+                $this->startDate,
+                $this->endDate
+            ]);
+        }
+
+        if ($this->selectedBarangay_id) {    // Changed from barangay_id
+            $query->whereHas('address', function($q) {
+                $q->where('barangay_id', $this->selectedBarangay_id);
+            });
+        }
+
+        if ($this->selectedPurok_id) {       // Changed from purok_id
+            $query->whereHas('address', function($q) {
+                $q->where('purok_id', $this->selectedPurok_id);
+            });
+        }
+
+        if ($this->selectedTransactionType_id) {  // Changed from transaction_type_id
+            $query->where('transaction_type_id', $this->selectedTransactionType_id);
+        }
+
+        if ($this->selectedTaggingStatus) {   // Added to match Excel export
+            $query->where('tagging_status', $this->selectedTaggingStatus);
+        }
+
+        $applicants = $query->get();
+
+        // Build Subtitle from Filters
+        $subtitle = [];
+
+        if ($this->selectedBarangay_id) {     // Changed from barangay_id
+            $barangay = Barangay::find($this->selectedBarangay_id);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        if ($this->selectedPurok_id) {        // Changed from purok_id
+            $purok = Purok::find($this->selectedPurok_id);
+            $subtitle[] = "PUROK: {$purok->name}";
+        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
+            $subtitle[] = "PUROK: All Purok";
+        }
+
+        if ($this->startDate && $this->endDate) {
+            $startDate = Carbon::parse($this->startDate)->format('m/d/Y');
+            $endDate = Carbon::parse($this->endDate)->format('m/d/Y');
+            $subtitle[] = "Date From: {$startDate} To: {$endDate}";
+        }
+
+        $subtitleText = implode(' | ', $subtitle);
+
+        $html = view('pdfs.applicants', [
+            'applicants' => $applicants,
+            'subtitle' => $subtitleText,
+        ])->render();
+
+        // Load the PDF with the generated HTML
+        $pdf = Pdf::loadHTML($html);
+        $pdf->setPaper('legal', 'portrait');
+
+        // Stream the PDF for download
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'applicants.pdf');
+    }
+
     public function render()
     {
-        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'transactionType'])
+        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'transactionType', 'person'])
             ->where(function($query) {
-                $query->where('applicant_id', 'like', '%'.$this->search.'%')
-                    ->orWhere('first_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('last_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('contact_number', 'like', '%'.$this->search.'%')
+                $query->whereHas('person', function($q) {
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('contact_number', 'like', '%'.$this->search.'%');
+                })
+                    ->orWhere('applicant_id', 'like', '%'.$this->search.'%')
                     ->orWhereHas('address.purok', function ($query) {
                         $query->where('name', 'like', '%'.$this->search.'%');
                     })

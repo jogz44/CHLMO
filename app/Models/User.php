@@ -2,15 +2,34 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Sanctum\HasApiTokens;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Jetstream\HasProfilePhoto;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property int $id
+ * @property string $username
+ * @property string $first_name
+ * @property string $middle_name
+ * @property string $last_name
+ * @property string $email
+ * @property string $password
+ * @property int $role_id
+ * @property bool $is_disabled
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string|null $remember_token
+ * @property string|null $profile_photo_path
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read string $profile_photo_url
+ * @property-read \App\Models\Role $role
+ */
 class User extends Authenticatable
 {
     use HasApiTokens;
@@ -20,11 +39,6 @@ class User extends Authenticatable
     use TwoFactorAuthenticatable;
     use HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'username',
         'first_name',
@@ -32,13 +46,11 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'role_id',
+        'is_disabled',
+        'email_verified_at'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -46,35 +58,26 @@ class User extends Authenticatable
         'two_factor_secret',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_disabled' => 'boolean',
         ];
     }
-    /**
-     * Get the full name of the user.
-     *
-     * @return string
-     */
-    public function full_name()
+
+    public function full_name(): string
     {
-        // Concatenate the name fields to create the full name
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
     }
 }

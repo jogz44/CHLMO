@@ -42,7 +42,7 @@ class ShelterProfiledTaggedApplicants extends Component
     public $materialUnitId, $material_id, $purchaseOrderId;
     public $quantity, $date_of_delivery, $date_of_ris;
     public $grantee_quantity = [];
-    public $photo = [];
+    public $images = [];
 
     // For uploading of files
     public $isFilePondUploadComplete = false, $isFilePonduploading = false, $requestLetterAddressToCityMayor, $certificateOfIndigency, $consentLetterIfTheLandIsNotTheirs,
@@ -188,9 +188,9 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public function updatedPhoto()
     {
-        Log::info('Photo uploaded:', $this->photo);
-        // Validate the uploaded photo immediately after selection
-        $this->validateOnly('photo');
+        Log::info('Photo uploaded:', $this->images);
+        // Validate the uploaded images immediately after selection
+        $this->validateOnly('images');
     }
 
 
@@ -265,113 +265,6 @@ class ShelterProfiledTaggedApplicants extends Component
     //     }
     // }
 
-    public function grantApplicant()
-    {
-        $this->validate();
-        DB::beginTransaction();
-
-        try {
-            // Create the grantee entry first
-            $grantee = Grantee::create([
-                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
-                'date_of_delivery' => $this->date_of_delivery,
-                'date_of_ris' => $this->date_of_ris,
-                'is_granted' => false,
-            ]);
-
-            // Now loop over the materials to create DeliveredMaterial entries for this grantee
-            foreach ($this->materials as $material) {
-                // Check if there's enough stock available for the material
-                $currentMaterial = Material::find($material['material_id']);
-                if ($currentMaterial->quantity < $material['grantee_quantity']) {
-                    throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
-                }
-
-                // Create the DeliveredMaterial record for each material
-                DeliveredMaterial::create([
-                    'grantee_id' => $grantee->id,
-                    'material_id' => $material['material_id'],
-                    'grantee_quantity' => $material['grantee_quantity'],
-                ]);
-
-                // Subtract the granted quantity from the available stock
-                $currentMaterial->decrement('quantity', $material['grantee_quantity']);
-            }
-
-            // Retrieve the delivered materials for logging or debugging purposes
-            $deliveredMaterials = $grantee->deliveredMaterials; // Will automatically load related delivered materials
-            Log::info('Materials delivered to grantee', ['granteeId' => $grantee->id, 'deliveredMaterials' => $deliveredMaterials]);
-
-           
-            foreach ($this->photo as $image) {
-                $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
-                ShelterUploadedFiles::create([
-                    'grantee_id' => $grantee->id,
-                    'image_path' => $path,
-                    'display_name' => $image->getClientOriginalName(),
-                ]);
-            }
-
-            Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
-
-            // Update the applicant's status
-            ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
-                'is_awarding_on_going' => true
-            ]);
-
-            DB::commit();
-            $this->resetForm();
-            $this->dispatch('alert', [
-                'title' => 'Granting Pending!',
-                'message' => 'Applicant needs to submit necessary requirements.',
-                'type' => 'warning',
-            ]);
-
-            return redirect()->route('shelter-profiled-tagged-applicants');
-        } catch (QueryException $e) {
-            DB::rollBack();
-            $this->handleGrantingError($e);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error processing grant: ' . $e->getMessage());
-            $this->dispatch('alert', [
-                'title' => 'Insufficient Stock!',
-                'message' => 'There was not enough stock to fulfill this request.',
-                'type' => 'danger',
-            ]);
-        }
-    }
-
-    protected function handleGrantingError(QueryException $e)
-    {
-        $errorMessage = 'An error occurred while processing your request. Please try again later.';
-        if ($e->getCode() === 23000) {
-            $errorMessage = 'The information you provided conflicts with existing records. Please check your input and try again.';
-        } elseif ($e->getCode() === 42000) {
-            $errorMessage = 'There was a problem with the data you provided. Please check your input and try again.';
-        }
-
-        Log::error('Error creating applicant or dependents: ' . $e->getMessage());
-        $this->dispatch('alert', [
-            'title' => 'Something went wrong!',
-            'message' => $errorMessage . ' <br><small>' . now()->calendar() . '</small>',
-            'type' => 'danger',
-        ]);
-    }
-
-    public function resetForm(): void
-    {
-        $this->reset([
-            'material_id',
-            'materialUnitId',
-            'purchaseOrderId',
-            'date_of_delivery',
-            'date_of_ris',
-            'grantee_quantity',
-            'photo',
-        ]);
-    }
-
     public  function removeUpload($property, $fileName, $load): void
     {
         $filePath = storage_path('livewire-tmp/' . $fileName);
@@ -397,14 +290,14 @@ class ShelterProfiledTaggedApplicants extends Component
         DB::beginTransaction();
         try {
             // Check if granteeId is set
-            if (is_null($this->granteeId)) {
+            if (is_null($this->profiledTaggedApplicantId)) {
                 $this->handleError('Grantee ID is missing. Please make sure the grantee is created first.');
                 return;
             }
 
             // Log the current IDs we're working with
             logger()->info('Starting submission with IDs', [
-                'grantee_id' => $this->granteeId,
+                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
                 // 'attachment_id' => $this->attachment_id,
             ]);
 
@@ -431,8 +324,8 @@ class ShelterProfiledTaggedApplicants extends Component
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
-                'message' => 'Applicant is now an official grantee! <br><small>' . now()->calendar() . '</small>',
-                'type' => 'success'
+                'message' => 'Applicant is now ready for granting! <br><small>' . now()->calendar() . '</small>',
+                'type' => 'warning'
             ]);
 
             $this->redirect('shelter-profiled-tagged-applicants');
@@ -461,7 +354,7 @@ class ShelterProfiledTaggedApplicants extends Component
             $filePath = $file->storeAs('documents', $fileName, 'grantee-photo-requirements');
 
             GranteeDocumentsSubmission::create([
-                'grantee_id' => $this->granteeId,
+                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
                 'attachment_id' => $attachmentId,
                 'file_path' => $filePath,
                 'file_name' => $fileName,
@@ -469,20 +362,20 @@ class ShelterProfiledTaggedApplicants extends Component
                 'file_size' => $file->getSize(),
             ]);
 
-            logger()->info('Searching for grantee with ID', ['id' => $this->granteeId]);
+            // logger()->info('Searching for grantee with ID', ['id' => $this->granteeId]);
 
-            $grantee = Grantee::findOrFail($this->granteeId);
+            // $grantee = Grantee::findOrFail($this->granteeId);
 
-            logger()->info('Found grantee', [
-                'grantee_id' => $grantee->id,
-                'profiled_tagged_applicant_id' => $grantee->profiled_tagged_applicant_id
+            // logger()->info('Found grantee', [
+            //     'grantee_id' => $grantee->id,
+            //     'profiled_tagged_applicant_id' => $grantee->profiled_tagged_applicant_id
+            // ]);
+
+            // Update the applicant's status
+            ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
+                'is_awarding_on_going' => true
             ]);
-
-            // $grantee->update(['is_granted' => true]);
-            Grantee::where('id', $this->granteeId)->update([
-                'is_granted' => true
-            ]);
-            logger()->info('The grantee is now granted', ['id' => $this->granteeId]);
+            logger()->info('The applicant submitted its requirements', ['id' => $this->profiledTaggedApplicantId]);
         }
     }
     private function handleError(string $message, \Exception $e = null): void
@@ -516,6 +409,112 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
         $this->show = false;  // Close the modal or hide any UI related to uploads if needed
     }
+    public function grantApplicant()
+    {
+        $this->validate();
+        DB::beginTransaction();
+
+        try {
+            // Create the grantee entry first
+            $grantee = Grantee::create([
+                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
+                'date_of_delivery' => $this->date_of_delivery,
+                'date_of_ris' => $this->date_of_ris,
+            ]);
+
+            // Now loop over the materials to create DeliveredMaterial entries for this grantee
+            foreach ($this->materials as $material) {
+                // Check if there's enough stock available for the material
+                $currentMaterial = Material::find($material['material_id']);
+                if ($currentMaterial->quantity < $material['grantee_quantity']) {
+                    throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
+                }
+
+                // Create the DeliveredMaterial record for each material
+                DeliveredMaterial::create([
+                    'grantee_id' => $grantee->id,
+                    'material_id' => $material['material_id'],
+                    'grantee_quantity' => $material['grantee_quantity'],
+                ]);
+
+                // Subtract the granted quantity from the available stock
+                $currentMaterial->decrement('quantity', $material['grantee_quantity']);
+            }
+
+            // Retrieve the delivered materials for logging or debugging purposes
+            $deliveredMaterials = $grantee->deliveredMaterials; // Will automatically load related delivered materials
+            Log::info('Materials delivered to grantee', ['granteeId' => $grantee->id, 'deliveredMaterials' => $deliveredMaterials]);
+
+
+            foreach ($this->images as $image) {
+                $path = $image->storeAs('images', $image->getClientOriginalName(), 'public');
+                ShelterUploadedFiles::create([
+                    'grantee_id' => $grantee->id,
+                    'image_path' => $path,
+                    'display_name' => $image->getClientOriginalName(),
+                ]);
+            }
+
+            Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
+
+            Grantee::where('id', $this->granteeId)->update([
+                'is_granted' => true
+            ]);
+            // $grantee->update(['is_granted' => true]);
+
+            DB::commit();
+            $this->resetForm();
+            $this->dispatch('alert', [
+                'title' => 'Granted!',
+                'message' => 'The Applicant Successfuly Granted.',
+                'type' => 'success',
+            ]);
+
+            return redirect()->route('shelter-profiled-tagged-applicants');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            $this->handleGrantingError($e);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error processing grant: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Insufficient Stock!',
+                'message' => 'There was not enough stock to fulfill this request.',
+                'type' => 'danger',
+            ]);
+        }
+    }
+
+    protected function handleGrantingError(QueryException $e)
+    {
+        $errorMessage = 'An error occurred while processing your request. Please try again later.';
+        if ($e->getCode() === 23000) {
+            $errorMessage = 'The information you provided conflicts with existing records. Please check your input and try again.';
+        } elseif ($e->getCode() === 42000) {
+            $errorMessage = 'There was a problem with the data you provided. Please check your input and try again.';
+        }
+
+        Log::error('Error creating grantee: ' . $e->getMessage());
+        $this->dispatch('alert', [
+            'title' => 'Something went wrong!',
+            'message' => $errorMessage . ' <br><small>' . now()->calendar() . '</small>',
+            'type' => 'danger',
+        ]);
+    }
+
+    public function resetForm(): void
+    {
+        $this->reset([
+            'material_id',
+            'materialUnitId',
+            'purchaseOrderId',
+            'date_of_delivery',
+            'date_of_ris',
+            'grantee_quantity',
+            'images',
+        ]);
+    }
+
     public function viewApplicantDetails($profileNo): RedirectResponse
     {
         return redirect()->route('profiled-tagged-applicant-details', ['profileNo' => $profileNo]);
@@ -523,42 +522,43 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public function render()
     {
-        $query = ProfiledTaggedApplicant::query();
-
-        // Apply search conditions if there is a search term
-        $query->when($this->search, function ($query) {
-            return $query->where(function ($query) {
-                $query->where('profile_no', 'like', '%' . $this->search . '%')
-                    ->orWhereHas('shelterApplicant', function ($query) { // Access shelterApplicant relationship
-                        $query->where('first_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('middle_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('last_name', 'like', '%' . $this->search . '%');
-                    })
-                    ->orWhereHas('shelterApplicant.originOfRequest', function ($query) {
-                        $query->where('name', 'like', '%' . $this->search . '%');
-                    });
+        // Fetch applicants with their related data
+        $query = ProfiledTaggedApplicant::with(['originOfRequest', 'shelterApplicant.person'])
+            ->where(function($query) {
+                // Search within shelterApplicant's person relationship
+                $query->whereHas('shelterApplicant.person', function($q) {
+                    $q->where('first_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                        ->orWhere('last_name', 'like', '%'.$this->search.'%');
+                })
+                // Search within shelterApplicant's own fields
+                ->orWhereHas('shelterApplicant', function($q) {
+                    $q->where('request_origin_id', 'like', '%'.$this->search.'%')
+                        ->orWhere('profile_no', 'like', '%'.$this->search.'%');
+                });
             });
-        });
-
+    
         // Apply date range filter (if both dates are present)
         if ($this->startTaggingDate && $this->endTaggingDate) {
             $query->whereBetween('date_tagged', [$this->startTaggingDate, $this->endTaggingDate]);
         }
-
+    
+        // Filter by selected origin of request
         if ($this->selectedOriginOfRequest) {
-            $query->whereHas('shelterApplicant.originOfRequest', function ($query) {
-                $query->where('id', $this->selectedOriginOfRequest);
+            $query->whereHas('shelterApplicant.originOfRequest', function ($q) {
+                $q->where('id', $this->selectedOriginOfRequest);
             });
         }
-
+    
+        // Fetch all origin of requests for filter dropdown
         $OriginOfRequests = OriginOfRequest::all();
-
-        $query = $query->with(['originOfRequest', 'shelterApplicant']);
-        $profiledTaggedApplicants = $query->paginate(5);
-
+    
+        // Fetch and paginate the results
+        $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate(5);
+    
         return view('livewire.shelter-profiled-tagged-applicants', [
             'profiledTaggedApplicants' => $profiledTaggedApplicants,
             'OriginOfRequests' => $OriginOfRequests,
         ]);
     }
-}
+}    
