@@ -40,7 +40,7 @@ class ShelterProfiledTaggedApplicants extends Component
     public $materialUnits = [];
     public $purchaseOrders = [];
     public $materialUnitId, $material_id, $purchaseOrderId;
-    public $quantity, $date_of_delivery, $date_of_ris;
+    public $quantity, $available_quantity, $date_of_delivery, $date_of_ris;
     public $grantee_quantity = [];
     public $images = [];
 
@@ -55,7 +55,7 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public $materialLists = [];
     public $materials = [
-        ['material_id' => '', 'grantee_quantity' => '', 'material_unit_id' => '', 'purchase_order_id' => '', 'quantity' => '']
+        ['material_id' => '', 'grantee_quantity' => '', 'material_unit_id' => '', 'purchase_order_id' => '', 'available_quantity' => '']
     ];
 
 
@@ -116,12 +116,12 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public function findMaterialInfo($material_id)
     {
-        $material = Material::with(['purchaseOrder', 'materialUnit', 'quantity'])->find($material_id);
+        $material = Material::with(['purchaseOrder', 'materialUnit', 'available_quantity'])->find($material_id);
         if ($material) {
             return [
                 'material_unit_id' => $material->materialUnit?->unit ?? 'N/A',
                 'purchase_order_id' => $material->purchaseOrder?->po_number ?? 'N/A',
-                'quantity' => $material->quantity // Assuming 'quantity' holds the available stock
+                'available_quantity' => $material->available_quantity // 'available quantity' holds the available stock
             ];
         }
         return [];
@@ -142,14 +142,14 @@ class ShelterProfiledTaggedApplicants extends Component
             $this->materials[$index]['purchaseOrderDisplay'] = $material->purchaseOrder?->po_number ?? 'N/A';
 
             // Quantity is a straightforward value
-            $this->materials[$index]['quantity'] = $material->quantity;
+            $this->materials[$index]['available_quantity'] = $material->available_quantity;
         } else {
             // Set defaults if material not found
             $this->materials[$index]['material_unit_id'] = null;
             $this->materials[$index]['purchase_order_id'] = null;
             $this->materials[$index]['materialUnitDisplay'] = 'N/A';
             $this->materials[$index]['purchaseOrderDisplay'] = 'N/A';
-            $this->materials[$index]['quantity'] = 'N/A';
+            $this->materials[$index]['available_quantity'] = 'N/A';
         }
     }
 
@@ -157,7 +157,7 @@ class ShelterProfiledTaggedApplicants extends Component
 
     public function addMaterial()
     {
-        $this->materials[] = ['material_id' => '', 'grantee_quantity' => '', 'material_unit_id' => '', 'purchase_order_id' => '', 'quantity' => ''];
+        $this->materials[] = ['material_id' => '', 'grantee_quantity' => '', 'material_unit_id' => '', 'purchase_order_id' => '', 'available_quantity' => ''];
     }
 
     public function removeMaterial($index)
@@ -426,7 +426,7 @@ class ShelterProfiledTaggedApplicants extends Component
             foreach ($this->materials as $material) {
                 // Check if there's enough stock available for the material
                 $currentMaterial = Material::find($material['material_id']);
-                if ($currentMaterial->quantity < $material['grantee_quantity']) {
+                if ($currentMaterial->available_quantity < $material['grantee_quantity']) {
                     throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
                 }
 
@@ -438,7 +438,7 @@ class ShelterProfiledTaggedApplicants extends Component
                 ]);
 
                 // Subtract the granted quantity from the available stock
-                $currentMaterial->decrement('quantity', $material['grantee_quantity']);
+                $currentMaterial->decrement('available_quantity', $material['grantee_quantity']);
             }
 
             // Retrieve the delivered materials for logging or debugging purposes
