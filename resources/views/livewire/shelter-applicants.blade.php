@@ -1,14 +1,24 @@
-<div x-data="{ openFilters: false, openModal: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
+<div x-data="{ openFilters: false, openModal: false, showDuplicateWarning: @entangle('showDuplicateWarning'), duplicateData: @entangle('duplicateData') }"
+         class="p-10 h-screen ml-[17%] mt-[60px]">
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
         <div class="flex-1 h-screen p-6 overflow-auto">
+            <!-- Add this to your Blade template -->
             <!-- Header -->
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
-                <h2 class="text-[13px] ml-5 text-gray-700">SHELTER ASSISTANCE PROGRAM APPLICANTS</h2>
-                <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+                <h2 class="text-[13px] ml-5 text-gray-700">
+                    SHELTER ASSISTANCE PROGRAM APPLICANTS
+                </h2>
+                <img src="{{ asset('storage/images/design.png') }}"
+                     alt="Design"
+                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative">
-                    <button @click="openModal = true" class="bg-gradient-to-r from-custom-red to-custom-green text-white px-4 py-2 rounded">Add Applicant</button>
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
+                    <button @click="openModal = true" class="bg-gradient-to-r from-custom-red to-custom-green text-white px-4 py-2 rounded">
+                        Add Applicant
+                    </button>
+                    <button class="bg-custom-green text-white px-4 py-2 rounded">
+                        Export
+                    </button>
                 </div>
             </div>
 
@@ -135,6 +145,137 @@
                     {{ $applicants->links() }}
                 </div>
 
+                <div x-show="$wire.showShelterDuplicateWarning"
+                     class="fixed inset-0 z-[99999] bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+                     x-cloak>
+                    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                        <div class="mt-3 text-center">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900"
+                                x-text="$wire.shelterDuplicateData?.applications?.shelter ? 'Cannot Proceed - Duplicate Found' : 'Possible Duplicate Found'">
+                            </h3>
+                            <div class="mt-2 px-7 py-3">
+                                <p class="text-sm text-gray-500" x-text="$wire.shelterDuplicateData?.message"></p>
+                                <div class="mt-4">
+                                    <template x-if="$wire.shelterDuplicateData?.applications?.housing">
+                                        <p class="text-sm text-red-600">Has Housing Application</p>
+                                    </template>
+                                    <template x-if="$wire.shelterDuplicateData?.applications?.shelter">
+                                        <p class="text-sm text-red-600">Has Shelter Application</p>
+                                    </template>
+                                </div>
+                            </div>
+                            <div class="items-center px-4 py-3 space-y-3">
+                                <template x-if="!$wire.shelterDuplicateData?.applications?.shelter">
+                                    <button type="button"
+                                            wire:click="proceedWithApplication"
+                                            class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                        Proceed
+                                    </button>
+                                </template>
+                                <button type="button"
+                                        wire:click="closeDuplicateWarning"
+                                        class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+{{--                <script>--}}
+{{--                    window.addEventListener('confirm-shelter-duplicate', event => {--}}
+{{--                        if (confirm(event.detail.message)) {--}}
+{{--                            @this.call('submitForm'); // or store for housing--}}
+{{--                        }--}}
+{{--                    });--}}
+{{--                </script>--}}
+
+                <!-- ADD APPLICANT MODAL -->
+                <div x-show="openModal"
+                     class="fixed inset-0 flex z-[9999] items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
+                     x-cloak>
+                    <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
+                        <!-- Modal Header -->
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
+                            <button @click="openModal = false" class="text-gray-400 hover:text-gray-200">
+                                &times;
+                            </button>
+                        </div>
+
+                        <!-- Form -->
+                        <form wire:submit.prevent="submitForm">
+
+                            <!-- Date Applied Field -->
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE OF REQUEST</label>
+                                <input type="date" id="date-applied" wire:model="date_request"
+                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                       max="{{ now()->toDateString() }}">
+                                @error('date_request') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Name Fields -->
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME</label>
+                                    <input type="text" id="first-name" wire:model="first_name"
+                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                           placeholder="First Name">
+                                    @error('first_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE NAME</label>
+                                    <input type="text" id="middle-name" wire:model="middle_name"
+                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                           placeholder="Middle Name">
+                                    @error('middle_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME</label>
+                                    <input type="text" id="last-name" wire:model="last_name"
+                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                           placeholder="Last Name">
+                                    @error('last_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
+                                    <input type="text" id="suffix-name" wire:model="suffix_name"
+                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                           placeholder="Suffix Name">
+                                    @error('suffix_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Request Origin Field -->
+                            <div class="mb-4">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="request_origin_id">ORIGIN OF REQUEST</label>
+                                <select wire:model="request_origin_id" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]">
+                                    <option value="">Select Origin of Request</option>
+                                    @foreach ($OriginOfRequests as $origin)
+                                        <option value="{{ $origin->id }}">{{ $origin->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('request_origin_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <button type="submit" wire:click.prevent="submitForm" class="w-full py-2 bg-custom-green hover:bg-custom-red text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-sm">+ ADD APPLICANT</span>
+                                </button>
+
+                                <button type="button" @click="openModal = false"
+                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    <span class="text-[12px]">CANCEL</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <!-- EDIT APPLICANT MODAL -->
                 <div x-cloak x-show="isEditModalOpen" class="fixed inset-0 flex z-50 items-center justify-center w-full bg-black bg-opacity-50 shadow-lg">
                     <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
@@ -225,101 +366,10 @@
                         </form>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </div>
-
-    <!-- ADD APPLICANT MODAL -->
-    <div x-show="openModal"
-        class="fixed inset-0 flex z-50 items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
-        x-cloak>
-        <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-            <!-- Modal Header -->
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
-                <button @click="openModal = false" class="text-gray-400 hover:text-gray-200">
-                    &times;
-                </button>
-            </div>
-
-            <!-- Form -->
-            <form wire:submit.prevent="submitForm">
-
-                <!-- Date Applied Field -->
-                <div class="mb-4">
-                    <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE OF REQUEST</label>
-                    <input type="date" id="date-applied" wire:model="date_request"
-                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                        max="{{ now()->toDateString() }}">
-                    @error('date_request') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Name Fields -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME</label>
-                        <input type="text" id="first-name" wire:model="first_name"
-                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                            placeholder="First Name">
-                        @error('first_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE NAME</label>
-                        <input type="text" id="middle-name" wire:model="middle_name"
-                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                            placeholder="Middle Name">
-                        @error('middle_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME</label>
-                        <input type="text" id="last-name" wire:model="last_name"
-                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                            placeholder="Last Name">
-                        @error('last_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
-                        <input type="text" id="suffix-name" wire:model="suffix_name"
-                            class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                            placeholder="Suffix Name">
-                        @error('suffix_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                    </div>
-                </div>
-
-                <!-- Request Origin Field -->
-                <div class="mb-4">
-                    <label class="block text-[12px] font-medium mb-2 text-black" for="request_origin_id">ORIGIN OF REQUEST</label>
-                    <select wire:model="request_origin_id" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]">
-                        <option value="">Select Origin of Request</option>
-                        @foreach ($OriginOfRequests as $origin)
-                        <option value="{{ $origin->id }}">{{ $origin->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('request_origin_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <button type="submit" wire:click.prevent="submitForm" class="w-full py-2 bg-custom-green hover:bg-custom-red text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                        <span class="text-sm">+ ADD APPLICANT</span>
-                    </button>
-
-                    <button type="button" @click="openModal = false"
-                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                        <span class="text-[12px]">CANCEL</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
 </div>
-
 <script>
     function capitalizeInput(input) {
         input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
