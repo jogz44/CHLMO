@@ -2,7 +2,7 @@
     <div class="flex bg-gray-100 text-[12px]">
         <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
             <form wire:submit.prevent="store">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-5">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%]">
                     <div class="flex items-center">
                         <a href="{{ route('shelter-transaction-applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -14,24 +14,28 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div class="flex space-x-2 z-[1000]">
-                        <div class="z-50">
-                            <div class="alert mt-14"
-                                :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
-                                x-data="{ open:false, alert:{} }"
-                                x-show="open" x-cloak
-                                x-transition:enter="animate-alert-show"
-                                x-transition:leave="animate-alert-hide"
-                                @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
-                                <div class="alert-wrapper">
-                                    <strong x-html="alert.title">Title</strong>
-                                    <p x-html="alert.message">Description</p>
+                    <div class="flex space-x-2 z-10">
+                        <div x-data="{ showModal: false }"
+                            x-on:keydown.escape.window="showModal = false">
+                            <div class="z-50">
+                                <div class="alert mt-14"
+                                    :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
+                                    x-data="{ open:false, alert:{} }"
+                                    x-show="open" x-cloak
+                                    x-transition:enter="animate-alert-show"
+                                    x-transition:leave="animate-alert-hide"
+                                    @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
+                                    <div class="alert-wrapper">
+                                        <strong x-html="alert.title">Title</strong>
+                                        <p x-html="alert.message">Description</p>
+                                    </div>
+                                    <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
                                 </div>
-                                <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
                             </div>
                             <!-- SUBMIT Button -->
-                            <button type="submit"
-                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
+                            <button type="button"
+                                @click="showModal = true"
+                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-semibold px-6 py-2 rounded">
                                 SUBMIT
                                 <div wire:loading>
                                     <svg aria-hidden="true"
@@ -47,7 +51,79 @@
                                     <span class="sr-only">Loading...</span>
                                 </div>
                             </button>
+
+                            <!-- Modal -->
+                            <div
+                                x-show="showModal"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0"
+                                x-transition:enter-end="opacity-100"
+                                x-transition:leave="transition ease-in duration-200"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="fixed inset-0 z-10 overflow-y-auto"
+                                style="display: none;">
+
+                                <!-- Background overlay -->
+                                <div class="fixed inset-0 bg-black opacity-50"></div>
+
+                                <!-- Modal content -->
+                                <div class="relative min-h-screen flex items-center justify-center p-4">
+                                    <div class="relative bg-white rounded-lg max-w-md w-full p-6 shadow-lg">
+                                        <div class="flex items-start justify-between">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 text-yellow-400">
+                                                    <!-- Warning icon -->
+                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <h3 class="text-lg font-medium text-gray-900">
+                                                        Confirm Submission
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <button @click="showModal = false"
+                                                class="text-gray-400 hover:text-gray-500">
+                                                <span class="sr-only">
+                                                    Close
+                                                </span>
+                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <p class="text-sm text-gray-500">
+                                                Please ensure all fields are filled out correctly. This action cannot be undone once submitted.
+                                                Are you sure you want to proceed?
+                                            </p>
+                                        </div>
+
+                                        <div class="mt-6 flex justify-end space-x-3">
+                                            <button
+                                                @click="showModal = false"
+                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-yellow">
+                                                Cancel
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                wire:click="store"
+                                                x-on:click="showModal = false"
+                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-custom-red border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-red">
+                                                Proceed
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
+
                         <script>
                             document.addEventListener('livewire.initialized', () => {
                                 let obj = @json(session('alert') ?? []);
@@ -174,7 +250,7 @@
                                 </div>
                                 <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label for="partner_middle_name" class="block text-[12px] font-medium text-gray-700 mb-1">
-                                        MIDDLE NAME 
+                                        MIDDLE NAME
                                     </label>
                                     <input type="text"
                                         id="partner_middle_name"
@@ -265,15 +341,15 @@
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="contactNo" class="block text-[13px] font-medium text-gray-700 mb-1">CONTACT
                                 NUMBER <span class="text-red-500">*</span></label>
-                                <input type="text"
-                                       wire:model="contact_number"
-                                       id="contact_number"
-                                       pattern="^09\d{9}$"
-                                       title="Enter a valid phone number (e.g., 09123456789)"
-                                       maxlength="11"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase"
-                                       placeholder="09xxxxxxxxx"
-                                       oninput="validateNumberInput(this)">
+                            <input type="text"
+                                wire:model="contact_number"
+                                id="contact_number"
+                                pattern="^09\d{9}$"
+                                title="Enter a valid phone number (e.g., 09123456789)"
+                                maxlength="11"
+                                class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase"
+                                placeholder="09xxxxxxxxx"
+                                oninput="validateNumberInput(this)">
 
                         </div>
                     </div>
@@ -344,7 +420,7 @@
                             </select>
                             @error('living_situation') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
-                        <template x-if="livingSituation >= '1' && livingSituation <= '7'  || livingSituation === '9'">
+                        <template x-if="livingSituation >= '1' && livingSituation <= '7'  || livingSituation === 9">
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span></label>
                                 <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification" name="living_situation_case_specification" placeholder="Enter case details"
@@ -381,156 +457,89 @@
                 </div>
                 <div class="p-3 rounded">
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">UPLOAD DOCUMENTS</h2>
-                    <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured requirements submitted by the qualified applicants.</p>
+                    <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured house situation of the applicant.</p>
                 </div>
 
                 <!-- File Uploads -->
-                <div x-data="fileUpload()" class="bg-white p-6 rounded shadow mb-6">
-                    <div class="grid grid-cols-2 gap-2">
-                        <!-- Drag and Drop Area -->
-                        <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1">
-                            <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
+                <div x-data="multipleImageUpload()" class="bg-white p-6 rounded shadow mb-6">
+                    <div class="flex flex-col space-y-4">
+                        <!-- Upload Area -->
+                        <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-2">
+                            <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
                             </svg>
-
-                            <button type="button"
-                                class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                @click="$refs.fileInput.click()">BROWSE FILES
+                            <p class="text-sm text-gray-600">Upload images of the housing structure</p>
+                            <button type="button" class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
+                                @click="$refs.fileInput.click()">
+                                BROWSE FILES
                             </button>
 
-                            <!-- Hidden File Input for Multiple Files -->
-                            <input wire:model="photo"
-                                type="file"
-                                id="photo"
-                                x-ref="fileInput"
-                                @change="addFiles($refs.fileInput.files)"
-                                multiple
-                                class="hidden" required />
-                            @error('photo') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            <!-- Hidden File Input -->
+                            <input wire:model="photos" type="file" accept="image/*" id="photos" x-ref="fileInput" multiple
+                                @change="handleFilesSelect" class="hidden" />
+                            @error('photos.*') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Show selected files and progress bars -->
-                        <div class="w-full grid grid-cols-1 gap-2 border-2 border-dashed border-green-500 rounded-lg p-2">
-                            <template x-for="(fileWrapper, index) in files" :key="index">
-                                <div @click="openPreviewModal = true; selectedFile = fileWrapper"
-                                    class="bg-white p-2 shadow border-2 border-green-500 rounded-lg">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <div class="flex items-center space-x-2">
-                                            <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Preview Area -->
+                        <div class="space-y-4">
+                            <template x-for="(image, index) in images" :key="index">
+                                <div class="border-2 border-green-500 rounded-lg p-4">
+                                    <div class="relative">
+                                        <img :src="image.url" alt="Preview" class="w-full h-64 object-contain rounded-lg">
+                                        <!-- Remove Button -->
+                                        <button type="button" @click="removeImage(index)"
+                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M7 3v6h4l1 1h4V3H7z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M5 8v10h14V8H5z" />
+                                                    d="M6 18L18 6M6 6l12 12" />
                                             </svg>
-                                            <span class="text-xs font-semibold text-gray-700"
-                                                x-text="fileWrapper.displayName"></span>
-                                        </div>
-                                        <!-- Status -->
-                                        <span class="text-xs text-green-500 font-semibold">100%</span>
+                                        </button>
                                     </div>
-                                    <!-- Progress Bar -->
-                                    <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                        <div class="w-full h-full bg-green-500"></div>
+                                    <!-- Filename Display -->
+                                    <div class="bg-gray-50 px-3 py-2 rounded">
+                                        <span class="text-sm text-gray-600" x-text="image.name"></span>
                                     </div>
                                 </div>
                             </template>
                         </div>
-
-                        <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
-                        <div x-show="openPreviewModal"
-                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                            x-cloak>
-                            <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                                <!-- Modal Header with File Name -->
-                                <div class="flex justify-between items-center mb-4">
-                                    <!-- Only show input if selectedFile is not null -->
-                                    <template x-if="selectedFile">
-                                        <!-- <input type="text" x-model="selectedFile.displayName" -->
-                                        <!-- class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0"> -->
-                                        <input type="text"
-                                            x-model="selectedFile.displayName"
-                                            wire:model.defer="renamedFileName"
-                                            class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0"
-                                            placeholder="Rename file">
-                                        @error('photo') <span class="error text-red-600">{{ $message }}</span> @enderror
-                                    </template>
-                                    <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename File</button>
-                                    <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">&times;</button>
-                                </div>
-
-                                <!-- Display Image -->
-                                <div class="flex justify-center mb-4">
-                                    <!-- <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'" -->
-                                    <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
-                                        alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                                </div>
-                                <!-- Modal Buttons -->
-                                <div class="flex justify-between mt-4">
-                                    <button type="button" class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                        @click="confirmFile(); $wire.store(selectedFile.file, selectedFile.renamedFileName)">CONFIRM
-                                    </button>
-                                    <button type="button" class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                        @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+
                 <script>
-                    function fileUpload() {
+                    function multipleImageUpload() {
                         return {
-                            files: [],
-                            selectedFile: null,
-                            openPreviewModal: false,
+                            images: [],
 
-                            addFiles(fileList) {
-                                for (let i = 0; i < fileList.length; i++) {
-                                    const file = fileList[i];
-                                    this.files.push({
-                                        file,
-                                        displayName: file.name,
-                                        progress: 0
+                            handleFilesSelect() {
+                                const files = this.$refs.fileInput.files;
+                                Array.from(files).forEach(file => {
+                                    // Validate file type
+                                    if (!file.type.startsWith('image/')) {
+                                        alert('Please select valid image files');
+                                        return;
+                                    }
+
+                                    this.images.push({
+                                        name: file.name,
+                                        url: URL.createObjectURL(file),
+                                        file: file,
                                     });
-                                    // Start the upload process for the file
-                                    this.uploadFile(file, this.files.length - 1);
-                                }
-                            },
-                            removeFile(fileWrapper) {
-                                this.files = this.files.filter(f => f !== fileWrapper);
-                            },
-                            uploadFile(file, index) {
-                                const uploadSimulation = setInterval(() => {
-                                    if (this.files[index].progress >= 100) {
-                                        clearInterval(uploadSimulation);
-                                    } else {
-                                        this.files[index].progress += 10; // Simulate progress increase
-                                    }
-                                }, 100); // Adjust the speed of progress simulation
-                            },
-                            renameFile() {
-                                if (this.selectedFile) {
-                                    const newName = prompt('Rename File', this.selectedFile.displayName);
-                                    if (newName) {
-                                        this.selectedFile.displayName = newName;
-                                        const fileIndex = this.files.findIndex(f => f === this.selectedFile);
-                                        if (fileIndex > -1) {
-                                            this.files[fileIndex].displayName = newName;
-                                        }
+                                });
 
-                                    }
-                                }
+                                // Sync files with Livewire
+                                this.$refs.fileInput.value = ''; // Clear the file input for subsequent uploads
                             },
-                            confirmFile() {
-                                // Logic to handle file confirmation (just close modal)
-                                this.openPreviewModal = false;
+
+                            removeImage(index) {
+                                this.images.splice(index, 1);
+                                // Clear file from Livewire model
+                                this.$wire.set('photos', this.images.map(img => img.file));
                             }
                         }
                     }
                 </script>
+
             </form>
         </div>
         <script>
