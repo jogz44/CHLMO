@@ -70,7 +70,7 @@
                             </a>
 
                             <!-- Shelter Submenu -->
-                            <a href="{{ route('shelter-admin.shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
+                            <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
                                 :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"
                                 class="flex items-center py-2 px-4 hover:text-[#FF9100]">
                                 <svg xmlns="http://www.w3.org/2000/svg"
