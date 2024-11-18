@@ -98,7 +98,7 @@
                                 <span class="ml-2">Housing</span>
                             </a>
                             <a href="{{ route('shelter-dashboard') }}"
-                               @click="activeChildLink = 'shelter-admin.shelter-dashboard';
+                               @click="activeChildLink = 'shelter-dashboard';
                                     localStorage.setItem('activeChildLink', 'shelter-dashboard')"
                                :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'shelter-dashboard' }"
                                class="flex items-center py-2 px-4 hover:text-[#FF9100]">

@@ -12,24 +12,57 @@ class ApplicantsMasterlist extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'tailwind';
+    // Search and filter properties
+    public $search = '';
+    public $filterApplicationType = ''; // 'housing', 'shelter', or empty for all
     // applicant details
     public $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $living_situation, $contact_number,
         $occupation, $monthly_income, $transaction_type;
 
     public function render()
     {
-        $people = People::with([
-            'applicants.address.purok',
-            'applicants.address.barangay',
-            'applicants.transactionType',
-            'applicants.taggedAndValidated.livingSituation',
-            'applicants.taggedAndValidated',
-        ])
+        $peopleQuery = People::query()
+            ->with([
+                'applicants' => function ($query) {
+                    $query->with([
+                        'address.purok',
+                        'address.barangay',
+                        'transactionType',
+                        'taggedAndValidated.livingSituation',
+                    ]);
+                },
+                'shelterApplicants' => function ($query) {
+                    $query->with([
+                        'originOfRequest',
+                    ]);
+                }
+            ]);
+
+        // Apply search if provided
+        if ($this->search) {
+            $peopleQuery->where(function ($query) {
+                $query->where('first_name', 'LIKE', '%' . $this->search . '%')
+                    ->orWhere('middle_name', 'LIKE', '%' . $this->search . '%')
+                    ->orWhere('last_name', 'LIKE', '%' . $this->search . '%');
+            });
+        }
+
+        // Apply application type filter if selected
+        if ($this->filterApplicationType) {
+            $peopleQuery->where('application_type', $this->filterApplicationType);
+        }
+
+        $people = $peopleQuery
             ->orderBy('created_at', 'desc')
-            ->paginate(5); // Pagination applies to $people
+            ->paginate(7);
 
         return view('livewire.applicants-masterlist', [
-            'people' => $people // Pass the paginated $people variable
+            'people' => $people
         ]);
+    }
+
+    public function resetFilters()
+    {
+        $this->reset(['search', 'filterApplicationType']);
     }
 }

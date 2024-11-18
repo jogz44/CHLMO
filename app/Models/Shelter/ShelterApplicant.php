@@ -26,9 +26,6 @@ class ShelterApplicant extends Model
         'person_id',
         'request_origin_id',
         'profile_no',
-        // 'first_name',
-        // 'middle_name',
-        // 'last_name',
         'date_request',
         'is_tagged',
     ];
@@ -42,22 +39,44 @@ class ShelterApplicant extends Model
         'user_id' => 'integer',
         'request_origin_id' => 'integer',
         'date_request' => 'date',
+        'is_tagged' => 'boolean'
     ];
 
+//    public static function generateProfileNo()
+//    {
+//        $currentYear = Carbon::now()->year;
+//
+//        // Increment the count for the current year
+//        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+//
+//        // Format the ID: "YYYY-000XXX"
+//        $profileNo = sprintf('%d-%06d', $currentYear, $countForYear);
+//
+//        // Log the generated values for debugging
+//        logger()->info('Generating Profile No', [
+//            'year' => $currentYear,
+//            'count' => $countForYear
+//        ]);
+//
+//        return $profileNo;
+//    }
     public static function generateProfileNo()
     {
         $currentYear = Carbon::now()->year;
 
-        // Increment the count for the current year
-        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+        // Use the same constant as defined in People model
+        $countForYear = ApplicantCounter::incrementCountForYear(
+            $currentYear,
+            ApplicantCounter::TYPE_SHELTER
+        );
 
         // Format the ID: "YYYY-000XXX"
         $profileNo = sprintf('%d-%06d', $currentYear, $countForYear);
 
-        // Log the generated values for debugging
         logger()->info('Generating Profile No', [
             'year' => $currentYear,
-            'count' => $countForYear
+            'count' => $countForYear,
+            'type' => ApplicantCounter::TYPE_SHELTER
         ]);
 
         return $profileNo;
@@ -65,7 +84,7 @@ class ShelterApplicant extends Model
 
     public function person(): BelongsTo
     {
-        return $this->belongsTo(People::class, 'person_id', 'id');
+        return $this->belongsTo(People::class, 'person_id');
     }
 
     public function originOfRequest(): BelongsTo

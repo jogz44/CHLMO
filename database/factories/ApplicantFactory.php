@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Address;
 use App\Models\Barangay;
 use App\Models\CivilStatus;
+use App\Models\People;
 use App\Models\Purok;
 use App\Models\Spouse;
 use App\Models\TransactionType;
@@ -13,40 +14,33 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Applicant;
 use App\Models\User;
+use RuntimeException;
 
 class ApplicantFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Applicant::class;
 
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         $userIds = User::pluck('id')->toArray();
         $transactionTypeIds = TransactionType::pluck('id')->toArray();
 
-        static $addressIds; // Use static to persist the array across multiple calls
-        if (!$addressIds) {
-            $addressIds = Address::pluck('id')->shuffle()->toArray(); // Fetch and shuffle the address IDs once
+        // Fetch IDs only if not already cached and ensure addresses exist
+        $addressIds = Address::exists() ? Address::pluck('id')->toArray() : [];
+
+        if (empty($addressIds)) {
+            throw new RuntimeException('No addresses available to assign to applicants. Please seed the addresses table first.');
         }
 
         return [
-            'user_id' => fake()->randomElement($userIds),
-            'transaction_type_id' => fake()->randomElement($transactionTypeIds),
+            'applicant_id' => Applicant::generateApplicantId(),
+            'person_id' => People::factory(), // Generates a related People model
+            'user_id' => 1, // Generates a related User model
+            'transaction_type_id' => fake()->randomElement($transactionTypeIds), // Generates a related TransactionType model
             'address_id' => fake()->randomElement($addressIds),
-            'first_name' => $this->faker->firstName(),
-            'middle_name' => $this->faker->optional()->firstName(), // Optional middle name
-            'last_name' => $this->faker->lastName(),
-            'suffix_name' => fake()->optional()->suffix(),
-            'phone' => $this->faker->phoneNumber(),
-            'date_applied' => $this->faker->date(),
-            'initially_interviewed_by' => $this->faker->name(), // Realistic name for the interviewer
+            'date_applied' => $this->faker->dateTimeBetween('-1 year', 'now'), // Random date within the last year
+            'initially_interviewed_by' => 1, // Assumes this is a User ID, could be another relation
+            'is_tagged' => false
         ];
     }
 }

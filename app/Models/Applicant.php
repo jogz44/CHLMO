@@ -31,26 +31,45 @@ class Applicant extends Model
         'date_applied' => 'date',
     ];
 
+//    public static function generateApplicantId(): string
+//    {
+//        $currentYear = Carbon::now()->year;
+//
+//        // Increment the count for the current year
+//        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+//
+//        // Format the ID: "YYYY-000XXX"
+//        $applicantId = sprintf('%d-%06d', $currentYear, $countForYear);
+//
+//        // Log the generated values for debugging
+//        logger()->info('Generating applicant ID', [
+//            'year' => $currentYear,
+//            'count' => $countForYear
+//        ]);
+//
+//        return $applicantId;
+//    }
     public static function generateApplicantId(): string
     {
         $currentYear = Carbon::now()->year;
 
-        // Increment the count for the current year
-        $countForYear = ApplicantCounter::incrementCountForYear($currentYear);
+        // Use the same constant as defined in People model
+        $countForYear = ApplicantCounter::incrementCountForYear(
+            $currentYear,
+            ApplicantCounter::TYPE_HOUSING
+        );
 
         // Format the ID: "YYYY-000XXX"
         $applicantId = sprintf('%d-%06d', $currentYear, $countForYear);
 
-        // Log the generated values for debugging
         logger()->info('Generating applicant ID', [
             'year' => $currentYear,
-            'count' => $countForYear
+            'count' => $countForYear,
+            'type' => ApplicantCounter::TYPE_HOUSING
         ]);
 
         return $applicantId;
     }
-
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
