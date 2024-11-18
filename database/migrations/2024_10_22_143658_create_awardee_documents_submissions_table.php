@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('awardee_documents_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('awardee_id')->constrained('awardees')->onDelete('cascade');
+            $table->foreignId('tagged_applicant_id')->constrained('tagged_and_validated_applicants')->onDelete('cascade');
             $table->foreignId('attachment_id')->constrained('awardee_attachments_lists')->onDelete('cascade');
             $table->string('file_path');
             $table->string('file_name');

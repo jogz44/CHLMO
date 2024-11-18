@@ -51,7 +51,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $relocation_lot_id,
         $relocationSites = [],
         $lot_size,
-//        $lot_size_unit_id,
         $unit;
 
     // For uploading of files
@@ -165,19 +164,20 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'grant_date' => $this->grant_date,
             'is_awarded' => false, // Update awardee table for status tracking
             'is_blacklisted' => false, // Update awardee table for status tracking
+            'documents_submitted' => false, // Add new state tracking
         ]);
 
         // Check if the awardee was created successfully
         if ($awardee) {
-            $this->awardeeId = $awardee->id; // Set awardeeId here
+            $this->awardeeId = $awardee->id;
             \Log::info('Awardee created successfully', ['awardeeId' => $this->awardeeId]);
         } else {
             \Log::error('Failed to create awardee');
         }
 
-        // Update the 'tagged_and_validated_applicants' table to mark the applicant as being processed for awarding
+        // Update the 'tagged_and_validated_applicants' table
         TaggedAndValidatedApplicant::where('id', $this->taggedAndValidatedApplicantId)->update([
-            'is_awarding_on_going' => true, // Update to reflect awarding is in process
+            'is_awarding_on_going' => true,
         ]);
 
         $this->resetForm();
@@ -198,7 +198,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         ]);
     }
 
-    public  function removeUpload($property, $fileName, $load): void
+    public function removeUpload($property, $fileName, $load): void
     {
         $filePath = storage_path('livewire-tmp/'.$fileName);
         if (file_exists($filePath)){
@@ -222,15 +222,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         DB::beginTransaction();
         try {
-            // Check if awardeeId is set
-            if (is_null($this->awardeeId)) {
-                $this->handleError('Awardee ID is missing. Please make sure the awardee is created first.');
-                return;
-            }
-
-            // Log the current IDs we're working with
-            logger()->info('Starting submission with IDs', [
-                'awardee_id' => $this->awardeeId,
+            // We don't need to check for awardeeId anymore since we're using applicant_id
+            logger()->info('Starting submission for applicant', [
+                'applicant_id' => $this->taggedAndValidatedApplicantId,
             ]);
 
             $this->isFilePonduploading = false;
@@ -257,11 +251,19 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $this->storeAttachment('marriageCert', 5);
             $this->storeAttachment('birthCert', 6);
 
+            // Update the applicant's status or related awardee if exists
+            $applicant = TaggedAndValidatedApplicant::find($this->taggedAndValidatedApplicantId);
+            if ($applicant->awardees()->exists()) {
+                $applicant->awardees()->first()->update([
+                    'documents_submitted' => true,
+                ]);
+            }
+
             DB::commit();
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
-                'message' => 'Applicant is now an official awardee! <br><small>'. now()->calendar() .'</small>',
+                'message' => 'Documents have been submitted successfully! <br><small>'. now()->calendar() .'</small>',
                 'type' => 'success'
             ]);
 
@@ -286,13 +288,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     {
         $file = $this->$fileInput;
         if ($file) {
-//            $fileName = 'awardee_' . $this->awardeeId . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-//            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
             $fileName = $file->getClientOriginalName();
             $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
 
             AwardeeDocumentsSubmission::create([
-                'awardee_id' => $this->awardeeId,
+                'tagged_applicant_id' => $this->taggedAndValidatedApplicantId,
                 'attachment_id' => $attachmentId,
                 'file_path' => $filePath,
                 'file_name' => $fileName,
@@ -300,18 +300,44 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'file_size' => $file->getSize(),
             ]);
 
-            logger()->info('Searching for awardee with ID', ['id' => $this->awardeeId]);
-
+//            logger()->info('Searching for awardee with ID', ['id' => $this->awardeeId]);
+//
+//            $awardee = Awardee::findOrFail($this->awardeeId);
+//
+//            logger()->info('Found awardee', [
+//                'awardee_id' => $awardee->id,
+//                'tagged_and_validated_applicant_id' => $awardee->tagged_and_validated_applicant_id
+//            ]);
+//
+//            $awardee->update(['is_awarded' => true]);
+        }
+    }
+    public function completeAward()
+    {
+        DB::beginTransaction();
+        try {
             $awardee = Awardee::findOrFail($this->awardeeId);
 
-            logger()->info('Found awardee', [
-                'awardee_id' => $awardee->id,
-                'tagged_and_validated_applicant_id' => $awardee->tagged_and_validated_applicant_id
+            // Verify documents are submitted before completing award
+            if (!$awardee->documents_submitted) {
+                throw new \Exception('Documents must be submitted before completing the award process.');
+            }
+            $awardee->update([
+                'is_awarded' => true
             ]);
 
-            $awardee->update(['is_awarded' => true]);
+            DB::commit();
 
-//            $this->resetUpload();
+            $this->dispatch('alert', [
+                'title' => 'Award Completed!',
+                'message' => 'Applicant has been successfully awarded. <br><small>'. now()->calendar() .'</small>',
+                'type' => 'success'
+            ]);
+
+            $this->redirect('transaction-request');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->handleError('Failed to complete award process: ' . $e->getMessage());
         }
     }
     private function handleError(string $message, \Exception $e = null): void
@@ -354,34 +380,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function render()
     {
         $query = TaggedAndValidatedApplicant::with([
+            'applicant.person',
             'applicant.address.purok',
             'applicant.address.barangay',
             'applicant.transactionType',
             'livingSituation',
             'caseSpecification'
         ]);
-
-//        ->whereHas('applicant', function($q) {
-//            $q->where('applicant_id', 'like', '%'.$this->search.'%')
-//                ->orWhere('first_name', 'like', '%'.$this->search.'%')
-//                ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-//                ->orWhere('last_name', 'like', '%'.$this->search.'%')
-//                ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
-//                ->orWhere('contact_number', 'like', '%'.$this->search.'%')
-//                ->orWhereHas('address.purok', function ($subQuery) {
-//                    $subQuery->where('name', 'like', '%'.$this->search.'%');
-//                })
-//                ->orWhereHas('address.barangay', function ($subQuery) {
-//                    $subQuery->where('name', 'like', '%'.$this->search.'%');
-//                });
-//            })
-//            ->orWhereHas('livingSituation', function($q) {
-//                $q->where('living_situation_description', 'like', '%' . $this->search . '%');
-//            })
-//            ->orWhereHas('caseSpecification', function($q) {
-//                $q->where('case_specification_name', 'like', '%' . $this->search . '%');
-//            })
-//            ->orWhere('living_situation_case_specification', 'like', '%'.$this->search.'%');
         // Apply search filter
         if ($this->search) {
             $query->whereHas('applicant', function($q) {
@@ -409,7 +414,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $query->whereBetween('tagging_date', [$this->startTaggingDate, $this->endTaggingDate]);
         }
 
-// Additional filters
+        // Additional filters
         if ($this->selectedPurok_id) {
             $query->whereHas('applicant.address', function ($q) {
                 $q->where('purok_id', $this->selectedPurok_id);

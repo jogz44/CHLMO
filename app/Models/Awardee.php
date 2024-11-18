@@ -18,6 +18,7 @@ class Awardee extends Model
         'lot_size',
         'unit',
         'grant_date',
+        'documents_submitted',
         'is_awarded',
         'is_blacklisted'
     ];
@@ -27,6 +28,7 @@ class Awardee extends Model
         'tagged_and_validated_applicant_id' => 'integer',
         'relocation_lot_id' => 'integer',
         'grant_date' => 'datetime',
+        'documents_submitted' => 'boolean',
         'is_awarded' => 'boolean',
         'is_blacklisted' => 'boolean'
     ];
@@ -46,10 +48,6 @@ class Awardee extends Model
     public function lotSizeUnit(): BelongsTo
     {
         return $this->belongsTo(LotSizeUnit::class, 'lot_size_unit_id', 'id');
-    }
-    public function awardeeDocumentsSubmissions(): HasMany
-    {
-        return $this->hasMany(AwardeeDocumentsSubmission::class, 'awardee_id');
     }
     public function blacklist(): HasOne
     {
