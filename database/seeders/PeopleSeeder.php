@@ -1,18 +1,18 @@
 <?php
 
-namespace Database\Seeders\ShelterSeeders;
+namespace Database\Seeders;
 
-use App\Models\Shelter\ShelterApplicant;
+use App\Models\People;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class ShelterApplicantSeeder extends Seeder
+class PeopleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        ShelterApplicant::factory(11)->create();
+        People::factory(10)->create();
     }
 }
