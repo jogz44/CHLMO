@@ -346,7 +346,7 @@ class Applicants extends Component
                 'barangay_id' => $this->selectedBarangay_id,
                 'purok_id' => $this->selectedPurok_id,
                 'transaction_type_id' => $this->selectedTransactionType_id,
-                'tagging_status' => $this->selectedTaggingStatus
+                'is_tagged' => $this->selectedTaggingStatus
             ]);
 
             return Excel::download(
@@ -383,7 +383,7 @@ class Applicants extends Component
             'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
             'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
             'transaction_type_id' => $this->selectedTransactionType_id,  // Changed from transaction_type_id
-            'tagging_status' => $this->selectedTaggingStatus  // Added to match Excel export
+            'is_tagged' => $this->selectedTaggingStatus  // Added to match Excel export
         ]);
 
         // Fetch Applicants based on filters
@@ -419,7 +419,7 @@ class Applicants extends Component
         }
 
         if ($this->selectedTaggingStatus) {   // Added to match Excel export
-            $query->where('tagging_status', $this->selectedTaggingStatus);
+            $query->where('is_tagged', $this->selectedTaggingStatus);
         }
 
         $applicants = $query->get();
