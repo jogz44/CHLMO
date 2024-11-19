@@ -103,7 +103,8 @@ class Grantees extends Component
         'profiledTaggedApplicant.shelterApplicant.originOfRequest',
         'profiledTaggedApplicant.governmentProgram', // Make sure the governmentProgram relationship is defined here
         'profiledTaggedApplicant.address.purok', // Correct path for address.purok
-        'profiledTaggedApplicant.address.barangay' // Correct path for address.barangay
+        'profiledTaggedApplicant.address.barangay', // Correct path for address.barangay
+        'profiledTaggedApplicant.shelterSpouse' // Correct path for shelterSpouse
     ])
     ->where(function($query) {
         // Search within shelterApplicant's person relationship
