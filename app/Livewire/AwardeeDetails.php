@@ -7,6 +7,7 @@ use App\Models\Barangay;
 use App\Models\Blacklist;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
+use App\Models\DependentsRelationship;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\LivingStatus;
@@ -18,6 +19,7 @@ use App\Models\Tribe;
 use App\Models\WallType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class AwardeeDetails extends Component
@@ -27,7 +29,7 @@ class AwardeeDetails extends Component
     public $awardee, $taggedApplicant, $applicant;
     // Applicant information
     public $transaction_type_id, $transactionTypes, $first_name, $middle_name, $last_name, $suffix_name, $barangay_id, $purok_id, $full_address, $contact_number;
-    public $puroks = [], $tribe_id, $sex, $date_of_birth, $religion_id, $occupation, $monthly_income, $family_income,
+    public $puroks = [], $tribe, $sex, $date_of_birth, $religion, $occupation, $monthly_income, $family_income,
             $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income,
             $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
 
@@ -39,6 +41,7 @@ class AwardeeDetails extends Component
     // Dependent's details
     public $dependents = [];
     public $images = [], $imagesForAwarding = [];
+    public $dependent_relationship_id, $dependentRelationships;
     public $selectedImage = null; // This is for the tagging image
     public $selectedAttachment = null; // this is for the awarding attachment
 
@@ -52,10 +55,9 @@ class AwardeeDetails extends Component
     public function mount($applicantId): void
     {
         $this->awardee = Awardee::with([
+            'taggedAndValidatedApplicant.applicant.person',
             'taggedAndValidatedApplicant.applicant.transactionType',
             'taggedAndValidatedApplicant.civilStatus',
-            'taggedAndValidatedApplicant.tribe',
-            'taggedAndValidatedApplicant.religion',
             'taggedAndValidatedApplicant.livingSituation',
             'taggedAndValidatedApplicant.caseSpecification',
             'taggedAndValidatedApplicant.governmentProgram',
@@ -64,7 +66,7 @@ class AwardeeDetails extends Component
             'taggedAndValidatedApplicant.wallType',
             'taggedAndValidatedApplicant.spouse',
             'taggedAndValidatedApplicant.liveInPartner',
-            'taggedAndValidatedApplicant.dependents',
+            'taggedAndValidatedApplicant.dependents.dependentRelationship',
             'address.purok',
             'address.barangay',
             'relocationLot',
@@ -84,21 +86,21 @@ class AwardeeDetails extends Component
         // Load Applicant Information
         $this->transaction_type_id = $this->applicant?->transactionType?->transaction_type_id ?? '--';
         $this->transactionTypes = TransactionType::all();
-        $this->first_name = $this->applicant->first_name ?? '--';
-        $this->middle_name = $this->applicant->middle_name ?? '--';
-        $this->last_name = $this->applicant->last_name ?? '--';
-        $this->suffix_name = $this->applicant->suffix_name ?? '--';
-        $this->contact_number = $this->applicant?->contact_number ?? '--';
+        $this->first_name = $this->applicant->person->first_name ?? '--';
+        $this->middle_name = $this->applicant->person->middle_name ?? '--';
+        $this->last_name = $this->applicant->person->last_name ?? '--';
+        $this->suffix_name = $this->applicant->person->suffix_name ?? '--';
+        $this->contact_number = $this->applicant?->person->contact_number ?? '--';
         $this->date_applied = optional($this->applicant?->date_applied)
             ->format('F d, Y') ?? '--';
 
         // Load Tagged and Validated Applicant Information
         $this->civil_status_id = $this->taggedApplicant?->civil_status_id ?? '--';
-        $this->tribe_id = $this->taggedApplicant?->tribe_id ?? '--';
+        $this->tribe = $this->taggedApplicant?->tribe ?? '--';
         $this->sex = $this->taggedApplicant?->sex ?? '--';
         $this->date_of_birth = optional($this->taggedApplicant?->date_of_birth)
             ->format('F d, Y') ?? '--';
-        $this->religion_id = $this->taggedApplicant?->religion_id ?? '--';
+        $this->religion = $this->taggedApplicant?->religion ?? '--';
         $this->occupation = $this->taggedApplicant?->occupation ?? '--';
         $this->monthly_income = $this->taggedApplicant?->monthly_income ?? '--';
         $this->family_income = $this->taggedApplicant?->family_income ?? '--';
@@ -131,13 +133,15 @@ class AwardeeDetails extends Component
                 'dependent_sex' => $dependent->dependent_sex,
                 'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
                 'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
-                'dependent_relationship' => $dependent->dependent_relationship,
+                'dependent_relationship_id' => $dependent->dependent_relationship_id,
                 'dependent_occupation' => $dependent->dependent_occupation,
                 'dependent_monthly_income' => $dependent->dependent_monthly_income,
             ];
         })->toArray();
         // Load civil statuses here
         $this->civilStatuses = CivilStatus::all();
+        // Load civil statuses here
+        $this->dependentRelationships = DependentsRelationship::all();
         // Load living situation
         $this->living_situation_id = $this->taggedApplicant?->living_situation_id ?? null;
         $this->livingSituations = LivingSituation::all();
@@ -175,9 +179,9 @@ class AwardeeDetails extends Component
         }
 
         // Load Address Information - Store IDs instead of names
-        $this->barangay_id = $this->awardee->address?->barangay?->id;
-        $this->purok_id = $this->awardee->address?->purok?->id;
-        $this->full_address = $this->awardee->address?->full_address ?? '--';
+        $this->barangay_id = $this->awardee->relocationLot?->address?->barangay?->name;
+        $this->purok_id = $this->awardee->relocationLot?->address?->purok?->name;
+        $this->full_address = $this->awardeerelocationLot?->address?->full_address ?? '--';
         // Load initial puroks if barangay is selected
         if ($this->barangay_id) {
             $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
@@ -186,7 +190,7 @@ class AwardeeDetails extends Component
         $this->images = $this->applicant->taggedAndValidated?->images ?? [];
 
         $this->imagesForAwarding = $this->applicant->taggedAndValidated?->awardees?->flatMap(function ($awardee) {
-            return $awardee->awardeeDocumentsSubmissions()
+            return $awardee->taggedAndValidatedApplicant->documents()
                 ->get()
                 ->map(function ($submission) {
                     return $submission->file_name;
@@ -233,18 +237,19 @@ class AwardeeDetails extends Component
         return [
             'date_blacklisted' => 'required|date',
             'blacklist_reason_description' => 'required|string|max:255',
+            'confirmationPassword' => 'required',
         ];
     }
     public function store()
     {
+        // Verify password first
+        if (!Hash::check($this->confirmationPassword, Auth::user()->password)) {
+            $this->blacklistError = 'Incorrect password. Please try again.';
+            return;
+        }
+
         // Validate the input data
         $this->validate();
-
-//        // Check if the user has provided the correct password
-//        if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
-//            $this->blacklistError = 'Incorrect password';
-//            return;
-//        }
 
         // Create the new applicant record and get the ID of the newly created applicant
         $blacklist = Blacklist::create([
@@ -275,68 +280,6 @@ class AwardeeDetails extends Component
     {
         $this->reset(['date_blacklisted', 'blacklist_reason_description', 'updated_by']);
     }
-//    public function addDependent(): void
-//    {
-//        $this->dependents[] = [
-//            'dependent_first_name' => '',
-//            'dependent_middle_name' => '',
-//            'dependent_last_name' => '',
-//            'dependent_sex' => '',
-//            'dependent_civil_status_id' => '',
-//            'dependent_date_of_birth' => '',
-//            'dependent_relationship' => '',
-//            'dependent_occupation' => '',
-//            'dependent_monthly_income' => 0,
-//        ];
-//    }
-//    public function blacklistAwardee(): void
-//    {
-//        if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
-//            $this->deleteError = 'Incorrect password';
-//            return;
-//        }
-//
-//        if ($this->deletingIndex !== null) {
-//            try {
-//                $dependentToDelete = $this->dependents[$this->deletingIndex];
-//
-//                // Delete from database
-//                if (!empty($dependentToDelete['id'])) {
-//                    $deleted = $this->taggedApplicant->dependents()
-//                        ->where('id', $dependentToDelete['id'])
-//                        ->delete();
-//
-//                    if ($deleted) {
-//                        // Only remove from UI if database deletion was successful
-//                        unset($this->dependents[$this->deletingIndex]);
-//                        $this->dependents = array_values($this->dependents);
-//
-//                        // Show success message (optional)
-////                        session()->flash('message', 'Dependent successfully deleted.');
-//                        $this->dispatch('alert', [
-//                            'title' => 'Dependent deleted!',
-//                            'message' => 'Dependent has been successfully deleted. <br><small>'. now()->calendar() .'</small>',
-//                            'type' => 'success'
-//                        ]);
-//                    } else {
-//                        $this->dispatch('alert', [
-//                            'title' => 'Deletion failed!',
-//                            'message' => 'Something went wrong. Try again. <br><small>'. now()->calendar() .'</small>',
-//                            'type' => 'danger'
-//                        ]);
-//                        return;
-//                    }
-//                }
-//
-//                $this->cancelDelete();
-//
-//            } catch (\Exception $e) {
-//                logger('Error deleting dependent:', ['error' => $e->getMessage()]);
-//                $this->deleteError = 'Error deleting dependent. Please try again.';
-//                return;
-//            }
-//        }
-//    }
     public function confirmBlacklisting($awardeeId): void
     {
         $this->awardeeToBlacklist = $awardeeId;
