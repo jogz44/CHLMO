@@ -65,7 +65,7 @@ class ShelterApplicantDetails extends Component
     public $spouse_middle_name;
     public $spouse_last_name;
     public $partner_first_name, $partner_middle_name, $partner_last_name;
-    public $photo = [], $renamedFileName = [], $structure_status_id, $structureStatuses;
+    public $photos = [], $renamedFileName = [], $structure_status_id, $structureStatuses;
 
     public function mount($profileNo)
     {
@@ -73,19 +73,19 @@ class ShelterApplicantDetails extends Component
             return CivilStatus::all();  // Cache for 1 hour
         });
 
-       
-        $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
+
+        $this->livingSituations = Cache::remember('livingSituations', 60 * 60, function () {
             return LivingSituation::all();  // Cache for 1 hour
         });
 
-        $this->caseSpecifications = Cache::remember('caseSpecifications', 60*60, function() {
+        $this->caseSpecifications = Cache::remember('caseSpecifications', 60 * 60, function () {
             return CaseSpecification::all();  // Cache for 1 hour
         });
 
-        $this->governmentPrograms = Cache::remember('governmentPrograms', 60*60, function() {
+        $this->governmentPrograms = Cache::remember('governmentPrograms', 60 * 60, function () {
             return GovernmentProgram::all();  // Cache for 1 hour
         });
-        $this->structureStatuses = Cache::remember('structureStatuses', 60*60, function() {
+        $this->structureStatuses = Cache::remember('structureStatuses', 60 * 60, function () {
             return StructureStatusType::all();  // Cache for 1 hour
         });
 
@@ -102,8 +102,8 @@ class ShelterApplicantDetails extends Component
             // Fetch the related origin of request and request date
             $this->origin_name = $this->applicant->originOfRequest->name ?? 'N/A';
             $this->date_request = $this->applicant?->date_request
-            ? $this->applicant->date_request->format('Y-m-d')
-            : '--';
+                ? $this->applicant->date_request->format('Y-m-d')
+                : '--';
 
             // Initialize dropdowns
             $this->barangays = Barangay::all();
@@ -117,7 +117,7 @@ class ShelterApplicantDetails extends Component
             $this->contact_number = $this->applicant->contact_number;
             $this->year_of_residency = $this->applicant->year_of_residency;
 
-        $this->date_tagged = now()->toDateString(); // YYYY-MM-DD format
+            $this->date_tagged = now()->toDateString(); // YYYY-MM-DD format
 
         } else {
             session()->flash('error', 'Applicant not found');
@@ -140,7 +140,7 @@ class ShelterApplicantDetails extends Component
         $this->purok_id = null; // Reset selected purok when barangay changes
     }
 
-    
+
     protected function rules()
     {
         return [
@@ -173,11 +173,11 @@ class ShelterApplicantDetails extends Component
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
             'remarks' => 'nullable|string|max:255',
-            'photo.*' => 'required|file|mimes:jpeg,png,jpg,gif',
+            'photos.*' => 'required|file|mimes:jpeg,png,jpg,gif',
             'full_address' => 'nullable|string|max:255',
 
-             // Live-in partner details
-             'partner_first_name' => [
+            // Live-in partner details
+            'partner_first_name' => [
                 function ($attribute, $value, $fail) {
                     if ($this->civil_status_id == '2' && empty($value)) {
                         $fail('Live-in partner\'s first name is required.');
@@ -207,8 +207,6 @@ class ShelterApplicantDetails extends Component
                     if ($this->civil_status_id == 3) {
                         if (empty($value)) {
                             $fail('Spouse last name is required.');
-                        } elseif ($value !== $this->last_name) {
-                            $fail('The spouse\'s last name must match the applicant\'s last name.');
                         }
                     }
                 },
@@ -220,7 +218,7 @@ class ShelterApplicantDetails extends Component
     public function store()
     {
         $this->validate();
-       // dd('Validation passed');
+        // dd('Validation passed');
         DB::beginTransaction();
         Log::info('Transaction started.');
 
@@ -255,8 +253,8 @@ class ShelterApplicantDetails extends Component
             ]);
             // dd($taggedApplicant);
 
-             // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
-             if ($this->civil_status_id == '2') {
+            // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
+            if ($this->civil_status_id == '2') {
                 ShelterLiveInPartner::create([
                     'profiled_tagged_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
                     'partner_first_name' => $this->partner_first_name,
@@ -275,13 +273,14 @@ class ShelterApplicantDetails extends Component
                 ]);
             }
 
-            foreach ($this->photo as $index => $image) {
-                $renamedFileName = $this->renamedFileName[$index] ?? $image->getClientOriginalName();
-                $path = $image->storeAs('photo', $renamedFileName, 'public');
+            // Save each uploaded photo
+            foreach ($this->photos as $photo) {
+                $path = $photo->store('housing-images', 'public'); // Adjust the storage path as needed
+
                 ShelterImagesForHousing::create([
-                    'profiled_tagged_applicant_id' => $taggedApplicant->id,
+                    'profiled_tagged_applicant_id' => $taggedApplicant->id, // Assuming this links the image to the applicant
                     'image_path' => $path,
-                    'display_name' => $renamedFileName,
+                    'display_name' => $photo->getClientOriginalName(),
                 ]);
             }
             
@@ -299,7 +298,6 @@ class ShelterApplicantDetails extends Component
                 'type' => 'success'
             ]);
             return redirect()->route('shelter-transaction-applicants');
-
         } catch (QueryException $e) {
             DB::rollBack();
             Log::error('Error creating applicant or dependents: ' . $e->getMessage());
