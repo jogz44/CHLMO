@@ -12,23 +12,12 @@ class Address extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'barangay_id',
         'purok_id',
         'full_address',
     ];
 
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'barangay_id' => 'integer',
@@ -36,9 +25,6 @@ class Address extends Model
         'full_address' => 'string',
     ];
 
-    /**
-     * Get the purok associated with this address.
-     */
     public function barangay(): BelongsTo
     {
         return $this->belongsTo(Barangay::class);
@@ -51,17 +37,15 @@ class Address extends Model
     {
         return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }
-    
     public function profiledTaggedApplicants(): HasMany
     {
         return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
     }
-    
-    public function taggedAndValidatedApplicants()
+    public function taggedAndValidatedApplicants(): HasMany
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
     }
-    public function awardees()
+    public function awardees(): HasMany
     {
         return $this->hasMany(Awardee::class);
     }
