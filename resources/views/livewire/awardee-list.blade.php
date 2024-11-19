@@ -79,13 +79,13 @@
                         <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2  text-center font-medium whitespace-nowrap">ID</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Applicant</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Purok</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Barangay</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Relocation Site</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Lot Size (m&sup2;)</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Awardee</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Relocation Site</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Lot Size (m&sup2;)</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Grant Date</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal">Status</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Action</th>
                         </tr>
                         </thead>
@@ -93,11 +93,11 @@
                             @foreach($awardees as $awardee)
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->last_name ?? 'N/A' }}, {{ $awardee->taggedAndValidatedApplicant->applicant->first_name ?? 'N/A' }} {{ $awardee->taggedAndValidatedApplicant->applicant->middle_name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->purok->name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->address->barangay->name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->relocationLot->relocation_site_name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }} m&sup2;</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->address->purok->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->relocation_site_name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }} m&sup2;</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap">
                                         <!-- Animated Confetti -->
@@ -118,7 +118,7 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="py-4 px-2 text-center border-b space-x-2 whitespace-nowrap">
+                                    <td class="py-4 px-2 text-center border-b whitespace-nowrap">
                                         @if(!$awardee->is_awarded)
                                             <button
                                                     disabled
@@ -127,7 +127,7 @@
                                             </button>
                                             <button
                                                     disabled
-                                                    class="bg-gray-400 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
+                                                    class="bg-gray-400 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
                                                 Transfer
                                             </button>
                                         @else

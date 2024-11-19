@@ -567,50 +567,6 @@
                         </div>
                         @endif
                     </div>
-
-                    <!-- Display images -->
-                    <div>
-                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">AFTER</h2>
-                        <!-- Image Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                            @forelse($images as $image)
-                            <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
-                                <img
-                                    src="{{ asset('storage/' . $image->image_path) }}"
-                                    alt="{{ $image->display_name }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                    {{ $image->display_name }}
-                                </div>
-                            </div>
-                            @empty
-                            <div class="col-span-full text-center py-4 text-gray-500">
-                                No images available
-                            </div>
-                            @endforelse
-                        </div>
-
-                        <!-- Modal -->
-                        @if($selectedImage)
-                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
-                                <div class="flex justify-end mb-2">
-                                    <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
-                                    alt="{{ $selectedImage->display_name }}"
-                                    class="max-w-full h-auto">
-                                <div class="mt-2 text-center text-gray-700">
-                                    {{ $selectedImage->display_name }}
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
                 </div>
             </form>
         </div>

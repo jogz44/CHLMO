@@ -17,8 +17,8 @@
                     <div class="flex space-x-2 z-10">
                         <div x-data="{ showModal: false }"
                                 x-on:keydown.escape.window="showModal = false">
-                            <div>
-                                <div class="alert"
+                            <div class="z-50">
+                                <div class="alert mt-14"
                                      :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
                                      x-data="{ open:false, alert:{} }"
                                      x-show="open" x-cloak
@@ -848,7 +848,7 @@
 
                 <div class="p-3 rounded">
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">UPLOAD DOCUMENTS</h2>
-                    <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured requirements submitted by the qualified applicants.</p>
+                    <p class="text-[12px] ml-2 items-center text-gray-700">Upload here the captured house situation of the applicant.</p>
                 </div>
 
                 <!-- File Uploads -->
