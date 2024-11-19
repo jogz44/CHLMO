@@ -61,7 +61,7 @@
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100"
                                 x-transition:leave-end="opacity-0"
-                                class="fixed inset-0 z-10 overflow-y-auto"
+                                class="fixed inset-0 z-50 overflow-y-auto"
                                 style="display: none;">
 
                                 <!-- Background overlay -->
@@ -111,10 +111,11 @@
                                                 Cancel
                                             </button>
                                             <button
-                                                type="submit"
+                                                type="button"
                                                 wire:click="store"
                                                 x-on:click="showModal = false"
-                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-custom-red border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-red">
+                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-custom-red border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-red"
+                                                wire:loading.attr="disabled">
                                                 Proceed
                                             </button>
                                         </div>
@@ -477,7 +478,7 @@
 
                             <!-- Hidden File Input -->
                             <input wire:model="photos" type="file" accept="image/*" id="photos" x-ref="fileInput" multiple
-                                @change="handleFilesSelect" class="hidden" />
+                                @change="handleFilesSelect" class="hidden z-5" />
                             @error('photos.*') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
 
@@ -485,11 +486,11 @@
                         <div class="space-y-4">
                             <template x-for="(image, index) in images" :key="index">
                                 <div class="border-2 border-green-500 rounded-lg p-4">
-                                    <div class="relative">
+                                    <div class="relative" >
                                         <img :src="image.url" alt="Preview" class="w-full h-64 object-contain rounded-lg">
                                         <!-- Remove Button -->
                                         <button type="button" @click="removeImage(index)"
-                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600  z-0">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M6 18L18 6M6 6l12 12" />
@@ -498,7 +499,7 @@
                                     </div>
                                     <!-- Filename Display -->
                                     <div class="bg-gray-50 px-3 py-2 rounded">
-                                        <span class="text-sm text-gray-600" x-text="image.name"></span>
+                                        <span class="text-sm text-gray-600  z-0" x-text="image.name"></span>
                                     </div>
                                 </div>
                             </template>

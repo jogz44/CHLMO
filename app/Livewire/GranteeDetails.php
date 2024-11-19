@@ -144,7 +144,7 @@ class GranteeDetails extends Component
         // Load Address Information - Store IDs instead of names
         $this->barangay_id = $this->profiledTagged?->address?->barangay?->id;
         $this->purok_id = $this->profiledTagged?->address?->purok?->id;
-        $this->full_address = $this->profiledTagged?->address?->full_address ?? '--';
+        $this->full_address = $this->profiledTagged?->full_address ?? '--';
         // Load initial puroks if barangay is selected
         if ($this->barangay_id) {
             $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();

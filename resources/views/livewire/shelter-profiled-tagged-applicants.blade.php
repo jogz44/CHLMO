@@ -161,15 +161,15 @@
 
                 <!-- GRANT Modal -->
                 <div x-show="openModalGrant"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
+                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg "
                     x-cloak style="font-family: 'Poppins', sans-serif;">
-                    <div class="bg-white text-white w-[530px] rounded-lg shadow-lg p-6 relative">
+                    <div class="bg-white text-white w-[530px] h-[590px] rounded-lg shadow-lg px-6 p-2 relative overflow-y-auto">
                         <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-4">
+                        <div class="flex justify-between items-center mb-4 bg-white sticky top-0 z-10 py-6">
                             <h3 class="text-lg font-semibold text-black">GRANT APPLICANT</h3>
                             <button @click="openModalGrant = false" class="text-gray-400 hover:text-gray-200">
                                 &times;
-                            </button>
+                            </button>   
                         </div>
 
                         <!-- Form -->
@@ -254,7 +254,7 @@
 
 
                                 <!-- House Situation Upload -->
-                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD PHOTO</h2>
+                                <h2 class="block text-[12px] font-medium mb-2 text-black mt-4">UPLOAD PHOTO</h2>
 
                                 <!-- Drag and Drop Area -->
                                 <div x-data="fileUpload()">
@@ -322,7 +322,7 @@
                                                     alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
                                             </div>
                                             <!-- Modal Buttons -->
-                                            <div class="flex justify-between mt-4">
+                                            <div class="flex justify-between mt-4 ">
                                                 <button type="button" class="px-4 py-2 bg-green-600 text-white rounded-lg"
                                                     @click="confirmFile(); $wire.grantApplicant(selectedFile.file)">CONFIRM
                                                 </button>
@@ -335,7 +335,7 @@
 
                                 </div>
                                 <!-- Buttons -->
-                                <div class="grid grid-cols-2 gap-4 mt-4">
+                                <div class="grid grid-cols-2 gap-4 mt-6">
                                     <div>
                                         <div class="alert"
                                             :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
@@ -491,7 +491,7 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="consentLetterIfTheLandIsNotTheirs" required>
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="consentLetterIfTheLandIsNotTheirs">
                                                 @error('consentLetterIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                             </div>
                                         </div>
@@ -521,7 +521,7 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" required>
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs">
                                                 @error('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                             </div>
                                         </div>

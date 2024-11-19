@@ -279,8 +279,8 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->validate([
             'requestLetterAddressToCityMayor' => 'required|file|max:10240',
             'certificateOfIndigency' => 'required|file|max:10240',
-            'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
-            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
+            'consentLetterIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
+            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
             'profilingForm' => 'required|file|max:10240',
         ]);
     }
@@ -307,8 +307,8 @@ class ShelterProfiledTaggedApplicants extends Component
             $validatedData = $this->validate([
                 'requestLetterAddressToCityMayor' => 'required|file|max:10240',
                 'certificateOfIndigency' => 'required|file|max:10240',
-                'consentLetterIfTheLandIsNotTheirs' => 'required|file|max:10240',
-                'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'required|file|max:10240',
+                'consentLetterIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
+                'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
                 'profilingForm' => 'required|file|max:10240',
             ]);
 
