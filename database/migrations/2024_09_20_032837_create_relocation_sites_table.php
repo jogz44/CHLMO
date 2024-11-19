@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('relocation_sites', function (Blueprint $table) {
             $table->id();
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
+            $table->string('lot_number', 255)->nullable();
+            $table->string('block_identifier', 255)->nullable();
             $table->string('relocation_site_name', 255);
             $table->integer('total_lot_size');
             $table->boolean('is_full')->default(false);

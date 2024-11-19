@@ -99,9 +99,9 @@ Route::middleware([
         return view('profile');
     })->name('profile');
 
-    Route::get('/reports-summary-informal-settlers', function () {
-        return view('reports-summary-informal-settlers');
-    })->name('reports-summary-informal-settlers');
+    Route::get('/summary-of-identified-informal-settlers', function () {
+        return view('summary-of-identified-informal-settlers');
+    })->name('summary-of-identified-informal-settlers');
 
     Route::get('/reports-summary-relocation-applicants', function () {
         return view('reports-summary-relocation-applicants');

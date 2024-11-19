@@ -8,9 +8,6 @@
                         <h2 class="text-[13px] ml-5 text-gray-700">AWARDEE LIST</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div x-data class="relative z-0">
-                        <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
-                    </div>
                 </div>
 
                 <div class="bg-white p-6 rounded shadow">
@@ -37,39 +34,73 @@
                                     <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75"
                                           stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
-                                <input type="search" name="search" id="search"
+                                <input wire:model.live.debounce.500ms="search"
+                                        type="search"
                                        class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
                                        placeholder="Search">
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <label class="text-center mt-2 mr-1" for="start_date">
+                                Date Applied From:
+                            </label>
+                            <input wire:model.live="startDate"
+                                   type="date"
+                                   class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                                   max="{{ now()->toDateString() }}"
+                                   value="{{ now()->toDateString() }}">
+                            <label class="text-center mt-2 ml-2 mr-1" for="end_date">
+                                To:
+                            </label>
+                            <input wire:model.live="endDate"
+                                   type="date"
+                                   class="border text-[13px] border-gray-300 rounded px-2 py-1 mr-1"
+                                   max="{{ now()->toDateString() }}"
+                                   value="{{ now()->toDateString() }}">
+
+                            <div class="relative group">
+                                <button wire:click="resetFilters" class="flex items-center justify-center border border-gray-300 bg-gray-100 rounded w-8 h-8">
+                                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 256 256" class="w-4 h-4" xml:space="preserve">
+                                        <g transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)">
+                                            <path d="M 81.521 31.109 c -0.86 -1.73 -2.959 -2.438 -4.692 -1.575 c -1.73 0.86 -2.436 2.961 -1.575 4.692 c 2.329 4.685 3.51 9.734 3.51 15.01 C 78.764 67.854 63.617 83 45 83 S 11.236 67.854 11.236 49.236 c 0 -16.222 11.501 -29.805 26.776 -33.033 l -3.129 4.739 c -1.065 1.613 -0.62 3.784 0.992 4.85 c 0.594 0.392 1.264 0.579 1.926 0.579 c 1.136 0 2.251 -0.553 2.924 -1.571 l 7.176 -10.87 c 0.001 -0.001 0.001 -0.002 0.002 -0.003 l 0.018 -0.027 c 0.063 -0.096 0.106 -0.199 0.159 -0.299 c 0.049 -0.093 0.108 -0.181 0.149 -0.279 c 0.087 -0.207 0.152 -0.419 0.197 -0.634 c 0.009 -0.041 0.008 -0.085 0.015 -0.126 c 0.031 -0.182 0.053 -0.364 0.055 -0.547 c 0 -0.014 0.004 -0.028 0.004 -0.042 c 0 -0.066 -0.016 -0.128 -0.019 -0.193 c -0.008 -0.145 -0.018 -0.288 -0.043 -0.431 c -0.018 -0.097 -0.045 -0.189 -0.071 -0.283 c -0.032 -0.118 -0.065 -0.236 -0.109 -0.35 c -0.037 -0.095 -0.081 -0.185 -0.125 -0.276 c -0.052 -0.107 -0.107 -0.211 -0.17 -0.313 c -0.054 -0.087 -0.114 -0.168 -0.175 -0.25 c -0.07 -0.093 -0.143 -0.183 -0.223 -0.27 c -0.074 -0.08 -0.153 -0.155 -0.234 -0.228 c -0.047 -0.042 -0.085 -0.092 -0.135 -0.132 L 36.679 0.775 c -1.503 -1.213 -3.708 -0.977 -4.921 0.53 c -1.213 1.505 -0.976 3.709 0.53 4.921 l 3.972 3.2 C 17.97 13.438 4.236 29.759 4.236 49.236 C 4.236 71.714 22.522 90 45 90 s 40.764 -18.286 40.764 -40.764 C 85.764 42.87 84.337 36.772 81.521 31.109 z"
+                                                  style="fill: rgb(0,0,0);"></path>
+                                        </g>
+                                    </svg>
+                                </button>
+                                <p class="absolute opacity-0 w-12/12 group-hover:opacity-50 transition-opacity duration-300 rounded-md bg-gray-700 text-[11px] text-white mt-1 p-1">
+                                    Reset
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                        <label class="text-center mt-2">Date From:</label>
-                        <input type="date" id="start-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
-                        <label class="text-center mt-2">To:</label>
-                        <input type="date" id="end-date" class="border text-[13px] border-gray-300 rounded px-2 py-1">
-                        <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                            <option value="">Purok</option>
-                            <option value="purok1">Purok 1</option>
-                            <option value="purok2">Purok 2</option>
-                            <option value="purok3">Purok 3</option>
+                        <select wire:model.live="barangay"
+                                class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">All Barangays</option>
+                            @foreach($barangays as $brgy)
+                                <option value="{{ $brgy}}">{{ $brgy}}</option>
+                            @endforeach
                         </select>
-                        <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                            <option value="">Barangay</option>
-                            <option value="barangay1">Barangay 1</option>
-                            <option value="barangay2">Barangay 2</option>
-                            <option value="barangay3">Barangay 3</option>
+                        <select wire:model.live="purok"
+                                class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">All Puroks</option>
+                            @foreach($puroks as $purokName)
+                                <option value="{{ $purokName}}">{{ $purokName}}</option>
+                            @endforeach
                         </select>
-
-                        <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                            <option value="">Status</option>
-                            <option value="barangay1">Barangay 1</option>
-                            <option value="barangay2">Barangay 2</option>
-                            <option value="barangay3">Barangay 3</option>
+                        <select wire:model.live="relocation_site"
+                                class="bg-white border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">All Relocation Sites</option>
+                            @foreach($relocationSites as $site)
+                                <option value="{{ $site}}">{{ $site }}</option>
+                            @endforeach
                         </select>
-
-                        <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>
+                        <button wire:click="resetFilters"
+                                class="bg-gray-300 px-2 py-1 rounded-full">
+                            Reset Filters
+                        </button>
                     </div>
                 </div>
 
@@ -80,8 +111,10 @@
                         <tr>
                             <th class="py-2 px-2  text-center font-medium whitespace-nowrap">ID</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Awardee</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Lot</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Block</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Purok</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Relocation Site</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Lot Size (m&sup2;)</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Grant Date</th>
@@ -93,9 +126,17 @@
                             @foreach($awardees as $awardee)
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? 'N/A' }}</td>
-                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->address->purok->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">
+                                        <button @click="window.location.href = '{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"
+                                                class="underline">
+{{--                                            Details--}}
+                                            {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? 'N/A' }}
+                                        </button>
+                                    </td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->lot_number ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->block_identifier ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->address->barangay->name ?? 'N/A' }}</td>
+                                    <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->address->purok->name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ $awardee->relocationLot->relocation_site_name ?? 'N/A' }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-normal">{{ $awardee->lot_size }} {{ $awardee->lotSizeUnit->lot_size_unit_short_name ?? '' }} m&sup2;</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->grant_date ? date('M d, Y', strtotime($awardee->grant_date)) : 'N/A' }}</td>
@@ -119,37 +160,47 @@
                                         </div>
                                     </td>
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">
-                                        @if(!$awardee->is_awarded)
-                                            <button
-                                                    disabled
-                                                    class="text-gray-400 text-bold underline px-4 py-1.5 cursor-not-allowed">
-                                                Details
-                                            </button>
-                                            <button
-                                                    disabled
-                                                    class="bg-gray-400 text-white px-4 py-1.5 rounded-full cursor-not-allowed">
-                                                Transfer
-                                            </button>
-                                        @else
-                                            <button @click="window.location.href = '{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"
-                                                    class="text-custom-red text-bold underline px-4 py-1.5">
-                                                Details
-                                            </button>
-                                            @if ($awardee->is_blacklisted)
-                                                <button disabled class="bg-gray-300 text-white px-8 py-1.5 rounded-full cursor-not-allowed">
+                                        <div class="flex space-x-2">
+                                            @if($awardee->is_blacklisted)
+                                                <!-- Blacklisted Button -->
+                                                <button
+                                                        class="px-4 py-2 bg-red-500 text-white rounded cursor-not-allowed"
+                                                        disabled>
+                                                    Blacklisted
+                                                </button>
+                                            @elseif($awardee->documents_submitted)
+                                                <!-- Documents Submitted Button and Transfer -->
+                                                <button
+                                                        class="px-4 py-2 bg-green-600 text-white rounded cursor-default">
+                                                    Submitted
+                                                </button>
+                                                <button
+                                                        wire:click="openConfirmModal({{ $awardee->id }})"
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                                     Transfer
                                                 </button>
                                             @else
-{{--                                                <button @click="window.location.href = '{{ route('transfer-awardee') }}'"--}}
-{{--                                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">--}}
-{{--                                                    Transfer--}}
-{{--                                                </button>--}}
-                                                <button @click="$wire.openTransferModal({{ $awardee->id }})"
-                                                        class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-8 py-1.5 rounded-full">
+                                                <!-- Initial Transfer Button -->
+                                                <button
+                                                        wire:click="openTransferModal({{ $awardee->id }})"
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
                                                     Transfer
+                                                    <div wire:loading>
+                                                        <svg aria-hidden="true"
+                                                             class="w-3 h-3 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                             viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                                    fill="currentColor" />
+                                                            <path
+                                                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                                    fill="currentFill" />
+                                                        </svg>
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
                                                 </button>
                                             @endif
-                                        @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -171,6 +222,18 @@
 
                                 <div class="max-h-[60vh] overflow-y-auto">
                                     <div class="space-y-4">
+                                        @if(isset($spouse))
+                                            <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
+                                                 wire:click="confirmTransfer({{ $spouse->id }})">
+                                                <div class="font-semibold">
+                                                    {{ $spouse->spouse_last_name }}, {{ $spouse->spouse_first_name }} {{ $spouse->spouse_middle_name }} (Spouse)
+                                                </div>
+                                                <div class="text-sm text-gray-600">
+                                                    Relationship: Spouse
+                                                </div>
+                                            </div>
+                                        @endif
+
                                         @foreach($eligibleDependents as $dependent)
                                             <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
                                                  wire:click="confirmTransfer({{ $dependent->id }})">
@@ -178,7 +241,7 @@
                                                     {{ $dependent->dependent_last_name }}, {{ $dependent->dependent_first_name }} {{ $dependent->dependent_middle_name }}
                                                 </div>
                                                 <div class="text-sm text-gray-600">
-                                                    Relationship: {{ $dependent->dependentRelationship->relationship }}
+                                                    Relationship: {{ $dependent->dependentRelationship->relationship ?? 'Unknown' }}
                                                 </div>
                                             </div>
                                         @endforeach
@@ -198,7 +261,283 @@
                         </div>
                     </div>
 
-                    <!-- Second Modal - Confirmation -->
+                    <!-- 2nd modal - Requirements Modal -->
+                    <div x-show="$wire.showRequirementsModal"
+                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                         x-cloak
+                         style="font-family: 'Poppins', sans-serif;">
+                        <!-- Modal -->
+                        <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">
+                            <!-- Modal Header -->
+                            <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
+                                <h3 class="text-lg font-bold text-gray-900">SUBMIT TRANSFER REQUIREMENTS</h3>
+                                <button wire:click="closeRequirementsModal"
+                                        class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <!-- Modal Content - Scrollable Area -->
+                            <div class="flex-1 p-8 overflow-y-auto">
+                                <form wire:submit.prevent="submit">
+                                    <!-- Horizontal Scrollable Container -->
+                                    <div class="w-full overflow-x-auto pb-4">
+                                        <!-- 1st Attachment - ORIGINAL COPY OF NOTICE OF AWARD -->
+                                        <div class="flex flex-nowrap gap-4 min-w-full">
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Letter of Intent' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+
+                                                <!-- File Upload -->
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('originalCopyOfNoticeOfAward', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('originalCopyOfNoticeOfAward', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="originalCopyOfNoticeOfAward">
+                                                    @error('originalCopyOfNoticeOfAward')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 2nd Attachment - DEATH CERTIFICATE -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Death Certificate' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('deathCert', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('deathCert', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="deathCert">
+                                                    @error('deathCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 3rd Attachment - MARRIAGE CERTIFICATE -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Marriage Certificate' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                 <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('marriageCert', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('marriageCert', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                     <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="marriageCert">
+                                                     @error('marriageCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                 </div>
+                                            </div>
+                                            <!-- 4th Attachment - VALID ID 1 -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Valid ID (1)' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('validId1', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('validId1', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="validId1">
+                                                    @error('validId1')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 5th Attachment - VALID ID 2 -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 5)->first()->attachment_name ?? 'Valid ID (2)' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('validId2', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('validId2', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="validId2">
+                                                    @error('validId2')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 6th Attachment - VOTERS CERT -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 6)->first()->attachment_name ?? 'Voter\'s Certificate' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('votersCert', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('votersCert', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="votersCert">
+                                                    @error('votersCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 7th Attachment - BIRTH CERT -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 7)->first()->attachment_name ?? 'Birth Certificate' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('birthCert', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('birthCert', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="birthCert">
+                                                    @error('birthCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 8th Attachment - EXTRAJUDICIAL SETTLEMENT / WAIVER OF RIGHTS -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 8)->first()->attachment_name ?? 'Extrajudicial Settlement / Waiver of Rights' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('extraJudicialSettlement', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('extraJudicialSettlement', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="extraJudicialSettlement">
+                                                    @error('extraJudicialSettlement')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                            <!-- 9th Attachment - CERTIFICATE OF NO LAND HOLDING -->
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 9)->first()->attachment_name ?? 'Certificate of No Land Holding' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('certOfNoLandHolding', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('certOfNoLandHolding', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certOfNoLandHolding">
+                                                    @error('certOfNoLandHolding')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button Section - Fixed at bottom -->
+                                    <div class="mt-4">
+                                        <button type="submit"
+                                                class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2"
+                                                :disabled="!$wire.isRequirementsComplete">
+                                            <span class="text-[12px]">SUBMIT</span>
+                                            <div wire:loading>
+                                                <svg aria-hidden="true"
+                                                     class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                          fill="currentColor"/>
+                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                          fill="currentFill"/>
+                                                </svg>
+                                                <span class="sr-only">Loading...</span>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Third Modal - Confirmation -->
                     <div x-show="$wire.showConfirmationModal"
                          class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                          x-cloak>
@@ -206,36 +545,31 @@
                             <h2 class="text-xl font-bold mb-4">Confirm Award Transfer</h2>
 
                             @if($selectedDependent)
-                                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0">
-                                            <!-- Warning Icon -->
-                                            <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm text-yellow-700">
-                                                This action will transfer the award to:
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
                                 <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                                    <p class="font-medium">{{ $selectedDependent->dependent_last_name }}, {{ $selectedDependent->dependent_first_name }} {{ $selectedDependent->dependent_middle_name }}</p>
-                                    <p class="text-sm text-gray-600">Relationship: {{ $dependent->dependentRelationship->relationship }}</p>
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        Are you sure you want to transfer the award to:
+                                    </p>
+                                    <p class="font-medium">
+                                        @if($isSpouseTransfer)
+                                            {{ $selectedDependent->spouse_last_name }},
+                                            {{ $selectedDependent->spouse_first_name }}
+                                            {{ $selectedDependent->spouse_middle_name }}
+                                        @else
+                                            {{ $selectedDependent->dependent_last_name }},
+                                            {{ $selectedDependent->dependent_first_name }}
+                                            {{ $selectedDependent->dependent_middle_name }}
+                                        @endif
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        Relationship: {{ $isSpouseTransfer ? 'Spouse' : $selectedDependent->dependentRelationship->relationship }}
+                                    </p>
                                 </div>
-
-                                <p class="mb-4 text-gray-600">
-                                    This action cannot be undone. The current awardee's record will be updated and a new award record will be created for the selected dependent.
-                                </p>
                             @endif
 
                             <div class="mt-6 flex justify-end space-x-3 border-t pt-4">
                                 <button
-                                        wire:click="cancelTransfer"
-                                        class="px-4 py-2 border rounded hover:bg-gray-100 transition duration-150">
+                                        wire:click="$set('showConfirmationModal', false)"
+                                        class="px-4 py-2 border rounded hover:bg-gray-100">
                                     Cancel
                                 </button>
                                 <div>
@@ -275,325 +609,7 @@
                         </div>
                     </div>
 
-                    <!-- Modal Background -->
-                    <div x-show="openModalTransfer"
-                         class="fixed inset-0 flex z-50 items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
-                         x-cloak>
-                        <!-- Modal -->Tr
-                        <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto scrollbar-hide">
-                            <!-- Modal Header -->
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-m font-semibold text-black">TRANSFER OF AWARD</h3>
-                                <button @click="openModalTransfer = false" class="text-gray-400 hover:text-gray-200">
-                                    &times;
-                                </button>
-                            </div>
-
-                            <!-- Form -->
-                            <form @submit.prevent>
-                                <!-- Date Applied Field -->
-                                <div class="mb-1">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE
-                                        UPDATED</label>
-                                    <input type="date" id="date-updated"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Date Applied">
-                                </div>
-
-                                <!-- Main Fields -->
-                                <div class="grid grid-cols-2 gap-2 mb-2">
-                                    <!-- First Name Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST
-                                            NAME</label>
-                                        <input type="text" id="first-name"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="First Name">
-                                    </div>
-
-                                    <!-- Middle Name Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE
-                                            NAME</label>
-                                        <input type="text" id="middle-name"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Middle Name">
-                                    </div>
-
-                                    <!-- Last Name Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST
-                                            NAME</label>
-                                        <input type="text" id="last-name"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Last Name">
-                                    </div>
-
-                                    <!-- Suffix Name Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX
-                                            NAME</label>
-                                        <input type="text" id="suffix-name"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Suffix Name">
-                                    </div>
-                                </div>
-
-                                <!-- Barangay Field -->
-                                <div class="mb-1">
-                                    <label class="block text-[12px] font-medium mb-2 text-black"
-                                           for="barangay">BARANGAY</label>
-                                    <input type="text" id="barangay"
-                                           class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                           placeholder="Barangay">
-                                </div>
-
-                                <!-- Additional Fields -->
-                                <div class="grid grid-cols-2 gap-2 mb-1">
-                                    <!-- Purok Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-1 text-black"
-                                               for="purok">PUROK</label>
-                                        <input type="text" id="purok"
-                                               class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Purok">
-                                    </div>
-
-                                    <!-- Age Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-1 text-black"
-                                               for="age">AGE</label>
-                                        <input type="text" id="age"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Age">
-                                    </div>
-
-                                    <!-- Contact Number Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black"
-                                               for="contact-number">CONTACT NUMBER</label>
-                                        <input type="text" id="contact-number"
-                                               class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Contact Number">
-                                    </div>
-
-                                    <!-- Gender Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black"
-                                               for="gender">GENDER</label>
-                                        <input type="text" id="gender"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Gender">
-                                    </div>
-
-                                    <!-- Religion Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="religion">RELIGION</label>
-                                        <input type="text" id="religion"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Religion">
-                                    </div>
-
-                                    <!-- Status Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black"
-                                               for="status">STATUS</label>
-                                        <input type="text" id="status"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Status">
-                                    </div>
-
-                                    <!-- Occupation Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="occupation">OCCUPATION</label>
-                                        <input type="text" id="occupation"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Occupation">
-                                    </div>
-
-                                    <!-- Monthly Income Field -->
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black"
-                                               for="monthly-income">MONTHLY INCOME</label>
-                                        <input type="text" id="monthly-income"
-                                               class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
-                                               placeholder="Monthly Income">
-                                    </div>
-                                </div>
-
-                                <h2 class="block text-[12px] font-medium mb-2 text-black">UPLOAD REQUIREMENT
-                                    DOCUMENTS</h2>
-
-                                <!-- Drag and Drop Area -->
-                                <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-1 mb-2">
-                                    <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                         viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                                    </svg>
-                                    <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                                    <p class="text-gray-500 text-xs">or</p>
-                                    <button type="button"
-                                            class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                            @click="$refs.fileInput.click()">BROWSE FILES
-                                    </button>
-
-                                    <!-- Hidden File Input for Multiple Files -->
-                                    <input type="file" x-ref="fileInput" @change="addFiles($refs.fileInput.files)"
-                                           multiple class="hidden" />
-                                </div>
-
-                                <!-- Show selected file and progress bar when a file is selected -->
-                                <template x-for="(fileWrapper, index) in files" :key="index">
-                                    <div @click="openPreviewModal = true; selectedFile = fileWrapper"
-                                         class="bg-white p-2 shadow border-2 border-green-500 rounded-lg">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <div class="flex items-center space-x-2">
-                                                <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg"
-                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2" d="M7 3v6h4l1 1h4V3H7z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                          stroke-width="2" d="M5 8v10h14V8H5z" />
-                                                </svg>
-                                                <span class="text-xs font-medium text-gray-700"
-                                                      x-text="fileWrapper.displayName, selectedFile.displayName"></span>
-                                            </div>
-                                            <!-- Status -->
-                                            <span class="text-xs text-green-500 font-medium">100%</span>
-                                        </div>
-                                        <!-- Progress Bar -->
-                                        <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                            <div class="w-full h-full bg-green-500"></div>
-                                        </div>
-                                    </div>
-                                </template>
-
-                                <!-- Buttons -->
-                                <div class="grid grid-cols-2 gap-4 mt-4">
-                                    <button type="submit"
-                                            class="w-full py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white font-semibold rounded-lg">
-                                        TAGGED & VALIDATED
-                                    </button>
-                                    <button type="button" @click="openModalTag = false"
-                                            class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg">
-                                        CANCEL
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Preview Modal (Triggered by Clicking a Progress Bar) -->
-                        <div x-show="openPreviewModal"
-                             class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                             x-cloak>
-                            <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                                <!-- Modal Header with File Name -->
-                                <div class="flex justify-between items-center mb-4">
-                                    <input type="text" x-model="selectedFile.displayName"
-                                           class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0">
-                                    <button class="text-orange-500 underline text-sm" @click="renameFile()">Rename
-                                        File
-                                    </button>
-                                    <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
-                                        &times;
-                                    </button>
-                                </div>
-
-                                <!-- Display Image -->
-                                <div class="flex justify-center mb-4">
-                                    <img :src="selectedFile ? URL.createObjectURL(selectedFile.file) : '/path/to/default/image.jpg'"
-                                         alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                                </div>
-                                <!-- Modal Buttons -->
-                                <div class="flex justify-between mt-4">
-                                    <button class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                            @click="openPreviewModal = false">CONFIRM
-                                    </button>
-                                    <button class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                            @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Pagination controls -->
-{{--                <div class="flex justify-end text-[12px] mt-4">--}}
-{{--                    <button--}}
-{{--                            @click="prevPage"--}}
-{{--                            :disabled="currentPage === 1"--}}
-{{--                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">--}}
-{{--                        Prev--}}
-{{--                    </button>--}}
-{{--                    <template x-for="page in totalPages" :key="page">--}}
-{{--                        <button--}}
-{{--                                @click="goToPage(page)"--}}
-{{--                                :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}"--}}
-{{--                                class="px-4 py-2 mx-1 rounded">--}}
-{{--                            <span x-text="page"></span>--}}
-{{--                        </button>--}}
-{{--                    </template>--}}
-{{--                    <button--}}
-{{--                            @click="nextPage"--}}
-{{--                            :disabled="currentPage === totalPages"--}}
-{{--                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">--}}
-{{--                        Next--}}
-{{--                    </button>--}}
-{{--                </div>--}}
-                <script>
-                    function fileUpload() {
-                        return {
-                            files: [],
-                            selectedFile: null,
-                            openPreviewModal: false,
-                            addFiles(fileList) {
-                                for (let i = 0; i < fileList.length; i++) {
-                                    const file = fileList[i];
-                                    this.files.push({
-                                        file,
-                                        displayName: file.name
-                                    });
-                                }
-                            },
-                            removeFile(fileWrapper) {
-                                this.files = this.files.filter(f => f !== fileWrapper);
-                            },
-                            renameFile() {
-                                if (this.selectedFile) {
-                                    const newName = prompt('Rename File', this.selectedFile.displayName);
-                                    if (newName) {
-                                        this.selectedFile.displayName = newName;
-                                        const fileIndex = this.files.findIndex(f => f === this.selectedFile);
-                                        if (fileIndex > -1) {
-                                            this.files[fileIndex].displayName = newName;
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                </script>
-{{--                <script>--}}
-{{--                    function pagination() {--}}
-{{--                        return {--}}
-{{--                            currentPage: 1,--}}
-{{--                            totalPages: 3, // Set this to the total number of pages you have--}}
-
-{{--                            prevPage() {--}}
-{{--                                if (this.currentPage > 1) this.currentPage--;--}}
-{{--                            },--}}
-{{--                            nextPage() {--}}
-{{--                                if (this.currentPage < this.totalPages) this.currentPage++;--}}
-{{--                            },--}}
-{{--                            goToPage(page) {--}}
-{{--                                this.currentPage = page;--}}
-{{--                            }--}}
-{{--                        }--}}
-{{--                    }--}}
-{{--                </script>--}}
             </div>
         </div>
     </div>

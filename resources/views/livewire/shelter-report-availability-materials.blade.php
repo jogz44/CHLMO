@@ -36,6 +36,22 @@
                                 <input type="search" name="search" id="search" class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow" placeholder="Search">
                             </div>
                         </div>
+                        <div class="flex justify-end space-x-2">
+                            <select class="border text-[12px] border-gray- text-gray-600 rounded px-2 py-2 shadow-sm ">
+                                <option value="">PO NUMBER</option>
+                                <option class="text-[11px]" value="barangay1">All</option>
+                                <option class="text-[11px]" value="purok1">PO No. 22-10-0052</option>
+                                <option class="text-[11px]" value="purok2">PO No. 23-11-0123</option>
+                                <option class="text-[11px]" value="purok3">PO No. 23-11-0252</option>
+                            </select>
+                            <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-2 py-2 shadow-sm">
+                                <option value="">PR NUMBER</option>
+                                <option class="text-[11px]" value="barangay1">All</option>
+                                <option class="text-[11px]" value="purok1">PR No. 22-10-0052</option>
+                                <option class="text-[11px]" value="purok2">PR No. 23-11-0123</option>
+                                <option class="text-[11px]" value="purok3">PR No. 23-11-0252</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
@@ -57,98 +73,44 @@
                             <option class="text-[11px]" value="purok2">SENIOR CITIZEN</option>
                             <option class="text-[11px]" value="purok3">SOLO PARENT</option>
                         </select>
-                        <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-1 py-1 shadow-sm">
-                            <option value="">PO NUMBER</option>
-                            <option class="text-[11px]" value="barangay1">All</option>
-                            <option class="text-[11px]" value="purok1">PO No. 22-10-0052</option>
-                            <option class="text-[11px]" value="purok2">PO No. 23-11-0123</option>
-                            <option class="text-[11px]" value="purok3">PO No. 23-11-0252</option>
-                        </select>
-                        <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-1 py-1 shadow-sm">
-                            <option value="">PR NUMBER</option>
-                            <option class="text-[11px]" value="barangay1">All</option>
-                            <option class="text-[11px]" value="purok1">PR No. 22-10-0052</option>
-                            <option class="text-[11px]" value="purok2">PR No. 23-11-0123</option>
-                            <option class="text-[11px]" value="purok3">PR No. 23-11-0252</option>
-                        </select>
                         <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>
                     </div>
                 </div>
 
-                <div class="mt-4">
-                    <p class="text-lg font-bold">Total Quantity (All Materials): <span class="text-green-600">{{ $totalQuantity }}</span></p>
-                </div>
-
-                <!-- Table with transaction requests -->
-                <div x-data="{openModalGrant: false, openPreviewModal: false, selectedFile: null, fileName: ''}" class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-200">
-                        <thead class="bg-gray-100">
+                <div x-data="{ openModalGrant: false, openPreviewModal: false, selectedFile: null, fileName: '' }" class="overflow-x-auto">
+                    @if($materials && $materials->isNotEmpty())
+                    <table class="min-w-full bg-white border border-gray-200 shadow-sm ">
+                        <thead class="bg-gray-100 font-bold">
                             <tr>
-                                <th class="py-2 px-[20px] text-center font-medium whitespace-nowrap">No.</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">DESCRIPTION</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">UNIT</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">TOTAL QUANTITY</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">WITHDRAWAL</th>
-                                <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">AVAILABLE MATERIALS</th>
+                                <th class="py-2 px-4 text-center  text-gray-700 ">ITEM NO.</th>
+                                <th class="py-2 px-4 text-center  text-gray-700">ITEM DESCRIPTION</th>
+                                <th class="py-2 px-4 text-center  text-gray-700">UNIT</th>
+                                <th class="py-2 px-4 text-center  text-gray-700">AVAILABLE MATERIALS</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($materials as $key => $material)
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b">{{ $key + 1 }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $material->description }}</td>
-                                <td class="py-4 px-2 text-center border-b">{{ $material->unit }}</td>
-                                <td class="py-4 px-2 text-center border-b">{{ $material->total_quantity }}</td>
-                                <td class="py-4 px-2 text-center border-b">{{ $material->withdrawal }}</td>
-                                <td class="py-4 px-2 text-center border-b">{{ $material->available_materials }}</td>
+                            @foreach($materials as $key => $material)
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $key + 1 }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600 whitespace-nowrap">{{ $material->description }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $material->unit }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $material->available_materials }}</td>
                             </tr>
                             @endforeach
                         </tbody>
-                        <tbody x-data>
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b">1</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">AMAKAN</td>
-                                <td class="py-4 px-2 text-center border-b">SHEETS</td>
-                                <td class="py-4 px-2 text-center border-b">100</td>
-                                <td class="py-4 px-2 text-center border-b">50</td>
-                                <td class="py-4 px-2 text-center border-b">50</td>
-                            </tr>
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b">2</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">PORTLAND CEMENT</td>
-                                <td class="py-4 px-2 text-center border-b">BAGS</td>
-                                <td class="py-4 px-2 text-center border-b">50</td>
-                                <td class="py-4 px-2 text-center border-b">25</td>
-                                <td class="py-4 px-2 text-center border-b">25</td>
-                            </tr>
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b">3</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">COCO LUMBER 4X4X10</td>
-                                <td class="py-4 px-2 text-center border-b">PCS</td>
-                                <td class="py-4 px-2 text-center border-b">150</td>
-                                <td class="py-4 px-2 text-center border-b">15</td>
-                                <td class="py-4 px-2 text-center border-b">135</td>
-                            </tr>
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b">4</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">COCO LUMBER 2X3X10</td>
-                                <td class="py-4 px-2 text-center border-b">PCS</td>
-                                <td class="py-4 px-2 text-center border-b">150</td>
-                                <td class="py-4 px-2 text-center border-b">130</td>
-                                <td class="py-4 px-2 text-center border-b">20</td>
-                            </tr>
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b">5</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">NAILS - CWN 2 1/2</td>
-                                <td class="py-4 px-2 text-center border-b">KLS</td>
-                                <td class="py-4 px-2 text-center border-b">250</td>
-                                <td class="py-4 px-2 text-center border-b">50</td>
-                                <td class="py-4 px-2 text-center border-b">200</td>
-                            </tr>
-                        </tbody>
                     </table>
+                    @else
+                    <div class="text-center py-4 text-gray-600">
+                        <p>No data available.</p>
+                    </div>
+                    @endif
                 </div>
 
+
+                </table>
+                <div class="mt-4 item-left">
+                    <p class="text-lg font-bold">Total Quantity (All Materials): <span class="text-green-600">{{ $totalQuantity }}</span></p>
+                </div>
                 <!-- Pagination controls -->
                 <div class="flex justify-end text-[12px] mt-4">
                     <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
@@ -163,10 +125,10 @@
                         Next
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
-
     <script>
         function pagination() {
             return {
@@ -185,4 +147,5 @@
             }
         }
     </script>
+</div>
 </div>

@@ -46,6 +46,15 @@ return [
             'url' => env('APP_URL').'/awardee-photo-requirements',
             'visibility' => 'public',
         ],
+        // newly created one
+        'transfer-photo-requirements' => [
+            'driver' => 'local',
+            'root' => storage_path('app/transfer-photo-requirements'),
+            'serve' => true,
+            'throw' => false,
+            'url' => env('APP_URL').'/transfer-photo-requirements',
+            'visibility' => 'public',
+        ],
 
         'grantee-photo-requirements' => [
             'driver' => 'local',

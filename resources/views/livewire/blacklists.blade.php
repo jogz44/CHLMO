@@ -72,7 +72,7 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2  text-center font-medium">Name</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>
+{{--                            <th class="py-2 px-2 border-b text-center font-medium">Contact Number</th>--}}
                             <th class="py-2 px-2 border-b text-center font-medium">Date Awarded</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Date Blacklisted</th>
 {{--                            <th class="py-2 px-2 border-b text-center font-medium">Blacklisted by</th>--}}
@@ -83,11 +83,9 @@
                     @forelse($blacklisted as $blacklistedApplicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">
-                                {{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->first_name ?? '--' }}
-                                {{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->middle_name ?? '--' }}
-                                {{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->last_name ?? '--' }}
+                                {{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? '--' }}
                             </td>
-                            <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->contact_number ?? '--' }}</td>
+{{--                            <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->person->contact_number ?? '--' }}</td>--}}
                             <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->awardee->grant_date ? date('M d, Y', strtotime($blacklistedApplicant->awardee->grant_date)) : 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->date_blacklisted ? date('M d, Y', strtotime($blacklistedApplicant->date_blacklisted)) : 'N/A' }}</td>
 {{--                            <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->first_name ?? '--' }}</td>--}}

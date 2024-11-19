@@ -198,6 +198,7 @@
                         <th class="py-2 px-2 border-b text-center font-medium">Transfer Date</th>
                         <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">Previous Awardee</th>
                         <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">Transferred To</th>
+                        <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Relationship</th>
                         <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Lot Details</th>
                         <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">Reason</th>
                         <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">Processed By</th>
@@ -210,12 +211,13 @@
                                     {{ $transfer->transfer_date->format('M d, Y') }}
                                 </td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">
-                                    {{ $transfer->previousAwardee->taggedAndValidatedApplicant->applicant->first_name }}
-                                    {{ $transfer->previousAwardee->taggedAndValidatedApplicant->applicant->middle_name }}
-                                    {{ $transfer->previousAwardee->taggedAndValidatedApplicant->applicant->last_name }}
+                                    {{ $transfer->previousAwardee->taggedAndValidatedApplicant->applicant->person->full_name }}
                                 </td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">
                                     {{ $transfer->remarks }}
+                                </td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">
+                                    {{ $transfer->relationship }}
                                 </td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">
                                     {{ $transfer->previousAwardee->relocationLot->relocation_site_name }}
