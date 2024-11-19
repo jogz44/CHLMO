@@ -14,7 +14,7 @@ class Blacklists extends Component
     public function render()
     {
         $blacklisted = Blacklist::with([
-            'awardee.taggedAndValidatedApplicant.applicant',
+            'awardee.taggedAndValidatedApplicant.applicant.person',
             'user'
         ])
             ->orderBy('created_at', 'desc')
