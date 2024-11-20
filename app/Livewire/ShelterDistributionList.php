@@ -47,7 +47,7 @@ class ShelterDistributionList extends Component
     public function applyFilters()
     {
         $this->resetPage(); // Reset pagination when applying filters
-        // $this->updatedSelectedPrNumber($this->selectedPrNumber);
+
         // Refetch PO numbers if PR is selected
         if (!empty($this->selectedPrNumber)) {
             $this->poNumbers = PurchaseOrder::where('purchase_requisition_id', $this->selectedPrNumber)->pluck('po_number', 'id')->toArray();
@@ -84,19 +84,6 @@ class ShelterDistributionList extends Component
     {
         $this->search = '';
     }
-    // public function updatedSelectedPrNumber($value)
-    // {
-    //     if (!empty($value)) {
-    //         // Fetch POs related to the selected PR
-    //         $this->poNumbers = PurchaseOrder::where('purchase_requisition_id', $value)->pluck('po_number', 'id')->toArray();
-    //     } else {
-    //         // Reset POs to all available if no PR is selected
-    //         $this->poNumbers = PurchaseOrder::pluck('po_number', 'id')->toArray();
-    //     }
-
-    //     // Clear the selected PO if PR is changed
-    //     $this->selectedPoNumber = '';
-    // }
 
     public function updatedSelectedPrNumber($value)
     {
@@ -142,13 +129,13 @@ class ShelterDistributionList extends Component
             $query->whereHas('deliveredMaterials.material.purchaseOrder', function ($q) {
                 $q->where('id', $this->selectedPoNumber);
             });
-        } elseif (!empty($this->selectedPrNumber)) { 
+        } elseif (!empty($this->selectedPrNumber)) {
             // Only apply PR filter when PO is not selected
             $query->whereHas('deliveredMaterials.material.purchaseOrder.purchaseRequisition', function ($q) {
                 $q->where('id', $this->selectedPrNumber);
             });
         }
-        
+
 
         // Apply PR Number Filter
         if (!empty($this->selectedPrNumber)) {
