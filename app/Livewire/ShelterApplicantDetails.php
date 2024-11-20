@@ -54,7 +54,7 @@ class ShelterApplicantDetails extends Component
     public $purok_id; // Store selected 
     public $puroks = [];
     public $barangays = [];
-    public $full_address;
+    public $full_address, $barangay_name, $purok_name;
     public $government_program_id; // Store selected Government Program ID
     public $governmentPrograms; // For populating the government programs dropdown
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification;
@@ -101,6 +101,8 @@ class ShelterApplicantDetails extends Component
 
             // Fetch the related origin of request and request date
             $this->origin_name = $this->applicant->originOfRequest->name ?? 'N/A';
+            $this->barangay_name = $this->applicant->address->barangay->name ?? 'N/A';
+            $this->purok_name = $this->applicant->address->purok->name ?? 'N/A';
             $this->date_request = $this->applicant?->date_request
                 ? $this->applicant->date_request->format('Y-m-d')
                 : '--';
@@ -149,7 +151,6 @@ class ShelterApplicantDetails extends Component
             'religion' => 'required|string|max:255',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer',
-            'barangay_id' => 'required|exists:barangays,id',
             'occupation' => 'required|string|max:255',
             'year_of_residency' => 'required|integer',
             'structure_status_id' => 'required|exists:structure_status_types,id',
@@ -169,7 +170,6 @@ class ShelterApplicantDetails extends Component
                 'required_if:living_situation_id,8', // Only required if living_situation_id is 8
                 'exists:case_specifications,id'
             ],
-            'purok_id' => 'required|exists:puroks,id',
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
             'remarks' => 'nullable|string|max:255',
@@ -222,11 +222,6 @@ class ShelterApplicantDetails extends Component
         DB::beginTransaction();
         Log::info('Transaction started.');
 
-        $address = Address::create([
-            'barangay_id' => $this->barangay_id,
-            'purok_id' => $this->purok_id,
-        ]);
-        // dd($address);
 
         try {
             $taggedApplicant = ProfiledTaggedApplicant::create([
@@ -236,7 +231,6 @@ class ShelterApplicantDetails extends Component
                 'sex' => $this->sex,
                 'age' => $this->age,
                 'religion' => $this->religion,
-                'address_id' => $address->id,
                 'occupation' => $this->occupation ?: null,
                 'year_of_residency' => $this->year_of_residency,
                 'contact_number' => $this->contact_number ?: null,

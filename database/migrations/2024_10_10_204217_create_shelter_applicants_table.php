@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('person_id')->constrained('people')->onDelete('cascade');
             $table->foreignId('request_origin_id')->nullable()->constrained('origin_of_requests');
+            $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
             $table->string('profile_no')->unique()->nullable();
             // $table->string('first_name', 50);
             // $table->string('middle_name', 50)->nullable();

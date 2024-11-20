@@ -360,28 +360,20 @@
                             <label for="barangay" class="block text-[13px] font-medium text-gray-700 mb-1">
                                 BARANGAY <span class="text-red-500">*</span>
                             </label>
-                            <select id="barangay" name="barangay" wire:model.live="barangay_id"
-                                class="w-full p-1.5 border text-gray-800 text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Barangay</option>
-                                @foreach($barangays as $barangay)
-                                <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('barangay_id') <span class="error">{{ $message }}</span> @enderror
+                            <input wire:model="barangay_name"
+                                       id="barangay"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                @error('barangay_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">
                                 PUROK <span class="text-red-500">*</span>
                             </label>
-                            <select id="purok" name="purok" wire:model.live="purok_id"
-                                class="w-full p-1.5 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                                <option value="">Select Purok</option>
-                                @foreach($puroks as $purok)
-                                <option value="{{ $purok->id }}">{{ $purok->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('purok_id') <span class="error">{{ $message }}</span> @enderror
+                            <input wire:model="purok_name"
+                                       id="purok"
+                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                                @error('purok') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="w-full md:w-1/3 px-2 mb-4">

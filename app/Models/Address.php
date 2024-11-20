@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Shelter\ProfiledTaggedApplicant;
+use App\Models\Shelter\ShelterApplicant;
 
 class Address extends Model
 {
@@ -27,7 +27,7 @@ class Address extends Model
 
     public function barangay(): BelongsTo
     {
-        return $this->belongsTo(Barangay::class);
+        return $this->belongsTo(Barangay::class, 'barangay_id', 'id');
     }
     public function purok(): BelongsTo
     {
@@ -37,9 +37,13 @@ class Address extends Model
     {
         return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }
-    public function profiledTaggedApplicants(): HasMany
+    // public function profiledTaggedApplicants(): HasMany
+    // {
+    //     return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
+    // }
+    public function shelterApplicants(): HasMany
     {
-        return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
+        return $this->hasMany(ShelterApplicant::class, 'address_id');
     }
     public function taggedAndValidatedApplicants(): HasMany
     {

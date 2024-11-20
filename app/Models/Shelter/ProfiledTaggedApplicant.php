@@ -33,7 +33,7 @@ class ProfiledTaggedApplicant extends Model
         'age',
         'civil_status_id',
         'religion',
-        'address_id',
+        // 'address_id',
         'government_program_id',
         'tribe',
         'living_situation_id',
@@ -66,7 +66,6 @@ class ProfiledTaggedApplicant extends Model
         'age' => 'integer',
         'civil_status_id' => 'integer',
         'request_origin_id' => 'integer',
-        'address_id' => 'integer',
         'government_program_id' => 'integer',
         'year_of_residency' => 'integer',
         'date_tagged' => 'date',
@@ -84,18 +83,18 @@ class ProfiledTaggedApplicant extends Model
     {
         return $this->belongsTo(Address::class, 'address_id');
     }
-    public function barangay()
-    {
-        return $this->belongsTo(Barangay::class, 'barangay_id');
-    }
+    // public function barangay()
+    // {
+    //     return $this->belongsTo(Barangay::class, 'barangay_id');
+    // }
     public function governmentProgram(): BelongsTo
     {
         return $this->belongsTo(GovernmentProgram::class);
     }
-    public function purok()
-    {
-        return $this->belongsTo(Purok::class, 'purok_id');
-    }
+    // public function purok()
+    // {
+    //     return $this->belongsTo(Purok::class, 'purok_id');
+    // }
     // Relationship with LivingSituation
     public function livingSituation(): BelongsTo
     {

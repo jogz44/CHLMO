@@ -56,10 +56,10 @@ class ProfiledTaggedApplicantDetails extends Component
     public function mount($profileNo): void
     {
         $this->profiledTaggedApplicant = ProfiledTaggedApplicant::with([
-            'address.purok',
+            'shelterApplicant.address.purok',
             'shelterApplicant.person',
             'shelterApplicant.originOfRequest',
-            'address.barangay',
+            'shelterApplicant.address.barangay',
             'livingSituation',
             'caseSpecification',
             'governmentProgram',
@@ -95,13 +95,13 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->middle_name = $this->profiledTaggedApplicant->shelterApplicant->person->middle_name ?? null;
         $this->last_name = $this->profiledTaggedApplicant->shelterApplicant->person->last_name ?? null;
         $this->origin_name = $this->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? null;
+        $this->barangay_id = $this->profiledTaggedApplicant->shelterApplicant->address?->barangay?->id;
+        $this->purok_id = $this->profiledTaggedApplicant->shelterApplicant->address?->purok?->id;
         $this->date_request = optional($this->profiledTaggedApplicant->shelterApplicant->date_request)
             ->format('F d, Y') ?? null;
         // Load Address Information - Store IDs instead of names
         $this->contact_number = $this->profiledTaggedApplicant->contact_number ?? null;
         $this->year_of_residency = $this->profiledTaggedApplicant->year_of_residency ?? null;
-        $this->barangay_id = $this->profiledTaggedApplicant->address?->barangay?->id;
-        $this->purok_id = $this->profiledTaggedApplicant->address?->purok?->id;
         $this->full_address = $this->profiledTaggedApplicant->full_address ?? null;
         $this->occupation = $this->profiledTaggedApplicant->occupation ?? null;
         $this->tribe = $this->profiledTaggedApplicant->tribe ?? null;

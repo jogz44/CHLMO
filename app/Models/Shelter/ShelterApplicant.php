@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use App\Models\People;
+use App\Models\Address;
+use App\Models\Barangay;
+use App\Models\Purok;
 
 
 class ShelterApplicant extends Model
@@ -25,6 +28,7 @@ class ShelterApplicant extends Model
         'user_id',
         'person_id',
         'request_origin_id',
+        'address_id',
         'profile_no',
         'date_request',
         'is_tagged',
@@ -37,6 +41,7 @@ class ShelterApplicant extends Model
     protected $casts = [
         'id' => 'integer',
         'user_id' => 'integer',
+        'address_id' => 'integer',
         'request_origin_id' => 'integer',
         'date_request' => 'date',
         'is_tagged' => 'boolean'
@@ -95,6 +100,18 @@ class ShelterApplicant extends Model
     public function profiledTagged(): HasOne
     {
         return $this->hasOne(ProfiledTaggedApplicant::class, 'profile_no');
+    }
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'address_id');
+    }
+    public function barangay()
+    {
+        return $this->belongsTo(Barangay::class, 'barangay_id');
+    }
+    public function purok()
+    {
+        return $this->belongsTo(Purok::class, 'purok_id');
     }
 
 }
