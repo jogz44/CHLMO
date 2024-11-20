@@ -254,6 +254,37 @@
                                     @error('suffix_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
+                            <!-- Barangay Field -->
+                                <div class="mb-3">
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">
+                                        BARANGAY <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="barangay" wire:model.live="barangay_id"
+                                            class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800"
+                                            required>
+                                        <option value="">Select Barangay</option>
+                                        @foreach($barangays as $barangay)
+                                            <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('barangay_id') <span class="error">{{ $message }}</span> @enderror
+                                </div>
+
+                                <!-- Purok Field -->
+                                <div class="mb-3">
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="purok">
+                                        PUROK <span class="text-red-500">*</span>
+                                    </label>
+                                    <select id="purok" wire:model.live="purok_id"
+                                            class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800"
+                                            required>
+                                        <option value="">Select Purok</option>
+                                        @foreach($puroks as $purok)
+                                            <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('purok_id') <span class="error">{{ $message }}</span> @enderror
+                                </div>
 
                             <!-- Request Origin Field -->
                             <div class="mb-4">
