@@ -142,8 +142,8 @@ class GranteeDetails extends Component
         $this->remarks = $this->profiledTagged?->remarks ?? '--';
 
         // Load Address Information - Store IDs instead of names
-        $this->barangay_id = $this->profiledTagged?->address?->barangay?->id;
-        $this->purok_id = $this->profiledTagged?->address?->purok?->id;
+        $this->barangay_id = $this->profiledTagged?->shelterApplicant->address?->barangay?->id;
+        $this->purok_id = $this->profiledTagged?->shelterApplicant->address?->purok?->id;
         $this->full_address = $this->profiledTagged?->full_address ?? '--';
         // Load initial puroks if barangay is selected
         if ($this->barangay_id) {
