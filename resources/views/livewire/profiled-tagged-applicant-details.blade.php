@@ -361,7 +361,7 @@
                             @error('barangay_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTaggedApplicant->address?->barangay?->name ?? '--' }}"
+                                value="{{  $profiledTaggedApplicant->shelterApplicant->address->barangay->name  ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -384,7 +384,7 @@
                             @error('purok_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTaggedApplicant->address?->purok?->name ?? '--' }}"
+                                value="{{  $profiledTaggedApplicant->shelterApplicant->address->purok->name  ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
