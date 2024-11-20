@@ -3,6 +3,9 @@
 namespace App\Livewire;
 
 use App\Models\People;
+use App\Models\Barangay;
+use App\Models\Purok;
+use App\Models\Address;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -35,6 +38,8 @@ class ShelterApplicants extends Component
     public $selectedOriginOfRequest = null, $profileNo, $date_request, $first_name, $middle_name, $last_name, $person_id,
         $suffix_name, $request_origin_id, $editingProfileNo = null, $origin_name, $selectedTaggingStatus, $taggingStatuses;
 
+    public $barangay_id, $barangays = [], $purok_id, $puroks = [], $selectedPurok_id, $selectedBarangay_id, $puroksFilter = [];
+
     // FOR CHECKING DUPLICATE APPLICANTS
     public $showShelterDuplicateWarning = false, $shelterDuplicateData = null, $proceedWithDuplicate = false;
 
@@ -59,7 +64,10 @@ class ShelterApplicants extends Component
         $this->middle_name = '';
         $this->last_name = '';
         $this->suffix_name = '';
+        $this->barangay_id = null;
+        $this->purok_id = null;
         $this->request_origin_id = null;
+        
     }
 
     public function openModalEdit($profileNo)
@@ -73,6 +81,8 @@ class ShelterApplicants extends Component
         $this->last_name = $applicant->person->last_name ?? null;
         $this->suffix_name = $applicant->suffix_name ?? null;
         $this->request_origin_id = $applicant->request_origin_id;
+        $this->barangay_id = $applicant->address->barangay_id ?? null;
+        $this->purok_id = $applicant->address->purok_id ?? null;
         $this->origin_name = $applicant->originOfRequest->name ?? 'Unknown';
 
         $this->isEditModalOpen = true; // Open the modal
@@ -122,9 +132,11 @@ class ShelterApplicants extends Component
             'date_request' => 'required|date',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'barangay_id' => 'required|exists:barangays,id',
+            'purok_id' => 'required|exists:puroks,id',
             'request_origin_id' => 'required|exists:origin_of_requests,id',
         ]);
-        
+
         if (!$this->proceedWithDuplicate) {
             $people = new People();
             $result = $people->checkExistingApplications(
@@ -184,6 +196,8 @@ class ShelterApplicants extends Component
             'date_request' => $this->date_request,
             'suffix_name' => $this->suffix_name,
             'request_origin_id' => $this->request_origin_id,
+            'barangay_id' => $this->barangay_id,
+            'purok_id' => $this->purok_id,
         ]);
 
         // Update related 'person' record
@@ -193,6 +207,7 @@ class ShelterApplicants extends Component
             'last_name' => $this->last_name,
         ]);
 
+
         $this->dispatch('alert', [
             'title' => 'Applicant Updated!',
             'message' => 'Applicant details updated successfully!',
@@ -201,32 +216,6 @@ class ShelterApplicants extends Component
     }
 
 
-    //    private function createNewApplicant(): void
-    //    {
-    //        $people = People::create([
-    //            'first_name' => $this->first_name,
-    //            'middle_name' => $this->middle_name,
-    //            'last_name' => $this->last_name,
-    //            'application_type' => 'Shelter Applicant',
-    //        ]);
-    //
-    //        $this->profileNo = ShelterApplicant::generateProfileNo();
-    //
-    //        ShelterApplicant::create([
-    //            'user_id' => Auth::id(),
-    //            'profile_no' => $this->profileNo,
-    //            'person_id' => $people->id,
-    //            'date_request' => $this->date_request,
-    //            'suffix_name' => $this->suffix_name,
-    //            'request_origin_id' => $this->request_origin_id,
-    //        ]);
-    //
-    //        $this->dispatch('alert', [
-    //            'title' => 'Applicant Added!',
-    //            'message' => 'Applicant added successfully! <br><small>'. now()->calendar() .'</small>',
-    //            'type' => 'success'
-    //        ]);
-    //    }
     private function createNewApplicant(): void
     {
         try {
@@ -243,11 +232,19 @@ class ShelterApplicants extends Component
                 'application_type' => 'Shelter Applicant',
             ]);
 
+            
+            // Create the address entry first
+            $address = Address::create([
+                'barangay_id' => $this->barangay_id,
+                'purok_id' => $this->purok_id,
+            ]);
+
             // Create shelter applicant record
             ShelterApplicant::create([
                 'user_id' => Auth::id(),
                 'profile_no' => $profileNo,
                 'person_id' => $people->id,
+                'address_id' => $address->id,
                 'date_request' => $this->date_request,
                 'suffix_name' => $this->suffix_name,
                 'request_origin_id' => $this->request_origin_id,
@@ -272,6 +269,7 @@ class ShelterApplicants extends Component
             throw $e;
         }
     }
+
     public function mount()
     {
         $this->date_request = now()->toDateString();
@@ -280,8 +278,33 @@ class ShelterApplicants extends Component
         $this->endDate = null;
         $this->search = ''; // Ensure search is empty initially
         $this->taggingStatuses = ['Tagged', 'Not Tagged'];
-    }
 
+        // Initialize dropdowns
+        $this->barangays = Barangay::all();
+        $this->puroks = Purok::all();
+    }
+    public function updatedBarangayId($barangayId): void
+    {
+        // Fetch the puroks based on the selected barangay
+        $this->puroks = Purok::where('barangay_id', $barangayId)->get();
+        $this->purok_id = null; // Reset selected purok when barangay changes
+        $this->isLoading = false; // Reset loading state
+        logger()->info('Retrieved Puroks', [
+            'barangay_id' => $barangayId,
+            'puroks' => $this->puroks
+        ]);
+    }
+    public function updatedSelectedBarangayId($barangayId)
+    {
+        // Fetch the puroks based on the selected barangay
+        $this->puroksFilter = Purok::where('barangay_id', $barangayId)->get();
+        $this->selectedPurok_id = null; // Reset selected purok when barangay changes
+        $this->isLoading = false; // Reset loading state
+        logger()->info('Retrieved Puroks', [
+            'selectedBarangay_id' => $barangayId,
+            'puroksFilter' => $this->puroksFilter
+        ]);
+    }
     // Reset pagination when search changes
     public function updatingSearch(): void
     {
@@ -368,21 +391,6 @@ class ShelterApplicants extends Component
             'originOfRequest',
         ]);
 
-        // // Apply filters
-        // if ($this->startDate && $this->endDate) {
-        //     $query->whereBetween('date_request', [
-        //         $this->startDate,
-        //         $this->endDate
-        //     ]);
-        // }
-
-        // if ($this->selectedOriginOfRequest) {
-        //     $query->where('request_origin_id', $this->selectedOriginOfRequest);
-        // }
-        // if ($this->selectedTaggingStatus) {   // Added to match Excel export
-        //     $query->where('tagging_status', $this->selectedTaggingStatus);
-        // }
-
         $shelterApplicants = $query->get();
 
         // Build Subtitle from Filters
@@ -419,7 +427,7 @@ class ShelterApplicants extends Component
     public function render()
     {
         // Fetch applicants with their related data
-        $query = ShelterApplicant::with(['originOfRequest', 'profiledTagged', 'person'])
+        $query = ShelterApplicant::with(['originOfRequest', 'profiledTagged', 'person',  'address.barangay', 'address.purok',])
             ->where(function ($query) {
                 $query->whereHas('person', function ($q) {
                     $q->where('first_name', 'like', '%' . $this->search . '%')
@@ -427,7 +435,13 @@ class ShelterApplicants extends Component
                         ->orWhere('last_name', 'like', '%' . $this->search . '%');
                 })
                     ->orWhere('request_origin_id', 'like', '%' . $this->search . '%')
-                    ->orWhere('profile_no', 'like', '%' . $this->search . '%');
+                    ->orWhere('profile_no', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('address.purok', function ($query) {
+                        $query->where('name', 'like', '%'.$this->search.'%');
+                    })
+                    ->orWhereHas('address.barangay', function ($query) {
+                        $query->where('name', 'like', '%'.$this->search.'%');
+                    });
             });
 
         if ($this->startDate && $this->endDate) {
@@ -439,6 +453,17 @@ class ShelterApplicants extends Component
         if ($this->selectedTaggingStatus !== null) {
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
+        if ($this->selectedPurok_id) {
+            $query->whereHas('address', function ($q) {
+                $q->where('purok_id', $this->selectedPurok_id);
+            });
+        }
+
+        if ($this->selectedBarangay_id) {
+            $query->whereHas('address', function ($q) {
+                $q->where('barangay_id', $this->selectedBarangay_id);
+            });
+        }
 
         $applicants = $query->orderBy('date_request', 'desc')->paginate(5);
         $OriginOfRequests = OriginOfRequest::all();
@@ -446,6 +471,8 @@ class ShelterApplicants extends Component
         // // Return the view with the filtered applicants
         return view('livewire.shelter-applicants', [
             'applicants' => $applicants,
+            'puroks' => $this->puroks,
+            'puroksFilter' => $this->puroksFilter,
             'OriginOfRequests' => $OriginOfRequests,
         ]);
     }
