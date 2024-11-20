@@ -37,6 +37,10 @@ class RelocationSite extends Model
     {
         return $this->total_lot_size - $this->awardees()->sum('lot_size');
     }
+    public function taggedAndValidatedApplicants(): HasMany
+    {
+        return $this->hasMany(TaggedAndValidatedApplicant::class, 'relocation_lot_id', 'id');
+    }
     public function awardees(): HasMany
     {
         return $this->hasMany(Awardee::class, 'relocation_lot_id', 'id');

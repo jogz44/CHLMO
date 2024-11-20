@@ -2,32 +2,33 @@
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
         <div class="flex-1 h-screen p-6 overflow-auto">
-            <div class="bg-white rounded shadow mb-6 flex items-center justify-between relative p-3">
+            <div class="bg-white rounded shadow mb-2 flex items-center justify-between relative p-3">
                 <div class="flex items-center">
-                    <h2 class="text-[13px] ml-2 items-center text-gray-700">REPORTS</h2>
+                    <h2 class="text-[13px] ml-2 items-center text-gray-700">Summary of Identified Informal Settlers</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                      class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-{{--                <div x-data="{ selectedReport: '' }" class="flex space-x-2 z-0">--}}
-{{--                    <select @change="window.location.href = selectedReport" x-model="selectedReport"--}}
-{{--                            class="w-full px-3 py-3 bg-transparent border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800  focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"--}}
-{{--                            style="padding: 4px 4px;">--}}
-{{--                        <option value="" default>Reports</option>--}}
-{{--                        <option value="/reports-summary-informal-settlers" selected>Summary of--}}
-{{--                            Identified Informal Settlers--}}
-{{--                        </option>--}}
-{{--                        <option value="/reports-summary-relocation-applicants">Relocation--}}
-{{--                            Applicant Summary--}}
-{{--                        </option>--}}
-{{--                    </select>--}}
-{{--                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>--}}
-{{--                </div>--}}
+                <div class="relative z-0">
+                    <button class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="export">Exporting Excel...</span>
+                        <span wire:loading.remove>Export to Excel</span>
+                    </button>
+                </div>
             </div>
-
+            <!-- Summary Stats -->
             <div class="flex items-center mb-2 ml-2">
-                <h2 class="text-[14px] font-semibold items-center text-gray-700">
-                    Summary of Identified Informal Settlers
-                </h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="text-sm font-semibold">Total Occupants :
+                            <span class="text-lg font-bold text-red-600">{{ number_format($totals->total_occupants) }}</span>
+                        </h3>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold">Total Awardees:
+                            <span class="text-lg font-bold text-red-600">{{ number_format($totals->total_awarded) }}</span>
+                        </h3>
+                    </div>
+                </div>
             </div>
 
             <div class="bg-white p-6 rounded shadow">
@@ -120,22 +121,12 @@
                                 class="py-2 px-10  text-center font-medium">
                                 <div class="flex items-center">
                                     Date Tagged
-                                    <span class="ml-2">
-                                        @if($sortField === 'tagging_date')
-                                            <button>
-                                                {!! $sortDirection === 'asc' ? '▲' : '▼' !!}
-                                            </button>
-                                        @endif
-                                    </span>
+                                    @if($sortField === 'tagging_date')
+                                        <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
+                                    @endif
                                 </div>
                             </th>
-                            <th wire:click="sortBy('address.barangay')"
-                                class="py-2 px-10 border-b text-center  font-medium">
-                                Barangay
-                                @if($sortField === 'address.barangay')
-                                    {!! $sortDirection === 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </th>
+                            <th class="py-2 px-10 border-b text-center font-medium">Barangay</th>
                             <th class="py-2 px-10 border-b text-center font-medium">Purok</th>
                             <th class="py-2 px-10 border-b text-center font-medium">Living Situation(Case)</th>
                             <th class="py-2 px-10 border-b text-center font-medium">Case Specification</th>
@@ -147,36 +138,44 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($taggedApplicants as $taggedApplicant)
-                            <tr>
-                                <td class="py-4 px-2 text-center  border-b">
-                                    {{ $taggedApplicant->tagging_date ? $taggedApplicant->tagging_date->format('m/d/Y') : 'N/A' }}
+                        @forelse($groupedApplicants as $group)
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                    {{ \Carbon\Carbon::parse($group->tagging_date)->format('M d, Y') }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b">
-                                    {{ optional($taggedApplicant->applicant->address->barangay)->name ?? 'N/A' }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    {{ $group->barangay }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b">
-                                    {{ optional($taggedApplicant->applicant->address->purok)->name ?? 'N/A' }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    {{ $group->purok }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b">
-                                    {{ optional($taggedApplicant->livingSituation)->living_situation_description ?? 'N/A' }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    {{ $group->living_situation }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b">
-                                    {{ optional($taggedApplicant->caseSpecification)->case_specification_name ?? 'N/A' }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    {{ $group->case_specification ?? 'N/A' }}
                                 </td>
-                                <td class="py-2 px-2 text-center border-b">25</td>
-                                <td class="py-2 px-2 text-center border-b">Canocotan Relocation Site</td>
-                                <td class="py-4 px-2 text-center border-b space-x-2">
-                                    {{ $taggedApplicant->awardees->count() }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    {{ number_format($group->occupants_count) }}
                                 </td>
-                                <td class="py-2 px-2 text-center border-b space-x-2"></td>
-                                <td class="py-2 px-2 text-center border-b space-x-2">
-                                    {{ $taggedApplicant->remarks ?? 'N/A' }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    Assigned relocation site here...
+                                </td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    {{ number_format($group->awarded_count) }}
+                                </td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    Actual relocation site here...
+                                </td>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center py-4">No informal settlers found</td>
+                                <td colspan="7" class="py-4 px-2 text-center border-b capitalize">
+                                    No records found.
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -184,7 +183,7 @@
             </div>
             <!-- Pagination -->
             <div class="mt-4">
-                {{ $taggedApplicants->links() }}
+                {{ $groupedApplicants->links() }}
             </div>
         </div>
     </div>
