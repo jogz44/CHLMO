@@ -1,5 +1,5 @@
 <div>
-    <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
+    <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[100px]">
         <div class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
             <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
@@ -37,14 +37,14 @@
                             </div>
                         </div>
                         <div class="flex justify-end space-x-2">
-                            <select class="border text-[12px] border-gray- text-gray-600 rounded px-2 py-2 shadow-sm ">
+                            <select class="border text-[12px] border-gray- text-gray-600 rounded px-5 py- shadow-sm ">
                                 <option value="">PO NUMBER</option>
                                 <option class="text-[11px]" value="barangay1">All</option>
                                 <option class="text-[11px]" value="purok1">PO No. 22-10-0052</option>
                                 <option class="text-[11px]" value="purok2">PO No. 23-11-0123</option>
                                 <option class="text-[11px]" value="purok3">PO No. 23-11-0252</option>
                             </select>
-                            <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-2 py-2 shadow-sm">
+                            <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-5 py-2 shadow-sm">
                                 <option value="">PR NUMBER</option>
                                 <option class="text-[11px]" value="barangay1">All</option>
                                 <option class="text-[11px]" value="purok1">PR No. 22-10-0052</option>
@@ -55,10 +55,30 @@
                     </div>
 
                     <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                        <label class="text-center mt-2">Date From:</label>
-                        <input type="date" id="start-date" class="border text-[12px] border-gray-300 rounded px-2 py-1">
-                        <label class="text-center mt-2">To:</label>
-                        <input type="date" id="end-date" class="border text-[12px] border-gray-300 rounded px-2 py-1">
+                        <select wire:model.live="itemsDescription" class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">Items Description</option>
+                            <option value="Amakan">Amakan</option>
+                            <option value="Cement">CEMENT</option>
+                            <option value="Kahoy">KAHOY</option>
+                            <option value="Plywood">PLYWOOD</option>
+                        </select>
+                        <select wire:model.live="quantity" class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">Quantity</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <select wire:model.live="unit" class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">Unit</option>
+                            <option value="1">SHEETS</option>
+                            <option value="2">BAGS</option>
+                            <option value="3">PCS</option>
+                            <option value="4">KLS</option>
+
+                        </select>
                         <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-1 py-1 shadow-sm">
                             <option value="">BARANGAY</option>
                             <option value="barangay1">All</option>
@@ -78,39 +98,77 @@
                 </div>
 
                 <div x-data="{ openModalGrant: false, openPreviewModal: false, selectedFile: null, fileName: '' }" class="overflow-x-auto">
-                    @if($materials && $materials->isNotEmpty())
-                    <table class="min-w-full bg-white border border-gray-200 shadow-sm ">
+                    @if($groupedMaterials && $groupedMaterials->isNotEmpty())
+                    <table class="min-w-full bg-white border border-gray-200 shadow-sm">
                         <thead class="bg-gray-100 font-bold">
                             <tr>
-                                <th class="py-2 px-4 text-center  text-gray-700 ">ITEM NO.</th>
-                                <th class="py-2 px-4 text-center  text-gray-700">ITEM DESCRIPTION</th>
-                                <th class="py-2 px-4 text-center  text-gray-700">UNIT</th>
-                                <th class="py-2 px-4 text-center  text-gray-700">AVAILABLE MATERIALS</th>
+                                <!-- Static column headers -->
+                                <th class="py-2 px-4 text-center text-gray-700 whitespace-nowrap">ITEM NO.</th>
+                                <th class="py-2 px-4 text-center text-gray-700 whitespace-nowrap">ITEM DESCRIPTION</th>
+                                <th class="py-2 px-4 text-center text-gray-700 whitespace-nowrap">UNIT</th>
+                                <th class="py-2 px-4 text-center text-gray-700 whitespace-nowrap">AVAILABLE MATERIALS</th>
+
+                                <!-- Dynamic column headers for PR and PO -->
+                                @foreach($groupedMaterials as $prPoKey => $group)
+                                <th colspan="1" class="py-2 px-4 text-center text-gray-700">
+                                    <strong>PR NUMBER:</strong> {{ explode(' | ', $prPoKey)[1] }}<br>
+                                    <strong>PO NUMBER:</strong> {{ explode(' | ', $prPoKey)[0] }}
+                                </th>
+                                @endforeach
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($materials as $key => $material)
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $key + 1 }}</td>
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600 whitespace-nowrap">{{ $material->description }}</td>
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $material->unit }}</td>
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $material->available_materials }}</td>
+                            @foreach($groupedMaterials as $group)
+                            @php $itemNo = 1; @endphp
+                            @foreach($group['materials'] as $material)
+                            <tr class="hover:bg-gray-50 text-center">
+                                <!-- Item Number Column -->
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">
+                                    {{ $itemNo++ }}
+                                </td>
+
+                                <!-- Item Description Column -->
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">
+                                    {{ $material['item_description'] }}
+                                </td>
+
+                                <!-- Unit Column -->
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">
+                                    {{ $material['unit'] }}
+                                </td>
+
+                                <!-- Available Material Column -->
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">
+                                    {{ $material['available_quantity'] }}
+                                </td>
+
+                                <!-- Count Column -->
+                                <td class="py-2 px-4 border-b text-sm text-gray-600">
+                                    {{ $material['count'] }}
+                                </td>
                             </tr>
+                            @endforeach
                             @endforeach
                         </tbody>
                     </table>
+
+                    <!-- Total Quantity -->
+                    <div class="mt-4">
+                        <p class="text-lg font-bold">
+                            Total Quantity (All Materials):
+                            <span class="text-green-600">{{ $totalQuantity }}</span>
+                        </p>
+                    </div>
+
+
                     @else
+                    <!-- No Data Available -->
                     <div class="text-center py-4 text-gray-600">
                         <p>No data available.</p>
                     </div>
                     @endif
                 </div>
 
-
-                </table>
-                <div class="mt-4 item-left">
-                    <p class="text-lg font-bold">Total Quantity (All Materials): <span class="text-green-600">{{ $totalQuantity }}</span></p>
-                </div>
                 <!-- Pagination controls -->
                 <div class="flex justify-end text-[12px] mt-4">
                     <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
