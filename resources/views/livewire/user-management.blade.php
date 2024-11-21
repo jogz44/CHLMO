@@ -176,15 +176,26 @@
                             </div>
 
                             <!-- Role -->
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>
-                                <select wire:model="roleId" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                    <option value="">Select Role</option>
+{{--                            <div class="mb-4">--}}
+{{--                                <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>--}}
+{{--                                <select wire:model="roleId" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">--}}
+{{--                                    <option value="">Select Role</option>--}}
+{{--                                    @foreach($roles as $role)--}}
+{{--                                        <option value="{{ $role->id }}">{{ $role->name }}</option>--}}
+{{--                                    @endforeach--}}
+{{--                                </select>--}}
+{{--                                @error('roleId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror--}}
+{{--                            </div>--}}
+                            <!-- Roles -->
+                            <div>
+                                <label for="role">Role</label>
+                                <select wire:model="selectedRole" id="role" class="form-control">
+                                    <option value="">-- Select a Role --</option>
                                     @foreach($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        <option value="{{ $role->id }}">{{ $role->name}}</option>
                                     @endforeach
                                 </select>
-                                @error('roleId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                                @error('selectedRole') <span class="text-danger">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
