@@ -309,12 +309,12 @@
                             Summary of Identified Informal Settlers
                         </a>
 
-                        <!-- Relocation Applicant Summary Submenu Item -->
-                        <a href="#"
-                            @click="setActiveLinks('relocation-applicant-summary')"
-                            :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'relocation-applicant-summary' }"
+                        <!-- Summary of Relocation Lot Applicant Submenu Item -->
+                        <a href="{{ route('summary-of-relocation-lot-applicants') }}"
+                            @click="setActiveLinks('summary-of-relocation-lot-applicants')"
+                            :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-relocation-lot-applicants' }"
                             class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                            Relocation Applicant Summary
+                            Summary of Relocation Lot Applicants
                         </a>
                     </div>
                 </div>
