@@ -40,4 +40,5 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany(Material::class, 'purchase_order_id');
     }
+    
 }
