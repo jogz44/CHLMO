@@ -1,39 +1,39 @@
 <div class="flex-1 flex flex-col ml-[17%] mt-[-50%]">
     <!-- Header for large screens -->
     <header class="fixed top-0 left-0 bg-[#ffffff] p-3 hidden md:flex w-full justify-between items-center z-10"
-            style="width: calc(100% - 17%); left: 17%; max-width: calc(100% - 17%);">
+        style="width: calc(100% - 17%); left: 17%; max-width: calc(100% - 17%);">
         <!-- Navigation Links -->
 
-{{--        <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">--}}
-{{--            <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">--}}
-{{--                {{ __('HOUSING') }}--}}
-{{--            </x-nav-link>--}}
-{{--            @role('ShelterAdmin')--}}
-{{--            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">--}}
-{{--                {{ __('SHELTER ASSISTANCE') }}--}}
-{{--            </x-nav-link>--}}
-{{--            @endrole--}}
-{{--            @role('Admin')--}}
-{{--            <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">--}}
-{{--                {{ __('SHELTER ASSISTANCE') }}--}}
-{{--            </x-nav-link>--}}
-{{--            <x-nav-link href="{{ route('admin.index') }}" :active="request()->routeIs('admin.index')">--}}
-{{--                {{ __('USER MANAGEMENT') }}--}}
-{{--            </x-nav-link>--}}
-{{--            @endrole--}}
-{{--        </div>--}}
+        {{-- <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">--}}
+        {{-- <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">--}}
+        {{-- {{ __('HOUSING') }}--}}
+        {{-- </x-nav-link>--}}
+        {{-- @role('ShelterAdmin')--}}
+        {{-- <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">--}}
+        {{-- {{ __('SHELTER ASSISTANCE') }}--}}
+        {{-- </x-nav-link>--}}
+        {{-- @endrole--}}
+        {{-- @role('Admin')--}}
+        {{-- <x-nav-link href="{{ route('shelter-dashboard') }}" :active="request()->routeIs('shelter-dashboard')">--}}
+        {{-- {{ __('SHELTER ASSISTANCE') }}--}}
+        {{-- </x-nav-link>--}}
+        {{-- <x-nav-link href="{{ route('admin.index') }}" :active="request()->routeIs('admin.index')">--}}
+        {{-- {{ __('USER MANAGEMENT') }}--}}
+        {{-- </x-nav-link>--}}
+        {{-- @endrole--}}
+        {{-- </div>--}}
 
         <!-- Right-aligned container for and Profile -->
         <div class="flex items-center ml-auto space-x-2">
             <!-- Search -->
-{{--            <div class="relative hidden md:block mr-2">--}}
-{{--                <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
-{{--                    <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />--}}
-{{--                    <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />--}}
-{{--                </svg>--}}
-{{--                <input type="search" name="search" id="search" class="rounded-full px-12 py-2 placeholder:text-[13px] outline-none border-none bg-[#f7f7f9] hover:ring-[#BA2C2C] focus:ring-[#BA2C2C]" --}}
-{{--                       placeholder="Search Anything">--}}
-{{--            </div>--}}
+            {{-- <div class="relative hidden md:block mr-2">--}}
+            {{-- <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+            {{-- <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />--}}
+            {{-- <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />--}}
+            {{-- </svg>--}}
+            {{-- <input type="search" name="search" id="search" class="rounded-full px-12 py-2 placeholder:text-[13px] outline-none border-none bg-[#f7f7f9] hover:ring-[#BA2C2C] focus:ring-[#BA2C2C]" --}}
+            {{-- placeholder="Search Anything">--}}
+            {{-- </div>--}}
 
             <!-- Profile Section -->
             <div x-data="{ showProfile: false }" class="relative rounded-full py-[-4px] px-2">
@@ -43,7 +43,14 @@
                     class="flex items-center w-30">
 
                     <!-- User profile photo -->
-                    <img :src="profilePhoto" class="w-8 h-8 rounded-full bg-gray-200 object-cover" alt="User Photo">
+                    <template x-if="profilePhoto === '{{ asset('/storage/images/default-avatar.png') }}'">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-400 bg-gray-200 rounded-full" viewBox="0 0 24 24" fill="gray">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                        </svg>
+                    </template>
+                    <template x-if="profilePhoto !== '{{ asset('/storage/images/default-avatar.png') }}'">
+                        <img :src="profilePhoto" class="w-8 h-8 rounded-full bg-gray-200 object-cover" alt="User Photo">
+                    </template>
 
                     <!-- User Name -->
                     <div class="flex flex-col">

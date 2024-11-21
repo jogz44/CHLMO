@@ -76,16 +76,12 @@
                             <option value="{{ $origin->id }}">{{ $origin->name }}</option>
                             @endforeach
                         </select>
-                        <select class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                            <option value="">Select Status</option>
-                           
-                        </select>
                         <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
                             Reset Filter
                         </button>
                     </div>
                 </div>
-                
+
             </div>
 
 
@@ -109,7 +105,6 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Delivery Date</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Remarks</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Details</th>
                         </tr>
                     </thead>
                     <tbody x-data>
@@ -117,11 +112,19 @@
                         <tr @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'" class="cursor-pointer">
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->person->last_name ?? 'N/A' }}, {{ $grantee->profiledTaggedApplicant->shelterApplicant->person->first_name ?? 'N/A' }} {{ $grantee->profiledTaggedApplicant->shelterApplicant->person->middle_name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->barangay->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->purok->name ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->address->full_address ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->address->barangay->name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->address->purok->name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->full_address ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->contact_number ?? 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b whitespace-nowrap"></td>
+                            <td class="py-4 px-2 text-center border-b whitespace-nowrap">
+                                @if($grantee->profiledTaggedApplicant->spouse)
+                                {{ $grantee->profiledTaggedApplicant->spouse->last_name ?? 'N/A' }},
+                                {{ $grantee->profiledTaggedApplicant->spouse->first_name ?? 'N/A' }}
+                                {{ $grantee->profiledTaggedApplicant->spouse->middle_name ?? '' }}
+                                @else
+                                N/A
+                                @endif
+                            </td>
                             <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->governmentProgram->program_name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b whitespace-nowrap"> {{ $grantee->profiledTaggedApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>

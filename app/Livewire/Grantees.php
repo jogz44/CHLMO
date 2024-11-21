@@ -102,8 +102,9 @@ class Grantees extends Component
         'profiledTaggedApplicant.shelterApplicant.person',
         'profiledTaggedApplicant.shelterApplicant.originOfRequest',
         'profiledTaggedApplicant.governmentProgram', // Make sure the governmentProgram relationship is defined here
-        'profiledTaggedApplicant.address.purok', // Correct path for address.purok
-        'profiledTaggedApplicant.address.barangay' // Correct path for address.barangay
+        'profiledTaggedApplicant.shelterApplicant.address.purok', // Correct path for address.purok
+        'profiledTaggedApplicant.shelterApplicant.address.barangay', // Correct path for address.barangay
+        'profiledTaggedApplicant.shelterSpouse' // Correct path for shelterSpouse
     ])
     ->where(function($query) {
         // Search within shelterApplicant's person relationship
@@ -125,10 +126,10 @@ class Grantees extends Component
         ->orWhereHas('profiledTaggedApplicant.governmentProgram', function ($q) {
             $q->where('program_name', 'like', '%'.$this->search.'%');
         })
-        ->orWhereHas('profiledTaggedApplicant.address.purok', function ($q) {
+        ->orWhereHas('profiledTaggedApplicant.shelterApplicant.address.purok', function ($q) {
             $q->where('name', 'like', '%'.$this->search.'%');
         })
-        ->orWhereHas('profiledTaggedApplicant.address.barangay', function ($q) {
+        ->orWhereHas('profiledTaggedApplicant.shelterApplicant.address.barangay', function ($q) {
             $q->where('name', 'like', '%'.$this->search.'%');
         });
     });

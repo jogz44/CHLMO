@@ -197,7 +197,6 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-col">CASE SPECIFICATION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
-{{--                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column monthly-col">MONTHLY INCOME</th>--}}
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TAGGING DATE</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">ACTIONS</th>
                         </tr>
@@ -213,7 +212,6 @@
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-col">{{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-description-col">{{ $applicant->living_situation_case_specification ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->contact_number ?? 'N/A' }}</td>
-{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap monthly-col">{{ $applicant->monthly_income ?? 'N/A' }}</td>--}}
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
                                 <td class="py-4 px-2 text-center border-b whitespace-nowrap actions-col">
                                     @if(!$applicant->documents->count() && !$applicant->is_awarding_on_going)
@@ -249,7 +247,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                <td colspan="10" class="py-4 px-2 text-center border-b">No applicants found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -269,7 +267,7 @@
                             </button>
                         </div>
 
-                        <!-- Form -->
+                        <!-- AWARD APPLICANT MODAL -->
                         <form wire:submit.prevent="awardApplicant">
                             <!-- Grant Date Field -->
                             <div class="mb-3">
@@ -280,12 +278,11 @@
                                 @error('grant_date') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
-                            <!-- Main Fields -->
+                            <label class="block text-sm font-medium mb-2 text-black" for="barangay">
+                                LOT ALLOCATION
+                            </label>
+                            <br>
                             <div class="mb-4">
-                                <br>
-                                <label class="block text-sm font-medium mb-2 text-black" for="barangay">
-                                    LOT ALLOCATION
-                                </label>
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                            for="lot_name">RELOCATION SITE <span class="text-red-500">*</span></label>
@@ -741,6 +738,13 @@
         </div>
     </div>
 </div>
+<script>
+    function capitalizeInput(input) {
+        input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
+            return char.toUpperCase();
+        });
+    }
+</script>
 <script>
     // Function to allow only numeric input
     function validateNumberInput(input) {

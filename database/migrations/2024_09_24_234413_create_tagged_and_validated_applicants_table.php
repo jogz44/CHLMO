@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('roof_type_id')->constrained('roof_types')->onDelete('cascade');
             $table->foreignId('wall_type_id')->constrained('wall_types')->onDelete('cascade');
             $table->foreignId('structure_status_id')->constrained('structure_status_types')->onDelete('cascade');
+            $table->foreignId('relocation_lot_id')->nullable()->constrained('relocation_sites')->onDelete('cascade');
             $table->text('full_address')->nullable();
             $table->char('sex', 6);
             $table->date('date_of_birth');

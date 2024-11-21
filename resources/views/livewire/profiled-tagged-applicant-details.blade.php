@@ -13,20 +13,20 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                <div x-data="{ saved: false }" class="flex space-x-2 z-0">
-                    <button
+                <!-- <div x-data="{ saved: false }" class="flex space-x-2 z-0"> -->
+                    <!-- <button
                         :disabled="!isEditable || saved"
                         class="bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white text-xs font-medium px-6 py-2 rounded"
                         @click="saved = true; message = 'Data has been saved successfully!'; isEditable = false">
                         SAVE
-                    </button>
-                    <button
+                    </button> -->
+                    <!-- <button
                         @click="isEditable = !isEditable"
                         type="button"
                         class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
                         EDIT
-                    </button>
-                </div>
+                    </button> -->
+                <!-- </div> -->
             </div>
 
 
@@ -361,7 +361,7 @@
                             @error('barangay_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTaggedApplicant->address?->barangay?->name ?? '--' }}"
+                                value="{{  $profiledTaggedApplicant->shelterApplicant->address->barangay->name  ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -384,7 +384,7 @@
                             @error('purok_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTaggedApplicant->address?->purok?->name ?? '--' }}"
+                                value="{{  $profiledTaggedApplicant->shelterApplicant->address->purok->name  ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif

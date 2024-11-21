@@ -52,7 +52,9 @@
                                 </div>
                             </button>
 
-                            <!-- Modal -->
+                            <!-- TODO: paste modal code here -->
+
+                            <!-- Confirmation Modal -->
                             <div
                                     x-show="showModal"
                                     x-transition:enter="transition ease-out duration-300"

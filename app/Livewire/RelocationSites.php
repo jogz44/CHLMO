@@ -7,21 +7,26 @@ use App\Models\Barangay;
 use App\Models\Purok;
 use App\Models\RelocationSite;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class RelocationSites extends Component
 {
     public $selectedSiteId, $password = '', $newStatus = '', $showPasswordModal = false;
-    public $relocation_site_name = '';
+    public  $lot_number, $block_identifier, $relocation_site_name = '';
     public $barangay_id, $barangays = [], $purok_id, $puroks = [];
     public $total_lot_size;
     public $isModalOpen = false, $isLoading = false;
+    // To edit relocation site
+    public $showEditModal = false, $editingRelocationSite, $currentId, $newTotalLotSize;
 
     protected $rules = [
+        'lot_number' => 'nullable|string|max:255',
+        'block_identifier' => 'nullable|string|max:255',
         'relocation_site_name' => 'required|string|max:255|unique:relocation_sites,relocation_site_name',
         'barangay_id' => 'required|exists:barangays,id',
         'purok_id' => 'required|exists:puroks,id',
-        'total_lot_size' => 'required|integer|min:0',
+        'total_lot_size' => 'required|numeric|min:0',
     ];
     protected $messages = [
         'relocation_site_name.required' => 'Relocation site name is required.',
@@ -39,13 +44,15 @@ class RelocationSites extends Component
     }
     public function resetForm()
     {
-        $this->reset(['relocation_site_name', 'barangay_id', 'purok_id', 'total_lot_size']);
+        $this->reset(['lot_number', 'block_identifier', 'relocation_site_name', 'barangay_id', 'purok_id', 'total_lot_size']);
         $this->resetValidation();
     }
     public function mount()
     {
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
+
+//        $this->reset();
     }
     public function updatedBarangayId($barangayId): void
     {
@@ -57,58 +64,6 @@ class RelocationSites extends Component
             'barangay_id' => $barangayId,
             'puroks' => $this->puroks
         ]);
-    }
-    public function initiateStatusChange($siteId, $status)
-    {
-        $this->selectedSiteId = $siteId;
-        $this->newStatus = $status;
-        $this->showPasswordModal = true;
-        $this->password = '';
-        $this->resetValidation();
-    }
-    // For status update validation (separate method)
-    protected function statusUpdateRules(): array
-    {
-        return [
-            'password' => 'required|min:6',
-            'newStatus' => 'required|in:vacant,full'
-        ];
-    }
-    public function updateStatus()
-    {
-        // Validate password and status
-        $this->validate($this->statusUpdateRules());
-
-        try {
-            // Verify password
-            if (!Hash::check($this->password, auth()->user()->password)) {
-                $this->addError('password', 'Invalid password');
-                return;
-            }
-
-            // Update status
-            RelocationSite::where('id', $this->selectedSiteId)
-                ->update(['status' => $this->newStatus]);
-
-            // Reset and close modal
-            $this->showPasswordModal = false;
-            $this->password = '';
-            $this->selectedSiteId = null;
-            $this->newStatus = '';
-
-            session()->flash('success', 'Status updated successfully!');
-
-        } catch (\Exception $e) {
-            session()->flash('error', 'Error updating status: ' . $e->getMessage());
-        }
-    }
-    public function closePasswordModal()
-    {
-        $this->showPasswordModal = false;
-        $this->password = '';
-        $this->selectedSiteId = null;
-        $this->newStatus = '';
-        $this->resetValidation();
     }
     public function getRemainingLotSize($relocationSiteId)
     {
@@ -124,25 +79,87 @@ class RelocationSites extends Component
         // Calculate the remaining lot size
         return $relocationSite->total_lot_size - $allocatedLotSize;
     }
+    public function getStatusBadgeClass($remainingSize, $totalSize): string
+    {
+        $percentage = ($remainingSize / $totalSize) * 100;
+
+        if ($remainingSize <= 0) {
+            return 'bg-red-100 text-red-800';
+        } elseif ($percentage <= 20) {
+            return 'bg-orange-100 text-orange-800';
+        }
+        return 'bg-green-100 text-green-800';
+    }
+    public function getStatusText($remainingSize, $totalSize): string
+    {
+        $percentage = ($remainingSize / $totalSize) * 100;
+
+        if ($remainingSize <= 0) {
+            return 'FULL';
+        } elseif ($percentage <= 20) {
+            return 'ALMOST FULL';
+        }
+        return 'AVAILABLE';
+    }
     public function createRelocationSite(): void
     {
         try {
+            Log::info('Starting relocation site creation', [
+                'form_data' => [
+                    'barangay_id' => $this->barangay_id,
+                    'purok_id' => $this->purok_id,
+                    'lot_number' => $this->lot_number,
+                    'block_identifier' => $this->block_identifier,
+                    'relocation_site_name' => $this->relocation_site_name,
+                    'total_lot_size' => $this->total_lot_size,
+                ]
+            ]);
+
             // Validate the input
-            $this->validate();
+            try {
+                $this->validate();
+                Log::info('Validation passed successfully');
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                Log::error('Validation failed', [
+                    'errors' => $e->errors(),
+                    'message' => $e->getMessage()
+                ]);
+                throw $e;
+            }
 
             // Create the address entry first
-            $address = Address::create([
-                'barangay_id' => $this->barangay_id,
-                'purok_id' => $this->purok_id,
-            ]);
+            try {
+                $address = Address::create([
+                    'barangay_id' => $this->barangay_id,
+                    'purok_id' => $this->purok_id,
+                ]);
+                Log::info('Address created successfully', ['address' => $address->toArray()]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create address', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
 
             // Create the relocation site
-            RelocationSite::create([
-                'relocation_site_name' => $this->relocation_site_name,
-                'address_id' => $address->id,
-                'total_lot_size' => $this->total_lot_size,
-                'is_full' => false,
-            ]);
+            try {
+                $relocationSite = RelocationSite::create([
+                    'lot_number' => $this->lot_number,
+                    'block_identifier' => $this->block_identifier,
+                    'relocation_site_name' => $this->relocation_site_name,
+                    'address_id' => $address->id,
+                    'total_lot_size' => $this->total_lot_size,
+                    'is_full' => false,
+                ]);
+                Log::info('Relocation site created successfully', ['site' => $relocationSite->toArray()]);
+            } catch (\Exception $e) {
+                Log::error('Failed to create relocation site', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                throw $e;
+            }
 
             // Show success message
             $this->dispatch('alert', [
@@ -151,15 +168,70 @@ class RelocationSites extends Component
                 'type' => 'success'
             ]);
 
+            Log::info('Relocation site creation completed successfully');
+
             // Close modal and reset form
             $this->closeModal();
-
             $this->redirect('relocation-sites');
 
         } catch (\Exception $e) {
+            Log::error('Unhandled exception in createRelocationSite', [
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             $this->dispatch('alert', [
                 'title' => 'Error creating relocation site.',
                 'message' => '<br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
+        }
+    }
+    public function openEditModal($relocationSiteId)
+    {
+        $this->editingRelocationSite = RelocationSite::find($relocationSiteId);
+        $this->newTotalLotSize = $this->editingRelocationSite->total_lot_size;
+        $this->showEditModal = true;
+    }
+    public function closeEditModal()
+    {
+        $this->showEditModal = false;
+        $this->reset('editingRelocationSite', 'newTotalLotSize');
+    }
+    public function updateTotalSize()
+    {
+        $this->validate([
+            'newTotalLotSize' => 'required|numeric|min:0'
+        ]);
+
+        try {
+            // Check if new size is less than currently allocated
+            $totalAllocated = $this->editingRelocationSite->awardees()->sum('lot_size');
+            if ($this->newTotalLotSize < $totalAllocated) {
+                $this->addError('newTotalLotSize', "New size cannot be less than currently allocated size ($totalAllocated m²)");
+                return;
+            }
+
+            $this->editingRelocationSite->update([
+                'total_lot_size' => $this->newTotalLotSize,
+                'is_full' => ($this->newTotalLotSize - $totalAllocated) <= 0
+            ]);
+
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Total lot size updated successfully.<br><small>' . now()->calendar() . '</small>',
+                'type' => 'success'
+            ]);
+
+            $this->closeEditModal();
+
+        } catch (\Exception $e) {
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to update total lot size.<br><small>' . now()->calendar() . '</small>',
                 'type' => 'danger'
             ]);
         }
@@ -168,7 +240,7 @@ class RelocationSites extends Component
     {
         $relocationSites = RelocationSite::with('address')
             ->orderBy('relocation_site_name')
-            ->paginate(10);
+            ->paginate(5);
 
         return view('livewire.relocation-sites', [
             'relocationSites' => $relocationSites

@@ -84,7 +84,7 @@
                         <th class="py-2 px-2 border-b text-center font-medium">No. of Awardees</th>
                         <th class="py-2 px-2 border-b text-center font-medium">Lot Size Left (m&sup2;)</th>
                         <th class="py-2 px-2 border-b text-center font-medium">Status</th>
-{{--                        <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size</th>--}}
+                        <th class="py-2 px-2 border-b text-center font-medium">Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -97,57 +97,35 @@
                                     {{ $relocationSite->total_lot_size ?? 'N/A' }} m&sup2;
                                 </td>
                                 <td class="py-2 px-2 text-center border-b">{{ $relocationSite->awardees->count() }}</td>
-                                <td class="py-2 px-2 text-center text-red-500 border-b">{{ $this->getRemainingLotSize($relocationSite->id) }} m&sup2;</td>
+                                <td class="py-2 px-2 text-center text-red-500 border-b">
+                                    {{ $this->getRemainingLotSize($relocationSite->id) }} m&sup2;
+                                </td>
+                                <td class="py-2 px-2 text-center border-b">
+                                    @php
+                                        $remainingSize = $this->getRemainingLotSize($relocationSite->id);
+                                    @endphp
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $this->getStatusBadgeClass($remainingSize, $relocationSite->total_lot_size) }}">
+                                        {{ $this->getStatusText($remainingSize, $relocationSite->total_lot_size) }}
+                                    </span>
+                                </td>
+                                <td class="py-2 px-2 text-center border-b">
+                                    <button wire:click="openEditModal({{ $relocationSite->id }})"
+                                            class="px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 focus:outline-none">
+                                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </button>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-4 px-2 text-center border-b">No relocation sites found.</td>
+                                <td colspan="7" class="py-4 px-2 text-center border-b">No relocation sites found.</td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
         </div>
-
-        {{-- Password Confirmation Modal --}}
-        @if($showPasswordModal)
-            <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closePasswordModal"></div>
-
-                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                        <form wire:submit.prevent="updateStatus">
-                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div class="mb-4">
-                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Status Change</h3>
-                                    <p class="text-sm text-gray-600 mb-4">Please enter your password to confirm this change.</p>
-
-                                    <input type="password"
-                                           wire:model="password"
-                                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                                           placeholder="Enter your password">
-                                    @error('password')
-                                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button type="submit"
-                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                    Confirm
-                                </button>
-                                <button type="button"
-                                        wire:click="closePasswordModal"
-                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        @endif
 
         @if($isModalOpen)
             <div class="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50" x-cloak
@@ -172,6 +150,32 @@
                                    required
                                    oninput="capitalizeInput(this)">
                             @error('relocation_site_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Lot Number -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black">
+                                LOT NAME/NUMBER
+                            </label>
+                            <input wire:model="lot_number"
+                                   type="text"
+                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                   placeholder="Lot name or number..."
+                                   oninput="capitalizeInput(this)">
+                            @error('lot_number') <span class="error">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Block Identifier -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black">
+                                BLOCK IDENTIFIER
+                            </label>
+                            <input wire:model="block_identifier"
+                                   type="text"
+                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                   placeholder="Block identifier..."
+                                   oninput="capitalizeInput(this)">
+                            @error('block_identifier') <span class="error">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Barangay Field -->
@@ -238,6 +242,77 @@
                 </div>
             </div>
         @endif
+
+        <!-- resources/views/livewire/edit-relocation-site.blade.php -->
+        <x-modal wire:model="showEditModal">
+            <div class="p-4">
+                <div class="text-lg font-medium mb-4">Update Total Lot Size</div>
+
+                @if($editingRelocationSite)
+                    <form wire:submit="updateTotalSize">
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">
+                                Relocation Site
+                            </label>
+                            <div class="text-gray-700">
+                                {{ $editingRelocationSite->relocation_site_name }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">
+                                Current Total Size
+                            </label>
+                            <div class="text-gray-700">
+                                {{ $editingRelocationSite->total_lot_size }} m²
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-2">
+                                Currently Allocated
+                            </label>
+                            <div class="text-gray-700">
+                                {{ $editingRelocationSite->awardees()->sum('lot_size') }} m²
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="newTotalLotSize" class="block text-sm font-medium mb-2">
+                                New Total Size (m²) <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                    type="number"
+                                    id="newTotalLotSize"
+                                    wire:model="newTotalLotSize"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    step="0.01"
+                                    min="0"
+                            >
+                            @error('newTotalLotSize')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="flex justify-end space-x-2">
+                            <button
+                                    type="button"
+                                    wire:click="closeEditModal"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                    type="submit"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Update Size
+                            </button>
+                        </div>
+                    </form>
+                @endif
+            </div>
+        </x-modal>
     </div>
 </div>
 <script>

@@ -13,20 +13,6 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                <!-- <div x-data="{ saved: false }" class="flex space-x-2 z-0">
-                    <button
-                        :disabled="!isEditable || saved"
-                        class="bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white text-xs font-medium px-6 py-2 rounded"
-                        @click="saved = true; message = 'Data has been saved successfully!'; isEditable = false">
-                        SAVE
-                    </button>
-                    <button
-                        @click="isEditable = !isEditable"
-                        type="button"
-                        class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
-                        EDIT
-                    </button>
-                </div> -->
             </div>
 
 
@@ -175,8 +161,9 @@
 
                     </div>
 
-                    @if ($civil_status_id == $liveInPartnerStatusId)
+
                     <div class="bg-gray-100 p-2 mb-4">
+                        @if ($civil_status_id == $liveInPartnerStatusId)
                         <h2 class="block text-[12px] font-medium text-gray-700 mb-2">PARTNER DETAILS</h2>
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/3 px-2 mb-4">
@@ -216,7 +203,6 @@
                         @endif
 
                         @if ($civil_status_id == $marriedStatusId)
-
                         <h2 class="block text-[12px] font-medium text-gray-700 mb-2">SPOUSE DETAILS</h2>
                         <div class="flex flex-wrap -mx-2">
                             <div class="w-full md:w-1/3 px-2 mb-4">
@@ -297,8 +283,6 @@
                         </div>
                     </div>
 
-
-
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="religion"
@@ -361,7 +345,7 @@
                             @error('barangay_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTagged->address?->barangay?->name ?? '--' }}"
+                                value="{{  $profiledTagged->shelterApplicant->address?->barangay?->name ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -384,7 +368,7 @@
                             @error('purok_id') <span class="text-danger">{{ $message }}</span> @enderror
                             @else
                             <input type="text"
-                                value="{{  $profiledTagged->address?->purok?->name ?? '--' }}"
+                                value="{{  $profiledTagged->shelterApplicant->address?->purok?->name ?? '--' }}"
                                 disabled
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @endif
@@ -518,8 +502,6 @@
 
                     </div>
                 </div>
-
-
                 <div class="flex flex-col p-3 rounded mt-5 mb-1">
                     <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">DELIVERY DETAILS</h2>
                 </div>
@@ -671,12 +653,8 @@
                     </div>
                 </div>
 
+
+            </form>
         </div>
     </div>
-
-
-    </form>
-</div>
-
-</div>
 </div>

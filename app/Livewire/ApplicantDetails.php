@@ -175,6 +175,7 @@ class ApplicantDetails extends Component
     protected function rules(): array
     {
         return [
+            // pipe syntax
             'full_address' => 'nullable|string|max:255',
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
             'tribe' => 'required|string|max:255',
@@ -224,6 +225,7 @@ class ApplicantDetails extends Component
             'roof_type_id' => 'required|exists:roof_types,id',
             'wall_type_id' => 'required|exists:wall_types,id',
             'structure_status_id' => 'required|exists:structure_status_types,id',
+            'relocation_lot_id' => 'nullable|exists:relocation_sites,id',
             'years_of_residency' => [
                 'required',
                 'integer',

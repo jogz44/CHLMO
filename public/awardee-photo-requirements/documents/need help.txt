@@ -1,0 +1,507 @@
+The second-state 'Transfer' button should fetch some data to confirm who to transfer data right??
+
+The selected dependent is performed in the first state 'Transfer' button just before uploading photo requirements. How can we execute this properly?
+
+<div class="flex space-x-2">
+    @if($awardee->is_blacklisted)
+        <!-- Blacklisted Button -->
+        <button
+                class="px-4 py-2 bg-red-500 text-white rounded cursor-not-allowed"
+                disabled>
+            Blacklisted
+        </button>
+@elseif($awardee->documents_submitted)
+                                                <!-- Documents Submitted Button and Transfer -->
+                                                <button
+                                                        class="px-4 py-2 bg-green-600 text-white rounded cursor-default">
+                                                    Submitted
+                                                </button>
+                                                <button
+                                                        wire:click="openConfirmModal({{ $awardee->id }})"
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                                    Transfer
+                                                </button>
+                                            @else
+  <!-- Initial Transfer Button -->
+                                                <button
+                                                        wire:click="openTransferModal({{ $awardee->id }})"
+                                                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                                    Transfer
+                                                    <div wire:loading>
+                                                        <svg aria-hidden="true"
+                                                             class="w-3 h-3 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                             viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path
+                                                                    d=""
+                                                                    fill="currentColor" />
+                                                            <path
+                                                                    d=""
+                                                                    fill="currentFill" />
+                                                        </svg>
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                </button>
+                                            @endif
+                                        </div>
+
+// modals:
+
+<!-- First Modal - Dependent Selection -->
+                    <div x-show="$wire.showTransferModal"
+                         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center overflow-y-auto"
+                         x-cloak>
+                        <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 my-8">
+                            <h2 class="text-xl font-bold mb-4">Transfer Award</h2>
+
+                            @if(count($eligibleDependents) > 0)
+                                <p class="mb-4">Please select the eligible dependent to transfer the award to:</p>
+
+                                <div class="max-h-[60vh] overflow-y-auto">
+                                    <div class="space-y-4">
+                                        @if(isset($spouse))
+                                            <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
+                                                 wire:click="confirmTransfer({{ $spouse->id }})">
+                                                <div class="font-semibold">
+                                                    {{ $spouse->spouse_last_name }}, {{ $spouse->spouse_first_name }} {{ $spouse->spouse_middle_name }} (Spouse)
+                                                </div>
+                                                <div class="text-sm text-gray-600">
+                                                    Relationship: Spouse
+                                                </div>
+                                            </div>
+                                        @endif
+@foreach($eligibleDependents as $dependent)
+                                            <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
+                                                 wire:click="confirmTransfer({{ $dependent->id }})">
+                                                <div class="font-semibold">
+                                                    {{ $dependent->dependent_last_name }}, {{ $dependent->dependent_first_name }} {{ $dependent->dependent_middle_name }}
+                                                </div>
+                                                <div class="text-sm text-gray-600">
+                                                    Relationship: {{ $dependent->dependentRelationship->relationship ?? 'Unknown' }}
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-red-600">No eligible dependents found for this awardee.</p>
+                            @endif
+
+                            <div class="mt-6 flex justify-end space-x-3 border-t pt-4">
+                                <button
+                                        wire:click="$set('showTransferModal', false)"
+                                        class="px-4 py-2 border rounded hover:bg-gray-100 transition duration-150">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+<!-- 2nd modal - Requirements Modal -->
+                    <div x-show="$wire.showRequirementsModal"
+                         class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                         x-cloak
+                         style="font-family: 'Poppins', sans-serif;">
+                        <!-- Modal -->
+                        <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">
+                            <!-- Modal Header -->
+                            <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
+                                <h3 class="text-lg font-bold text-gray-900">SUBMIT TRANSFER REQUIREMENTS</h3>
+                                <button wire:click="closeRequirementsModal"
+                                        class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
+                                    &times;
+                                </button>
+                            </div>
+<!-- Modal Content - Scrollable Area -->
+                            <div class="flex-1 p-8 overflow-y-auto">
+                                <form wire:submit.prevent="submit">
+                                    <!-- Horizontal Scrollable Container -->
+                                    <div class="w-full overflow-x-auto pb-4">
+                                        <!-- 1st Attachment - ORIGINAL COPY OF NOTICE OF AWARD -->
+                                        <div class="flex flex-nowrap gap-4 min-w-full">
+                                            <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
+                                                <p class="uppercase font-bold text-gray-900 text-sm">
+                                                    {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Letter of Intent' }}
+                                                    <span class="text-red-500">*</span>
+                                                </p>
+
+                                                <!-- File Upload -->
+                                                <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                                    FilePond.registerPlugin(FilePondPluginImagePreview);
+                                                    const pond = FilePond.create($refs.input, {
+                                                        allowFileEncode: true,
+                                                        onprocessfilestart: () => { isUploading = true; },
+                                                        onprocessfile: (error, file) => { isUploading = false; },
+                                                        server: {
+                                                            process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                                                @this.upload('originalCopyOfNoticeOfAward', file, load, error, progress);
+                                                            },
+                                                            revert: (fileName, load) => {
+                                                                @this.removeUpload('originalCopyOfNoticeOfAward', fileName, load);
+                                                            },
+                                                        },
+                                                    });">
+                                                    <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="originalCopyOfNoticeOfAward">
+                                                    @error('originalCopyOfNoticeOfAward')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                </div>
+                                            </div>
+.
+.
+.
+<!-- Submit Button Section - Fixed at bottom -->
+                                    <div class="mt-4">
+                                        <button type="submit"
+                                                class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2"
+                                                :disabled="!$wire.isRequirementsComplete">
+                                            <span class="text-[12px]">SUBMIT</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+<!-- Third Modal - Confirmation -->
+                    <div x-show="$wire.showConfirmationModal"
+                         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
+                         x-cloak>
+                        <div class="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+                            <h2 class="text-xl font-bold mb-4">Confirm Award Transfer</h2>
+
+                            @if($selectedDependent)
+                                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                                    <p class="text-sm text-gray-600 mb-4">
+                                        Are you sure you want to transfer the award to:
+                                    </p>
+                                    <p class="font-medium">
+                                        @if($isSpouseTransfer)
+                                            {{ $selectedDependent->spouse_last_name }},
+                                            {{ $selectedDependent->spouse_first_name }}
+                                            {{ $selectedDependent->spouse_middle_name }}
+                                        @else
+                                            {{ $selectedDependent->dependent_last_name }},
+                                            {{ $selectedDependent->dependent_first_name }}
+                                            {{ $selectedDependent->dependent_middle_name }}
+                                        @endif
+                                    </p>
+<p class="text-sm text-gray-600">
+                                        Relationship: {{ $isSpouseTransfer ? 'Spouse' : $selectedDependent->dependentRelationship->relationship }}
+                                    </p>
+                                </div>
+                            @endif
+<div class="mt-6 flex justify-end space-x-3 border-t pt-4">
+                                <button
+                                        wire:click="$set('showConfirmationModal', false)"
+                                        class="px-4 py-2 border rounded hover:bg-gray-100">
+                                    Cancel
+                                </button>
+</div>
+                        </div>
+                    </div>
+
+First Modal (showTransferModal): Selecting the dependent
+Second Modal (showRequirementsModal): Uploading transfer requirements
+Third Modal (showConfirmationModal): Final transfer confirmation
+
+public function openTransferModal($awardeeId): void
+{
+    $this->selectedAwardeeId = $awardeeId;
+    $this->loadEligibleDependents();
+    $this->showTransferModal = true;
+}
+public function loadEligibleDependents(): void
+{
+    // Get the awardee with dependents and spouse relationships
+    $awardee = Awardee::with([
+        'taggedAndValidatedApplicant' => function ($query) {
+            $query->with([
+                'dependents' => function ($dependentQuery) {
+                    $dependentQuery->whereHas('dependentRelationship', function ($relationshipQuery) {
+                        $relationshipQuery->whereIn('relationship', [
+                            'Child (Biological)',
+                            'Mother',
+                            'Father'
+                        ]);
+                    });
+                },
+                'spouse', // Include the spouse if the applicant is married
+            ]);
+        },
+        'taggedAndValidatedApplicant.dependents.dependentRelationship'
+    ])->findOrFail($this->selectedAwardeeId);
+
+    // Separate dependents and spouse
+    $this->eligibleDependents = $awardee->taggedAndValidatedApplicant->dependents;
+
+    // Check for spouse eligibility based on civil status
+    if ($awardee->taggedAndValidatedApplicant->civil_status_id === 3) {
+        $spouse = $awardee->taggedAndValidatedApplicant->spouse;
+        if ($spouse) {
+            $this->spouse = $spouse; // Handle spouse separately
+        }
+    }
+}
+// Requirements upload:
+    public function mount()
+    {
+        // Fetch attachment types for the dropdown
+        $this->attachmentLists = TransferAttachmentsList::all(); // Fetch all attachment lists
+        $this->isFilePondUploadComplete = false;
+        // Check if the selected awardee has submitted documents
+        $this->hasSubmittedDocuments = Awardee::where('id', $this->selectedAwardeeId)
+            ->value('documents_submitted') ?? false;
+    }
+    protected $rules = [
+        'selectedAwardeeIdForTransfer' => 'required|exists:awardees,id',
+        'originalCopyOfNoticeOfAward' => 'nullable|file|max:10240',
+        'deathCert' => 'nullable|file|max:10240',
+        'marriageCert' => 'nullable|file|max:10240',
+        'validId1' => 'nullable|file|max:10240',
+        'validId2' => 'nullable|file|max:10240',
+        'votersCert' => 'nullable|file|max:10240',
+        'birthCert' => 'nullable|file|max:10240',
+        'extraJudicialSettlement' => 'nullable|file|max:10240',
+        'certOfNoLandHolding' => 'nullable|file|max:10240',
+    ];
+public function openRequirementsModal($awardeeIdForTransfer)
+    {
+        $this->selectedAwardeeIdForTransfer = $awardeeIdForTransfer;
+        $this->showRequirementsModal = true;
+    }
+public function submit()
+    {
+        DB::beginTransaction();
+        try {
+            logger()->info('Starting document submission for transfer', [
+                'awardee' => $this->selectedAwardeeIdForTransfer,
+            ]);
+
+            $this->isFilePonduploading = false;
+
+            // Validate and store documents
+            $this->validate([
+                'originalCopyOfNoticeOfAward' => 'nullable|file|max:10240',
+                'deathCert' => 'nullable|file|max:10240',
+                'marriageCert' => 'nullable|file|max:10240',
+                'validId1' => 'nullable|file|max:10240',
+                'validId2' => 'nullable|file|max:10240',
+                'votersCert' => 'nullable|file|max:10240',
+                'birthCert' => 'nullable|file|max:10240',
+                'extraJudicialSettlement' => 'nullable|file|max:10240',
+                'certOfNoLandHolding' => 'nullable|file|max:10240',
+            ]);
+
+// Store each document
+            $this->storeAttachment('originalCopyOfNoticeOfAward', 1);
+            $this->storeAttachment('deathCert', 2);
+            $this->storeAttachment('marriageCert', 3);
+            $this->storeAttachment('validId1', 4);
+            $this->storeAttachment('validId2', 5);
+            $this->storeAttachment('votersCert', 6);
+            $this->storeAttachment('birthCert', 7);
+            $this->storeAttachment('extraJudicialSettlement', 8);
+            $this->storeAttachment('certOfNoLandHolding', 9);
+// Update the documents_submitted field for the awardee
+            Awardee::where('id', $this->selectedAwardeeIdForTransfer)
+                ->update([
+                    'documents_submitted' => true,
+                    'is_blacklisted' => false,
+                    ]);
+
+            $this->hasSubmittedDocuments = true;
+
+            DB::commit();
+
+//            $this->hasSubmittedDocuments = true;
+            $this->showRequirementsModal = false;
+//            $this->showConfirmationModal = true; // Show confirmation modal after requirements submitted
+
+            $this->dispatch('alert', [
+                'title' => 'Requirements Submitted Successfully!',
+                'message' => 'Documents have been submitted successfully!.' . '<br>' . 'You mmay now proceed to Transfer.',
+                'type' => 'success'
+            ]);
+
+//            $this->redirect('awardee-list');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->handleError('Document submission failed', $e);
+        }
+    }
+/**
+     * Store individual attachment
+     */
+    private function storeAttachment($fileInput, $attachmentId)
+    {
+        $file = $this->$fileInput;
+        if ($file) {
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->storeAs('documents', $fileName, 'transfer-photo-requirements');
+
+            TransferDocumentsSubmissions::create([
+                'awardee_id' => $this->selectedAwardeeIdForTransfer,
+                'attachment_id' => $attachmentId,
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+                'file_type' => $file->extension(),
+                'file_size' => $file->getSize(),
+            ]);
+        }
+    }
+public function closeRequirementsModal()
+    {
+        $this->showRequirementsModal = false;
+    }
+    public function openConfirmModal(): void
+    {
+        $this->showConfirmationModal = true;
+    }
+public function confirmTransfer($id): void
+    {
+        $this->selectedDependentId = $id;
+
+        // Get the awardee
+        $awardee = Awardee::with([
+            'taggedAndValidatedApplicant.dependents.dependentRelationship',
+            'taggedAndValidatedApplicant.spouse'
+        ])->find($this->selectedAwardeeId);
+
+        // Check if this is a spouse transfer
+        if ($this->spouse && $this->spouse->id == $id) {
+            $this->selectedDependent = $this->spouse;
+            $this->isSpouseTransfer = true;
+        } else {
+            // Regular dependent transfer
+            $this->selectedDependent = $awardee->taggedAndValidatedApplicant->dependents
+                ->where('id', $id)
+                ->first();
+            $this->isSpouseTransfer = false;
+        }
+
+        // Check if requirements are already submitted
+        $hasSubmittedRequirements = TransferDocumentsSubmissions::where('awardee_id', $this->selectedAwardeeId)->exists();
+
+        if (!$hasSubmittedRequirements) {
+            // Close transfer modal and open requirements modal
+            $this->showTransferModal = false;
+            $this->openRequirementsModal($this->selectedAwardeeId);
+        } else {
+            // If requirements already submitted, show confirmation modal
+            $this->showConfirmationModal = true;
+        }
+    }
+public function hasSubmittedRequirements($awardeeId)
+    {
+        return TransferDocumentsSubmissions::where('awardee_id', $awardeeId)->exists();
+    }
+public function proceedWithTransfer(): void
+    {
+        try {
+            $this->transferAward($this->selectedDependentId);
+
+            // Mark awardee as transferred
+            Awardee::where('id', $this->selectedAwardeeId)
+                ->update(['is_awarded' => true]);
+
+            $this->transferredAwardees[] = $this->selectedAwardeeId;
+
+            $this->showConfirmationModal = false;
+
+            // Reset states
+            $this->hasSubmittedDocuments = false;
+            $this->reset(['selectedAwardeeId', 'eligibleDependents', 'selectedDependentId', 'selectedDependent']);
+
+            $this->dispatch('transfer-completed')->self();
+
+        } catch (\Exception $e) {
+            logger()->error('Transfer process failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            session()->flash('error', 'Failed to transfer award: ' . $e->getMessage());
+        }
+    }public function transferAward($transfereeId): void
+    {
+        try {
+            DB::beginTransaction();
+
+            // Get the current awardee
+            $currentAwardee = Awardee::with([
+                'taggedAndValidatedApplicant.dependents.dependentRelationship',
+                'taggedAndValidatedApplicant.spouse'
+            ])->findOrFail($this->selectedAwardeeId);
+
+            if ($this->isSpouseTransfer) {
+                // Handle spouse transfer
+                $transferee = $currentAwardee->taggedAndValidatedApplicant->spouse()
+                    ->where('id', $transfereeId)
+                    ->firstOrFail();
+                $relationship = 'Spouse';
+            } else {
+                // Handle dependent transfer
+                $transferee = $currentAwardee->taggedAndValidatedApplicant->dependents()
+                    ->with('dependentRelationship')
+                    ->where('id', $transfereeId)
+                    ->firstOrFail();
+                $relationship = $transferee->dependentRelationship->relationship;
+            }
+
+            // Create blacklist record
+            $blacklist = new Blacklist([
+                'awardee_id' => $currentAwardee->id,
+                'user_id' => auth()->id(),
+                'blacklist_reason_description' => 'Deceased - Award transferred to ' .
+                    ($this->isSpouseTransfer
+                        ? "{$transferee->spouse_first_name} {$transferee->spouse_last_name}"
+                        : "{$transferee->dependent_first_name} {$transferee->dependent_last_name}"),
+                'date_blacklisted' => now(),
+                'updated_by' => auth()->id()
+            ]);
+            $blacklist->save();
+
+            // Update current awardee
+            $currentAwardee->update([
+                'is_blacklisted' => true
+            ]);
+
+            // Create transfer history
+            $transferHistory = AwardeeTransferHistory::create([
+                'previous_awardee_id' => $currentAwardee->id,
+                'transfer_date' => now(),
+                'transfer_reason' => 'Death of previous awardee',
+                'relationship' => $relationship,
+                'processed_by' => auth()->id(),
+                'remarks' => $this->isSpouseTransfer
+                    ? "{$transferee->spouse_first_name} {$transferee->spouse_last_name}"
+                    : "{$transferee->dependent_first_name} {$transferee->dependent_last_name}"
+            ]);
+
+            DB::commit();
+            logger()->info('Transfer completed successfully', [
+                'transfer_to' => $this->isSpouseTransfer
+                    ? "{$transferee->spouse_first_name} {$transferee->spouse_last_name}"
+                    : "{$transferee->dependent_first_name} {$transferee->dependent_last_name}",
+                'is_spouse' => $this->isSpouseTransfer
+            ]);
+
+            session()->flash('message', 'Award successfully transferred to ' .
+                ($this->isSpouseTransfer
+                    ? "{$transferee->spouse_first_name} {$transferee->spouse_last_name}"
+                    : "{$transferee->dependent_first_name} {$transferee->dependent_last_name}"));
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Transfer failed', [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'is_spouse' => $this->isSpouseTransfer ?? false
+            ]);
+
+            throw $e;
+        }
+    }
+public function cancelTransfer(): void
+    {
+        $this->showConfirmationModal = false;
+        $this->selectedDependentId = null;
+        $this->selectedDependent = null;
+    }

@@ -18,6 +18,7 @@ use App\Models\TemporaryImageForHousing;
 use App\Models\TransactionType;
 use Barryvdh\DomPDF\Facade\Pdf;
 use http\Env\Request;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -145,11 +146,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'certOfNoLandHolding' => 'required|file|max:10240',
             'marriageCert' => 'nullable|file|max:10240',
             'birthCert' => 'required|file|max:10240',
-            // Relocation rules
-            'grant_date' => 'required|date',
-            'relocation_lot_id' => 'required|exists:relocation_sites,id',
-            'lot_size' => 'required|numeric',
-            'unit' => 'in:m²',
         ];
     }
     public function awardApplicant(): void
@@ -170,6 +166,14 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 throw new \Exception('Documents must be submitted before awarding.');
             }
 
+            // Check if there's enough space available
+            $relocationSite = RelocationSite::find($this->relocation_lot_id);
+            $remainingSize = $relocationSite->getRemainingLotSize();
+
+            if ($remainingSize < $this->lot_size) {
+                throw new \Exception('Insufficient lot size available. Only ' . number_format($remainingSize, 2) . ' ' . $this->unit . ' remaining.');
+            }
+
             // Create awardee record
             $awardee = Awardee::create([
                 'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
@@ -177,7 +181,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'lot_size' => $this->lot_size,
                 'unit' => $this->unit,
                 'grant_date' => $this->grant_date,
-                'documents_submitted' => true,
+                'documents_submitted' => false,
                 'is_awarded' => true,
                 'is_blacklisted' => false,
             ]);
@@ -186,6 +190,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $applicant->update([
                 'is_awarding_on_going' => true,
             ]);
+
+            // Update relocation site status
+            $relocationSite->updateFullStatus();
 
             DB::commit();
 
@@ -207,7 +214,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'relocation_lot_id', 'lot_size', 'grant_date',
         ]);
     }
-
     public function removeUpload($property, $fileName, $load): void
     {
         $filePath = storage_path('livewire-tmp/'.$fileName);
@@ -215,6 +221,18 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             unlink($filePath);
         }
         $load('');
+    }
+    protected function schedule(Schedule $schedule): void
+    {
+        $schedule->call(function () {
+            $tmpPath = storage_path('livewire-tmp');
+            // Delete files older than 24 hours
+            foreach (glob("$tmpPath/*") as $file) {
+                if (time() - filemtime($file) > 24 * 3600) {
+                    unlink($file);
+                }
+            }
+        })->daily();
     }
     public function updatedAwardeeUpload(): void
     {
@@ -298,15 +316,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $awardee = Awardee::where('tagged_and_validated_applicant_id', $applicantId)
                 ->where('is_awarded', true)
                 ->firstOrFail();
-
-            // Generate the certificate
-//            $pdf = PDF::loadView('pdfs.awarding-certificate', [
-//                'awardee' => $awardee,
-//                'applicant' => $awardee->taggedAndValidatedApplicant->applicant
-//            ]);
-//
-//            // Return the PDF for download
-//            return $pdf->download('Award_Certificate_' . $applicantId . '.pdf');
 
             $html = view('pdfs.awarding-certificate', [
                 'awardee' => $awardee,
@@ -441,3 +450,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         ]);
     }
 }
+
+// Optional: Create an observer to automatically update status when awardees change
+// see in the app/Observers
+// registered in the AppServiceProvider

@@ -6,29 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Shelter\ProfiledTaggedApplicant;
+use App\Models\Shelter\ShelterApplicant;
 
 class Address extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'barangay_id',
         'purok_id',
         'full_address',
     ];
 
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'barangay_id' => 'integer',
@@ -36,12 +25,9 @@ class Address extends Model
         'full_address' => 'string',
     ];
 
-    /**
-     * Get the purok associated with this address.
-     */
     public function barangay(): BelongsTo
     {
-        return $this->belongsTo(Barangay::class);
+        return $this->belongsTo(Barangay::class, 'barangay_id', 'id');
     }
     public function purok(): BelongsTo
     {
@@ -51,17 +37,19 @@ class Address extends Model
     {
         return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }
-    
-    public function profiledTaggedApplicants(): HasMany
+    // public function profiledTaggedApplicants(): HasMany
+    // {
+    //     return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
+    // }
+    public function shelterApplicants(): HasMany
     {
-        return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
+        return $this->hasMany(ShelterApplicant::class, 'address_id');
     }
-    
-    public function taggedAndValidatedApplicants()
+    public function taggedAndValidatedApplicants(): HasMany
     {
         return $this->hasMany(TaggedAndValidatedApplicant::class);
     }
-    public function awardees()
+    public function awardees(): HasMany
     {
         return $this->hasMany(Awardee::class);
     }
