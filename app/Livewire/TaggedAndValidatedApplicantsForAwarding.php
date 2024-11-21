@@ -61,6 +61,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $awardeeToPreview, $isUploading = false, $attachment_id, $attachmentLists = [], $awardeeId, $documents = [],
         $newFileImages = [];
 
+    public $taggedAndValidatedApplicant;
+
     public function updatingSearch(): void
     {
         // This ensures that the search query is updated dynamically as the user types
@@ -380,7 +382,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'applicant.transactionType',
             'livingSituation',
             'caseSpecification',
+            'relocationSite'
         ]);
+
         // Apply search filter
         if ($this->search) {
             $query->whereHas('applicant', function($q) {
