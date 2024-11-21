@@ -113,14 +113,14 @@
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">
                                         <div class="flex items-center justify-center">
                                             <!-- Details Button -->
-{{--                                            <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $person->applicants->first()->id]) }}'"--}}
-{{--                                                    class="text-custom-red px-2 py-1.5">--}}
-{{--                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
-{{--                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>--}}
-{{--                                                </svg>--}}
-{{--                                            </button>--}}
+                                            <button @click="window.location.href = '{{ route('masterlist-applicant-details', ['applicantId' => $person->applicants->first()->id]) }}'"
+                                                    class="text-custom-red px-2 py-1.5">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                                                </svg>
+                                            </button>
                                             <!-- Applicant ID -->
-{{--                                            <span>{{ $person->applicants->first()->applicant_id }}</span>--}}
+                                            <span>{{ $person->applicants->first()->applicant_id }}</span>
                                         </div>
                                     </td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words name-col">
@@ -135,15 +135,15 @@
                                                 {{ ucfirst($person->application_type) }}
                                             </span>
                                     </td>
-{{--                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">--}}
-{{--                                        @if($person->application_type === 'Housing Applicant' && $person->applicants->first())--}}
-{{--                                            {{ $person->applicants->first()->date_applied->format('M d, Y') }}--}}
-{{--                                        @elseif($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first())--}}
-{{--                                            {{ $person->shelterApplicants->first()->date_request->format('M d, Y') }}--}}
-{{--                                        @else--}}
-{{--                                            N/A--}}
-{{--                                        @endif--}}
-{{--                                    </td>--}}
+                                    <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">
+                                        @if($person->application_type === 'Housing Applicant' && $person->applicants->first())
+                                            {{ $person->applicants->first()->date_applied->format('M d, Y') }}
+                                        @elseif($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first())
+                                            {{ $person->shelterApplicants->first()->date_request->format('M d, Y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                                 {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'bg-green-100 text-green-800' :
@@ -153,13 +153,13 @@
                                             </span>
                                     </td>
                                     <td class="py-4 px-2 text-center text-red-600 border-b whitespace-normal break-words status-col">
-{{--                                        <div class="flex items-center justify-center w-full">--}}
-{{--                                            {{ $person->applicants->first()->date_applied->shortAbsoluteDiffForHumans() }}--}}
-{{--                                            <span class="ml-1">--}}
-{{--                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>--}}
-{{--                                                <lord-icon src="https://cdn.lordicon.com/lzgqzxrq.json" trigger="loop" delay="3000" style="width: 20px; height: 20px"></lord-icon>--}}
-{{--                                            </span>--}}
-{{--                                        </div>--}}
+                                        <div class="flex items-center justify-center w-full">
+                                            {{ $person->applicants->first()->date_applied->shortAbsoluteDiffForHumans() }}
+                                            <span class="ml-1">
+                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                                                <lord-icon src="https://cdn.lordicon.com/lzgqzxrq.json" trigger="loop" delay="3000" style="width: 20px; height: 20px"></lord-icon>
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

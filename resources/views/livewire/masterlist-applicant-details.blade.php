@@ -118,7 +118,7 @@
                                 <label for="tribe"
                                        class="block text-[12px] font-semibold text-gray-700 mb-1">
                                     TRIBE/ETHNICITY</label>
-                                <input wire:model="tribe" id="tribe" name="tribe" :disabled="!isEditable"
+                                <input wire:model="tribe"
                                         class="capitalize w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 </input>
                             </div>
