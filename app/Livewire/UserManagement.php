@@ -17,7 +17,8 @@ class UserManagement extends Component
     public $isModalOpen = false, $isEditing = false;
 
     // User Management Properties
-    public $userId, $username, $firstName, $middleName, $lastName, $email, $password, $roleId;
+    public $userId, $username, $firstName, $middleName, $lastName, $email, $password,
+        $roles = [], $selectedRole;
 
     // For search and filter
     public $search = '', $roleFilter = '';
@@ -57,12 +58,14 @@ class UserManagement extends Component
         // If editing a user, refresh the role data
         if ($this->isModalOpen && $this->isEditing && $this->userId) {
             $user = User::findOrFail($this->userId);
-            $this->roleId = $user->role_id;
+//            $this->roleId = $user->role_id;
         }
     }
     public function mount()
     {
         $this->resetInputFields();
+        // Fetch roles from the database
+        $this->roles = Role::all();
     }
     protected $rules = [
         'username' => 'required|string|max:255|unique:users,username',
@@ -71,7 +74,7 @@ class UserManagement extends Component
         'lastName' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8',
-        'roleId' => 'required|exists:roles,id',
+        'selectedRole' => 'required|exists:roles,id',
     ];
     public function openPermissionsModal($type, $id): void
     {
@@ -138,7 +141,6 @@ class UserManagement extends Component
         $this->lastName = '';
         $this->email = '';
         $this->password = '';
-        $this->roleId = '';
         $this->isEditing = false;
     }
     public function openModal(): void
@@ -163,7 +165,6 @@ class UserManagement extends Component
         $this->middleName = $user->middle_name;
         $this->lastName = $user->last_name;
         $this->email = $user->email;
-        $this->roleId = $user->role_id;
 
         $this->isModalOpen = true;
     }
@@ -176,10 +177,10 @@ class UserManagement extends Component
             Log::info('Data before validation', [
                 'username' => $this->username,
                 'email' => $this->email,
-                'role_id' => $this->roleId,
                 'first_name' => $this->firstName,
                 'last_name' => $this->lastName,
-                'password' => $this->password
+                'password' => $this->password,
+                'selectedRole' => $this->selectedRole
             ]);
 
             $validatedData = $this->validate($this->isEditing
@@ -199,7 +200,6 @@ class UserManagement extends Component
                     'middle_name' => $this->middleName,
                     'last_name' => $this->lastName,
                     'email' => $this->email,
-                    'role_id' => $this->roleId,
                     'is_disabled' => false,
                 ]);
 
@@ -222,7 +222,6 @@ class UserManagement extends Component
                 Log::info('Creating new user', [
                     'username' => $this->username,
                     'email' => $this->email,
-                    'role_id' => $this->roleId
                 ]);
 
                 $user = User::create([
@@ -232,16 +231,18 @@ class UserManagement extends Component
                     'last_name' => $this->lastName,
                     'email' => $this->email,
                     'password' => Hash::make($this->password),
-                    'role_id' => $this->roleId,
                     'is_disabled' => false,
                     'email_verified_at' => now(),
                 ]);
 
+                $roleName = Role::findOrFail($this->selectedRole)->name;
+                $user->assignRole($roleName);
+
                 Log::info('User created successfully', ['userId' => $user->id]);
 
-                $role = Role::findById($this->roleId);
-                $user->assignRole($role->name);
-                Log::info('Role assigned to new user', ['userId' => $user->id, 'role' => $role->name]);
+//                $role = Role::findById($this->roleId);
+//                $user->assignRole($role->name);
+//                Log::info('Role assigned to new user', ['userId' => $user->id, 'role' => $role->name]);
 
                 $this->dispatch('alert', [
                     'title' => 'User created successfully!',
@@ -251,7 +252,7 @@ class UserManagement extends Component
             }
 
             $this->closeModal();
-            $this->dispatch('role-management', 'roleUpdated');
+//            $this->dispatch('role-management', 'roleUpdated');
         } catch (\Illuminate\Validation\ValidationException $ve) {
             Log::error('Validation failed', [
                 'errors' => $ve->errors(),
@@ -284,7 +285,6 @@ class UserManagement extends Component
             'lastName' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,'.$this->userId,
             'password' => 'nullable|string|min:8',
-            'roleId' => 'required|exists:roles,id',
         ];
     }
     public function delete($userId): void
@@ -360,15 +360,15 @@ class UserManagement extends Component
             }
 
             // Prevent disabling admin accounts (role_id = 1)
-            if ($user->role_id === 1) {
-//                session()->flash('error', 'Administrator accounts cannot be disabled.');
-                $this->dispatch('alert', [
-                    'title' => 'Administrator accounts cannot be disabled!',
-                    'message' => '<br><small>' . now()->calendar() . '</small>',
-                    'type' => 'danger'
-                ]);
-                return;
-            }
+//            if ($user->role_id === 1) {
+////                session()->flash('error', 'Administrator accounts cannot be disabled.');
+//                $this->dispatch('alert', [
+//                    'title' => 'Administrator accounts cannot be disabled!',
+//                    'message' => '<br><small>' . now()->calendar() . '</small>',
+//                    'type' => 'danger'
+//                ]);
+//                return;
+//            }
 
             $user->update(['is_disabled' => true]);
 
@@ -407,19 +407,20 @@ class UserManagement extends Component
                         ->orWhere('last_name', 'like', '%'.$this->search.'%');
                 });
             })
-            ->when($this->roleFilter, function ($query) {
-                $query->where('role_id', $this->roleFilter);
-            })
-            ->with(['role' => function ($query) {
-                $query->with('permissions')->withoutGlobalScopes();
-            }])
+//            ->when($this->roleFilter, function ($query) {
+//                $query->where('role_id', $this->roleFilter);
+//            })
+//            ->with(['role' => function ($query) {
+//                $query->with('permissions')->withoutGlobalScopes();
+//            }])
             ->paginate(5);
 
         return view('livewire.user-management', [
             'users' => $users,
-            'roles' => Role::with('permissions')->withoutGlobalScopes()->get(),
-            'permissions' => Permission::withoutGlobalScopes()->get(),
-            'selectedRolePermissions' => $this->selectedRolePermissions
+            'roles' => Role::all(),
+//            'roles' => Role::with('permissions')->withoutGlobalScopes()->get(),
+//            'permissions' => Permission::withoutGlobalScopes()->get(),
+//            'selectedRolePermissions' => $this->selectedRolePermissions
         ])->layout('layouts.app');
     }
 }
