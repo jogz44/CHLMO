@@ -2,14 +2,18 @@
 
 namespace App\Livewire;
 
+use App\Exports\ApplicantsDataExport;
+use App\Exports\SummaryOfIdentifiedInformalSettlersDataExport;
 use App\Models\Barangay;
 use App\Models\CaseSpecification;
 use App\Models\LivingSituation;
 use App\Models\Purok;
+use App\Models\RelocationSite;
 use App\Models\TaggedAndValidatedApplicant;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SummaryOfIdentifiedInformalSettlers extends Component
 {
@@ -19,7 +23,8 @@ class SummaryOfIdentifiedInformalSettlers extends Component
     const DANGER_ZONE_ID = 8;
 
     // Search and filters properties
-    public $search = '', $filterBarangay = '', $filterPurok = '', $filterLivingSituation = '', $filterCaseSpecification = '';
+    public $search = '', $filterBarangay = '', $filterPurok = '', $filterLivingSituation = '', $filterCaseSpecification = '',
+        $filterAssignedRelocationSite, $filterActualRelocationSite, $startDate, $endDate;
 
     // Sorting properties
     public $sortField = 'tagging_date', $sortDirection = 'desc';
@@ -75,10 +80,42 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             'filterPurok',
             'filterLivingSituation',
             'filterCaseSpecification',
+            'filterAssignedRelocationSite',
+            'filterActualRelocationSite',
+            'startDate',
+            'endDate',
             'sortField',
             'sortDirection'
         ]);
         $this->resetPage();
+    }
+// todo try checking comparing table's data in the system and in the excel
+    public function export()
+    {
+        try {
+            $filters =  array_filter([
+                'startDate' => $this->startDate,
+                'endDate' => $this->endDate,
+                'filterBarangay' => $this->filterBarangay,
+                'filterPurok' => $this->filterPurok,
+                'filterLivingSituation' => $this->filterLivingSituation,
+                'filterCaseSpecification' => $this->filterCaseSpecification,
+                'filterAssignedRelocationSite' => $this->filterAssignedRelocationSite
+            ]);
+
+            return Excel::download(
+                new SummaryOfIdentifiedInformalSettlersDataExport($filters),
+                'summary-of-identified-informal-settlers-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            \Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed: ',
+                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
+            return null;
+        }
     }
 
     public function render()
@@ -94,8 +131,11 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                     THEN case_specifications.case_specification_name 
                     ELSE tagged_and_validated_applicants.living_situation_case_specification 
                 END as case_specification'),
+                'relocation_sites.relocation_site_name as assigned_relocation_site',
+                'awardees.relocation_lot_id as actual_relocation_site_id',
                 DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as occupants_count'),
-                DB::raw('COUNT(DISTINCT awardees.id) as awarded_count')
+                DB::raw('COUNT(DISTINCT awardees.id) as awarded_count'),
+                DB::raw('GROUP_CONCAT(DISTINCT relocation_lots.relocation_site_name SEPARATOR ", ") as actual_relocation_sites')
             ])
             ->join('applicants', 'tagged_and_validated_applicants.applicant_id', '=', 'applicants.id')
             ->join('addresses', 'applicants.address_id', '=', 'addresses.id')
@@ -106,8 +146,11 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                 $join->on('tagged_and_validated_applicants.case_specification_id', '=', 'case_specifications.id')
                     ->where('tagged_and_validated_applicants.living_situation_id', '=', self::DANGER_ZONE_ID);
             })
+            ->leftJoin('relocation_sites', 'tagged_and_validated_applicants.relocation_lot_id', '=', 'relocation_sites.id')
             ->leftJoin('awardees', 'tagged_and_validated_applicants.id', '=', 'awardees.tagged_and_validated_applicant_id')
-            ->where('tagged_and_validated_applicants.is_tagged', true);
+            // New join for Actual Relocation Site
+            ->leftJoin('relocation_sites as relocation_lots', 'awardees.relocation_lot_id', '=', 'relocation_lots.id');
+//            ->where('tagged_and_validated_applicants.is_tagged', true);
 
         // Apply filters
         if ($this->filterBarangay) {
@@ -134,6 +177,27 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             });
         }
 
+        // Date Range Filter
+        if ($this->startDate) {
+            $query->where('tagged_and_validated_applicants.tagging_date', '>=', $this->startDate);
+        }
+        if ($this->endDate) {
+            $query->where('tagged_and_validated_applicants.tagging_date', '<=', $this->endDate);
+        }
+
+        // Assigned Relocation Site Filter
+        if ($this->filterAssignedRelocationSite) {
+            $query->where('relocation_sites.relocation_site_name', $this->filterAssignedRelocationSite);
+        }
+
+        // Actual Relocation Site Filter
+        if ($this->filterActualRelocationSite) {
+            $query->where(function($q) {
+                $q->where('relocation_lots.relocation_site_name', $this->filterActualRelocationSite)
+                    ->orWhereNull('relocation_lots.relocation_site_name'); // Handle cases where the actual relocation site may be null
+            });
+        }
+
         // Get filter options (cached for performance)
         if (empty($this->filterOptions)) {
             $this->filterOptions = [
@@ -147,7 +211,9 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                     TaggedAndValidatedApplicant::where('living_situation_id', '!=', self::DANGER_ZONE_ID)
                         ->whereNotNull('living_situation_case_specification')
                         ->pluck('living_situation_case_specification')
-                ])->flatten()->unique()->sort()->values()
+                ])->flatten()->unique()->sort()->values(),
+                // Add filter options for Assigned and Actual Relocation Sites
+                'relocationSites' => RelocationSite::all(),
             ];
         }
 
@@ -172,7 +238,9 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                 WHEN tagged_and_validated_applicants.living_situation_id = ' . self::DANGER_ZONE_ID . '
                 THEN case_specifications.case_specification_name 
                 ELSE tagged_and_validated_applicants.living_situation_case_specification 
-            END')
+            END'),
+            'relocation_sites.relocation_site_name',
+            'awardees.relocation_lot_id'
         ]);
 
         // Apply sorting
@@ -189,6 +257,7 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             'puroks' => $this->filterOptions['puroks'],
             'livingSituations' => $this->filterOptions['livingSituations'],
             'caseSpecifications' => $this->filterOptions['caseSpecifications'],
+            'relocationSites' => $this->filterOptions['relocationSites'],
         ]);
     }
 }
