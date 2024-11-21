@@ -16,136 +16,87 @@
                 <div class="bg-white p-6 rounded shadow">
                     <div class="flex justify-between items-center">
                         <div class="flex space-x-2">
-                            <button @click="openFilters = !openFilters" class="flex space-x-2 items-center hover:bg-yellow-500 py-2 px-4 rounded bg-iroad-orange">
-                                <div class="text-white">
-                                    <!-- Filter Icon (You can use an icon from any library) -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.447.894l-4 2.5A1 1 0 017 21V13.414L3.293 6.707A1 1 0 013 6V4z" />
-                                    </svg>
-                                </div>
-                                <div class="text-[13px] text-white font-medium">
-                                    Filter
-                                </div>
-                            </button>
-                            <!-- Search -->
-                            <div class="relative hidden md:block border-gray-300">
-                                <svg class="absolute top-[13px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                                    <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                <input type="search" name="search" id="search" class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow" placeholder="Search">
-                            </div>
-                        </div>
-                        <div class="flex justify-end space-x-2">
-                            <select class="border text-[12px] border-gray- text-gray-600 rounded px-2 py-2 shadow-sm ">
-                                <option value="">PO NUMBER</option>
-                                <option class="text-[11px]" value="barangay1">All</option>
-                                <option class="text-[11px]" value="purok1">PO No. 22-10-0052</option>
-                                <option class="text-[11px]" value="purok2">PO No. 23-11-0123</option>
-                                <option class="text-[11px]" value="purok3">PO No. 23-11-0252</option>
-                            </select>
-                            <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-2 py-2 shadow-sm">
-                                <option value="">PR NUMBER</option>
-                                <option class="text-[11px]" value="barangay1">All</option>
-                                <option class="text-[11px]" value="purok1">PR No. 22-10-0052</option>
-                                <option class="text-[11px]" value="purok2">PR No. 23-11-0123</option>
-                                <option class="text-[11px]" value="purok3">PR No. 23-11-0252</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
-                        <label class="text-center mt-2">Date From:</label>
-                        <input type="date" id="start-date" class="border text-[12px] border-gray-300 rounded px-2 py-1">
-                        <label class="text-center mt-2">To:</label>
-                        <input type="date" id="end-date" class="border text-[12px] border-gray-300 rounded px-2 py-1">
-                        <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-1 py-1 shadow-sm">
-                            <option value="">BARANGAY</option>
-                            <option value="barangay1">All</option>
-                            <option value="purok1">BARANGAY 1</option>
-                            <option value="purok2">BARANGAY 1</option>
-                            <option value="purok3">BARANGAY 1</option>
-                        </select>
-                        <select class="border text-[12px] border-gray-300 text-gray-600 rounded px-1 py-1 shadow-sm">
-                            <option value="">SOCIAL WELFARE SECTOR</option>
-                            <option class="text-[11px]" value="barangay1">All</option>
-                            <option class="text-[11px]" value="purok1">4P'S</option>
-                            <option class="text-[11px]" value="purok2">SENIOR CITIZEN</option>
-                            <option class="text-[11px]" value="purok3">SOLO PARENT</option>
-                        </select>
-                        <button class="bg-custom-yellow text-white px-4 py-2 rounded">Apply Filters</button>
+                        </div>
+                        <!-- Filter Dropdown and Clear Button -->
+                        <div class="flex justify-end">
+                            <select wire:model.live="selectedPrPo" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                                <option value="">Select PO and PR</option>
+                                @foreach($prPoHeaders as $header)
+                                <option value="{{ $header->pr_number }}-{{ $header->po_number }}">
+                                    PR {{ $header->pr_number }} - PO {{ $header->po_number }}
+                                </option>
+                                @endforeach
+                            </select>
+                            <button wire:click="clearFilter" class="ml-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
+                                Clear Filter
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div x-data="{ openModalGrant: false, openPreviewModal: false, selectedFile: null, fileName: '' }" class="overflow-x-auto">
-                    @if($materials && $materials->isNotEmpty())
+
                     <table class="min-w-full bg-white border border-gray-200 shadow-sm ">
                         <thead class="bg-gray-100 font-bold">
                             <tr>
-                                <th class="py-2 px-4 text-center  text-gray-700 ">ITEM NO.</th>
-                                <th class="py-2 px-4 text-center  text-gray-700">ITEM DESCRIPTION</th>
-                                <th class="py-2 px-4 text-center  text-gray-700">UNIT</th>
-                                <th class="py-2 px-4 text-center  text-gray-700">AVAILABLE MATERIALS</th>
+                                <th class="py-2 px-4 text-center text-gray-700">ITEM NO.</th>
+                                <th class="py-2 px-4 text-center text-gray-700">ITEM DESCRIPTION</th>
+                                <th class="py-2 px-4 text-center text-gray-700">UNIT</th>
+                                @if(!$isFiltered)
+                                @foreach($prPoHeaders as $header)
+                                <th class="py-2 px-4 text-center text-gray-700 whitespace-nowrap">
+                                    PR {{ $header->pr_number }}<br>PO {{ $header->po_number }}
+                                </th>
+                                @endforeach
+                                @else
+                                <th class="py-2 px-4 text-center text-gray-700">TOTAL QUANTITY</th>
+                                <th class="py-2 px-4 text-center text-gray-700">WITHDRAWAL</th>
+                                <th class="py-2 px-4 text-center text-gray-700">AVAILABLE MATERIALS</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($materials as $key => $material)
+                            @if($materials && count($materials) > 0)
+                            @foreach($materials as $key => $materialGroup)
+                            @php
+                            $firstMaterial = $materialGroup->first(); // First entry of grouped materials
+                            @endphp
                             <tr class="hover:bg-gray-50">
                                 <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $key + 1 }}</td>
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600 whitespace-nowrap">{{ $material->description }}</td>
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $material->unit }}</td>
-                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $material->available_materials }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600 whitespace-nowrap">{{ $firstMaterial->description }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $firstMaterial->unit }}</td>
+                                @if(!$isFiltered)
+                                @foreach($prPoHeaders as $header)
+                                @php
+                                $quantity = $materialGroup->where('pr_number', $header->pr_number)
+                                ->where('po_number', $header->po_number)
+                                ->first()->available_quantity ?? 0;
+                                @endphp
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">
+                                    {{ $quantity }}
+                                </td>
+                                @endforeach
+                                @else
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $firstMaterial->total_quantity }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $firstMaterial->delivered_quantity }}</td>
+                                <td class="py-2 px-4 text-center border-b text-sm text-gray-600">{{ $firstMaterial->available_quantity }}</td>
+                                @endif
                             </tr>
                             @endforeach
+                            @else
+                            <tr>
+                                <td colspan="{{ !$isFiltered ? 3 + count($prPoHeaders) : 6 }}" class="py-4 px-2 text-center text-gray-600">
+                                    No data available.
+                                </td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
-                    @else
-                    <div class="text-center py-4 text-gray-600">
-                        <p>No data available.</p>
-                    </div>
-                    @endif
-                </div>
-
-
-                </table>
-                <div class="mt-4 item-left">
-                    <p class="text-lg font-bold">Total Quantity (All Materials): <span class="text-green-600">{{ $totalQuantity }}</span></p>
-                </div>
-                <!-- Pagination controls -->
-                <div class="flex justify-end text-[12px] mt-4">
-                    <button @click="prevPage" :disabled="currentPage === 1" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-l disabled:opacity-50">
-                        Prev
-                    </button>
-                    <template x-for="page in totalPages" :key="page">
-                        <button @click="goToPage(page)" :class="{'bg-custom-green text-white': page === currentPage, 'bg-gray-200': page !== currentPage}" class="px-4 py-2 mx-1 rounded">
-                            <span x-text="page"></span>
-                        </button>
-                    </template>
-                    <button @click="nextPage" :disabled="currentPage === totalPages" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-r disabled:opacity-50">
-                        Next
-                    </button>
                 </div>
 
             </div>
         </div>
     </div>
-    <script>
-        function pagination() {
-            return {
-                currentPage: 1,
-                totalPages: 3, // Set this to the total number of pages you have
-
-                prevPage() {
-                    if (this.currentPage > 1) this.currentPage--;
-                },
-                nextPage() {
-                    if (this.currentPage < this.totalPages) this.currentPage++;
-                },
-                goToPage(page) {
-                    this.currentPage = page;
-                }
-            }
-        }
-    </script>
 </div>
 </div>
