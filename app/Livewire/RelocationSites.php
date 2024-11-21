@@ -9,6 +9,8 @@ use App\Models\RelocationSite;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
+use App\Livewire\Logs\ActivityLogs;
 
 class RelocationSites extends Component
 {
@@ -153,6 +155,7 @@ class RelocationSites extends Component
                     'is_full' => false,
                 ]);
                 Log::info('Relocation site created successfully', ['site' => $relocationSite->toArray()]);
+
             } catch (\Exception $e) {
                 Log::error('Failed to create relocation site', [
                     'error' => $e->getMessage(),
@@ -167,6 +170,11 @@ class RelocationSites extends Component
                 'message' => '<br><small>'. now()->calendar() .'</small>',
                 'type' => 'success'
             ]);
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Created New Relocation Site', $user);            
 
             Log::info('Relocation site creation completed successfully');
 
@@ -225,6 +233,11 @@ class RelocationSites extends Component
                 'message' => 'Total lot size updated successfully.<br><small>' . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
+
+               // Log the activity
+               $logger = new ActivityLogs();
+               $user = Auth::user();
+               $logger->logActivity('Updated Relocation Site', $user);
 
             $this->closeEditModal();
 
