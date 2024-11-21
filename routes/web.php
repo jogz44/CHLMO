@@ -17,6 +17,7 @@ use App\Livewire\AwardeeDetails;
 use App\Livewire\GranteeDetails;
 use App\Livewire\PermissionsManager;
 use App\Livewire\ShelterApplicantDetails;
+use App\Livewire\ShelterReportAvailabilityMaterials;
 use App\Livewire\ProfiledTaggedApplicantDetails;
 use App\Livewire\TaggedAndValidatedApplicantDetails;
 use App\Livewire\TransactionWalkin;
@@ -54,10 +55,10 @@ Route::middleware([
         return view('activity-logs');
     })->name('activity-logs');
 
-//    Route::get('/permissions', PermissionsManager::class)
-//        ->name('permissions');
-//    Route::get('/permissions', PermissionsManager::class)
-//        ->middleware(['auth', 'can:manage permissions']);
+    //    Route::get('/permissions', PermissionsManager::class)
+    //        ->name('permissions');
+    //    Route::get('/permissions', PermissionsManager::class)
+    //        ->middleware(['auth', 'can:manage permissions']);
     Route::get('/user-role-management', function () {
         return view('user-role-management');
     })->name('user-role-management');
@@ -104,9 +105,9 @@ Route::middleware([
         return view('summary-of-identified-informal-settlers');
     })->name('summary-of-identified-informal-settlers');
 
-    Route::get('/reports-summary-relocation-applicants', function () {
-        return view('reports-summary-relocation-applicants');
-    })->name('reports-summary-relocation-applicants');
+    Route::get('/summary-of-relocation-lot-applicants', function () {
+        return view('summary-of-relocation-lot-applicants');
+    })->name('summary-of-relocation-lot-applicants');
 
     Route::get('/request-applicant-details', function () {
         return view('request-applicant-details');
@@ -135,19 +136,19 @@ Route::middleware([
     Route::get('/applicants', function () {
         return view('applicants');
     })->name('applicants');
-//    Route::get('/transaction-walkin', TransactionWalkin::class)->name('transaction-walkin');
+    //    Route::get('/transaction-walkin', TransactionWalkin::class)->name('transaction-walkin');
 
     Route::get('/system-configuration', function () {
         return view('system-configuration');
     })->name('system-configuration');
 
-//    shelter assistance program
+    //    shelter assistance program
     Route::get('/shelter-dashboard', function () {
         return view('shelter-dashboard');
     })->name('shelter-dashboard');
-//    Route::middleware(['role.shelterAdmin'])->get('/shelter-dashboard', function () {
-//        return view('shelter-dashboard');
-//    })->name('shelter-dashboard');
+    //    Route::middleware(['role.shelterAdmin'])->get('/shelter-dashboard', function () {
+    //        return view('shelter-dashboard');
+    //    })->name('shelter-dashboard');
 
     Route::get('/shelter-transaction-applicants', function () {
         return view('shelter-transaction-applicants');
@@ -158,8 +159,8 @@ Route::middleware([
     //})->name('shelter-tag-applicant');
 
     Route::get('/shelter-applicant-details/{profileNo}', ShelterApplicantDetails::class)
-    ->name('shelter-applicant-details');
-    
+        ->name('shelter-applicant-details');
+
     Route::get('/shelter-profiled-tagged-applicants', function () {
         return view('shelter-profiled-tagged-applicants');
     })->name('shelter-profiled-tagged-applicants');
@@ -182,7 +183,7 @@ Route::middleware([
 
     Route::get('/grantee-details/{profileNo}', GranteeDetails::class)->name('grantee-details');
     Route::get('/profiled-tagged-applicant-details/{profileNo}', ProfiledTaggedApplicantDetails::class)->name('profiled-tagged-applicant-details');
-    
+
     Route::get('/shelter-grantees', function () {
         return view('shelter-grantees');
     })->name('shelter-grantees');
@@ -198,6 +199,12 @@ Route::middleware([
     Route::get('/shelter-reports-availability-materials', function () {
         return view('shelter-reports-availability-materials');
     })->name('shelter-reports-availability-materials');
+
+
+
+    // Route::get('/shelter-report-availability-materials', ShelterReportAvailabilityMaterials::class)
+    //     ->name('shelter-report-availability-materials');
+
 
     Route::get('/shelter-reports-distribution-list', function () {
         return view('shelter-reports-distribution-list');

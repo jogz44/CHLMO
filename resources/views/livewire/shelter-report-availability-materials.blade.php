@@ -1,5 +1,5 @@
 <div>
-    <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
+    <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[100px]">
         <div class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
             <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">

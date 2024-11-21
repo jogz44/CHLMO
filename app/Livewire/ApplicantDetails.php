@@ -15,6 +15,7 @@ use App\Models\LivingSituation;
 use App\Models\LivingStatus;
 use App\Models\Purok;
 use App\Models\Religion;
+use App\Models\RelocationSite;
 use App\Models\RoofType;
 use App\Models\Spouse;
 use App\Models\StructureStatusType;
@@ -57,11 +58,18 @@ class ApplicantDetails extends Component
     public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $dependent_relationship_id, $dependentRelationships,
     $images, $renamedFileName = [];
 
+    public $relocation_lot_id, $relocationSites = [];
+    public $shouldAssignRelocation = false;
+    public $showRelocationModal = false;
+    public $showConfirmationModal = false;
+
     public function mount($applicantId): void
     {
         $this->applicantId = $applicantId;
         $this->applicant = Applicant::with(['person'])->findOrFail($applicantId);
         $person = $this->applicant->person;
+
+        $this->relocationSites = RelocationSite::all();
 
         // Clear dependents array before populating it again
         $this->dependents = [];
@@ -173,6 +181,24 @@ class ApplicantDetails extends Component
     {
         unset($this->dependents[$index]);
     }
+    public function askAboutRelocation(): void
+    {
+        $this->dispatch('openQuestionModal');
+    }
+    public function handleRelocationResponse($response): void
+    {
+        $this->shouldAssignRelocation = $response;
+        if ($response) {
+            // If Yes was clicked, show the relocation modal
+//            $this->showRelocationModal = true;
+            $this->showRelocationModal = true;
+            $this->shouldAssignRelocation = true;
+        } else {
+            // If No was clicked, proceed with storage
+//            $this->store();
+            $this->showConfirmationModal = true;
+        }
+    }
 
     protected function rules(): array
     {
@@ -227,7 +253,11 @@ class ApplicantDetails extends Component
             'roof_type_id' => 'required|exists:roof_types,id',
             'wall_type_id' => 'required|exists:wall_types,id',
             'structure_status_id' => 'required|exists:structure_status_types,id',
-            'relocation_lot_id' => 'nullable|exists:relocation_sites,id',
+            'relocation_lot_id' => [
+                'required_if:shouldAssignRelocation,true',
+                'nullable',
+                'exists:relocation_sites,id'
+            ],
             'years_of_residency' => [
                 'required',
                 'integer',
@@ -319,128 +349,143 @@ class ApplicantDetails extends Component
             'dependents.*.dependent_relationship_id' => 'required|exists:dependents_relationships,id',
         ];
     }
+    public function confirmRelocation(): void
+    {
+        // Validate relocation data before proceeding
+        $this->validate([
+            'relocation_lot_id' => 'required|exists:relocation_sites,id',
+        ]);
+        // If validation passes,
+        $this->showConfirmationModal = true;
+    }
     public function store()
     {
-        // Validate the input data
-        $this->validate();
+        // Only proceed if either relocation is not required OR relocation data is provided
+        if (!$this->shouldAssignRelocation || ($this->shouldAssignRelocation && $this->relocation_lot_id)) {
+
+            // Validate the input data
+            $this->validate();
 
         Log::info('Creating tagged applicant', ['is_tagged' => true]);
 
-        DB::beginTransaction();
+            DB::beginTransaction();
 
-        // Attempt to create the new tagged and validated applicant record
-        try {
-            $taggedApplicant = TaggedAndValidatedApplicant::create([
-                'applicant_id' => $this->applicantId,
-                'transaction_type_id' => $this->transaction_type_id,
-                'full_address' => $this->full_address ?: null,
-                'civil_status_id' => $this->civil_status_id,
-                'tribe' => $this->tribe,
-                'sex' => $this->sex,
-                'date_of_birth' => $this->date_of_birth,
-                'religion' => $this->religion ?: null,
-                'occupation' => $this->occupation ?: null,
-                'monthly_income' => $this->monthly_income,
-                'tagging_date' => $this->tagging_date,
-                'living_situation_id' => $this->living_situation_id,
-                'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
-                'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
-                'government_program_id' => $this->government_program_id,
-                'living_status_id' => $this->living_status_id,
-                'rent_fee' => $this->living_status_id == 1 ? $this->rent_fee : null, // Store rent fee only if living_status_id is 1,
-                'landlord' => $this->living_status_id == 1 ? $this->landlord : null, // Store landlord only if living_status_id is 1,
-                'house_owner' => $this->living_status_id == 5 ? $this->house_owner : null, // Store house owner only if living_status_id is 5,
-                'relationship_to_house_owner' => $this->living_status_id == 5 ? $this->relationship_to_house_owner : null,
-                'roof_type_id' => $this->roof_type_id,
-                'wall_type_id' => $this->wall_type_id,
-                'structure_status_id' => $this->structure_status_id,
-                'years_of_residency' => $this->years_of_residency ?: 'N/A',
-                'remarks' => $this->remarks ?: 'N/A',
-                // These two are auto-generated
-                'is_tagged' => true,
-                'tagger_name' => $this->tagger_name,
-            ]);
-
-            // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
-            if ($this->civil_status_id == '2') {
-                LiveInPartner::create([
-                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
-                    'partner_first_name' => $this->partner_first_name,
-                    'partner_middle_name' => $this->partner_middle_name,
-                    'partner_last_name' => $this->partner_last_name,
-                    'partner_occupation' => $this->partner_occupation,
-                    'partner_monthly_income' => $this->partner_monthly_income,
+            // Attempt to create the new tagged and validated applicant record
+            try {
+                $taggedApplicant = TaggedAndValidatedApplicant::create([
+                    'applicant_id' => $this->applicantId,
+                    'transaction_type_id' => $this->transaction_type_id,
+                    'full_address' => $this->full_address ?: null,
+                    'civil_status_id' => $this->civil_status_id,
+                    'tribe' => $this->tribe,
+                    'sex' => $this->sex,
+                    'date_of_birth' => $this->date_of_birth,
+                    'religion' => $this->religion ?: null,
+                    'occupation' => $this->occupation ?: null,
+                    'monthly_income' => $this->monthly_income,
+                    'tagging_date' => $this->tagging_date,
+                    'living_situation_id' => $this->living_situation_id,
+                    'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
+                    'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
+                    'government_program_id' => $this->government_program_id,
+                    'living_status_id' => $this->living_status_id,
+                    'rent_fee' => $this->living_status_id == 1 ? $this->rent_fee : null, // Store rent fee only if living_status_id is 1,
+                    'landlord' => $this->living_status_id == 1 ? $this->landlord : null, // Store landlord only if living_status_id is 1,
+                    'house_owner' => $this->living_status_id == 5 ? $this->house_owner : null, // Store house owner only if living_status_id is 5,
+                    'relationship_to_house_owner' => $this->living_status_id == 5 ? $this->relationship_to_house_owner : null,
+                    'roof_type_id' => $this->roof_type_id,
+                    'wall_type_id' => $this->wall_type_id,
+                    'structure_status_id' => $this->structure_status_id,
+                    'relocation_lot_id' => $this->relocation_lot_id,
+                    'years_of_residency' => $this->years_of_residency ?: 'N/A',
+                    'remarks' => $this->remarks ?: 'N/A',
+                    // These two are auto-generated
+                    'is_tagged' => true,
+                    'tagger_name' => $this->tagger_name,
                 ]);
-            }
 
-            // Check if civil_status_id is 3 (Married) before creating Spouse record
-            if ($this->civil_status_id == '3') {
-                Spouse::create([
-                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
-                    'spouse_first_name' => $this->spouse_first_name,
-                    'spouse_middle_name' => $this->spouse_middle_name,
-                    'spouse_last_name' => $this->spouse_last_name,
-                    'spouse_occupation' => $this->spouse_occupation,
-                    'spouse_monthly_income' => $this->spouse_monthly_income,
-                ]);
-            }
+                // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
+                if ($this->civil_status_id == '2') {
+                    LiveInPartner::create([
+                        'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
+                        'partner_first_name' => $this->partner_first_name,
+                        'partner_middle_name' => $this->partner_middle_name,
+                        'partner_last_name' => $this->partner_last_name,
+                        'partner_occupation' => $this->partner_occupation,
+                        'partner_monthly_income' => $this->partner_monthly_income,
+                    ]);
+                }
 
-            // batching the database for large data
-            $dependentData = [];
-            // Create dependent records associated with the applicant
-            foreach ($this->dependents as $dependent) {
-                $dependentData[] = ([
-                    'tagged_and_validated_applicant_id' => $taggedApplicant->id,
-                    'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
-                    'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
-                    'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
-                    'dependent_sex' => $dependent['dependent_sex'] ?: null,
-                    'dependent_civil_status_id' => $dependent['dependent_civil_status_id'] ?: null,
-                    'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
-                    'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
-                    'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?: null,
-                    'dependent_relationship_id' => $dependent['dependent_relationship_id'] ?: null,
-                ]);
-            }
+                // Check if civil_status_id is 3 (Married) before creating Spouse record
+                if ($this->civil_status_id == '3') {
+                    Spouse::create([
+                        'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
+                        'spouse_first_name' => $this->spouse_first_name,
+                        'spouse_middle_name' => $this->spouse_middle_name,
+                        'spouse_last_name' => $this->spouse_last_name,
+                        'spouse_occupation' => $this->spouse_occupation,
+                        'spouse_monthly_income' => $this->spouse_monthly_income,
+                    ]);
+                }
 
-            Dependent::insert($dependentData);
+                // batching the database for large data
+                $dependentData = [];
+                // Create dependent records associated with the applicant
+                foreach ($this->dependents as $dependent) {
+                    $dependentData[] = ([
+                        'tagged_and_validated_applicant_id' => $taggedApplicant->id,
+                        'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
+                        'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
+                        'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
+                        'dependent_sex' => $dependent['dependent_sex'] ?: null,
+                        'dependent_civil_status_id' => $dependent['dependent_civil_status_id'] ?: null,
+                        'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
+                        'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
+                        'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?: null,
+                        'dependent_relationship_id' => $dependent['dependent_relationship_id'] ?: null,
+                    ]);
+                }
 
-            if ($this->images) {
-                $path = $this->images->store('images', 'public');
-                ImagesForHousing::create([
-                    'tagged_and_validated_applicant_id' => $taggedApplicant->id,
-                    'image_path' => $path,
-                    'display_name' => $this->images->getClientOriginalName(),
-                ]);
-            }
+                Dependent::insert($dependentData);
 
-            // Find the applicant by ID and update the 'tagged' field
-            $applicant = Applicant::findOrFail($this->applicantId);
-            $applicant->update(['is_tagged' => true]);
+                if ($this->images) {
+                    $path = $this->images->store('images', 'public');
+                    ImagesForHousing::create([
+                        'tagged_and_validated_applicant_id' => $taggedApplicant->id,
+                        'image_path' => $path,
+                        'display_name' => $this->images->getClientOriginalName(),
+                    ]);
+                }
+
+                // Add relocation_lot_id if it was set
+//                if ($this->shouldAssignRelocation && $this->relocation_lot_id) {
+//                    $data['relocation_lot_id'] = $this->relocation_lot_id;
+//                }
+
+                // Find the applicant by ID and update the 'tagged' field
+                $applicant = Applicant::findOrFail($this->applicantId);
+                $applicant->update(['is_tagged' => true]);
 
             DB::commit();
 
-            $logger = new ActivityLogs();
-            $user = Auth::user();
-            $logger->logActivity('Tagged Applicant', $user);
+                $this->dispatch('alert', [
+                    'title' => 'Tagging successful!',
+                    'message' => 'Applicant has been successfully tagged and validated. <br><small>'. now()->calendar() .'</small>',
+                    'type' => 'success'
+                ]);
+                $this->dependents = [];
 
-            $this->dispatch('alert', [
-                'title' => 'Tagging successful!',
-                'message' => 'Applicant has been successfully tagged and validated. <br><small>'. now()->calendar() .'</small>',
-                'type' => 'success'
-            ]);
-            $this->dependents = [];
+                return redirect()->route('applicants');
 
-            return redirect()->route('applicants');
-
-        } catch (QueryException $e) {
-            DB::rollBack();
-            \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
-            $this->dispatch('alert', [
-                'title' => 'Something went wrong!',
-                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
-                'type' => 'danger'
-            ]);
+            } catch (QueryException $e) {
+                DB::rollBack();
+                \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
+                $this->dispatch('alert', [
+                    'title' => 'Something went wrong!',
+                    'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                    'type' => 'danger'
+                ]);
+            }
         }
     }
 

@@ -106,8 +106,8 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->hasMany(ImagesForHousing::class, 'tagged_and_validated_applicant_id');
     }
-    public function relocationLot(): BelongsTo
+    public function relocationSite(): BelongsTo
     {
-        return $this->belongsTo(RelocationSite::class, 'relocation_lot_id');
+        return $this->belongsTo(RelocationSite::class, 'relocation_lot_id', 'id');
     }
 }

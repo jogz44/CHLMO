@@ -26,6 +26,8 @@ class ShelterMaterialInventory extends Component
         ['item_description' => '', 'quantity' => '', 'unit' => ''],
     ];
 
+    public $materialGroups = []; // Keeps track of PR-PO combinations and their associated materials
+
     // Updated validation rules to ensure required fields
     protected $rules = [
         'purchaseOrderNo' => 'required|string|max:255',
@@ -34,27 +36,6 @@ class ShelterMaterialInventory extends Component
         'rows.*.quantity' => 'required|numeric',
         'rows.*.unit' => 'required|string|max:255',
     ];
-
-    // public function updatingSearch(): void
-    // {
-    //     // This ensures that the search query is updated dynamically as the user types
-    //     $this->resetPage();
-    // }
-    // public function clearSearch()
-    // {
-    //     $this->search = ''; // Clear the search input
-    // }
-    // public function resetFilters(): void
-    // {
-    //     $this->item_description = null;
-    //     $this->quantity = null;
-    //     $this->unit = null;
-
-    //     // Reset pagination and any search terms
-    //     // $this->resetPage();
-    //     $this->search = '';
-    // }
-
 
     // Load material units on component mount
     public function mount()
@@ -75,58 +56,61 @@ class ShelterMaterialInventory extends Component
         $this->rows = array_values($this->rows); // Re-index the array after removal
     }
 
-    // Save function to handle the logic
     public function save()
     {
         try {
             // Validate the input
             $this->validate();
 
-            // Ensure the purchase order number starts with "PO"
-            if (!str_starts_with($this->purchaseOrderNo, 'PO-')) {
-                $this->purchaseOrderNo = 'PO-' . strtoupper($this->purchaseOrderNo); // Add "PO" and make uppercase
-            }
-            // Ensure the purchase order number starts with "PO"
-            if (!str_starts_with($this->purchaseRequisitionNo, 'PR-')) {
-                $this->purchaseRequisitionNo = 'PR-' . strtoupper($this->purchaseRequisitionNo); // Add "PR" and make uppercase
-            }
+            // Ensure the purchase order and requisition numbers have proper prefixes
+            $this->purchaseOrderNo = str_starts_with($this->purchaseOrderNo, 'PO-') ? strtoupper($this->purchaseOrderNo) : 'PO-' . strtoupper($this->purchaseOrderNo);
+            $this->purchaseRequisitionNo = str_starts_with($this->purchaseRequisitionNo, 'PR-') ? strtoupper($this->purchaseRequisitionNo) : 'PR-' . strtoupper($this->purchaseRequisitionNo);
 
-            // First, handle the Purchase Requisition
+            // Handle Purchase Requisition
             $purchaseRequisition = PurchaseRequisition::firstOrCreate(
-                ['pr_number' => $this->purchaseRequisitionNo],  // Look for existing requisition by pr_number
-                ['pr_number' => $this->purchaseRequisitionNo]   // Create a new one if not found
-            );
-            $purchaseRequisition = PurchaseRequisition::firstOrCreate(
-                ['pr_number' => $this->purchaseRequisitionNo],  // Make sure this line refers to 'pr_number'
-                ['pr_number' => $this->purchaseRequisitionNo]   // This should be saving 'pr_number', not 'id'
+                ['pr_number' => $this->purchaseRequisitionNo],
+                ['pr_number' => $this->purchaseRequisitionNo]
             );
 
-
-            // Then, handle the Purchase Order creation
+            // Handle Purchase Order
             $purchaseOrder = PurchaseOrder::firstOrCreate(
-                ['po_number' => $this->purchaseOrderNo],   // Look for existing purchase order by po_number
+                ['po_number' => $this->purchaseOrderNo],
                 [
-                    'po_number' => $this->purchaseOrderNo,   // Create with custom input
-                    'purchase_requisition_id' => $purchaseRequisition->id  // Link to the newly created or existing requisition
+                    'po_number' => $this->purchaseOrderNo,
+                    'purchase_requisition_id' => $purchaseRequisition->id,
                 ]
             );
 
+            // Generate the PR-PO key
+            $prPoKey = $this->generatePrPoKey($this->purchaseRequisitionNo, $this->purchaseOrderNo);
+
+            // Create or update the PR-PO group in materialGroups
+            if (!array_key_exists($prPoKey, $this->materialGroups)) {
+                $this->materialGroups[$prPoKey] = [
+                    'purchaseRequisitionNo' => $this->purchaseRequisitionNo,
+                    'purchaseOrderNo' => $this->purchaseOrderNo,
+                    'materials' => [],
+                ];
+            }
+
             // Loop through each row and save the material information
             foreach ($this->rows as $row) {
-                // Get the material unit ID based on the selected unit from the form
-                // $materialUnitId = MaterialUnit::where('id', $row['unit'])->value('id');
                 $materialUnitId = $row['unit'];
+
                 if (!$materialUnitId) {
                     session()->flash('error', 'Invalid material unit.');
                     return;
                 }
 
-                // Create a new material record in the database
+                // Add the material to the group
+                $this->materialGroups[$prPoKey]['materials'][] = $row;
+
+                // Save the material in the database
                 Material::create([
-                    'purchase_order_id' => $purchaseOrder->id,  // Link to the purchase order
+                    'purchase_order_id' => $purchaseOrder->id,
                     'item_description' => $row['item_description'],
                     'quantity' => $row['quantity'],
-                    'material_unit_id' => $materialUnitId,  // Link to the material unit
+                    'material_unit_id' => $materialUnitId,
                 ]);
             }
 
@@ -140,14 +124,18 @@ class ShelterMaterialInventory extends Component
 
             // Reset form fields after successful save
             $this->reset(['purchaseOrderNo', 'purchaseRequisitionNo', 'rows']);
-        
         } catch (\Exception $e) {
-            // Handle any exceptions that might be thrown during the save process
-            session()->flash('error', 'An error occurred while saving: ' . $e->getMessage());
+            // Handle errors
+            session()->flash('error', 'An error occurred: ' . $e->getMessage());
         }
     }
+    // Add this method inside your ShelterMaterialInventory component
+    private function generatePrPoKey($pr, $po)
+    {
+        return md5($pr . $po); // Create a unique key by hashing the PR and PO numbers
+    }
 
-    // Render the Livewire component
+
     public function render()
     {
         return view('livewire.shelter-material-inventory');

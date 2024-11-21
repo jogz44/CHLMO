@@ -1,4 +1,3 @@
-
 <div class="p-10 h-screen ml-[17%] mt-[60px]">
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
@@ -12,24 +11,6 @@
 
             <form wire:submit.prevent="save" x-data="{ showTable: false }">
                 <div class="bg-white p-6 rounded shadow mb-6">
-
-
-                    <!-- <div class="bg-white p-6 rounded">
-                        <div class="relative hidden md:block border-gray-300 ">
-                            <svg class="absolute top-[9px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                                <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            <input wire:model.live.debounce.300ms="search" type="search" name="search" class="rounded-md px-12 py-2 placeholder:text-[13px] z-10 shadow border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] " placeholder="Search">
-                                 Clear Button
-                            <button wire:click="clearSearch" class="absolute bottom-1 text-2xl text-gray-500">
-                                &times;  This is the "x" symbol
-                            </button> 
-                                Edit & Save Button Here
-                           
-                        </div>
-                    </div> -->
-
                     <div class="w-full lg:w-1/2 pr-4 grid grid-cols-1 mt-10 mb-10">
                         <div class="flex flex-wrap -mx-2 mb-1 items-center">
                             <!-- Purchase Order No. -->
@@ -37,49 +18,27 @@
                                 <label class=" whitespace-nowrap text-[12px] font-medium mb-2 text-black">
                                     PURCHASE ORDER NO.
                                 </label>
-                                <input type="text"
-                                       wire:model="purchaseOrderNo"
-                                       class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]"
-                                       required>
-                                @error('purchaseRequisitionNo') <span class="error">{{ $message }}</span> @enderror
+                                <input type="text" wire:model="purchaseOrderNo" class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]" required>
+                                @error('purchaseOrderNo') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Purchase Requisition No. -->
-                            <div class="w-full md:w-1/3 px-3">
+                            <div class="w-full md:w-1/3 px-3 whitespace-nowrap">
                                 <label class=" whitespace-nowrap block text-[12px] font-medium mb-2 text-black">
                                     PURCHASE REQUISITION NO.
                                 </label>
-                                <input type="text"
-                                       wire:model="purchaseRequisitionNo"
-                                       class="uppercase w-full px-1 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]"
-                                       required>
-                                @error('purchaseOrderNo') <span class="error">{{ $message }}</span> @enderror
+                                <input type="text" wire:model="purchaseRequisitionNo" class="uppercase w-full px-1 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]" required>
+                                @error('purchaseRequisitionNo') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Add Button -->
                             <div class="flex items-end md:w-auto mt-6">
-                                <button type="button" @click="showTable = true" class="text-white bg-green-500 hover:bg-green-600 text-[13px] px-5 py-1 rounded-md flex items-center">
+                                <button type="button" @click="showTable = true" :disabled="!@this.purchaseOrderNo || !@this.purchaseRequisitionNo" class="text-white bg-green-500 hover:bg-green-600 text-[13px] px-5 py-1 rounded-md flex items-center">
                                     Add
                                 </button>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Add Row Button -->
-                    <!-- <div class="ml-3">
-                        <button type="button" @click="showTable = true" class="text-white bg-green-500 hover:bg-green-600 text-[13px] mpx-5 py-1 rounded-md flex items-center">
-                            Add
-                        </button>
-                    </div> -->
-
-                    <!-- <div class="w-full md:w-1/2 px-5 mb-4">
-                                    <label class="block text-[12px] font-medium mb-2 text-black ">PURCHASE REQUISITION NO.</label>
-                                    <input type="text" wire:model="PurchaseRequisition" class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181]  rounded-md text-gray-800 text-[12px]" required>
-                                    <div class="w-full md:w-1/2 px-2 mb-4"> -->
-                    <!-- <label class="block text-[12px] font-medium mb-2 text-black ">PR NO.</label> -->
-                    <!-- <input type="text" wire:model="purchaseOrderNo" class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181]  rounded-md text-gray-800 text-[12px]" required> -->
-                    <!-- </div> 
-                                </div> -->
 
                     <!-- Material Inventory Table -->
                     <div x-show="showTable" style="display: none;">
@@ -119,7 +78,6 @@
                             </tbody>
                         </table>
 
-
                         <!-- Add Row Button -->
                         <div class="flex justify-end mb-4 mt-4">
                             <button type="button" wire:click="addRow" class="text-white bg-green-500 hover:bg-green-600 text-[13px] px-2 py-2 rounded-md flex items-center">
@@ -152,7 +110,6 @@
                     {{ session('error') }}
                 </div>
                 @endif
-
             </form>
         </div>
     </div>

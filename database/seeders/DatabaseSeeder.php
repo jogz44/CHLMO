@@ -71,9 +71,9 @@ class DatabaseSeeder extends Seeder
             $this->call(ShelterSeeders\PurchaseOrderSeeder::class);
         }
 
-        if (Material::count() == 0){
-            $this->call(ShelterSeeders\MaterialSeeder::class);
-        }
+        //if (Material::count() == 0){
+            //$this->call(ShelterSeeders\MaterialSeeder::class);
+       // }
 
         if (Address::count() == 0){
             $this->call(AddressSeeder::class);

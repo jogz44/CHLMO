@@ -15,6 +15,14 @@ class ShelterReportAvailabilityMaterials extends Component
     public $prPoHeaders = [];
     public $selectedPrPo = null; // Track selected PR-PO combination
     public $isFiltered = false; // Flag to track if a filter is applied
+    public $groupedMaterials = [];
+    public $totalQuantity;
+    public $itemsDescription = '';
+    public $quantity = '';
+    public $available_quantity = '';
+    public $unit = '';
+    public $poNumber = ''; // PO Number
+    public $prNumber = ''; // PR Number
 
     public function mount()
     {
@@ -91,3 +99,4 @@ class ShelterReportAvailabilityMaterials extends Component
         ]);
     }
 }
+

@@ -22,8 +22,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
 use App\Livewire\Logs\ActivityLogs;
 
-
-
 class Applicants extends Component
 {
     use WithPagination;
