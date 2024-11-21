@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
+use App\Livewire\Logs\ActivityLogs;
 
 class ShelterApplicants extends Component
 {
@@ -207,6 +208,10 @@ class ShelterApplicants extends Component
             'last_name' => $this->last_name,
         ]);
 
+                // Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Updated a Shelter Applicant', $user);
 
         $this->dispatch('alert', [
             'title' => 'Applicant Updated!',
@@ -252,6 +257,11 @@ class ShelterApplicants extends Component
             ]);
 
             DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Created New Shelter Applicant', $user);
 
             $this->dispatch('alert', [
                 'title' => 'Applicant Added!',
