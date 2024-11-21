@@ -9,8 +9,6 @@ use App\Models\TransactionType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -35,9 +33,9 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
 
     private function getTitle(): string
     {
-        $title = 'LIST OF';
+        $title = 'SUMMARY OF IDENTIFIED INFORMAL SETTLERS';
 
-        // aAdd Transaction Type to title
+        // Add Transaction Type to title
         if (!empty($this->filters['transaction_type_id'])) {
             $transactionType = TransactionType::find($this->filters['transaction_type_id']);
             $title .= 'APPLICANTS VIA ' . strtoupper($transactionType->type_name);
