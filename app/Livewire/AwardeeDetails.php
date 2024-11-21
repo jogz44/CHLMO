@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use App\Livewire\Logs\ActivityLogs;
 
 class AwardeeDetails extends Component
 {
@@ -263,6 +264,10 @@ class AwardeeDetails extends Component
         $this->awardee->update([
             'is_blacklisted' => true
         ]);
+
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Blacklisted an Awardee', $user);
 
         $this->resetForm();
         $this->showBlacklistConfirmationModal = false;
