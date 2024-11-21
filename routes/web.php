@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\IndexController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Shelter\ShelterIndexController;
+use App\Http\Controllers\Housing\HousingStaffIndexController;
 use App\Http\Controllers\Admin\PermissionCOntroller;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -248,4 +249,11 @@ Route::middleware([
     Route::get('/', [ShelterIndexController::class, 'index'])->name('index');
 });
 
-
+// Shelter Admin routes
+Route::middleware([
+    'auth:web', 
+    'role:HousingStaff', // Correct Spatie role middleware syntax
+    'verified'
+])->name('housing-staff.')->prefix('housing-staff')->group(function () {
+    Route::get('/', [HousingStaffIndexController::class, 'index'])->name('index');
+});
