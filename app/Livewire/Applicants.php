@@ -21,8 +21,6 @@ use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
 
-
-
 class Applicants extends Component
 {
     use WithPagination;
