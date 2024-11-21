@@ -4,6 +4,7 @@ namespace App\Livewire;
 use App\Models\User;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Logs\ActivityLogs;
 
 class ProfileAdmin extends Component
 {
@@ -43,6 +44,11 @@ class ProfileAdmin extends Component
 
         $user->save();
         $this->isEditing = false;
+
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Updated Profile Info', $user);
+
         session()->flash('message', 'Profile updated successfully.');
     }
 

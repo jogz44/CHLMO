@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
+use App\Livewire\Logs\ActivityLogs;
 
 class ProfilePhotoUpload extends Component
 {
@@ -21,13 +23,11 @@ class ProfilePhotoUpload extends Component
     // Handle the photo upload and validation when the file input changes
     public function updatedPhoto()
     {
-    
+
         // Validate that the uploaded file is an image and is less than 1MB
         $this->validate([
             'photo' => 'image|max:1024', // Max size of 1MB
         ]);
-
-        
     }
 
     // Save the uploaded photo and update the user's profile
@@ -50,10 +50,12 @@ class ProfilePhotoUpload extends Component
             $user->profile_photo_path = $path;
             $user->save();
 
-            // Provide a success message after updating the profile photo
-        $this->dispatch('profile-updated');
-        
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Updated Profile Photo', $user);
 
+            // Provide a success message after updating the profile photo
+            $this->dispatch('profile-updated');
         } else {
             session()->flash('error', 'User is not an instance of User model.');
         }
