@@ -8,6 +8,8 @@ use App\Models\Shelter\Material;
 use App\Models\Shelter\MaterialUnit;
 use App\Models\Shelter\PurchaseOrder;
 use App\Models\Shelter\PurchaseRequisition;
+use App\Livewire\Logs\ActivityLogs;
+use Illuminate\Support\Facades\Auth;
 
 class ShelterMaterialInventory extends Component
 {
@@ -127,6 +129,11 @@ class ShelterMaterialInventory extends Component
                     'material_unit_id' => $materialUnitId,  // Link to the material unit
                 ]);
             }
+
+                            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Add New Sets of Materials', $user);
 
             // Set a success message
             session()->flash('message', 'Material Inventory saved successfully!');
