@@ -11,6 +11,8 @@ use App\Models\CaseSpecification;
 use App\Models\LivingStatus;
 use App\Models\Barangay;
 use App\Models\Purok;
+use App\Livewire\Logs\ActivityLogs;
+use Illuminate\Support\Facades\Auth;
 
 class SystemConfiguration extends Component
 {
@@ -78,6 +80,10 @@ class SystemConfiguration extends Component
         CivilStatus::create(['civil_status' => $this->newStatus]);
         $this->civilStatuses[] = $this->newStatus;
 
+         // Log the activity
+         $logger = new ActivityLogs();
+         $user = Auth::user();
+         $logger->logActivity('Add New Civil Status', $user);
 
         // Clear input and show success message
         $this->newStatus = '';
@@ -194,6 +200,11 @@ class SystemConfiguration extends Component
         LivingSituation::create(['living_situation_description' => $this->newSituation]);
         $this->livingSituations[] = $this->newSituation;
 
+        // Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Living Situation', $user);
+
         // Clear the input field and display success message
         $this->newSituation = '';
         session()->flash('message', 'Living Situation added successfully!');
@@ -223,6 +234,11 @@ class SystemConfiguration extends Component
         CaseSpecification::create(['case_specification_name' => $this->newSpecification]);
         $this->caseSpecifications[] = $this->newSpecification;
 
+        // Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Case Specification', $user);
+
         // Clear input and show success message
         $this->newSpecification = '';
         session()->flash('message', 'Case Specification added Successfully!');
@@ -244,6 +260,11 @@ class SystemConfiguration extends Component
         // Add the case specification to the database and update array
         LivingStatus::create(['living_status_name' => $this->newLivingStatus]);
         $this->livingStatuses[] = $this->newLivingStatus;
+
+        // Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Living Status', $user);
 
         // Clear input and show success message
         $this->newLivingStatus = '';
@@ -269,6 +290,10 @@ class SystemConfiguration extends Component
         Barangay::create(['name' => $this->newBarangay]);
         $this->barangays[] = $this->newBarangay;
 
+        // Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Barangay', $user);
 
         // Clear input and show success message
         $this->newBarangay = '';
@@ -287,6 +312,11 @@ class SystemConfiguration extends Component
             'newPurok' => 'required|string|unique:puroks,name',
             'barangay_id' => 'required|exists:barangays,id' // Add this validation rule
         ]);
+
+        // Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Purok', $user);
 
         // Add the Purok to the database and update array
         Purok::create(['name' => $this->newPurok]);

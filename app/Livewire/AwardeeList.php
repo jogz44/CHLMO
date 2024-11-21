@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use App\Livewire\Logs\ActivityLogs;
+use Illuminate\Support\Facades\Auth;
 
 class AwardeeList extends Component
 {
@@ -395,6 +397,10 @@ class AwardeeList extends Component
                     : "{$transferee->dependent_first_name} {$transferee->dependent_last_name}",
                 'is_spouse' => $this->isSpouseTransfer
             ]);
+
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Transfer an Awardee', $user);
 
             session()->flash('message', 'Award successfully transferred to ' .
                 ($this->isSpouseTransfer

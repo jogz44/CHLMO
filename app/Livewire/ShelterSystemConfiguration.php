@@ -6,6 +6,9 @@ use Livewire\Component;
 use App\Models\CivilStatus;
 use App\Models\Tribe;
 use App\Models\Religion; // Assuming you have a Religion model for storing religions
+use App\Livewire\Logs\ActivityLogs;
+use Illuminate\Support\Facades\Auth;
+
 
 class ShelterSystemConfiguration extends Component
 {
@@ -59,6 +62,12 @@ class ShelterSystemConfiguration extends Component
 
         // Update the tribes list and clear the input array
         $this->applicant_tribes = [];
+        
+         // Log the activity
+         $logger = new ActivityLogs();
+         $user = Auth::user();
+         $logger->logActivity('Added New Tribe', $user);
+
         session()->flash('message', 'Tribes added successfully!');
     }
 

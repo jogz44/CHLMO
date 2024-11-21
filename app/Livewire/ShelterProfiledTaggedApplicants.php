@@ -22,6 +22,8 @@ use App\Models\ShelterUploadedFile;
 use Illuminate\Http\RedirectResponse;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Auth;
+use App\Livewire\Logs\ActivityLogs;
 
 
 class ShelterProfiledTaggedApplicants extends Component
@@ -193,78 +195,6 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->validateOnly('images');
     }
 
-
-
-    // public function grantApplicant()
-    // {
-    //     $this->validate();
-    //     DB::beginTransaction();
-
-    //     try {
-    //         // Loop over each material to create a grantee entry
-    //         foreach ($this->materials as $material) {
-    //             // Check if there's enough stock available for the material
-    //             $currentMaterial = Material::find($material['material_id']);
-    //             if ($currentMaterial->quantity < $material['grantee_quantity']) {
-    //                 throw new \Exception("Insufficient stock for material ID: {$material['material_id']}");
-    //             }
-
-    //             // Create the grantee entry
-    //             $grantee = Grantee::create([
-    //                 'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
-    //                 'material_id' => $material['material_id'],
-    //                 'grantee_quantity' => $material['grantee_quantity'],
-    //                 'material_unit_id' => $material['material_unit_id'],
-    //                 'purchase_order_id' => $material['purchase_order_id'],
-    //                 'date_of_delivery' => $this->date_of_delivery,
-    //                 'date_of_ris' => $this->date_of_ris,
-    //                 'is_granted' => false,
-    //             ]);
-
-    //             // Upload photos if any
-    //             foreach ($this->photo as $image) {
-    //                 $path = $image->storeAs('photo', $image->getClientOriginalName(), 'public');
-    //                 ShelterUploadedFiles::create([
-    //                     'grantee_id' => $grantee->id,
-    //                     'image_path' => $path,
-    //                     'display_name' => $image->getClientOriginalName(),
-    //                 ]);
-    //             }
-
-    //             // Subtract the granted quantity from the available stock
-    //             $currentMaterial->decrement('quantity', $material['grantee_quantity']);
-
-    //             Log::info('Grantee created successfully', ['granteeId' => $grantee->id]);
-    //         }
-
-    //         // Update the applicant's status
-    //         ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
-    //             'is_awarding_on_going' => true
-    //         ]);
-
-    //         DB::commit();
-    //         $this->resetForm();
-    //         $this->dispatch('alert', [
-    //             'title' => 'Granting Pending!',
-    //             'message' => 'Applicant needs to submit necessary requirements.',
-    //             'type' => 'warning',
-    //         ]);
-
-    //         return redirect()->route('shelter-profiled-tagged-applicants');
-    //     } catch (QueryException $e) {
-    //         DB::rollBack();
-    //         $this->handleGrantingError($e);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         Log::error('Error processing grant: ' . $e->getMessage());
-    //         $this->dispatch('alert', [
-    //             'title' => 'Insufficient Stock!',
-    //             'message' => 'There was not enough stock to fulfill this request.',
-    //             'type' => 'danger',
-    //         ]);
-    //     }
-    // }
-
     public  function removeUpload($property, $fileName, $load): void
     {
         $filePath = storage_path('livewire-tmp/' . $fileName);
@@ -321,6 +251,11 @@ class ShelterProfiledTaggedApplicants extends Component
             $this->storeAttachment('profilingForm', 5);
 
             DB::commit();
+
+             // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Submitted Applicants Requirements', $user);
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
@@ -461,6 +396,11 @@ class ShelterProfiledTaggedApplicants extends Component
                 'is_granted' => true
             ]);
             // $grantee->update(['is_granted' => true]);
+
+             // Log the activity
+             $logger = new ActivityLogs();
+             $user = Auth::user();
+             $logger->logActivity('Granted Shelter Applicant', $user);
 
             DB::commit();
             $this->resetForm();

@@ -27,9 +27,11 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Livewire\Logs\ActivityLogs;
 
 class ApplicantDetails extends Component
 {
@@ -364,7 +366,7 @@ class ApplicantDetails extends Component
             // Validate the input data
             $this->validate();
 
-            \Log::info('Creating tagged applicant', ['is_tagged' => true]);
+        Log::info('Creating tagged applicant', ['is_tagged' => true]);
 
             DB::beginTransaction();
 
@@ -464,7 +466,7 @@ class ApplicantDetails extends Component
                 $applicant = Applicant::findOrFail($this->applicantId);
                 $applicant->update(['is_tagged' => true]);
 
-                DB::commit();
+            DB::commit();
 
                 $this->dispatch('alert', [
                     'title' => 'Tagging successful!',
