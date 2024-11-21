@@ -25,6 +25,9 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
+use App\Livewire\Logs\ActivityLogs;
+use Illuminate\Support\Facades\Auth;
+
 
 
 class TaggedAndValidatedApplicantsForAwarding extends Component
@@ -191,6 +194,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
                 'is_awarding_on_going' => true,
             ]);
 
+            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Awarded an Applicant', $user);
+
             // Update relocation site status
             $relocationSite->updateFullStatus();
 
@@ -275,6 +283,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $this->storeAttachment('birthCert', 6);
 
             DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Submitted Applicants Requirements', $user);
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
