@@ -43,7 +43,7 @@
 
                         <div class="flex justify-end">
                             <label class="text-center mt-2 mr-1" for="start_date">
-                                Date Applied From:
+                                Date Granted From:
                             </label>
                             <input wire:model.live="startDate"
                                    type="date"
