@@ -104,9 +104,9 @@ Route::middleware([
         return view('summary-of-identified-informal-settlers');
     })->name('summary-of-identified-informal-settlers');
 
-    Route::get('/reports-summary-relocation-applicants', function () {
-        return view('reports-summary-relocation-applicants');
-    })->name('reports-summary-relocation-applicants');
+    Route::get('/summary-of-relocation-lot-applicants', function () {
+        return view('summary-of-relocation-lot-applicants');
+    })->name('summary-of-relocation-lot-applicants');
 
     Route::get('/request-applicant-details', function () {
         return view('request-applicant-details');
