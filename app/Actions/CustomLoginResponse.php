@@ -9,12 +9,15 @@ class CustomLoginResponse implements LoginResponseContract
 {
     public function toResponse($request)
     {
-        // Check if user has 'housing' role
+        // Check what role
         if (Auth::user()->hasRole('Housing System Admin')) {
             return redirect('/dashboard');
         }
 
-        // Check if user has 'shelter' role
+        if (Auth::user()->hasRole('Super Admin')) {
+            return redirect('/dashboard');
+        }
+
         if (Auth::user()->hasRole('Shelter System Admin')) {
             return redirect('/shelter-dashboard');
         }

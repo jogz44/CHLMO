@@ -130,7 +130,7 @@
                             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
                                 <path d="M 13 7 C 11.125 7 9.5288151 7.7571335 8.5039062 8.9101562 C 7.4789976 10.063179 7 11.541667 7 13 C 7 14.458333 7.4789975 15.936821 8.5039062 17.089844 C 9.5288151 18.242867 11.125 19 13 19 C 14.875 19 16.471185 18.242867 17.496094 17.089844 C 18.521003 15.936821 19 14.458333 19 13 C 19 11.541667 18.521003 10.063179 17.496094 8.9101562 C 16.471185 7.7571335 14.875 7 13 7 z M 35 7 C 33.125 7 31.528815 7.7571335 30.503906 8.9101562 C 29.478997 10.063179 29 11.541667 29 13 C 29 14.458333 29.478997 15.936821 30.503906 17.089844 C 31.528815 18.242867 33.125 19 35 19 C 36.875 19 38.471185 18.242867 39.496094 17.089844 C 40.521003 15.936821 41 14.458333 41 13 C 41 11.541667 40.521003 10.063179 39.496094 8.9101562 C 38.471185 7.7571335 36.875 7 35 7 z M 13 10 C 14.124999 10 14.778816 10.367867 15.253906 10.902344 C 15.728997 11.436821 16 12.208333 16 13 C 16 13.791667 15.728997 14.563179 15.253906 15.097656 C 14.778816 15.632133 14.124999 16 13 16 C 11.875001 16 11.221184 15.632133 10.746094 15.097656 C 10.271003 14.563179 10 13.791667 10 13 C 10 12.208333 10.271003 11.436821 10.746094 10.902344 C 11.221184 10.367867 11.875001 10 13 10 z M 35 10 C 36.124999 10 36.778816 10.367867 37.253906 10.902344 C 37.728997 11.436821 38 12.208333 38 13 C 38 13.791667 37.728997 14.563179 37.253906 15.097656 C 36.778816 15.632133 36.124999 16 35 16 C 33.875001 16 33.221184 15.632133 32.746094 15.097656 C 32.271003 14.563179 32 13.791667 32 13 C 32 12.208333 32.271003 11.436821 32.746094 10.902344 C 33.221184 10.367867 33.875001 10 35 10 z M 24 17 C 22.125 17 20.528815 17.757133 19.503906 18.910156 C 18.478997 20.063179 18 21.541667 18 23 C 18 24.458333 18.478997 25.936821 19.503906 27.089844 C 20.528815 28.242867 22.125 29 24 29 C 25.875 29 27.471185 28.242867 28.496094 27.089844 C 29.521003 25.936821 30 24.458333 30 23 C 30 21.541667 29.521003 20.063179 28.496094 18.910156 C 27.471185 17.757133 25.875 17 24 17 z M 24 20 C 25.124999 20 25.778816 20.367867 26.253906 20.902344 C 26.728997 21.436821 27 22.208333 27 23 C 27 23.791667 26.728997 24.563179 26.253906 25.097656 C 25.778816 25.632133 25.124999 26 24 26 C 22.875001 26 22.221184 25.632133 21.746094 25.097656 C 21.271003 24.563179 21 23.791667 21 23 C 21 22.208333 21.271003 21.436821 21.746094 20.902344 C 22.221184 20.367867 22.875001 20 24 20 z M 7.5 21 C 5.57 21 4 22.57 4 24.5 L 4 27 C 4 30.36 7.95 33 13 33 L 13.210938 33 C 13.660937 31.39 14.839375 30.079688 16.359375 29.429688 C 15.409375 29.779688 14.26 30 13 30 C 9.57 30 7 28.42 7 27 L 7 24.5 C 7 24.22 7.22 24 7.5 24 L 16.060547 24 C 16.020547 23.67 16 23.34 16 23 C 16 22.31 16.09 21.64 16.25 21 L 7.5 21 z M 31.75 21 C 31.91 21.64 32 22.31 32 23 C 32 23.34 31.979453 23.67 31.939453 24 L 40.5 24 C 40.78 24 41 24.22 41 24.5 L 41 27 C 41 28.42 38.43 30 35 30 C 33.74 30 32.590625 29.779688 31.640625 29.429688 C 33.160625 30.079687 34.339063 31.39 34.789062 33 L 35 33 C 40.05 33 44 30.36 44 27 L 44 24.5 C 44 22.57 42.43 21 40.5 21 L 31.75 21 z M 18.5 31 C 16.585045 31 15 32.585045 15 34.5 L 15 37 C 15 38.918154 16.279921 40.481204 17.925781 41.46875 C 19.571641 42.456296 21.68576 43 24 43 C 26.31424 43 28.428359 42.456296 30.074219 41.46875 C 31.720079 40.481204 33 38.918154 33 37 L 33 34.5 C 33 32.585045 31.414955 31 29.5 31 L 18.5 31 z M 18.5 34 L 29.5 34 C 29.795045 34 30 34.204955 30 34.5 L 30 37 C 30 37.566846 29.59989 38.255281 28.53125 38.896484 C 27.46261 39.537688 25.82776 40 24 40 C 22.17224 40 20.53739 39.537688 19.46875 38.896484 C 18.40011 38.255281 18 37.566846 18 37 L 18 34.5 C 18 34.204955 18.204955 34 18.5 34 z"></path>
                             </svg>
-                            <p class="ml-2">Application</p>
+                            <p class="ml-2">Applications</p>
                         </div>
                         <svg :class="{ 'transform rotate-180': isApplicationsOpen }"
                              class="w-4 h-4 transition-transform duration-200"
@@ -276,85 +276,6 @@
                         </a>
                     </div>
                 </div>
-
-{{--                <div x-data="{--}}
-{{--                        activeLink: localStorage.getItem('activeLink') || '',--}}
-{{--                        activeChildLink: localStorage.getItem('activeChildLink') || '',--}}
-{{--                        isReportsSubmenuOpen: false,--}}
-{{--                        toggleReportsSubmenu() {--}}
-{{--                          this.isReportsSubmenuOpen = !this.isReportsSubmenuOpen;--}}
-{{--                          this.activeLink = this.activeLink === 'reports' ? '' : 'reports';--}}
-{{--                          localStorage.setItem('activeLink', this.activeLink);--}}
-{{--                        },--}}
-{{--                        setActiveLinks(childLink) {--}}
-{{--                          this.activeLink = 'reports';--}}
-{{--                          this.activeChildLink = childLink;--}}
-{{--                          localStorage.setItem('activeLink', 'reports');--}}
-{{--                          localStorage.setItem('activeChildLink', childLink);--}}
-{{--                        }--}}
-{{--                    }">--}}
-{{--                    <!-- Parent Reports Link -->--}}
-{{--                    <a href="#"--}}
-{{--                       @click.prevent="toggleReportsSubmenu()"--}}
-{{--                       :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'reports' }"--}}
-{{--                       class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
-{{--                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">--}}
-{{--                            <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 35.5 44 C 37.981 44 40 41.981 40 39.5 L 40 18.5 C 40 18.085 39.831797 17.710703 39.560547 17.439453 L 26.560547 4.4394531 C 26.289297 4.1682031 25.915 4 25.5 4 L 12.5 4 z M 12.5 7 L 24 7 L 24 15.5 C 24 17.98 26.02 20 28.5 20 L 37 20 L 37 39.5 C 37 40.327 36.327 41 35.5 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 z M 27 9.1210938 L 34.878906 17 L 28.5 17 C 27.67 17 27 16.33 27 15.5 L 27 9.1210938 z M 32 25 A 2 2 0 0 0 30.005859 26.873047 L 26 30.878906 L 22.994141 27.873047 A 2 2 0 0 0 21 26 A 2 2 0 0 0 19.005859 27.873047 L 15.873047 31.005859 A 2 2 0 0 0 16 35 A 2 2 0 0 0 17.994141 33.126953 L 21 30.121094 L 24.005859 33.126953 A 2 2 0 0 0 26 35 A 2 2 0 0 0 27.994141 33.126953 L 32.126953 28.994141 A 2 2 0 0 0 32 25 z"></path>--}}
-{{--                        </svg>--}}
-{{--                        <p class="ml-2">Reports</p>--}}
-{{--                    </a>--}}
-
-{{--                    <!-- Submenu -->--}}
-{{--                    <div x-show="isReportsSubmenuOpen"--}}
-{{--                         x-transition:enter="transition ease-out duration-300"--}}
-{{--                         x-transition:enter-start="opacity-0 transform -translate-y-2"--}}
-{{--                         x-transition:enter-end="opacity-100 transform translate-y-0"--}}
-{{--                         x-transition:leave="transition ease-in duration-300"--}}
-{{--                         x-transition:leave-start="opacity-100 transform translate-y-0"--}}
-{{--                         x-transition:leave-end="opacity-0 transform -translate-y-2"--}}
-{{--                         class="pl-10">--}}
-
-{{--                        <!-- Transfer Histories -->--}}
-{{--                        <a href="{{ route('transfer-histories') }}"--}}
-{{--                           @click="setActiveLinks('transfer-histories')"--}}
-{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'transfer-histories' }"--}}
-{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
-{{--                            Transfer Histories--}}
-{{--                        </a>--}}
-
-{{--                        <!-- Blacklist Submenu Item -->--}}
-{{--                        <a href="{{ route('blacklist') }}"--}}
-{{--                           @click="setActiveLinks('blacklist')"--}}
-{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'blacklist' }"--}}
-{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
-{{--                            Blacklist--}}
-{{--                        </a>--}}
-
-{{--                        <!-- Summary of Identified Informal Settlers Submenu Item -->--}}
-{{--                        <a href="{{ route('summary-of-identified-informal-settlers') }}"--}}
-{{--                           @click="setActiveLinks('summary-of-identified-informal-settlers')"--}}
-{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-identified-informal-settlers' }"--}}
-{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
-{{--                            Summary of Identified Informal Settlers--}}
-{{--                        </a>--}}
-
-{{--                        <!-- Summary of Relocation Lot Applicant Submenu Item -->--}}
-{{--                        <a href="{{ route('summary-of-relocation-lot-applicants') }}"--}}
-{{--                           @click="setActiveLinks('summary-of-relocation-lot-applicants')"--}}
-{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-relocation-lot-applicants' }"--}}
-{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
-{{--                            Summary of Relocation Lot Applicants--}}
-{{--                        </a>--}}
-
-{{--                        <!-- Masterlist of Actual Occupants -->--}}
-{{--                        <a href="{{ route('masterlist-of-actual-occupants') }}"--}}
-{{--                           @click="setActiveLinks('masterlist-of-actual-occupants')"--}}
-{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'masterlist-of-actual-occupants' }"--}}
-{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
-{{--                            Masterlist of Actual Occupants--}}
-{{--                        </a>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
 
                 <a href="{{ route('activity-logs') }}" @click="activeLink = 'activity'; activeChildLink = ''; localStorage.setItem('activeLink', 'activity'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'activity' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
