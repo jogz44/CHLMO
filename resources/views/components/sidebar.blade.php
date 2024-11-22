@@ -188,76 +188,173 @@
                     <p class="ml-2">Relocation Sites</p>
                 </a>
 
-                <div x-data="{
-                    activeLink: localStorage.getItem('activeLink') || '',
-                    activeChildLink: localStorage.getItem('activeChildLink') || '',
-                    isReportsSubmenuOpen: false,
-                    toggleReportsSubmenu() {
-                      this.isReportsSubmenuOpen = !this.isReportsSubmenuOpen;
-                      this.activeLink = this.activeLink === 'reports' ? '' : 'reports';
-                      localStorage.setItem('activeLink', this.activeLink);
-                    },
-                    setActiveLinks(childLink) {
-                      this.activeLink = 'reports';
-                      this.activeChildLink = childLink;
-                      localStorage.setItem('activeLink', 'reports');
-                      localStorage.setItem('activeChildLink', childLink);
-                    }
-                }">
-                    <!-- Parent Reports Link -->
-                    <a href="#"
-                       @click.prevent="toggleReportsSubmenu()"
-                       :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'reports' }"
-                       class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
-                            <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 35.5 44 C 37.981 44 40 41.981 40 39.5 L 40 18.5 C 40 18.085 39.831797 17.710703 39.560547 17.439453 L 26.560547 4.4394531 C 26.289297 4.1682031 25.915 4 25.5 4 L 12.5 4 z M 12.5 7 L 24 7 L 24 15.5 C 24 17.98 26.02 20 28.5 20 L 37 20 L 37 39.5 C 37 40.327 36.327 41 35.5 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 z M 27 9.1210938 L 34.878906 17 L 28.5 17 C 27.67 17 27 16.33 27 15.5 L 27 9.1210938 z M 32 25 A 2 2 0 0 0 30.005859 26.873047 L 26 30.878906 L 22.994141 27.873047 A 2 2 0 0 0 21 26 A 2 2 0 0 0 19.005859 27.873047 L 15.873047 31.005859 A 2 2 0 0 0 16 35 A 2 2 0 0 0 17.994141 33.126953 L 21 30.121094 L 24.005859 33.126953 A 2 2 0 0 0 26 35 A 2 2 0 0 0 27.994141 33.126953 L 32.126953 28.994141 A 2 2 0 0 0 32 25 z"></path>
+                <div x-data="{ isReportsOpen: false }">
+                    <!-- Reports Menu -->
+                    <a href="#" @click="isReportsOpen = !isReportsOpen; activeLink = 'reports'; localStorage.setItem('activeLink', 'reports')"
+                       :class="{ 'bg-[#D9D9D9] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'reports' }"
+                       class="mx-2 flex items-center justify-between py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="w-5 h-5"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      stroke-width="2"
+                                      d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="ml-2">Reports</p>
+                        </div>
+                        <svg :class="{ 'transform rotate-180': isReportsOpen }"
+                             class="w-4 h-4 transition-transform duration-200"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M19 9l-7 7-7-7" />
                         </svg>
-                        <p class="ml-2">Reports</p>
                     </a>
 
-                    <!-- Submenu -->
-                    <div x-show="isReportsSubmenuOpen"
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 transform -translate-y-2"
-                         x-transition:enter-end="opacity-100 transform translate-y-0"
-                         x-transition:leave="transition ease-in duration-300"
-                         x-transition:leave-start="opacity-100 transform translate-y-0"
-                         x-transition:leave-end="opacity-0 transform -translate-y-2"
-                         class="pl-10">
-
+                    <!-- Reports Submenus -->
+                    <div x-show="isReportsOpen" x-transition class="ml-6">
                         <!-- Transfer Histories -->
                         <a href="{{ route('transfer-histories') }}"
-                           @click="setActiveLinks('transfer-histories')"
-                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'transfer-histories' }"
-                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                            Transfer Histories
+                           @click="activeChildLink = 'transfer-histories'; localStorage.setItem('activeChildLink', 'transfer-histories')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'transfer-histories' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 24 4 C 12.972066 4 4 12.972074 4 24 C 4 35.027926 12.972066 44 24 44 C 35.027934 44 44 35.027926 44 24 C 44 12.972074 35.027934 4 24 4 z M 24 7 C 33.406615 7 41 14.593391 41 24 C 41 33.406609 33.406615 41 24 41 C 14.593385 41 7 33.406609 7 24 C 7 14.593391 14.593385 7 24 7 z M 23.976562 12.978516 A 1.50015 1.50015 0 0 0 22.5 14.5 L 22.5 24 C 22.5 24.397 22.658 24.774781 22.933594 25.050781 L 28.933594 31.050781 A 1.50015 1.50015 0 1 0 31.066406 28.917969 L 25.5 23.351562 L 25.5 14.5 A 1.50015 1.50015 0 0 0 23.976562 12.978516 z"></path>
+                            </svg>
+                            <span class="ml-2">Transfer Histories</span>
                         </a>
 
-                        <!-- Blacklist Submenu Item -->
+                        <!-- Blacklist -->
                         <a href="{{ route('blacklist') }}"
-                           @click="setActiveLinks('blacklist')"
-                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'blacklist' }"
-                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                            Blacklist
+                           @click="activeChildLink = 'blacklist'; localStorage.setItem('activeChildLink', 'blacklist')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'blacklist' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 24 4 C 12.972066 4 4 12.972074 4 24 C 4 35.027926 12.972066 44 24 44 C 35.027934 44 44 35.027926 44 24 C 44 12.972074 35.027934 4 24 4 z M 24 7 C 33.406615 7 41 14.593391 41 24 C 41 33.406609 33.406615 41 24 41 C 14.593385 41 7 33.406609 7 24 C 7 14.593391 14.593385 7 24 7 z M 31.976562 15.978516 A 1.50015 1.50015 0 0 0 30.939453 16.439453 L 24 23.378906 L 17.060547 16.439453 A 1.50015 1.50015 0 0 0 15.939453 16.439453 A 1.50015 1.50015 0 0 0 15.939453 17.560547 L 22.878906 24.5 L 15.939453 31.439453 A 1.50015 1.50015 0 1 0 17.060547 32.560547 L 24 25.621094 L 30.939453 32.560547 A 1.50015 1.50015 0 1 0 32.060547 31.439453 L 25.121094 24.5 L 32.060547 17.560547 A 1.50015 1.50015 0 0 0 31.976562 15.978516 z"></path>
+                            </svg>
+                            <span class="ml-2">Blacklist</span>
                         </a>
 
-                        <!-- Summary of Identified Informal Settlers Submenu Item -->
+                        <!-- Summary of Identified Informal Settlers -->
                         <a href="{{ route('summary-of-identified-informal-settlers') }}"
-                           @click="setActiveLinks('summary-of-identified-informal-settlers')"
-                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-identified-informal-settlers' }"
-                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                            Summary of Identified Informal Settlers
+                           @click="activeChildLink = 'summary-of-identified-informal-settlers'; localStorage.setItem('activeChildLink', 'summary-of-identified-informal-settlers')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'summary-of-identified-informal-settlers' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 7 4 C 6.448 4 6 4.448 6 5 L 6 43 C 6 43.552 6.448 44 7 44 L 41 44 C 41.552 44 42 43.552 42 43 L 42 5 C 42 4.448 41.552 4 41 4 L 7 4 z M 9 7 L 39 7 L 39 41 L 9 41 L 9 7 z M 14 12 L 14 15 L 34 15 L 34 12 L 14 12 z M 14 20 L 14 23 L 34 23 L 34 20 L 14 20 z M 14 28 L 14 31 L 34 31 L 34 28 L 14 28 z M 14 36 L 14 39 L 34 39 L 34 36 L 14 36 z"></path>
+                            </svg>
+                            <span class="ml-2">Summary of Identified Informal Settlers</span>
                         </a>
 
-                        <!-- Summary of Relocation Lot Applicant Submenu Item -->
+                        <!-- Summary of Relocation Lot Applicants -->
                         <a href="{{ route('summary-of-relocation-lot-applicants') }}"
-                           @click="setActiveLinks('summary-of-relocation-lot-applicants')"
-                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-relocation-lot-applicants' }"
-                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
-                            Summary of Relocation Lot Applicants
+                           @click="activeChildLink = 'summary-of-relocation-lot-applicants'; localStorage.setItem('activeChildLink', 'summary-of-relocation-lot-applicants')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'summary-of-relocation-lot-applicants' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 6 5 C 5.448 5 5 5.448 5 6 L 5 42 C 5 42.552 5.448 43 6 43 L 42 43 C 42.552 43 43 42.552 43 42 L 43 6 C 43 5.448 42.552 5 42 5 L 6 5 z M 8 8 L 40 8 L 40 40 L 8 40 L 8 8 z M 14.5 13 C 13.67 13 13 13.67 13 14.5 L 13 15.5 C 13 16.33 13.67 17 14.5 17 L 33.5 17 C 34.33 17 35 16.33 35 15.5 L 35 14.5 C 35 13.67 34.33 13 33.5 13 L 14.5 13 z M 14.5 23 C 13.67 23 13 23.67 13 24.5 L 13 25.5 C 13 26.33 13.67 27 14.5 27 L 33.5 27 C 34.33 27 35 26.33 35 25.5 L 35 24.5 C 35 23.67 34.33 23 33.5 23 L 14.5 23 z M 14.5 33 C 13.67 33 13 33.67 13 34.5 L 13 35.5 C 13 36.33 13.67 37 14.5 37 L 33.5 37 C 34.33 37 35 36.33 35 35.5 L 35 34.5 C 35 33.67 34.33 33 33.5 33 L 14.5 33 z"></path>
+                            </svg>
+                            <span class="ml-2">Summary of Relocation Lot Applicants</span>
+                        </a>
+
+                        <!-- Masterlist of Actual Occupants -->
+                        <a href="{{ route('masterlist-of-actual-occupants') }}"
+                           @click="activeChildLink = 'masterlist-of-actual-occupants'; localStorage.setItem('activeChildLink', 'masterlist-of-actual-occupants')"
+                           :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'masterlist-of-actual-occupants' }"
+                           class="flex items-center py-2 px-4 hover:text-[#FF9100]">
+                            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                                <path d="M 12.5 4 C 10.032499 4 8 6.0324991 8 8.5 L 8 39.5 C 8 41.967501 10.032499 44 12.5 44 L 35.5 44 C 37.967501 44 40 41.967501 40 39.5 L 40 18.5 A 1.50015 1.50015 0 0 0 39.560547 17.439453 L 26.560547 4.4394531 A 1.50015 1.50015 0 0 0 25.5 4 L 12.5 4 z M 12.5 7 L 24 7 L 24 16.5 C 24 18.967501 26.032499 21 28.5 21 L 37 21 L 37 39.5 C 37 40.346499 36.346499 41 35.5 41 L 12.5 41 C 11.653501 41 11 40.346499 11 39.5 L 11 8.5 C 11 7.6535009 11.653501 7 12.5 7 z M 27 9.1210938 L 34.878906 17 L 28.5 17 C 27.653501 17 27 16.346499 27 15.5 L 27 9.1210938 z"></path>
+                            </svg>
+                            <span class="ml-2">Masterlist of Actual Occupants</span>
                         </a>
                     </div>
                 </div>
+
+{{--                <div x-data="{--}}
+{{--                        activeLink: localStorage.getItem('activeLink') || '',--}}
+{{--                        activeChildLink: localStorage.getItem('activeChildLink') || '',--}}
+{{--                        isReportsSubmenuOpen: false,--}}
+{{--                        toggleReportsSubmenu() {--}}
+{{--                          this.isReportsSubmenuOpen = !this.isReportsSubmenuOpen;--}}
+{{--                          this.activeLink = this.activeLink === 'reports' ? '' : 'reports';--}}
+{{--                          localStorage.setItem('activeLink', this.activeLink);--}}
+{{--                        },--}}
+{{--                        setActiveLinks(childLink) {--}}
+{{--                          this.activeLink = 'reports';--}}
+{{--                          this.activeChildLink = childLink;--}}
+{{--                          localStorage.setItem('activeLink', 'reports');--}}
+{{--                          localStorage.setItem('activeChildLink', childLink);--}}
+{{--                        }--}}
+{{--                    }">--}}
+{{--                    <!-- Parent Reports Link -->--}}
+{{--                    <a href="#"--}}
+{{--                       @click.prevent="toggleReportsSubmenu()"--}}
+{{--                       :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'reports' }"--}}
+{{--                       class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">--}}
+{{--                            <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 35.5 44 C 37.981 44 40 41.981 40 39.5 L 40 18.5 C 40 18.085 39.831797 17.710703 39.560547 17.439453 L 26.560547 4.4394531 C 26.289297 4.1682031 25.915 4 25.5 4 L 12.5 4 z M 12.5 7 L 24 7 L 24 15.5 C 24 17.98 26.02 20 28.5 20 L 37 20 L 37 39.5 C 37 40.327 36.327 41 35.5 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 z M 27 9.1210938 L 34.878906 17 L 28.5 17 C 27.67 17 27 16.33 27 15.5 L 27 9.1210938 z M 32 25 A 2 2 0 0 0 30.005859 26.873047 L 26 30.878906 L 22.994141 27.873047 A 2 2 0 0 0 21 26 A 2 2 0 0 0 19.005859 27.873047 L 15.873047 31.005859 A 2 2 0 0 0 16 35 A 2 2 0 0 0 17.994141 33.126953 L 21 30.121094 L 24.005859 33.126953 A 2 2 0 0 0 26 35 A 2 2 0 0 0 27.994141 33.126953 L 32.126953 28.994141 A 2 2 0 0 0 32 25 z"></path>--}}
+{{--                        </svg>--}}
+{{--                        <p class="ml-2">Reports</p>--}}
+{{--                    </a>--}}
+
+{{--                    <!-- Submenu -->--}}
+{{--                    <div x-show="isReportsSubmenuOpen"--}}
+{{--                         x-transition:enter="transition ease-out duration-300"--}}
+{{--                         x-transition:enter-start="opacity-0 transform -translate-y-2"--}}
+{{--                         x-transition:enter-end="opacity-100 transform translate-y-0"--}}
+{{--                         x-transition:leave="transition ease-in duration-300"--}}
+{{--                         x-transition:leave-start="opacity-100 transform translate-y-0"--}}
+{{--                         x-transition:leave-end="opacity-0 transform -translate-y-2"--}}
+{{--                         class="pl-10">--}}
+
+{{--                        <!-- Transfer Histories -->--}}
+{{--                        <a href="{{ route('transfer-histories') }}"--}}
+{{--                           @click="setActiveLinks('transfer-histories')"--}}
+{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'transfer-histories' }"--}}
+{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                            Transfer Histories--}}
+{{--                        </a>--}}
+
+{{--                        <!-- Blacklist Submenu Item -->--}}
+{{--                        <a href="{{ route('blacklist') }}"--}}
+{{--                           @click="setActiveLinks('blacklist')"--}}
+{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'blacklist' }"--}}
+{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                            Blacklist--}}
+{{--                        </a>--}}
+
+{{--                        <!-- Summary of Identified Informal Settlers Submenu Item -->--}}
+{{--                        <a href="{{ route('summary-of-identified-informal-settlers') }}"--}}
+{{--                           @click="setActiveLinks('summary-of-identified-informal-settlers')"--}}
+{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-identified-informal-settlers' }"--}}
+{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                            Summary of Identified Informal Settlers--}}
+{{--                        </a>--}}
+
+{{--                        <!-- Summary of Relocation Lot Applicant Submenu Item -->--}}
+{{--                        <a href="{{ route('summary-of-relocation-lot-applicants') }}"--}}
+{{--                           @click="setActiveLinks('summary-of-relocation-lot-applicants')"--}}
+{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'summary-of-relocation-lot-applicants' }"--}}
+{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                            Summary of Relocation Lot Applicants--}}
+{{--                        </a>--}}
+
+{{--                        <!-- Masterlist of Actual Occupants -->--}}
+{{--                        <a href="{{ route('masterlist-of-actual-occupants') }}"--}}
+{{--                           @click="setActiveLinks('masterlist-of-actual-occupants')"--}}
+{{--                           :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeChildLink === 'masterlist-of-actual-occupants' }"--}}
+{{--                           class="block py-2 px-4 text-sm hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">--}}
+{{--                            Masterlist of Actual Occupants--}}
+{{--                        </a>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
 
                 <a href="{{ route('activity-logs') }}" @click="activeLink = 'activity'; activeChildLink = ''; localStorage.setItem('activeLink', 'activity'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'activity' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
                     <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
