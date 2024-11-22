@@ -55,10 +55,6 @@ Route::middleware([
         return view('activity-logs');
     })->name('activity-logs');
 
-    //    Route::get('/permissions', PermissionsManager::class)
-    //        ->name('permissions');
-    //    Route::get('/permissions', PermissionsManager::class)
-    //        ->middleware(['auth', 'can:manage permissions']);
     Route::get('/user-role-management', function () {
         return view('user-role-management');
     })->name('user-role-management');
