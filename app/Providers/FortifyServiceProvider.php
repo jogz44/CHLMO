@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Actions\CustomLoginResponse;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Actions\Fortify\UpdateUserPassword;
@@ -23,7 +25,8 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Added for redirection (coming from the CustomLoginResponse)
+        $this->app->singleton(LoginResponseContract::class, CustomLoginResponse::class);
     }
 
     /**
@@ -45,43 +48,6 @@ class FortifyServiceProvider extends ServiceProvider
         RateLimiter::for('two-factor', function (Request $request) {
             return Limit::perMinute(5)->by($request->session()->get('login.id'));
         });
-
-//        Fortify::authenticateUsing(function ($request) {
-//            \Log::info('Login attempt', [
-//                'username' => $request->username,
-//                'email' => $request->email
-//            ]);
-//
-//            // Check if user exists by username or email
-//            $user = User::where('username', $request->username)
-//                ->orWhere('email', $request->username) // This allows email input in username field
-//                ->first();
-//
-//            \Log::info('User found', [
-//                'found' => (bool)$user,
-//                'role_id' => $user?->role_id,
-//                'is_disabled' => $user?->is_disabled ?? 'not set',
-//            ]);
-//
-//            if (!$user) {
-//                return null;
-//            }
-//
-//            $passwordCorrect = Hash::check($request->password, $user->password);
-//            \Log::info('Password check', ['correct' => $passwordCorrect]);
-//
-//            if (!$passwordCorrect) {
-//                return null;
-//            }
-//
-//            if ($user->is_disabled && $user->role_id !== 1) {
-//                throw ValidationException::withMessages([
-//                    'username' => ['This account has been disabled.'],
-//                ]);
-//            }
-//
-//            return $user;
-//        });
 
         Fortify::authenticateUsing(function ($request) {
             $fieldType = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
