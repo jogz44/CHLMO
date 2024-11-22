@@ -164,7 +164,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="10" class="py-4 px-2 text-center border-b">No applicants found.</td>
+                                    <td colspan="7" class="py-4 px-2 text-center border-b">No applicants found.</td>
                                 </tr>
                             @endforelse
                         </tbody>

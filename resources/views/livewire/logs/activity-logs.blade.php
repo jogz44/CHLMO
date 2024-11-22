@@ -7,9 +7,9 @@
                     <h2 class="text-[13px] ml-5 text-gray-700">ACTIVITY LOGS</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                <div x-data class="relative z-0">
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
-                </div>
+{{--                <div x-data class="relative z-0">--}}
+{{--                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>--}}
+{{--                </div>--}}
             </div>
 
             <div class="bg-white p-4 rounded shadow">
@@ -46,7 +46,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
                                 No activity logs available.
                             </td>
                         </tr>
