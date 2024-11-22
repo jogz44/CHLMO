@@ -54,7 +54,7 @@ class ApplicantsMasterlist extends Component
 
         $people = $peopleQuery
             ->orderBy('created_at', 'desc')
-            ->paginate(7);
+            ->paginate(5);
 
         return view('livewire.applicants-masterlist', [
             'people' => $people
