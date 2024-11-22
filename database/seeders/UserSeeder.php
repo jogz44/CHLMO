@@ -50,12 +50,25 @@ class UserSeeder extends Seeder
             'email' => 'housing@example.com',
             'email_verified_at' => now(),
             'password' => Hash::make('password'), // Make consistent with admin
-            'role_id' => 5,
             'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
         ])->assignRole('Shelter System Admin');
+
+        User::create([
+            'username' => 'super_admin',
+            'first_name' => 'Mark',
+            'middle_name' => 'Jason',
+            'last_name' => 'Suazo',
+            'email' => 'superAdmin@gmail.com',
+            'email_verified_at' => now(),
+            'password' => Hash::make('password'), // Make consistent with admin
+            'is_disabled' => false, // Explicitly set this
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'profile_photo_path' => null,
+        ])->assignRole('Super Admin');
 
     }
 }
