@@ -43,7 +43,15 @@ class ApplicantsMasterlist extends Component
             $peopleQuery->where(function ($query) {
                 $query->where('first_name', 'LIKE', '%' . $this->search . '%')
                     ->orWhere('middle_name', 'LIKE', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'LIKE', '%' . $this->search . '%');
+                    ->orWhere('last_name', 'LIKE', '%' . $this->search . '%')
+                    ->orWhereHas('applicants', function ($subQuery) {
+                        $subQuery->where('applicant_id', $this->search)  // Exact match
+                        ->orWhere('applicant_id', 'LIKE', '%' . $this->search . '%');  // Partial match
+                    })
+                    ->orWhereHas('shelterApplicants', function ($subQuery) {
+                        $subQuery->where('profile_no', $this->search)  // Exact match
+                        ->orWhere('profile_no', 'LIKE', '%' . $this->search . '%');  // Partial match
+                    });
             });
         }
 
@@ -53,8 +61,8 @@ class ApplicantsMasterlist extends Component
         }
 
         $people = $peopleQuery
-            ->orderBy('created_at', 'desc')
-            ->paginate(7);
+            ->orderBy('last_name', 'asc')
+            ->paginate(5);
 
         return view('livewire.applicants-masterlist', [
             'people' => $people

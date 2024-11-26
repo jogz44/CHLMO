@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Livewire\Logs\ActivityLogs;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
@@ -17,7 +18,8 @@ class UserManagement extends Component
     public $isModalOpen = false, $isEditing = false;
 
     // User Management Properties
-    public $userId, $username, $firstName, $middleName, $lastName, $email, $password, $roleId;
+    public $userId, $username, $firstName, $middleName, $lastName, $email, $password,
+        $roles = [], $selectedRole;
 
     // For search and filter
     public $search = '', $roleFilter = '';
@@ -25,6 +27,7 @@ class UserManagement extends Component
     // Permissions Management Properties
     public $selectedPermissions = [], $showPermissionsModal = false, $managingPermissionsFor = null,
         $selectedRoleId, $selectedUserId;
+
 
     protected $listeners = [
         'permissionUpdated' => 'handlePermissionUpdate',
@@ -57,12 +60,14 @@ class UserManagement extends Component
         // If editing a user, refresh the role data
         if ($this->isModalOpen && $this->isEditing && $this->userId) {
             $user = User::findOrFail($this->userId);
-            $this->roleId = $user->role_id;
+//            $this->roleId = $user->role_id;
         }
     }
     public function mount()
     {
         $this->resetInputFields();
+        // Fetch roles from the database
+        $this->roles = Role::all();
     }
     protected $rules = [
         'username' => 'required|string|max:255|unique:users,username',
@@ -71,12 +76,12 @@ class UserManagement extends Component
         'lastName' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:8',
-        'roleId' => 'required|exists:roles,id',
+        'selectedRole' => 'required|exists:roles,id',
     ];
     public function openPermissionsModal($type, $id): void
     {
         $this->managingPermissionsFor = $type;
-        if ($type === 'role'){
+        if ($type === 'role') {
             $this->selectedRoleId = $id;
             $role = Role::findById($id);
             $this->selectedPermissions = $role->permissions->pluck('name')->toArray();
@@ -90,10 +95,10 @@ class UserManagement extends Component
     public function savePermissions(): void
     {
         try {
-            if ($this->managingPermissionsFor === 'role'){
+            if ($this->managingPermissionsFor === 'role') {
                 $role = Role::findById($this->selectedRoleId);
                 $role->syncPermissions($this->selectedPermissions);
-//                session()->flash('message', 'Role permissions updated successfully.');
+                //                session()->flash('message', 'Role permissions updated successfully.');
                 $this->dispatch('alert', [
                     'title' => 'Role permissions updated successfully!',
                     'message' => '<br><small>' . now()->calendar() . '</small>',
@@ -102,7 +107,7 @@ class UserManagement extends Component
             } else {
                 $user = User::findOrFail($this->selectedUserId);
                 $user->syncPermissions($this->selectedPermissions);
-//                session()->flash('message', 'User permissions updated successfully.');
+                //                session()->flash('message', 'User permissions updated successfully.');
                 $this->dispatch('alert', [
                     'title' => 'User permissions updated successfully!',
                     'message' => '<br><small>' . now()->calendar() . '</small>',
@@ -112,13 +117,12 @@ class UserManagement extends Component
             $this->closePermissionsModal();
             $this->dispatch('role-management', 'roleUpdated');
         } catch (\Exception $e) {
-//            session()->flash('error', 'Error: ' . $e->getMessage());
+            //            session()->flash('error', 'Error: ' . $e->getMessage());
             $this->dispatch('alert', [
                 'title' => 'Something went wrong!',
                 'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
                 'type' => 'danger'
             ]);
-
         }
     }
     public function closePermissionsModal(): void
@@ -138,7 +142,6 @@ class UserManagement extends Component
         $this->lastName = '';
         $this->email = '';
         $this->password = '';
-        $this->roleId = '';
         $this->isEditing = false;
     }
     public function openModal(): void
@@ -163,7 +166,6 @@ class UserManagement extends Component
         $this->middleName = $user->middle_name;
         $this->lastName = $user->last_name;
         $this->email = $user->email;
-        $this->roleId = $user->role_id;
 
         $this->isModalOpen = true;
     }
@@ -176,15 +178,16 @@ class UserManagement extends Component
             Log::info('Data before validation', [
                 'username' => $this->username,
                 'email' => $this->email,
-                'role_id' => $this->roleId,
                 'first_name' => $this->firstName,
                 'last_name' => $this->lastName,
-                'password' => $this->password
+                'password' => $this->password,
+                'selectedRole' => $this->selectedRole
             ]);
 
-            $validatedData = $this->validate($this->isEditing
-                ? $this->getUpdateRules()
-                : $this->rules
+            $validatedData = $this->validate(
+                $this->isEditing
+                    ? $this->getUpdateRules()
+                    : $this->rules
             );
 
             Log::info('Validation passed', ['validatedData' => $validatedData]);
@@ -199,7 +202,6 @@ class UserManagement extends Component
                     'middle_name' => $this->middleName,
                     'last_name' => $this->lastName,
                     'email' => $this->email,
-                    'role_id' => $this->roleId,
                     'is_disabled' => false,
                 ]);
 
@@ -210,6 +212,11 @@ class UserManagement extends Component
 
                 $role = Role::findById($this->roleId);
                 $user->syncRoles([$role->name]);
+
+                  // Log the activity using ActivityLogs
+                  $logger = new ActivityLogs();
+                  $logger->logActivity('Update User', $user);
+
                 Log::info('Role updated for user', ['userId' => $this->userId, 'role' => $role->name]);
 
                 $this->dispatch('alert', [
@@ -217,12 +224,10 @@ class UserManagement extends Component
                     'message' => '<br><small>' . now()->calendar() . '</small>',
                     'type' => 'success'
                 ]);
-
             } else {
                 Log::info('Creating new user', [
                     'username' => $this->username,
                     'email' => $this->email,
-                    'role_id' => $this->roleId
                 ]);
 
                 $user = User::create([
@@ -232,16 +237,23 @@ class UserManagement extends Component
                     'last_name' => $this->lastName,
                     'email' => $this->email,
                     'password' => Hash::make($this->password),
-                    'role_id' => $this->roleId,
                     'is_disabled' => false,
                     'email_verified_at' => now(),
                 ]);
+              
+                $roleName = Role::findOrFail($this->selectedRole)->name;
+                $user->assignRole($roleName);
+              
+                // Log the activity using ActivityLogs
+                $logger = new ActivityLogs();
+                $logger->logActivity('Create User', $user);
+
 
                 Log::info('User created successfully', ['userId' => $user->id]);
 
-                $role = Role::findById($this->roleId);
-                $user->assignRole($role->name);
-                Log::info('Role assigned to new user', ['userId' => $user->id, 'role' => $role->name]);
+//                $role = Role::findById($this->roleId);
+//                $user->assignRole($role->name);
+//                Log::info('Role assigned to new user', ['userId' => $user->id, 'role' => $role->name]);
 
                 $this->dispatch('alert', [
                     'title' => 'User created successfully!',
@@ -251,7 +263,7 @@ class UserManagement extends Component
             }
 
             $this->closeModal();
-            $this->dispatch('role-management', 'roleUpdated');
+//            $this->dispatch('role-management', 'roleUpdated');
         } catch (\Illuminate\Validation\ValidationException $ve) {
             Log::error('Validation failed', [
                 'errors' => $ve->errors(),
@@ -278,13 +290,12 @@ class UserManagement extends Component
     protected function getUpdateRules(): array
     {
         return [
-            'username' => 'required|string|max:255|unique:users,username,'.$this->userId,
+            'username' => 'required|string|max:255|unique:users,username,' . $this->userId,
             'firstName' => 'required|string|max:255',
             'middleName' => 'nullable|string|max:255',
             'lastName' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$this->userId,
+            'email' => 'required|email|unique:users,email,' . $this->userId,
             'password' => 'nullable|string|min:8',
-            'roleId' => 'required|exists:roles,id',
         ];
     }
     public function delete($userId): void
@@ -292,7 +303,7 @@ class UserManagement extends Component
         try {
             $user = User::findOrFail($userId);
             $user->delete();
-//            session()->flash('message', 'User deleted successfully.');
+            //            session()->flash('message', 'User deleted successfully.');
             $this->dispatch('alert', [
                 'title' => 'User deleted successfully!',
                 'message' => '<br><small>' . now()->calendar() . '</small>',
@@ -300,7 +311,7 @@ class UserManagement extends Component
             ]);
             $this->dispatch('role-management', 'roleUpdated');
         } catch (\Exception $e) {
-//            session()->flash('error', 'Error deleting user: ' . $e->getMessage());
+            //            session()->flash('error', 'Error deleting user: ' . $e->getMessage());
             $this->dispatch('alert', [
                 'title' => 'Something went wrong!',
                 'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
@@ -337,7 +348,7 @@ class UserManagement extends Component
         try {
             // Verify the password matches the authenticated user's password
             if (!Hash::check($this->confirmationPassword, auth()->user()->password)) {
-//                session()->flash('error', 'Invalid password.');
+                //                session()->flash('error', 'Invalid password.');
                 $this->dispatch('alert', [
                     'title' => 'Invalid password!',
                     'message' => '<br><small>' . now()->calendar() . '</small>',
@@ -350,7 +361,7 @@ class UserManagement extends Component
 
             // Prevent disabling your own account
             if ($user->id === auth()->id()) {
-//                session()->flash('error', 'You cannot disable your own account.');
+                //                session()->flash('error', 'You cannot disable your own account.');
                 $this->dispatch('alert', [
                     'title' => 'You cannot disable your own account!',
                     'message' => '<br><small>' . now()->calendar() . '</small>',
@@ -360,25 +371,30 @@ class UserManagement extends Component
             }
 
             // Prevent disabling admin accounts (role_id = 1)
-            if ($user->role_id === 1) {
-//                session()->flash('error', 'Administrator accounts cannot be disabled.');
-                $this->dispatch('alert', [
-                    'title' => 'Administrator accounts cannot be disabled!',
-                    'message' => '<br><small>' . now()->calendar() . '</small>',
-                    'type' => 'danger'
-                ]);
-                return;
-            }
+
+//            if ($user->role_id === 1) {
+////                session()->flash('error', 'Administrator accounts cannot be disabled.');
+//                $this->dispatch('alert', [
+//                    'title' => 'Administrator accounts cannot be disabled!',
+//                    'message' => '<br><small>' . now()->calendar() . '</small>',
+//                    'type' => 'danger'
+//                ]);
+//                return;
+//            }
 
             $user->update(['is_disabled' => true]);
 
-            // Log the action for audit purposes
-//            activity()
-//                ->performedOn($user)
-//                ->causedBy(auth()->user())
-//                ->log('disabled user account');
+              // Log the activity using ActivityLogs
+              $logger = new ActivityLogs();
+              $logger->logActivity('Disabled User', $user);
 
-//            session()->flash('message', 'User disabled successfully.');
+            // Log the action for audit purposes
+            // activity()
+            //     ->performedOn($user)
+            //     ->causedBy(auth()->user())
+            //     ->log('disabled user account');
+
+            //            session()->flash('message', 'User disabled successfully.');
             $this->dispatch('alert', [
                 'title' => 'User disabled successfully!',
                 'message' => '<br><small>' . now()->calendar() . '</small>',
@@ -387,7 +403,7 @@ class UserManagement extends Component
             $this->closeDisableModal();
             $this->dispatch('role-management', 'roleUpdated');
         } catch (\Exception $e) {
-//            session()->flash('error', 'Error disabling user: ' . $e->getMessage());
+            //            session()->flash('error', 'Error disabling user: ' . $e->getMessage());
             $this->dispatch('alert', [
                 'title' => 'Error disabling user!',
                 'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
@@ -401,25 +417,26 @@ class UserManagement extends Component
         $users = User::query()
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('username', 'like', '%'.$this->search.'%')
-                        ->orWhere('email', 'like', '%'.$this->search.'%')
-                        ->orWhere('first_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('last_name', 'like', '%'.$this->search.'%');
+                    $q->where('username', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%')
+                        ->orWhere('first_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->roleFilter, function ($query) {
-                $query->where('role_id', $this->roleFilter);
-            })
-            ->with(['role' => function ($query) {
-                $query->with('permissions')->withoutGlobalScopes();
-            }])
+//            ->when($this->roleFilter, function ($query) {
+//                $query->where('role_id', $this->roleFilter);
+//            })
+//            ->with(['role' => function ($query) {
+//                $query->with('permissions')->withoutGlobalScopes();
+//            }])
             ->paginate(5);
 
         return view('livewire.user-management', [
             'users' => $users,
-            'roles' => Role::with('permissions')->withoutGlobalScopes()->get(),
-            'permissions' => Permission::withoutGlobalScopes()->get(),
-            'selectedRolePermissions' => $this->selectedRolePermissions
+            'roles' => Role::all(),
+//            'roles' => Role::with('permissions')->withoutGlobalScopes()->get(),
+//            'permissions' => Permission::withoutGlobalScopes()->get(),
+//            'selectedRolePermissions' => $this->selectedRolePermissions
         ])->layout('layouts.app');
     }
 }

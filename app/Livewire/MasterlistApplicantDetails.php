@@ -37,8 +37,8 @@ class MasterlistApplicantDetails extends Component
                     'taggedAndValidated.livingSituation',
                     'taggedAndValidated.caseSpecification',
                     'taggedAndValidated.awardees.awardeeDocumentsSubmissions',
-                    'taggedAndValidated.tribe',
-                    'taggedAndValidated.religion',
+//                    'taggedAndValidated.tribe',
+//                    'taggedAndValidated.religion',
                     'taggedAndValidated.spouse',
                     'taggedAndValidated.liveInPartner',
                     'taggedAndValidated.dependents.civilStatus',
@@ -70,11 +70,11 @@ class MasterlistApplicantDetails extends Component
 
         // Access all these fields
         $this->civil_status = $this->applicant->taggedAndValidated?->civilStatus?->civil_status ?? '--';
-        $this->tribe = $this->applicant->taggedAndValidated?->tribe?->tribe_name ?? '--';
+        $this->tribe = $this->applicant->taggedAndValidated?->tribe ?? '--';
         $this->sex = $this->applicant->taggedAndValidated?->sex ?? '--';
         $this->date_of_birth = optional($this->applicant->taggedAndValidated?->date_of_birth)
             ->format('F d, Y') ?? '--';
-        $this->religion = $this->applicant->taggedAndValidated?->religion?->religion_name ?? '--';
+        $this->religion = $this->applicant->taggedAndValidated?->religion ?? '--';
         $this->occupation = $this->applicant->taggedAndValidated?->occupation ?? '--';
         $this->monthly_income = $this->applicant->taggedAndValidated?->monthly_income ?? '--';
         $this->family_income = $this->applicant->taggedAndValidated?->family_income ?? '--';

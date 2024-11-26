@@ -189,6 +189,7 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
+                            <th class="py-2 px-2 border-b text-center font-medium">Trial</th>
                             <th class="py-2 px-2 border-b text-center font-medium">ID</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">NAME</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">PUROK</th>
@@ -204,6 +205,7 @@
                     <tbody>
                         @forelse($taggedAndValidatedApplicants as $applicant)
                             <tr>
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-description-col">{{ $applicant->relocationSite->relocation_site_name ?? 'N/A' }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant->applicant_id}}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words name-col">{{ $applicant->applicant->person->full_name }}</td>
                                 <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
@@ -278,10 +280,17 @@
                                 @error('grant_date') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
-                            <label class="block text-sm font-medium mb-2 text-black" for="barangay">
+                            <label class="block text-sm font-medium text-black">
                                 LOT ALLOCATION
                             </label>
-                            <br>
+
+                            <label class="block text-xs mb-4 text-black">
+                                Assigned Relocation Site:
+                                <span class="italic text-red-500">
+                                    {{ $taggedAndValidatedApplicants->first()?->relocationSite->relocation_site_name ?? 'None' }}
+                                </span>
+                            </label>
+
                             <div class="mb-4">
                                 <div class="mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"

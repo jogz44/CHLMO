@@ -43,7 +43,7 @@
 
                         <div class="flex justify-end">
                             <label class="text-center mt-2 mr-1" for="start_date">
-                                Date Applied From:
+                                Date Granted From:
                             </label>
                             <input wire:model.live="startDate"
                                    type="date"
@@ -109,7 +109,7 @@
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
                         <tr>
-                            <th class="py-2 px-2  text-center font-medium whitespace-nowrap">ID</th>
+                            <th class="py-2 px-2 text-center font-medium whitespace-nowrap">ID</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Awardee</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Lot</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Block</th>
@@ -123,7 +123,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach($awardees as $awardee)
+                            @forelse($awardees as $awardee)
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}</td>
                                     <td class="py-4 px-2 text-center border-b whitespace-normal break-words">
@@ -203,7 +203,11 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="11" class="py-4 px-2 text-center border-b">No records found.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                     <div class="mt-4">

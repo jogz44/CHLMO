@@ -1,4 +1,5 @@
 <x-app-layout>
+<<<<<<< HEAD
     <div x-data="{ openFilters: false }" class="p-10  ml-[17%] mt-[100px]">
         <div class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
@@ -161,3 +162,7 @@
         </div>
     </div>
 </x-app-layout>
+=======
+   <livewire:logs.activity-logs />
+</x-app-layout>
+>>>>>>> c72966a35990a200f8a18b512280e36f6d83347c

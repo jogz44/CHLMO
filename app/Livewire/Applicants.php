@@ -20,8 +20,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
-
-
+use App\Livewire\Logs\ActivityLogs;
 
 class Applicants extends Component
 {
@@ -235,6 +234,11 @@ class Applicants extends Component
                 'initially_interviewed_by' => $this->interviewer,
                 'address_id' => $address->id,
             ]);
+            
+             // Log the activity using ActivityLogs
+             $logger = new ActivityLogs();
+             $user = Auth::user();
+             $logger->logActivity('Create Applicant', $user);
 
             logger()->info('Applicant stored successfully', [
                 'applicant_id' => $applicantId
@@ -320,6 +324,10 @@ class Applicants extends Component
             $address->purok_id = $this->edit_purok_id;
             $address->save(); // Don't forget to save the address
         }
+         // Log the activity using ActivityLogs
+         $logger = new ActivityLogs();
+         $user = Auth::user();
+         $logger->logActivity('Edit Applicant Info', $user);
 
         $this->dispatch('alert', [
             'title' => 'Details Updated!',

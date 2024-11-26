@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\IndexController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Shelter\ShelterIndexController;
+use App\Http\Controllers\Housing\HousingStaffIndexController;
 use App\Http\Controllers\Admin\PermissionCOntroller;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -54,10 +55,6 @@ Route::middleware([
         return view('activity-logs');
     })->name('activity-logs');
 
-    //    Route::get('/permissions', PermissionsManager::class)
-    //        ->name('permissions');
-    //    Route::get('/permissions', PermissionsManager::class)
-    //        ->middleware(['auth', 'can:manage permissions']);
     Route::get('/user-role-management', function () {
         return view('user-role-management');
     })->name('user-role-management');
@@ -104,9 +101,13 @@ Route::middleware([
         return view('summary-of-identified-informal-settlers');
     })->name('summary-of-identified-informal-settlers');
 
-    Route::get('/reports-summary-relocation-applicants', function () {
-        return view('reports-summary-relocation-applicants');
-    })->name('reports-summary-relocation-applicants');
+    Route::get('/summary-of-relocation-lot-applicants', function () {
+        return view('summary-of-relocation-lot-applicants');
+    })->name('summary-of-relocation-lot-applicants');
+
+    Route::get('/masterlist-of-actual-occupants', function () {
+        return view('masterlist-of-actual-occupants');
+    })->name('masterlist-of-actual-occupants');
 
     Route::get('/request-applicant-details', function () {
         return view('request-applicant-details');
@@ -224,31 +225,13 @@ Route::middleware([
 });
 
 
-// Admin routes
+// Housing Admin routes
 Route::middleware([
     'auth:web', // Session-based authentication via web guard
-    'role:Admin', // Spatie permission middleware to check if the user has the 'admin' role
+    'role:Housing System Admin', // Spatie permission middleware to check if the user has the 'Housing System' role
     'verified', // Ensures the user has verified their email
 ])->name('admin.')->prefix('admin')->group(function () {
-    Route::get('/', [IndexController::class, 'index'])->name('index');
 
-    Route::resource('/roles', RoleController::class);
-    Route::post('/roles{role}/permissions', [RoleController::class, 'givePermission'])->name('roles.permissions');
-    Route::delete('/roles{role}/permissions/{permission}', [RoleController::class, 'revokePermission'])->name('roles.permissions.revoke');
-
-    Route::resource('/permissions', PermissionController::class);
-    Route::post('/permissions/{permission}/roles', [PermissionController::class, 'assignRole'])->name('permissions.roles');
-    Route::delete('/permissions{permission}/roles/{role}', [PermissionController::class, 'removeRole'])->name('permissions.roles.remove');
-
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-
-    Route::post('/users/{user}/roles', [UserController::class, 'assignRole'])->name('users.roles');
-    Route::delete('/users/{user}/roles/{role}', [UserController::class, 'removeRole'])->name('users.roles.remove');
-
-    Route::post('/users/{user}/permissions', [UserController::class, 'givePermission'])->name('users.permissions');
-    Route::delete('/users/{user}/permissions/{permission}', [UserController::class, 'revokePermission'])->name('users.permissions.revoke');
 });
 
 // Shelter Admin routes
@@ -258,4 +241,13 @@ Route::middleware([
     'verified', // Ensures the user has verified their email
 ])->name('shelter-admin.')->prefix('shelter-admin')->group(function () {
     Route::get('/', [ShelterIndexController::class, 'index'])->name('index');
+});
+
+// Shelter Admin routes
+Route::middleware([
+    'auth:web', 
+    'role:HousingStaff', // Correct Spatie role middleware syntax
+    'verified'
+])->name('housing-staff.')->prefix('housing-staff')->group(function () {
+    Route::get('/', [HousingStaffIndexController::class, 'index'])->name('index');
 });
