@@ -19,36 +19,18 @@ class UserSeeder extends Seeder
             'first_name' => 'Sheldon',
             'middle_name' => 'Shelly',
             'last_name' => 'Cooper',
-            'email' => 'admin@example.com',
-            'email_verified_at' => now(),
             'password' => Hash::make('password'),
             'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'profile_photo_path' => null,
         ])->assignRole('Housing System Admin');
-//
-//        User::create([
-//            'username' => 'editor_1',
-//            'first_name' => 'Missy',
-//            'middle_name' => 'Sissy',
-//            'last_name' => 'Cooper',
-//            'email' => 'user@example.com',
-//            'email_verified_at' => now(),
-//            'password' => Hash::make('password'), // Make consistent with admin
-//            'is_disabled' => false, // Explicitly set this
-//            'two_factor_secret' => null,
-//            'two_factor_recovery_codes' => null,
-//            'profile_photo_path' => null,
-//        ])->assignRole('Editor');
-//
+
         User::create([
             'username' => 'housingAdmin_1',
             'first_name' => 'Sabrina',
             'middle_name' => 'Car',
             'last_name' => 'Painter',
-            'email' => 'housing@example.com',
-            'email_verified_at' => now(),
             'password' => Hash::make('password'), // Make consistent with admin
             'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
@@ -61,8 +43,6 @@ class UserSeeder extends Seeder
             'first_name' => 'Mark',
             'middle_name' => 'Jason',
             'last_name' => 'Suazo',
-            'email' => 'superAdmin@gmail.com',
-            'email_verified_at' => now(),
             'password' => Hash::make('password'), // Make consistent with admin
             'is_disabled' => false, // Explicitly set this
             'two_factor_secret' => null,
