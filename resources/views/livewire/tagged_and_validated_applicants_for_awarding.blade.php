@@ -1,7 +1,7 @@
 <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
-        <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
+        <div class="flex-1 h-screen p-6 overflow-auto">
             <!-- Container for the Title -->
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                 <div class="flex items-center">
@@ -45,88 +45,6 @@
                                 &times; <!-- This is the "x" symbol -->
                             </button>
                         </div>
-                        <!-- Button to toggle dropdown -->
-                        <div x-data="{ showDropdown: false }" class="relative">
-                            <button @click="showDropdown = !showDropdown" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-2 rounded-md items-center">
-                                Toggle Columns
-                            </button>
-
-                            <!-- Dropdown Menu -->
-                            <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute bg-white border border-gray-300 shadow-lg w-56 mt-2 py-2 rounded-lg z-10">
-                                <!-- Select All Option -->
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" id="toggle-all" checked> Select All
-                                </label>
-                                <hr class="my-2">
-                                <!-- Individual Column Toggles -->
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-name" checked> Name
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-purok" checked> Purok
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-barangay" checked> Barangay
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-living-situation" checked> Case
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-case-specification" checked> Case Specification
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-case-specification-description" checked> Case Specification Description
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-contact" checked> Contact Number
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-monthly" checked> Monthly Income
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-transaction-type" checked> Transaction Type
-                                </label>
-                                <label class="block px-4 py-2">
-                                    <input type="checkbox" class="toggle-column" id="toggle-actions" checked> ACTIONS
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- JavaScript for toggling columns and "Select All" -->
-                        <script>
-                            // Function to toggle visibility of columns
-                            function toggleColumn(columnClass, isVisible) {
-                                document.querySelectorAll('.' + columnClass).forEach(function(col) {
-                                    col.style.display = isVisible ? '' : 'none';
-                                });
-                            }
-
-                            // Select All functionality
-                            document.getElementById('toggle-all').addEventListener('change', function() {
-                                const isChecked = this.checked;
-                                document.querySelectorAll('.toggle-column').forEach(function(checkbox) {
-                                    checkbox.checked = isChecked;
-                                    const columnClass = checkbox.id.replace('toggle-', '') + '-col';
-                                    toggleColumn(columnClass, isChecked);
-                                });
-                            });
-
-                            // Individual column checkboxes
-                            document.querySelectorAll('.toggle-column').forEach(function(checkbox) {
-                                checkbox.addEventListener('change', function() {
-                                    const columnClass = this.id.replace('toggle-', '') + '-col';
-                                    toggleColumn(columnClass, this.checked);
-
-                                    // If any checkbox is unchecked, uncheck "Select All"
-                                    if (!this.checked) {
-                                        document.getElementById('toggle-all').checked = false;
-                                    }
-
-                                    // If all checkboxes are checked, check "Select All"
-                                    document.getElementById('toggle-all').checked = Array.from(document.querySelectorAll('.toggle-column')).every(cb => cb.checked);
-                                });
-                            });
-                        </script>
                     </div>
 
                     <div class="flex justify-end">
@@ -240,10 +158,10 @@
                                         <button disabled class="bg-gray-400 text-white px-4 py-1.5 rounded-full cursor-not-allowed mr-2">
                                             Awarded
                                         </button>
-                                        <button @click="$wire.exportCertificate({{ $applicant->id }})"
-                                                class="bg-gradient-to-r from-blue-500 to-blue-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 text-white px-4 py-1.5 rounded-full">
-                                            Export Certificate
-                                        </button>
+{{--                                        <button @click="$wire.exportCertificate({{ $applicant->id }})"--}}
+{{--                                                class="bg-gradient-to-r from-blue-500 to-blue-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-800 text-white px-4 py-1.5 rounded-full">--}}
+{{--                                            Export Certificate--}}
+{{--                                        </button>--}}
                                     @endif
                                 </td>
                             </tr>

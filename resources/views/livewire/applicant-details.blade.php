@@ -14,7 +14,6 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-{{--                    x-on:keydown.escape.window="openModalRelocate = false"--}}
                     <div class="flex space-x-2 z-10">
                         <div x-data="{
                                     showQuestionModal: false,
@@ -449,38 +448,15 @@
                             </div>
                             <div class="w-full md:w-1/4 px-2 mb-4">
                                 <label for="years_of_residency" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                    YEAR OF RESIDENCY <span class="text-red-500">*</span>
+                                    LENGTH OF RESIDENCY <span class="text-red-500">*</span>
                                 </label>
                                 <input type="number"
-                                       id="years_of_residency"
                                        wire:model="years_of_residency"
-                                       placeholder="2001"
                                        class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                       min="1900"
-                                       max="2099"
-                                       maxlength="4"
-                                       oninput="validateYearInput(this)">
+                                       maxlength="3"
+                                       oninput="validateNumberInput(this)">
                                 @error('years_of_residency') <span class="text-red-600 error">{{ $message }}</span> @enderror
                             </div>
-                            <script>
-                                function validateYearInput(input) {
-                                    // Remove any non-numeric characters
-                                    input.value = input.value.replace(/[^0-9]/g, '');
-
-                                    // Limit the length to 4 digits
-                                    if (input.value.length > 4) {
-                                        input.value = input.value.slice(0, 4);
-                                    }
-
-                                    // Ensure the year is within the range
-                                    const year = parseInt(input.value, 10);
-                                    if (year < 1900 || year > 2099) {
-                                        input.setCustomValidity("Please enter a valid year between 1900 and 2099.");
-                                    } else {
-                                        input.setCustomValidity(""); // Clears the validation message
-                                    }
-                                }
-                            </script>
                         </div>
 
                         <template x-if="civilStatus === '2'">
@@ -829,33 +805,95 @@
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="rent_fee"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
-                                    RENT FEE <span class="text-red-500">*</span>
+                                    ROOM RENT FEE <span class="text-red-500">*</span>
                                 </label>
-                                <input wire:model="rent_fee"
+                                <input wire:model="room_rent_fee"
                                        type="number"
-                                       id="rent_fee"
+                                       id="room_rent_fee"
                                        placeholder="How much monthly?"
                                        class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                        min="0" step="0.01"
                                        oninput="validateNumberInput(this)">
-                                @error('rent_fee') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                @error('room_rent_fee') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                             <div class="w-full md:w-2/4 px-2 mb-4">
-                                <label for="landlord"
+                                <label for="room_landlord"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
                                     LANDLORD <span class="text-red-500">*</span>
                                 </label>
-                                <input wire:model="landlord"
+                                <input wire:model="room_landlord"
                                        type="text"
-                                       id="landlord"
+                                       id="room_landlord"
                                        placeholder="LANDLORD"
                                        class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                        oninput="capitalizeInput(this)">
-                                @error('landlord') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                @error('room_landlord') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </div>
                     </template>
-                    <template x-if="livingStatus === '5'">
+                    <template x-if="livingStatus === '2'">
+                        <div class="flex flex-wrap -mx-2 ml-[33%]">
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="house_rent_fee"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                    HOUSE RENT FEE <span class="text-red-500">*</span>
+                                </label>
+                                <input wire:model="house_rent_fee"
+                                       type="number"
+                                       id="house_rent_fee"
+                                       placeholder="How much monthly?"
+                                       class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       min="0" step="0.01"
+                                       oninput="validateNumberInput(this)">
+                                @error('house_rent_fee') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="house_landlord"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                    LANDLORD <span class="text-red-500">*</span>
+                                </label>
+                                <input wire:model="house_landlord"
+                                       type="text"
+                                       id="house_landlord"
+                                       placeholder="LANDLORD"
+                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
+                                @error('house_landlord') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="livingStatus === '3'">
+                        <div class="flex flex-wrap -mx-2 ml-[33%]">
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="lot_rent_fee"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                    LOT RENT FEE <span class="text-red-500">*</span>
+                                </label>
+                                <input wire:model="lot_rent_fee"
+                                       type="number"
+                                       id="lot_rent_fee"
+                                       placeholder="How much monthly?"
+                                       class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       min="0" step="0.01"
+                                       oninput="validateNumberInput(this)">
+                                @error('lot_rent_fee') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="w-full md:w-2/4 px-2 mb-4">
+                                <label for="lot_landlord"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                    LANDLORD <span class="text-red-500">*</span>
+                                </label>
+                                <input wire:model="lot_landlord"
+                                       type="text"
+                                       id="lot_landlord"
+                                       placeholder="LANDLORD"
+                                       class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                       oninput="capitalizeInput(this)">
+                                @error('lot_landlord') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="livingStatus === '8'">
                         <div class="flex flex-wrap -mx-2 ml-[33%]">
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="house_owner"
@@ -961,106 +999,45 @@
                 </div>
 
                 <!-- File Uploads -->
-                <div x-data="singleImageUpload()" class="bg-white p-6 rounded shadow mb-6">
-                    <div class="flex flex-col space-y-4">
+                <div class="bg-white p-6 rounded shadow mb-6">
+                    <div class="mb-4">
                         <!-- Upload Area -->
-                        <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-2"
-                             x-show="!hasImage">
-                            <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                 viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z"/>
-                            </svg>
-                            <p class="text-sm text-gray-600">Upload an image of the housing structure</p>
-                            <button type="button"
-                                    class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                    @click="$refs.fileInput.click()">
-                                BROWSE FILE
-                            </button>
-
-                            <!-- Hidden File Input -->
-                            <input wire:model="images"
-                                   type="file"
-                                   accept="image/*"
-                                   id="images"
-                                   x-ref="fileInput"
-                                   @change="handleFileSelect"
-                                   class="hidden"/>
-                            @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Preview Area -->
-                        <div x-show="hasImage" class="border-2 border-green-500 rounded-lg p-4">
-                            <div class="flex flex-col space-y-4">
-                                <!-- Image Preview -->
-                                <div class="relative">
-                                    <img :src="imageUrl"
-                                         alt="Preview"
-                                         class="w-full h-64 object-contain rounded-lg">
-
-                                    <!-- Remove Button -->
-                                    <button type="button"
-                                            @click="removeImage"
-                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                <!-- Filename Display -->
-                                <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded">
-                                    <div class="flex items-center space-x-2">
-                                        <svg class="w-4 h-4 text-green-500" xmlns="http://www.w3.org/2000/svg"
-                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                        <span class="text-sm text-gray-600" x-text="fileName"></span>
-                                    </div>
-                                </div>
-                            </div>
+                        <p class="text-sm text-gray-600">Upload images of the house structure</p>
+                        <!-- House Structure Images -->
+                        <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                const pond = FilePond.create($refs.input, {
+                                    allowMultiple: true,
+                                    server: {
+                                        process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                            @this.upload('houseStructureImages', file,
+                                                (uploadedFileName) => {
+                                                    load(uploadedFileName);
+                                                    console.log('File uploaded successfully');
+                                                },
+                                                (error) => {
+                                                    console.error('Upload error:', error);
+                                                    error('Upload failed');
+                                                },
+                                                (event) => {
+                                                    progress(event.lengthComputable ? event.loaded/event.total : 0.5);
+                                                }
+                                            );
+                                        },
+                                        revert: (filename, load) => {
+                                            @this.removeUpload('houseStructureImages', filename, load);
+                                        }
+                                    },
+                                    allowProcess: true
+                                });
+                            ">
+                            <input type="file" x-ref="input" multiple accept="image/*" required>
+                            @error('houseStructureImages.*')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                 </div>
-
-                <script>
-                    function singleImageUpload() {
-                        return {
-                            hasImage: false,
-                            imageUrl: null,
-                            fileName: '',
-
-                            handleFileSelect() {
-                                const fileInput = this.$refs.fileInput;
-                                if (fileInput.files && fileInput.files[0]) {
-                                    const file = fileInput.files[0];
-
-                                    // Validate file type
-                                    if (!file.type.startsWith('image/')) {
-                                        alert('Please select an image file');
-                                        this.removeImage();
-                                        return;
-                                    }
-
-                                    // Update state
-                                    this.fileName = file.name;
-                                    this.imageUrl = URL.createObjectURL(file);
-                                    this.hasImage = true;
-                                }
-                            },
-
-                            removeImage() {
-                                this.hasImage = false;
-                                this.imageUrl = null;
-                                this.fileName = '';
-                                this.$refs.fileInput.value = '';
-                                // Clear Livewire model
-                                this.$wire.set('images', null);
-                            }
-                        }
-                    }
-                </script>
             </form>
         </div>
     </div>
