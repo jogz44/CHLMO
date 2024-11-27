@@ -192,9 +192,14 @@ class AwardeeDetails extends Component
 
         $this->imagesForAwarding = $this->applicant->taggedAndValidated?->awardees?->flatMap(function ($awardee) {
             return $awardee->taggedAndValidatedApplicant->documents()
+                ->with('attachmentType') // Eager load the relationship
                 ->get()
                 ->map(function ($submission) {
-                    return $submission->file_name;
+//                    return $submission->file_name;
+                    return [
+//                        'file_name' => $submission->file_name,
+                        'attachment_name' => $submission->attachmentType->attachment_name ?? $submission->file_name
+                    ];
                 })->filter();
         }) ?? collect();
     }
