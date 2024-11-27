@@ -32,8 +32,12 @@ return new class extends Migration
             $table->string('occupation', 255);
             $table->integer('monthly_income');
             $table->date('tagging_date');
-            $table->integer('rent_fee')->nullable();
-            $table->string('landlord', 255)->nullable();
+            $table->integer('room_rent_fee')->nullable();
+            $table->string('room_landlord', 255)->nullable();
+            $table->integer('house_rent_fee')->nullable();
+            $table->string('house_landlord', 255)->nullable();
+            $table->integer('lot_rent_fee')->nullable();
+            $table->string('lot_landlord', 255)->nullable();
             $table->string('house_owner', 255)->nullable();
             $table->string('relationship_to_house_owner', 255)->nullable();
             $table->string('tagger_name', 100)->nullable();

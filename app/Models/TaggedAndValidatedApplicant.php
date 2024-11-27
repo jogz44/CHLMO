@@ -16,8 +16,9 @@ class TaggedAndValidatedApplicant extends Model
         'applicant_id', 'civil_status_id', 'tribe', 'religion', 'living_situation_id', 'case_specification_id',
         'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id',
         'wall_type_id', 'structure_status_id', 'relocation_lot_id', 'full_address', 'sex', 'date_of_birth', 'occupation',
-        'monthly_income', 'tagging_date', 'rent_fee', 'landlord', 'house_owner', 'relationship_to_house_owner',
-        'tagger_name', 'years_of_residency', 'remarks', 'is_tagged', 'is_awarding_on_going',
+        'monthly_income', 'tagging_date', 'room_rent_fee', 'room_landlord', 'house_rent_fee', 'house_landlord',
+        'lot_rent_fee', 'lot_landlord', 'house_owner', 'relationship_to_house_owner', 'tagger_name',
+        'years_of_residency', 'remarks', 'is_tagged', 'is_awarding_on_going',
     ];
 
     protected $casts = [

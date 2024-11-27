@@ -9,13 +9,21 @@ class CustomLoginResponse implements LoginResponseContract
 {
     public function toResponse($request)
     {
-        // Check what role
+        // Super Admin
+        if (Auth::user()->hasRole('Super Admin')) {
+            return redirect('/dashboard');
+        }
+        // Housing System Admin
         if (Auth::user()->hasRole('Housing System Admin')) {
             return redirect('/dashboard');
         }
-
-        if (Auth::user()->hasRole('Super Admin')) {
+        // Housing System Staff
+        if (Auth::user()->hasRole('Housing System Staff')) {
             return redirect('/dashboard');
+        }
+        // Housing System Tagger
+        if (Auth::user()->hasRole('Housing System Tagger')) {
+            return redirect('/applicants');
         }
 
         if (Auth::user()->hasRole('Shelter System Admin')) {

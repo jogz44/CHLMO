@@ -54,6 +54,7 @@ class TaggedAndValidatedApplicantDetails extends Component
     public function mount($applicantId): void
     {
         $this->taggedAndValidatedApplicant = TaggedAndValidatedApplicant::with([
+            'applicant.person',
             'applicant.address.purok',
             'applicant.address.barangay',
             'applicant.transactionType',
@@ -99,12 +100,12 @@ class TaggedAndValidatedApplicantDetails extends Component
         });
 
         // Applicant basic information
-        $this->first_name = $this->taggedAndValidatedApplicant->applicant->first_name ?? null;
+        $this->first_name = $this->taggedAndValidatedApplicant->applicant->person->first_name ?? null;
         $this->transactionTypes = TransactionType::all();
-        $this->middle_name = $this->taggedAndValidatedApplicant->applicant->middle_name ?? null;
-        $this->last_name = $this->taggedAndValidatedApplicant->applicant->last_name ?? null;
-        $this->suffix_name = $this->taggedAndValidatedApplicant->applicant->suffix_name ?? null;
-        $this->contact_number = $this->taggedAndValidatedApplicant->applicant->contact_number ?? null;
+        $this->middle_name = $this->taggedAndValidatedApplicant->applicant->person->middle_name ?? null;
+        $this->last_name = $this->taggedAndValidatedApplicant->applicant->person->last_name ?? null;
+        $this->suffix_name = $this->taggedAndValidatedApplicant->applicant->person->suffix_name ?? null;
+        $this->contact_number = $this->taggedAndValidatedApplicant->applicant->person->contact_number ?? null;
         $this->transaction_type_id = $this->taggedAndValidatedApplicant?->applicant->transactionType?->transaction_type_id ?? null;
         $this->date_applied = optional($this->taggedAndValidatedApplicant->applicant->date_applied)
             ->format('F d, Y') ?? null;
@@ -113,8 +114,9 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->purok_id = $this->taggedAndValidatedApplicant->applicant?->address?->purok?->id;
         $this->full_address = $this->taggedAndValidatedApplicant->full_address ?? null;
         $this->occupation = $this->taggedAndValidatedApplicant->occupation ?? null;
-        $this->monthly_income = $this->taggedAndValidatedApplicant->family_income ?? null;
-        $this->family_income = $this->taggedAndValidatedApplicant->family_income ?? null;
+        $this->tribe = $this->taggedAndValidatedApplicant->tribe ?? null;
+        $this->religion = $this->taggedAndValidatedApplicant->religion ?? null;
+        $this->monthly_income = $this->taggedAndValidatedApplicant->monthly_income ?? null;
         // Load initial puroks if barangay is selected
         if ($this->barangay_id) {
             $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
@@ -142,7 +144,7 @@ class TaggedAndValidatedApplicantDetails extends Component
                 'dependent_sex' => $dependent->dependent_sex,
                 'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
                 'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
-                'dependent_relationship' => $dependent->dependent_relationship,
+                'dependent_relationship' => $dependent->dependentRelationship->relationship,
                 'dependent_occupation' => $dependent->dependent_occupation,
                 'dependent_monthly_income' => $dependent->dependent_monthly_income,
             ];

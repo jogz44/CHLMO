@@ -31,8 +31,8 @@ class UserFactory extends Factory
             'first_name' => fake()->firstName(),           // Generates a random first name
             'middle_name' => fake()->firstName(),          // Generates a distinct middle name
             'last_name' => fake()->lastName(),             // Generates a random last name
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+//            'email' => fake()->unique()->safeEmail(),
+//            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role_id' => fake()->numberBetween(1, 5),
             'two_factor_secret' => null,
@@ -50,7 +50,7 @@ class UserFactory extends Factory
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+//            'email_verified_at' => null,
         ]);
     }
 

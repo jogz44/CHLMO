@@ -44,7 +44,7 @@ class User extends Authenticatable
         'first_name',
         'middle_name',
         'last_name',
-        'email',
+//        'email',
         'password',
         'is_disabled',
         'email_verified_at'
@@ -64,7 +64,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+//            'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_disabled' => 'boolean',
         ];
@@ -73,10 +73,5 @@ class User extends Authenticatable
     public function full_name(): string
     {
         return trim("{$this->first_name} {$this->middle_name} {$this->last_name}");
-    }
-
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class, 'role_id');
     }
 }

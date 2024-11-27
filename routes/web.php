@@ -217,6 +217,11 @@ Route::middleware([
     Route::get('/shelter-system-configuration', function () {
         return view('shelter-system-configuration');
     })->name('shelter-system-configuration');
+
+    Route::get('/developers', function () {
+        return view('developers');
+    })->name('developers');
+    
 });
 
 

@@ -20,11 +20,14 @@ return new class extends Migration
 
         // Insert initial data
         DB::table('living_statuses')->insert([
-            ['living_status_name' => 'Renting'],
-            ['living_status_name' => 'Own house but renting the land, without the owner\'s consent'],
-            ['living_status_name' => 'Free to live in the house and land with the owner\'s permission'],
-            ['living_status_name' => 'Free to live in the house and land without the owner\'s permission'],
-            ['living_status_name' => 'Sharer'],
+            ['living_status_name' => 'ROOM RENTER'],
+            ['living_status_name' => 'HOUSE RENTER'],
+            ['living_status_name' => 'LOT RENTER'],
+            ['living_status_name' => 'HOUSE OWNER'],
+            ['living_status_name' => 'LOT SQUATTER'],
+            ['living_status_name' => 'FREE OCCUPANT'],
+            ['living_status_name' => 'SQUATTER'],
+            ['living_status_name' => 'SHARER'],
         ]);
 
         Schema::enableForeignKeyConstraints();
