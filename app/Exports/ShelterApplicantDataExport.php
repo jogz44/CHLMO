@@ -4,6 +4,8 @@ namespace App\Exports;
 
 use App\Models\Shelter\ShelterApplicant;
 use App\Models\Shelter\OriginOfRequest;
+use App\Models\Barangay;
+use App\Models\Purok;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -46,6 +48,19 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
             $subtitle[] = "ORIGIN OF REQUEST: {$originOfRequest->name}";
         }
 
+
+        // Add Barangay info
+        if (!empty($this->filters['barangay_id'])) {
+            $barangay = Barangay::find($this->filters['barangay_id']);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        // Add Purok info
+        if (!empty($this->filters['purok_id'])) {
+            $purok = Purok::find($this->filters['purok_id']);
+            $subtitle[] = "PUROK: All Purok";
+        }
+
         // Add Date Range
         if (!empty($this->filters['start_date']) && !empty($this->filters['end_date'])) {
             $startDate = Carbon::parse($this->filters['start_date'])->format('m/d/Y');
@@ -60,9 +75,11 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
     {
         $query = ShelterApplicant::with([
             'person',
+            'address.barangay',
+            'address.purok',
             'originOfRequest',
         ]);
-    
+
         // Apply filters
         if (!empty($this->filters['start_date']) && !empty($this->filters['end_date'])) {
             $query->whereBetween('date_request', [
@@ -70,21 +87,34 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
                 $this->filters['end_date']
             ]);
         }
-    
+
+        if (!empty($this->filters['barangay_id'])) {
+            $query->whereHas('address', function ($q) {
+                $q->where('barangay_id', $this->filters['barangay_id']);
+            });
+        }
+
+        if (!empty($this->filters['purok_id'])) {
+            $query->whereHas('address', function ($q) {
+                $q->where('purok_id', $this->filters['purok_id']);
+            });
+        }
+
+
         if (!empty($this->filters['request_origin_id'])) {
             $query->where('request_origin_id', $this->filters['request_origin_id']);
         }
-    
-        if (isset($this->filters['tagging_status'])) {
-            $query->where('is_tagged', $this->filters['tagging_status'] === 'Tagged');
+
+        if (isset($this->filters['is_tagged'])) {
+            $query->where('is_tagged', $this->filters['is_tagged'] === 'Tagged');
         }
-    
+
         $shelterApplicants = $query->get();
-    
+
         // Get the dynamic title and subtitle
         $title = $this->getTitle();
         $subtitle = $this->getSubtitle();
-    
+
         // Make sure you have a corresponding export view
         return view('exports.shelter-applicants', [
             'shelterApplicants' => $shelterApplicants,
@@ -92,7 +122,7 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
             'subtitle' => $subtitle
         ]);
     }
-    
+
 
     public function chunkSize(): int
     {
@@ -109,7 +139,9 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
         $sheet->getColumnDimension('B')->setWidth(30); // Name
         $sheet->getColumnDimension('C')->setWidth(10); // originOfRequest
         $sheet->getColumnDimension('D')->setWidth(15); // DATE REQUEST
-    
+        $sheet->getColumnDimension('E')->setWidth(15); // Purok
+        $sheet->getColumnDimension('F')->setWidth(15); // Barangay
+
 
         // Set print area
         $lastRow = $sheet->getHighestRow();
@@ -134,38 +166,45 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
         $drawing->setCoordinates('B1'); // Stay in column B
         $drawing->setOffsetX(100); // Adjust this value to push it toward the end of column B
         $drawing->setOffsetY(2);
-    
+
         return $drawing;
     }
-    
+
     public function startCell(): string
     {
         return 'A2'; // Start the text content from row 2
     }
 
     public function registerEvents(): array
-{
-    return [
-        AfterSheet::class => function (AfterSheet $event) {
-            $worksheet = $event->sheet->getDelegate();
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $worksheet = $event->sheet->getDelegate();
 
-            // Fit content to one page wide by height dynamically
-            $worksheet->getPageSetup()->setFitToWidth(1);
-            $worksheet->getPageSetup()->setFitToHeight(0);
+                // Fit content to one page wide by height dynamically
+                $worksheet->getPageSetup()->setFitToWidth(1);
+                $worksheet->getPageSetup()->setFitToHeight(0);
 
-            // Dynamically set print area to avoid extra columns or blank rows
-            $highestRow = $worksheet->getHighestRow();
-            $highestColumn = $worksheet->getHighestColumn();
-            $worksheet->getPageSetup()->setPrintArea("A1:{$highestColumn}{$highestRow}");
+                // Dynamically set print area to avoid extra columns or blank rows
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+                $worksheet->getPageSetup()->setPrintArea("A1:{$highestColumn}{$highestRow}");
 
-            // Optional: Set margins for compact view
-            $worksheet->getPageMargins()
-                ->setTop(0.5)
-                ->setRight(0.5)
-                ->setBottom(0.5)
-                ->setLeft(0.5);
-        },
-    ];
-}
+                // Optional: Set margins for compact view
+                $worksheet->getPageMargins()
+                    ->setTop(0.5)
+                    ->setRight(0.5)
+                    ->setBottom(0.5)
+                    ->setLeft(0.5);
 
+                // Optional: Adjust column widths to fit content
+                $worksheet->getColumnDimension('A')->setWidth(13.33);
+                $worksheet->getColumnDimension('B')->setWidth(43.89);
+                $worksheet->getColumnDimension('C')->setWidth(6.89);
+                $worksheet->getColumnDimension('D')->setWidth(15.11);
+                $worksheet->getColumnDimension('E')->setWidth(19.56);
+                $worksheet->getColumnDimension('F')->setWidth(24);
+            },
+        ];
+    }
 }
