@@ -47,6 +47,15 @@ return [
             'visibility' => 'public',
         ],
         // newly created one
+        'tagging-house-structure-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/tagging-house-structure-images'),
+            'serve' => true,
+            'throw' => false,
+            'url' => env('APP_URL').'/tagging-house-structure-images',
+            'visibility' => 'public',
+        ],
+        // newly created one
         'transfer-photo-requirements' => [
             'driver' => 'local',
             'root' => storage_path('app/transfer-photo-requirements'),
@@ -55,7 +64,6 @@ return [
             'url' => env('APP_URL').'/transfer-photo-requirements',
             'visibility' => 'public',
         ],
-
         'grantee-photo-requirements' => [
             'driver' => 'local',
             'root' => storage_path('app/grantee-photo-requirements'),
@@ -64,8 +72,6 @@ return [
             'url' => env('APP_URL').'/grantee-photo-requirements',
             'visibility' => 'public',
         ],
-
-
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
