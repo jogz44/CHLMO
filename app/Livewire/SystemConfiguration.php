@@ -11,6 +11,7 @@ use App\Models\CaseSpecification;
 use App\Models\LivingStatus;
 use App\Models\Barangay;
 use App\Models\Purok;
+use App\Models\StructureStatusType;
 use App\Livewire\Logs\ActivityLogs;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,16 +21,6 @@ class SystemConfiguration extends Component
     public $newStatus = ''; // For the input field
     public $showConfirmModal = false;
     public $indexToRemove = null;
-
-    public $tribes = [];
-    public $applicant_tribes = []; // Array to hold new tribe entries from Alpine.js
-    public $newTribe = '';
-    public $showModal = true;
-
-    public $religions = ['']; // Initial list with an empty entry
-    public $newReligion = '';
-    public $deleteIndex = null;
-    public $message = null; // For success messages
 
     public $livingSituations = [];
     public $newSituation = '';
@@ -50,20 +41,24 @@ class SystemConfiguration extends Component
     public $newPurok;
     public $barangay_id;
 
+    public $structure_status_types = [];
+    public $newStructure = '';
+
+
 
 
 
     public function mount()
-    {
-        $this->civilStatuses = CivilStatus::pluck('civil_status')->toArray();
-        $this->tribes = Tribe::pluck('tribe_name')->toArray();
-        $this->religions = Religion::pluck('religion_name')->toArray();
-        $this->living_situations = LivingSituation::pluck('living_situation_description')->toArray();
-        $this->case_specifications = CaseSpecification::pluck('case_specification_name')->toArray();
-        $this->living_statuses = LivingStatus::pluck('living_status_name')->toArray();
-        $this->barangays = Barangay::pluck('name')->toArray();
-        $this->puroks = Purok::pluck('name')->toArray();
-    }
+{
+    $this->civilStatuses = CivilStatus::pluck('civil_status')->toArray();
+    $this->living_situations = LivingSituation::pluck('living_situation_description')->toArray();
+    $this->case_specifications = CaseSpecification::pluck('case_specification_name')->toArray();
+    $this->living_statuses = LivingStatus::pluck('living_status_name')->toArray();
+    $this->barangays = Barangay::pluck('name')->toArray();
+    $this->puroks = Purok::pluck('name')->toArray();
+    $this->structure_status_types = StructureStatusType::pluck('structure_status')->toArray(); // Added Structure Status Type
+}
+
     public function addCivilStatusField()
     {
         // Add an empty field for civil status
@@ -80,10 +75,10 @@ class SystemConfiguration extends Component
         CivilStatus::create(['civil_status' => $this->newStatus]);
         $this->civilStatuses[] = $this->newStatus;
 
-         // Log the activity
-         $logger = new ActivityLogs();
-         $user = Auth::user();
-         $logger->logActivity('Add New Civil Status', $user);
+        //Log the activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Civil Status', $user);
 
         // Clear input and show success message
         $this->newStatus = '';
@@ -106,82 +101,7 @@ class SystemConfiguration extends Component
             session()->flash('message', 'Civil status removed successfully.'); // Flash message for confirmation
         }
     }
-    public function addTribeField()
-    {
-        $this->applicant_tribes[] = '';
-    }
-    public function addTribe()
-    {
-        // Validate the new tribe
-        $this->validate([
-            'newTribe' => 'required|string|unique:tribes,tribe_name',
-        ]);
-
-        // Add the tribe to the database and update the array
-        Tribe::create(['tribe_name' => $this->newTribe]);
-        $this->applicant_tribes[] = $this->newTribe;
-
-        // Clear input and show success message
-        $this->newTribe = '';
-        session()->flash('message', 'Tribe added successfully!');
-    }
-    // Method to open the confirmation modal and set the index of the field to be removed
-    public function confirmRemoveTribe($index)
-    {
-        $this->indexToRemove = $index;
-        $this->showConfirmModal = true;
-    }
-
-    // Method to remove the tribe field if confirmed
-    public function removeTribe()
-    {
-        if ($this->indexToRemove !== null) {
-            unset($this->applicant_tribes[$this->indexToRemove]);
-            $this->applicant_tribes = array_values($this->applicant_tribes); // Re-index array
-            $this->indexToRemove = null;
-            $this->showConfirmModal = false;
-            session()->flash('message', 'Tribe removed successfully.'); // Flash message for confirmation
-        }
-    }
-
-    public function addReligionField()
-    {
-        $this->religions[] = '';
-    }
-
-    public function addReligion()
-    {
-        // Validate the new religion input
-        $this->validate([
-            'newReligion' => 'required|string|unique:religions,religion_name',
-        ]);
-
-        // Add the new religion to the database and to the list
-        Religion::create(['religion_name' => $this->newReligion]);
-        $this->religions[] = $this->newReligion;
-
-        // Clear the input field and set a success message
-        $this->newReligion = '';
-        session()->flash('message', 'Religion added successfully!');
-    }
-
-    // Method to confirm removal of a religion by opening the confirmation modal
-    public function confirmRemoveReligion($index)
-    {
-        $this->indexToRemove = $index;
-        $this->showConfirmModal = true;
-    }
-
-    // Method to remove the selected religion from the array
-    public function removeReligion()
-    {
-        if ($this->indexToRemove !== null) {
-            unset($this->applicant_religions[$this->indexToRemove]);
-            $this->religions = array_values($this->applicant_religions); // Re-index array
-            $this->showConfirmModal = false;
-            session()->flash('message', 'Religion removed successfully!');
-        }
-    }
+   
 
     public function addLivingSituationField()
     {
@@ -350,9 +270,29 @@ class SystemConfiguration extends Component
     //     }
     // }
 
+   
+    
+    public function addStructure()
+    {
+        $this->validate([
+            'newStructure' => 'required|string|unique:structure_status_types,structure_status|max:255',
+        ]);
 
+        // // Log activity
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Add New Structure Status', $user);
 
+        // Save the new structure status
+        StructureStatusType::create(['structure_status' => $this->newStructure]);
 
+        // Update the list and reset the input
+        $this->structure_status_types[] = $this->newStructure;
+        $this->newStructure = '';
+
+        session()->flash('message', 'Structure status added successfully!');
+    }
+    
     public function render()
     {
         return view('livewire.system-configuration');

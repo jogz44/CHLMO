@@ -11,9 +11,20 @@
                         <h2 class="text-[13px] ml-5 text-gray-700">LIST OF MATERIALS</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div x-data class="relative z-0">
-                        <button class="bg-[#2B7A0B] text-white px-4 py-2 rounded">Export</button>
-                    </div>
+                    <div class="relative">
+                    <button @click="openModal = true" class="bg-gradient-to-r from-custom-red to-custom-green text-white px-4 py-2 rounded">Add Applicant</button>
+                    <button wire:click="exportPDF" wire:loading.attr="disabled"
+                        class="bg-gradient-to-r from-custom-blue to-custom-purple hover:bg-gradient-to-r hover:from-custom-blue hover:to-custom-dark-purple text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="exportPDF">Exporting PDF...</span>
+                        <span wire:loading.remove>Export to PDF</span>
+                    </button>
+
+                    <button wire:click="export" wire:ignore wire:loading.attr="disabled"
+                        class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="export">Exporting Excel...</span>
+                        <span wire:loading.remove>Export to Excel</span>
+                    </button>
+                </div>
                 </div>
 
                 <!-- Search and Filters -->
