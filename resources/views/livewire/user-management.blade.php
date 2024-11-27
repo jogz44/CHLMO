@@ -4,7 +4,7 @@
         <h2 class="text-xl font-semibold">User Management</h2>
         <button
                 wire:click="openModal"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
             Add New User
         </button>
     </div>
@@ -47,9 +47,6 @@
                 <th class="px-6 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Role
                 </th>
-{{--                <th class="px-6 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">--}}
-{{--                    Permissions--}}
-{{--                </th>--}}
                 <th class="px-6 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                 </th>
@@ -87,11 +84,6 @@
                                 class="text-custom-green mr-2 underline">
                             Edit
                         </button>
-{{--                        <button--}}
-{{--                                wire:click="openPermissionsModal('user', {{ $user->id }})"--}}
-{{--                                class="bg-amber-500 text-white px-2 py-1 rounded-md mr-2">--}}
-{{--                            Manage Permissions--}}
-{{--                        </button>--}}
                         <button
                                 wire:click="confirmDisable({{ $user->id }})"
                                 class="{{ $user->is_disabled ? 'bg-gray-500 text-white cursor-not-allowed' : 'bg-custom-dark-green text-white' }} px-2 py-1 rounded-md"
@@ -159,38 +151,52 @@
                                 @error('lastName') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
-                            <!-- Email -->
-                            <div class="mb-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                                <input type="email" wire:model="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
-                            </div>
-
                             <!-- Password -->
-                            <div class="mb-4">
+                            <div class="mb-4 relative">
                                 <label class="block text-gray-700 text-sm font-bold mb-2">
                                     Password {{ $isEditing ? '(Leave blank to keep current)' : '' }}
                                 </label>
-                                <input type="password" wire:model="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                <div class="relative">
+                                    <input type="password" wire:model.debounce.500ms="password" id="password"
+                                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10">
+                                    <button type="button"
+                                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                                            onclick="togglePasswordVisibility('password')">
+                                        👁️
+                                    </button>
+                                </div>
+                                @if($password)
+                                    <p class="text-xs text-gray-500 mt-1">Password strength: {{ $this->passwordStrength }}</p>
+                                @endif
                                 @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
-                            <!-- Role -->
-{{--                            <div class="mb-4">--}}
-{{--                                <label class="block text-gray-700 text-sm font-bold mb-2">Role</label>--}}
-{{--                                <select wire:model="roleId" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">--}}
-{{--                                    <option value="">Select Role</option>--}}
-{{--                                    @foreach($roles as $role)--}}
-{{--                                        <option value="{{ $role->id }}">{{ $role->name }}</option>--}}
-{{--                                    @endforeach--}}
-{{--                                </select>--}}
-{{--                                @error('roleId') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror--}}
-{{--                            </div>--}}
+
+                            <!-- Confirm Password -->
+                            <div class="mb-4 relative">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">
+                                    Confirm Password
+                                </label>
+                                <div class="relative">
+                                    <input type="password" wire:model="password_confirmation" id="confirm_password"
+                                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10">
+                                    <button type="button"
+                                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                                            onclick="togglePasswordVisibility('confirm_password')">
+                                        👁️
+                                    </button>
+                                </div>
+                                @if($password_confirmation && $password !== $password_confirmation)
+                                    <p class="text-xs text-red-500 mt-1">Passwords do not match.</p>
+                                @endif
+                                @error('password_confirmation') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                            </div>
+
                             <!-- Roles -->
                             <div>
                                 <label for="role">Role</label>
-                                <select wire:model="selectedRole" id="role" class="form-control">
-                                    <option value="">-- Select a Role --</option>
+                                <select wire:model="selectedRole" id="role" class="bg-white shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">
+                                    <option value="">Select a role</option>
                                     @foreach($roles as $role)
                                         <option value="{{ $role->id }}">{{ $role->name}}</option>
                                     @endforeach
@@ -394,5 +400,11 @@
         input.value = input.value.toLowerCase().replace(/\b\w/g, function(char) {
             return char.toUpperCase();
         });
+    }
+</script>
+<script>
+    function togglePasswordVisibility(id) {
+        const input = document.getElementById(id);
+        input.type = input.type === 'password' ? 'text' : 'password';
     }
 </script>
