@@ -209,10 +209,10 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
         $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
 
         // Adjust column widths
-        $sheet->getColumnDimension('A')->setWidth(5.11); // No.
-        $sheet->getColumnDimension('B')->setWidth(9); // Date Tagged
-        $sheet->getColumnDimension('C')->setWidth(13.56); // Barangay
-        $sheet->getColumnDimension('D')->setWidth(13.33); // Purok
+        $sheet->getColumnDimension('A')->setWidth(15.56); // ID.
+        $sheet->getColumnDimension('B')->setWidth(36.89); // PRINCIPAL NAME
+        $sheet->getColumnDimension('C')->setWidth(4.22); // AGE
+        $sheet->getColumnDimension('D')->setWidth(14.67); // Purok
         $sheet->getColumnDimension('E')->setWidth(20.44); // living Situation (case)
         $sheet->getColumnDimension('F')->setWidth(22); // Case Specification
         $sheet->getColumnDimension('G')->setWidth(12.44); // No. of Actual Occupants

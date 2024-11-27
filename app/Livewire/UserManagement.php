@@ -18,7 +18,7 @@ class UserManagement extends Component
     public $isModalOpen = false, $isEditing = false;
 
     // User Management Properties
-    public $userId, $username, $firstName, $middleName, $lastName, $email, $password,
+    public $userId, $username, $firstName, $middleName, $lastName, $password, $password_confirmation,
         $roles = [], $selectedRole;
 
     // For search and filter
@@ -74,8 +74,9 @@ class UserManagement extends Component
         'firstName' => 'required|string|max:255',
         'middleName' => 'nullable|string|max:255',
         'lastName' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email',
-        'password' => 'required|string|min:8',
+//        'email' => 'required|email|unique:users,email',
+//        'password' => 'required|string|min:8',
+        'password' => 'required|min:8|confirmed',
         'selectedRole' => 'required|exists:roles,id',
     ];
     public function openPermissionsModal($type, $id): void
@@ -140,7 +141,7 @@ class UserManagement extends Component
         $this->firstName = '';
         $this->middleName = '';
         $this->lastName = '';
-        $this->email = '';
+//        $this->email = '';
         $this->password = '';
         $this->isEditing = false;
     }
@@ -165,10 +166,28 @@ class UserManagement extends Component
         $this->firstName = $user->first_name;
         $this->middleName = $user->middle_name;
         $this->lastName = $user->last_name;
-        $this->email = $user->email;
+//        $this->email = $user->email;
 
         $this->isModalOpen = true;
     }
+    public function getPasswordStrengthProperty()
+    {
+        $length = strlen($this->password);
+
+        if ($length === 0) {
+            return null; // No feedback if password is empty
+        }
+
+        if ($length < 6) {
+            return 'Weak';
+        } elseif ($length < 10) {
+            return 'Medium';
+        } else {
+            return 'Strong';
+        }
+    }
+
+
     public function save(): void
     {
         Log::info('Starting save process', ['isEditing' => $this->isEditing]);
@@ -177,7 +196,7 @@ class UserManagement extends Component
             // Log data before validation to verify values
             Log::info('Data before validation', [
                 'username' => $this->username,
-                'email' => $this->email,
+//                'email' => $this->email,
                 'first_name' => $this->firstName,
                 'last_name' => $this->lastName,
                 'password' => $this->password,
@@ -201,7 +220,7 @@ class UserManagement extends Component
                     'first_name' => $this->firstName,
                     'middle_name' => $this->middleName,
                     'last_name' => $this->lastName,
-                    'email' => $this->email,
+//                    'email' => $this->email,
                     'is_disabled' => false,
                 ]);
 
@@ -227,7 +246,7 @@ class UserManagement extends Component
             } else {
                 Log::info('Creating new user', [
                     'username' => $this->username,
-                    'email' => $this->email,
+//                    'email' => $this->email,
                 ]);
 
                 $user = User::create([
@@ -235,10 +254,10 @@ class UserManagement extends Component
                     'first_name' => $this->firstName,
                     'middle_name' => $this->middleName,
                     'last_name' => $this->lastName,
-                    'email' => $this->email,
+//                    'email' => $this->email,
                     'password' => Hash::make($this->password),
                     'is_disabled' => false,
-                    'email_verified_at' => now(),
+//                    'email_verified_at' => now(),
                 ]);
               
                 $roleName = Role::findOrFail($this->selectedRole)->name;
@@ -294,7 +313,7 @@ class UserManagement extends Component
             'firstName' => 'required|string|max:255',
             'middleName' => 'nullable|string|max:255',
             'lastName' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->userId,
+//            'email' => 'required|email|unique:users,email,' . $this->userId,
             'password' => 'nullable|string|min:8',
         ];
     }
@@ -418,7 +437,7 @@ class UserManagement extends Component
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('username', 'like', '%' . $this->search . '%')
-                        ->orWhere('email', 'like', '%' . $this->search . '%')
+//                        ->orWhere('email', 'like', '%' . $this->search . '%')
                         ->orWhere('first_name', 'like', '%' . $this->search . '%')
                         ->orWhere('last_name', 'like', '%' . $this->search . '%');
                 });

@@ -185,15 +185,6 @@
                                    disabled
                                    class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="family_income" class="block text-[12px] font-semibold text-gray-700 mb-1">
-                                FAMILY INCOME
-                            </label>
-                            <input wire:model="family_income"
-                                   type="text"
-                                   disabled
-                                   class="uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
                     </div>
 
                     <hr class="mt-2 mb-2 ">
@@ -522,15 +513,15 @@
             <div class="bg-white p-6 rounded shadow mb-6">
                 <!-- Image Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                    @forelse($imagesForAwarding as $fileName)
-                        <div class="relative group cursor-pointer" wire:click="viewAttachment('{{ $fileName }}')">
+                    @forelse($imagesForAwarding as $image)
+                        <div class="relative group cursor-pointer" wire:click="viewAttachment('{{ $image['attachment_name'] }}')">
                             <img
-                                    src="{{ asset('awardee-photo-requirements/documents/' . $fileName) }}"
-                                    alt="{{ $fileName }}"
+                                    src="{{ asset('awardee-photo-requirements/documents/' . $image['attachment_name']) }}"
+                                    alt="{{ $image['attachment_name'] }}"
                                     class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                                     loading="lazy">
                             <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                {{ $fileName }}
+                                {{ $image['attachment_name'] }}
                             </div>
                         </div>
                     @empty

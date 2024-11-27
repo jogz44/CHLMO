@@ -21,6 +21,8 @@ class RelocationSites extends Component
     public $isModalOpen = false, $isLoading = false;
     // To edit relocation site
     public $showEditModal = false, $editingRelocationSite, $currentId, $newTotalLotSize;
+    public $isAwardeesModalVisible = false; // Changed property name
+    public $selectedRelocationSite = null;
 
     protected $rules = [
         'lot_number' => 'nullable|string|max:255',
@@ -248,6 +250,17 @@ class RelocationSites extends Component
                 'type' => 'danger'
             ]);
         }
+    }
+    public function openAwardeesModal($relocationSiteId): void // Changed method name
+    {
+        $this->selectedRelocationSite = RelocationSite::with('awardees.taggedAndValidatedApplicant')->findOrFail($relocationSiteId);
+        $this->isAwardeesModalVisible = true; // Updated property name
+    }
+
+    public function closeAwardeesModal(): void
+    {
+        $this->isAwardeesModalVisible = false; // Updated property name
+        $this->selectedRelocationSite = null;
     }
     public function render()
     {

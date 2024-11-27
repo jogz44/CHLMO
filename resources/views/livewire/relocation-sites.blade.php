@@ -12,9 +12,6 @@
                             class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded">
                         Add Relocation Site
                     </button>
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">
-                        Export
-                    </button>
                 </div>
             </div>
 
@@ -113,6 +110,13 @@
                                             class="px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 focus:outline-none">
                                         <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </button>
+
+                                    <button wire:click="openAwardeesModal({{ $relocationSite->id }})"
+                                            class="px-2 py-1 text-xs font-medium text-green-600 hover:text-green-800 focus:outline-none">
+                                        <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </button>
                                 </td>
@@ -304,7 +308,7 @@
                             </button>
                             <button
                                     type="submit"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    class="px-4 py-2 text-sm font-medium bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
                                 Update Size
                             </button>
@@ -313,6 +317,57 @@
                 @endif
             </div>
         </x-modal>
+
+        <!-- Awardees Modal -->
+        @if($isAwardeesModalVisible)
+            <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeAwardeesModal"></div>
+
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                Awardees for {{ $selectedRelocationSite->relocation_site_name }}
+                            </h3>
+
+                            @if($selectedRelocationSite->awardees->count() > 0)
+                                <div class="max-h-96 overflow-y-auto">
+                                    <table class="min-w-full bg-white border border-gray-200">
+                                        <thead class="bg-gray-100 sticky top-0">
+                                        <tr>
+                                            <th class="py-2 px-2 text-center font-medium">Name</th>
+                                            <th class="py-2 px-2 text-center font-medium">Lot Size (m²)</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        @foreach($selectedRelocationSite->awardees as $awardee)
+                                            <tr>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? 'N/A' }}
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->lot_size }} m²
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <p class="text-center text-gray-500">No awardees found for this relocation site.</p>
+                            @endif
+                        </div>
+                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse">
+                            <button type="button"
+                                    wire:click="closeAwardeesModal"
+                                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 <script>

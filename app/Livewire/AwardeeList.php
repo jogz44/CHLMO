@@ -28,7 +28,7 @@ class AwardeeList extends Component
     use WithPagination;
     use WithFileUploads;
 
-    public $spouse = null, $isSpouseTransfer = false;
+    public $spouse = null, $isSpouseTransfer = false, $awardee;
     public $showTransferModal = false, $showConfirmationModal = false, $selectedAwardeeId, $eligibleDependents = [],
         $selectedDependentId, $selectedDependent;
 
@@ -51,8 +51,8 @@ class AwardeeList extends Component
         $this->awardee = Awardee::findOrFail($awardeeId);
 
         // Fetch eligible dependents
-        $this->spouse = Spouse::where('applicant_id', $this->awardee->applicant_id)->first();
-        $this->eligibleDependents = Dependent::where('applicant_id', $this->awardee->applicant_id)
+        $this->spouse = Spouse::where('tagged_and_validated_applicant_id', $this->awardee->applicant_id)->first();
+        $this->eligibleDependents = Dependent::where('tagged_and_validated_applicant_id', $this->awardee->applicant_id)
             ->whereHas('dependentRelationship', function($query) {
                 // Add your eligibility criteria here
                 $query->whereIn('relationship', [

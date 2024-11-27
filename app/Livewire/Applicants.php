@@ -75,6 +75,9 @@ class Applicants extends Component
         // Set today's date as the default value for date_applied
         $this->date_applied = now()->toDateString(); // YYYY-MM-DD format
 
+        $this->startDate = now()->toDateString();
+        $this->endDate = now()->toDateString();
+
         // Initialize dropdowns
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
