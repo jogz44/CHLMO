@@ -85,7 +85,13 @@
                                         {{ $person->last_name }}, {{ $person->first_name }} {{ $person->middle_name }}
                                     </td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
+                                    @if($person->application_type === 'Housing Applicant' && $person->applicants->first())
                                         {{ $person->contact_number ?? 'N/A' }}
+                                        @elseif($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first())
+                                            {{ $person->shelterApplicants->first()->contact_number ?? 'N/A' }}
+                                        @else
+                                            N/A
+                                        @endif
                                     </td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full

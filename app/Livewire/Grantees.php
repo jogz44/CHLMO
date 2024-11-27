@@ -9,7 +9,13 @@ use App\Models\Purok;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Shelter\OriginOfRequest;
+use App\Exports\GranteesDataExport;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use Ramsey\Collection\Collection;
+use Illuminate\Support\Carbon;
 
 class Grantees extends Component
 {
@@ -94,6 +100,136 @@ class Grantees extends Component
  {
      $this->resetPage();
  }
+
+ //  export method
+    public function export()
+    {
+        try {
+            $filters = array_filter([
+                'start_date' => $this->startGrantingDate,
+                'end_date' => $this->endGrantingDate,
+                'barangay_id' => $this->selectedBarangay_id,
+                'purok_id' => $this->selectedPurok_id,
+                'request_origin_id' => $this->selectedOriginOfRequest,
+            ]);
+
+            return Excel::download(
+                new GranteesDataExport($filters),
+                'grantees-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed: ',
+                'message' => $e->getMessage(),
+                'type' => 'danger',
+            ]);
+        }
+    }
+
+    public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        ini_set('default_charset', 'UTF-8');
+
+        // Fetch Applicants based on filters
+        $query = Grantee::with([
+           'profiledTaggedApplicant.shelterApplicant.person',
+            'profiledTaggedApplicant.shelterApplicant.address.purok',
+            'profiledTaggedApplicant.shelterApplicant.address.barangay',
+            'profiledTaggedApplicant.shelterApplicant.originOfRequest',
+            'profiledTaggedApplicant.governmentProgram',
+            'profiledTaggedApplicant.shelterSpouse',
+        ]);
+
+        // Create filters array matching your Excel export
+        $filters = array_filter([
+            'start_date' => $this->startGrantingDate,
+            'end_date' => $this->endGrantingDate,
+            'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
+            'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
+            'request_origin_id' => $this->selectedOriginOfRequest,
+        ]);
+
+        // Fetch Applicants based on filters
+        $query = Grantee::with([
+            'profiledTaggedApplicant.shelterApplicant.person',
+            'profiledTaggedApplicant.shelterApplicant.address.purok',
+            'profiledTaggedApplicant.shelterApplicant.address.barangay',
+            'profiledTaggedApplicant.shelterApplicant.originOfRequest',
+            'profiledTaggedApplicant.governmentProgram',
+            'profiledTaggedApplicant.shelterSpouse',
+        ]);
+
+        
+        // Apply filters
+        if ($this->startGrantingDate && $this->endGrantingDate) {
+            $query->whereBetween('date_of_delivery', [
+                $this->startGrantingDate,
+                $this->endGrantingDate
+            ]);
+        }
+
+        if ($this->selectedBarangay_id) {    // Changed from barangay_id
+            $query->whereHas('address', function($q) {
+                $q->where('barangay_id', $this->selectedBarangay_id);
+            });
+        }
+
+        if ($this->selectedPurok_id) {       // Changed from purok_id
+            $query->whereHas('address', function($q) {
+                $q->where('purok_id', $this->selectedPurok_id);
+            });
+        }
+
+        if ($this->selectedOriginOfRequest) {  // Changed from request_origin_id
+            $query->where('request_origin_id', $this->selectedOriginOfRequest);
+        }
+
+
+        $grantees = $query->get();
+
+        // Build Subtitle from Filters
+        $subtitle = [];
+
+        if ($this->selectedOriginOfRequest) {
+            $originOfRequest = OriginOfRequest::find($this->selectedOriginOfRequest);
+            $subtitle[] = "ORIGIN OF REQUEST: {$originOfRequest->name}";
+        }
+
+        if ($this->selectedBarangay_id) {     // Changed from barangay_id
+            $barangay = Barangay::find($this->selectedBarangay_id);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        if ($this->selectedPurok_id) {        // Changed from purok_id
+            $purok = Purok::find($this->selectedPurok_id);
+            $subtitle[] = "PUROK: {$purok->name}";
+        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
+            $subtitle[] = "PUROK: All Purok";
+        }
+
+        if ($this->startGrantingDate && $this->endGrantingDate) {
+            $startGrantingDate = Carbon::parse($this->startGrantingDate)->format('m/d/Y');
+            $endGrantingDate = Carbon::parse($this->endGrantingDate)->format('m/d/Y');
+            $subtitle[] = "Date of Delivery From: {$startGrantingDate} To: {$endGrantingDate}";
+        }
+
+        $subtitleText = implode(' | ', $subtitle);
+
+        $html = view('pdfs.grantees', [
+            'grantees' => $grantees,
+            'subtitle' => $subtitleText,
+        ])->render();
+
+        // Load the PDF with the generated HTML
+        $pdf = Pdf::loadHTML($html);
+        $pdf->setPaper('legal', 'portrait');
+
+        // Stream the PDF for download
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->stream();
+        }, 'grantees.pdf');
+    }
 
  public function render()
 {

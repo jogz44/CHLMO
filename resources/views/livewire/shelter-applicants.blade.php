@@ -1,5 +1,5 @@
 <div x-data="{ openFilters: false, openModal: false, showDuplicateWarning: @entangle('showDuplicateWarning'), duplicateData: @entangle('duplicateData') }"
-         class="p-10 h-screen ml-[17%] mt-[60px]">
+    class="p-10 h-screen ml-[17%] mt-[60px] md:mt-[100px]">
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
         <div class="flex-1 h-screen p-6 overflow-auto">
@@ -10,8 +10,8 @@
                     SHELTER ASSISTANCE PROGRAM APPLICANTS
                 </h2>
                 <img src="{{ asset('storage/images/design.png') }}"
-                     alt="Design"
-                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+                    alt="Design"
+                    class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative">
                     <button @click="openModal = true" class="bg-gradient-to-r from-custom-red to-custom-green text-white px-4 py-2 rounded">Add Applicant</button>
                     <button wire:click="exportPDF" wire:loading.attr="disabled"
@@ -92,6 +92,18 @@
                         <option value="{{ $origin->id }}">{{ $origin->name }}</option>
                         @endforeach
                     </select>
+                    <select wire:model.live="selectedBarangay_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Barangay</option>
+                        @foreach($barangaysFilter as $barangayFilter)
+                        <option value="{{ $barangayFilter->id }}">{{ $barangayFilter->name }}</option>
+                        @endforeach
+                    </select>
+                    <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Purok</option>
+                        @foreach($puroksFilter as $purokFilter)
+                        <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
+                        @endforeach
+                    </select>
                     <select wire:model.live="selectedTaggingStatus" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Status</option>
                         @foreach($taggingStatuses as $status)
@@ -109,11 +121,13 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="py-2 px-2 border-b text-center font-medium">PROFILE NO.</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">NAME</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">DATE REQUEST</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">ORIGIN OF REQUEST</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">ACTIONS</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Profile No.</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">Purok</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">Barangay</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Date Request</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Origin Of Request</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -121,6 +135,8 @@
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $applicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ optional($applicant->person)->full_name }}</td>
+                            <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">{{ optional($applicant->address->purok)->name ?? 'N/A' }}</td>
+                            <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">{{ optional($applicant->address->barangay)->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $applicant->OriginOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center border-b">
@@ -152,8 +168,8 @@
                 </div>
 
                 <div x-show="$wire.showShelterDuplicateWarning"
-                     class="fixed inset-0 z-[99999] bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
-                     x-cloak>
+                    class="fixed inset-0 z-[99999] bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+                    x-cloak>
                     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                         <div class="mt-3 text-center">
                             <h3 class="text-lg leading-6 font-medium text-gray-900"
@@ -173,32 +189,32 @@
                             <div class="items-center px-4 py-3 space-y-3">
                                 <template x-if="!$wire.shelterDuplicateData?.applications?.shelter">
                                     <button type="button"
-                                            wire:click="proceedWithApplication"
-                                            class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                        wire:click="proceedWithApplication"
+                                        class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                                         Proceed
                                     </button>
                                 </template>
                                 <button type="button"
-                                        wire:click="closeDuplicateWarning"
-                                        class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                                    wire:click="closeDuplicateWarning"
+                                    class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
                                     Close
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-{{--                <script>--}}
-{{--                    window.addEventListener('confirm-shelter-duplicate', event => {--}}
-{{--                        if (confirm(event.detail.message)) {--}}
-{{--                            @this.call('submitForm'); // or store for housing--}}
-{{--                        }--}}
-{{--                    });--}}
-{{--                </script>--}}
+                {{-- <script>--}}
+                {{-- window.addEventListener('confirm-shelter-duplicate', event => {--}}
+                {{-- if (confirm(event.detail.message)) {--}}
+                {{-- @this.call('submitForm'); // or store for housing--}}
+                {{-- }--}}
+                {{-- });--}}
+                {{-- </script>--}}
 
                 <!-- ADD APPLICANT MODAL -->
                 <div x-show="openModal"
-                     class="fixed inset-0 flex z-[9999] items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
-                     x-cloak>
+                    class="fixed inset-0 flex z-[9999] items-center justify-center w-full bg-black bg-opacity-50 shadow-lg"
+                    x-cloak>
                     <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
                         <!-- Modal Header -->
                         <div class="flex justify-between items-center mb-4">
@@ -213,86 +229,86 @@
 
                             <!-- Date Applied Field -->
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE OF REQUEST</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="date-applied">DATE OF REQUEST <span class="text-red-500">*</span></label>
                                 <input type="date" id="date-applied" wire:model="date_request"
-                                       class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                       max="{{ now()->toDateString() }}">
+                                    class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                    max="{{ now()->toDateString() }}">
                                 @error('date_request') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Name Fields -->
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME</label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="first-name">FIRST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="first-name" wire:model="first_name"
-                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="First Name" oninput="capitalizeInput(this)">
+                                        class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                        placeholder="First Name" oninput="capitalizeInput(this)">
                                     @error('first_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="middle-name">MIDDLE NAME</label>
                                     <input type="text" id="middle-name" wire:model="middle_name"
-                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="Middle Name" oninput="capitalizeInput(this)">
+                                        class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                        placeholder="Middle Name" oninput="capitalizeInput(this)">
                                     @error('middle_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME</label>
+                                    <label class="block text-[12px] font-medium mb-2 text-black" for="last-name">LAST NAME <span class="text-red-500">*</span></label>
                                     <input type="text" id="last-name" wire:model="last_name"
-                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="Last Name" oninput="capitalizeInput(this)">
+                                        class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                        placeholder="Last Name" oninput="capitalizeInput(this)">
                                     @error('last_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
                                     <input type="text" id="suffix-name" wire:model="suffix_name"
-                                           class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
-                                           placeholder="Suffix Name" oninput="capitalizeInput(this)">
+                                        class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
+                                        placeholder="Suffix Name" oninput="capitalizeInput(this)">
                                     @error('suffix_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                             <!-- Barangay Field -->
-                                <div class="mb-3">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">
-                                        BARANGAY <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="barangay" wire:model.live="barangay_id"
-                                            class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800"
-                                            required>
-                                        <option value="">Select Barangay</option>
-                                        @foreach($barangays as $barangay)
-                                            <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('barangay_id') <span class="error">{{ $message }}</span> @enderror
-                                </div>
+                            <div class="mb-3">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">
+                                    BARANGAY <span class="text-red-500">*</span>
+                                </label>
+                                <select id="barangay" wire:model.live="barangay_id"
+                                    class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800"
+                                    required>
+                                    <option value="">Select Barangay</option>
+                                    @foreach($barangays as $barangay)
+                                    <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('barangay_id') <span class="error">{{ $message }}</span> @enderror
+                            </div>
 
-                                <!-- Purok Field -->
-                                <div class="mb-3">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="purok">
-                                        PUROK <span class="text-red-500">*</span>
-                                    </label>
-                                    <select id="purok" wire:model.live="purok_id"
-                                            class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800"
-                                            required>
-                                        <option value="">Select Purok</option>
-                                        @foreach($puroks as $purok)
-                                            <option value="{{ $purok->id }}">{{ $purok->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('purok_id') <span class="error">{{ $message }}</span> @enderror
-                                </div>
+                            <!-- Purok Field -->
+                            <div class="mb-3">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="purok">
+                                    PUROK <span class="text-red-500">*</span>
+                                </label>
+                                <select id="purok" wire:model.live="purok_id"
+                                    class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800"
+                                    required>
+                                    <option value="">Select Purok</option>
+                                    @foreach($puroks as $purok)
+                                    <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('purok_id') <span class="error">{{ $message }}</span> @enderror
+                            </div>
 
                             <!-- Request Origin Field -->
                             <div class="mb-4">
-                                <label class="block text-[12px] font-medium mb-2 text-black" for="request_origin_id">ORIGIN OF REQUEST</label>
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="request_origin_id">ORIGIN OF REQUEST <span class="text-red-500">*</span></label>
                                 <select wire:model="request_origin_id" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]">
                                     <option value="">Select Origin of Request</option>
                                     @foreach ($OriginOfRequests as $origin)
-                                        <option value="{{ $origin->id }}">{{ $origin->name }}</option>
+                                    <option value="{{ $origin->id }}">{{ $origin->name }}</option>
                                     @endforeach
                                 </select>
                                 @error('request_origin_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -305,7 +321,7 @@
                                 </button>
 
                                 <button type="button" @click="openModal = false"
-                                        class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
+                                    class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                     <span class="text-[12px]">CANCEL</span>
                                 </button>
                             </div>
@@ -346,11 +362,39 @@
                                     <input type="text" id="suffix-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="suffix_name" oninput="capitalizeInput(this)">
                                 </div>
                             </div>
+                            <!-- Barangay Field -->
+                            <div class="mb-3">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY </label>
+                                <select id="barangay" wire:model.defer="barangay_id"
+                                    class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
+                                    <option value="">Select Barangay</option>
+                                    @foreach($barangays as $barangay)
+                                    <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Purok Field -->
+                            <div class="mb-3">
+                                <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK </label>
+                                <select id="purok" wire:model.defer="purok_id"
+                                    class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
+                                    <option value="">Select Purok</option>
+                                    @foreach($puroks as $purok)
+                                    <option value="{{ $purok->id }}">{{ $purok->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             <!-- Origin of Request -->
                             <div class="mb-4">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="origin-of-request">ORIGIN OF REQUEST</label>
-                                <input type="text" id="origin-of-request" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]" wire:model="origin_name" placeholder="Origin of Request">
+                                <select wire:model.defer="request_origin_id" class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]">
+                                    <option value="">Select Origin of Request</option>
+                                    @foreach ($OriginOfRequests as $origin)
+                                    <option value="{{ $origin->id }}">{{ $origin->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <!-- Buttons -->
@@ -369,7 +413,7 @@
                                         </div>
                                         <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
                                     </div>
-                                   
+
                                     <button type="submit" wire:click.prevent="submitForm"
                                         class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                         <span class="text-[12px]"> SAVE </span>

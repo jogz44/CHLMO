@@ -2,7 +2,7 @@
     <div class="flex bg-gray-100 text-[12px]">
         <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
             <form wire:submit.prevent="store">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%]">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 p-3 fixed top-[80px] left-[20%] right-[3%]">
                     <div class="flex items-center">
                         <a href="{{ route('shelter-transaction-applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -14,10 +14,10 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div class="flex space-x-2 z-10">
+                    <div class="flex space-x-2  z-[60]">
                         <div x-data="{ showModal: false }"
                             x-on:keydown.escape.window="showModal = false">
-                            <div class="z-50">
+                            <div >
                                 <div class="alert mt-14"
                                     :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
                                     x-data="{ open:false, alert:{} }"
@@ -61,8 +61,8 @@
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100"
                                 x-transition:leave-end="opacity-0"
-                                class="fixed inset-0 z-50 overflow-y-auto"
-                                style="display: none;">
+                                class="fixed inset-0 flex z-[50] overflow-y-auto items-center justify-center"
+                                style="display: none;" x-cloak>
 
                                 <!-- Background overlay -->
                                 <div class="fixed inset-0 bg-black opacity-50"></div>
