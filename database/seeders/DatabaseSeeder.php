@@ -64,13 +64,13 @@ class DatabaseSeeder extends Seeder
         //     $this->call(ShelterSeeders\ShelterApplicantSeeder::class);
         // }
 
-        if (PurchaseRequisition::count() == 0){
-            $this->call(ShelterSeeders\PurchaseRequisitionSeeder::class);
-        }
+        // if (PurchaseRequisition::count() == 0){
+        //     $this->call(ShelterSeeders\PurchaseRequisitionSeeder::class);
+        // }
 
-        if (PurchaseOrder::count() == 0){
-            $this->call(ShelterSeeders\PurchaseOrderSeeder::class);
-        }
+        // if (PurchaseOrder::count() == 0){
+        //     $this->call(ShelterSeeders\PurchaseOrderSeeder::class);
+        // }
 
         //if (Material::count() == 0){
             //$this->call(ShelterSeeders\MaterialSeeder::class);
