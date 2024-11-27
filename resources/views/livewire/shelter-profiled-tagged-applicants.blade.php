@@ -8,7 +8,7 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative z-0">
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
+                    <!-- <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button> -->
                 </div>
             </div>
 
