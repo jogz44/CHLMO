@@ -24,5 +24,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useTailwind();
         Awardee::observe(AwardeeObserver::class);
+
+        if (!file_exists(public_path('tagging-house-structure-images'))) {
+            symlink(
+                storage_path('app/tagging-house-structure-images'),
+                public_path('tagging-house-structure-images')
+            );
+        }
     }
 }
