@@ -103,9 +103,13 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(StructureStatusType::class);
     }
-    public function images()
+//    public function images()
+//    {
+//        return $this->hasMany(ImagesForHousing::class, 'tagged_and_validated_applicant_id');
+//    }
+    public function taggedDocuments(): HasMany
     {
-        return $this->hasMany(ImagesForHousing::class, 'tagged_and_validated_applicant_id');
+        return $this->hasMany(TaggedDocumentsSubmission::class, 'tagged_applicant_id');
     }
     public function relocationSite(): BelongsTo
     {
