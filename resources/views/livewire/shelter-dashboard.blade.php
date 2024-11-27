@@ -1,5 +1,5 @@
-<div class="p-10 h-screen ml-[17%] mt-[70px]">
-    <div class="flex justify-end items-center mb-6 space-x-3 mt-2">
+<div class="p-10 h-screen ml-[17%] mt-[60px]">
+    <div class="flex justify-end items-center mb-4 space-x-3 mt-2">
         <!-- Filter -->
         <div class="flex items-center space-x-2">
             <select id="year"
@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-10 mb-12">
+    <div class="grid grid-cols-3 gap-10 mb-8">
         <a href="{{ route('shelter-applicants-masterlist') }}">
             <div @click="window.location.href='{{ route('shelter-applicants-masterlist') }}'" class="relative cursor-pointer bg-white shadow rounded-lg flex items-center">
                 <div class="flex-shrink-0 mr-4">
@@ -77,104 +77,61 @@
                 </div>
             </div>
         </a>
-
-
     </div>
 
     <!-- Monthly Report Section -->
-    <div class="grid grid-cols-2 gap-6">
+    <div class="flex-1 justify-center items-center mt-6 w-[80%] ml-24">
         <div class="bg-white shadow rounded-lg p-6">
-            <h4 class="text-[13px] mb-2 font-semibold text-center">
-                Report of Shelter Assistance Applicants
+            <h4 class="text-[14px] mb-2 font-semibold text-center">
+                Applicants and Granted Applicants per Origin of Request
             </h4>
-            <div>
-                <canvas wire:ignore id="shelterApplicantsChart"></canvas>
+
+            <!-- Legend -->
+            <div class="flex space-x-4 text-sm justify-center">
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 bg-[#FF9100] inline-block rounded"></span>
+                    <span>Applicants</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="w-4 h-4 bg-[#00712D] inline-block rounded"></span>
+                    <span>Granted Applicants</span>
+                </div>
             </div>
-        </div>
 
-
-        <div class="bg-white shadow rounded-lg p-6">
-            <h4 class="text-[13px] mb-2 font-semibold text-center">
-                Applicants per Origin of Request
-            </h4>
-            <div>
-                <canvas wire:ignore id="originOfRequestApplicantsChart"></canvas>
+            <div class="space-y-2 mt-6">
+                @foreach($originOfRequestData as $origin => $data)
+                @php
+                $colors = ['#FF9100', '#00712D']; // Orange for applicants, Green for grantees
+                @endphp
+                <div class="flex items-center mb-4">
+                    <span class="w-1/6 text-gray-700 text-sm font-medium">{{ $origin }}</span>
+                    <div class="flex-1">
+                        <div class="flex items-center">
+                            <div class="flex-1 h-4 bg-gray-200 rounded-md overflow-hidden">
+                                <div
+                                    class="h-6 rounded-md"
+                                    style="width: {{ $data['applicants'] > 0 ? ($data['applicants'] / max(array_column($originOfRequestData, 'applicants')) * 100) : 0 }}%;
+                                background-color: {{ $colors[0] }};">
+                                </div>
+                            </div>
+                            <span class="ml-4 text-gray-700 text-md font-semibold">{{ $data['applicants'] }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="flex-1 h-4 bg-gray-200 rounded-md overflow-hidden">
+                                <div
+                                    class="h-6 rounded-md"
+                                    style="width: {{ $data['grantees'] > 0 ? ($data['grantees'] / max(array_column($originOfRequestData, 'grantees')) * 100) : 0 }}%;
+                                background-color: {{ $colors[1] }};">
+                                </div>
+                            </div>
+                            <span class="ml-4 text-gray-700 text-md font-semibold">{{ $data['grantees'] }}</span>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
         </div>
     </div>
-    @push('scripts')
-    <script>
-        document.addEventListener('alpine:init', () => {
-                // Relocation Lot Applicants Bar Chart
-                const ctx1 = document.getElementById('shelterApplicantsChart').getContext('2d');
-                new Chart(ctx1, {
-                    type: 'line',
-                    data: {
-                        labels: @js($shelterApplicantsData['labels']),
-                        datasets: [{
-                                label: 'Applicants',
-                                data: @js($shelterApplicantsData['shelterApplicants']),
-                                backgroundColor: 'rgba(255, 145, 0, 100)',
-                                borderColor: 'rgba(255, 145, 0, 100)',
-                                borderWidth: 2
-                            },
-                            {
-                                label: 'Profiled/Tagged',
-                                data: @js($shelterApplicantsData['totalTagged']),
-                                backgroundColor: 'rgba(0, 113, 45, 100)',
-                                borderColor: 'rgba(0, 113, 45, 100)',
-                                borderWidth: 2
-                            },
-                            {
-                                label: 'Granted',
-                                data: @js($shelterApplicantsData['grantees']),
-                                backgroundColor: 'rgba(0, 113, 45, 100)',
-                                borderColor: 'rgba(0, 113, 45, 100)',
-                                borderWidth: 2
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: {
-                                    boxWidth: 20,
-                                    padding: 10
-                                }
-                            }
-                        }
-                    }
-                });
 
-                const ctx2 = document.getElementById('originOfRequestApplicantsChart').getContext('2d');
-                new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: @js($originOfRequestData['labels']),
-                        datasets: [{
-                            label: 'Origin of Request Applicants',
-                            data: @js($originOfRequestData['originOfRequests']),
-                            backgroundColor: 'rgba(255, 145, 0, 100)',
-                            borderColor: 'rgba(255, 145, 0, 100)',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                                labels: {
-                                    boxWidth: 20,
-                                    padding: 10
-                                }
-                            }
-                        }
-                    }
-                });
-            });
-    </script>
-    @endpush
+
 </div>
