@@ -28,6 +28,7 @@
 </head>
 
 <body class="font-poppins antialiased bg-gray-100">
+
     <!-- Sidebar -->
     <x-sidebar/>
 
@@ -68,50 +69,5 @@
     <!-- Filepond js -->
     <script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
     <script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
-{{--    <script>--}}
-{{--        FilePond.registerPlugin(FilePondPluginImagePreview);--}}
-{{--    </script>--}}
-{{--        // Get a reference to the file input element--}}
-{{--        const inputElement = document.querySelector('input[id="image"]');--}}
-
-{{--        // Create a FilePond instance--}}
-{{--        const pond = FilePond.create(inputElement);--}}
-
-{{--        FilePond.setOptions({--}}
-{{--            server:{--}}
-{{--                process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
-{{--                    @this.upload('image', file, load, error, progress)--}}
-{{--                },--}}
-{{--                revert: (filename, load) => {--}}
-{{--                    @this.removeUpload('image', filename, load)--}}
-{{--                },--}}
-{{--                headers: {--}}
-{{--                    'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
-{{--                }--}}
-{{--            },--}}
-{{--        });--}}
-{{--    </script>--}}
-{{--    <script>--}}
-{{--        window.livewire.find('{{ $component->id }}').then(component => {--}}
-{{--            FilePond.setOptions({--}}
-{{--                server: {--}}
-{{--                    process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
-{{--                        component.upload('newImage', file, load, error, progress)--}}
-{{--                    },--}}
-{{--                    revert: (filename, load) => {--}}
-{{--                        component.removeUpload('newImage', filename, load)--}}
-{{--                    },--}}
-{{--                    headers: {--}}
-{{--                        'X-CSRF-TOKEN': '{{ csrf_token() }}'--}}
-{{--                    }--}}
-{{--                },--}}
-{{--            });--}}
-{{--        });--}}
-{{--    </script>--}}
-{{--    <script>--}}
-{{--        function setApplicantId(id) {--}}
-{{--            document.getElementById('taggedAndValidatedApplicantId').value = id;--}}
-{{--        }--}}
-{{--    </script>--}}
 </body>
 </html>
