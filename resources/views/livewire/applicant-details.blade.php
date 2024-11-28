@@ -94,7 +94,7 @@
                                             &times;
                                         </button>
                                     </div>
-                                    <form wire:submit.prevent="confirmRelocation">
+                                    <form>
                                         <label class="block text-sm font-medium mb-2 text-black">
                                             LOT ALLOCATION (ASSIGNED RELOCATION SITE)
                                         </label>
@@ -133,7 +133,7 @@
                                                     <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
                                                 </div>
                                                 <button type="button"
-                                                        wire:click="confirmRelocation()"
+                                                        @click="$wire.confirmRelocation().then(() => { $wire.showRelocationModal = false; showConfirmationModal = true; })"
                                                         class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
                                                     <span class="text-[12px]">CONFIRM</span>
                                                     <div wire:loading>
@@ -192,12 +192,6 @@
                                                     </h3>
                                                 </div>
                                             </div>
-{{--                                            <button @click="$wire.showConfirmationModal = false" class="text-gray-400 hover:text-gray-500">--}}
-{{--                                                <span class="sr-only">Close</span>--}}
-{{--                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
-{{--                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>--}}
-{{--                                                </svg>--}}
-{{--                                            </button>--}}
                                         </div>
 
                                         <div class="mt-4">
