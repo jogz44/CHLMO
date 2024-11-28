@@ -2,7 +2,7 @@
     <div class="flex bg-gray-100 text-[12px]">
         <div class="flex-1 p-6 overflow-auto">
             <form wire:submit.prevent="store">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-0">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-10">
                     <div class="flex items-center">
                         <a href="{{ route('applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
