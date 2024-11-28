@@ -9,6 +9,10 @@ use App\Models\Shelter\PurchaseOrder;
 use App\Models\Shelter\PurchaseRequisition;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Cache;
+use Maatwebsite\Excel\Facades\Excel;
+use Ramsey\Collection\Collection;
+use Illuminate\Support\Facades\Log;
+use App\Exports\DistributionListDataExport;
 
 class ShelterDistributionList extends Component
 {
@@ -98,6 +102,34 @@ class ShelterDistributionList extends Component
         // Clear the selected PO if PR is changed
         $this->selectedPoNumber = '';
         $this->applyFilters(); // Ensure filters are applied immediately
+    }
+
+    public function export()
+    {
+        try {
+            $filters = array_filter([
+                'start_date' => $this->startRisDate,
+                'end_date' => $this->endRisDate,
+                'po_number' => $this->selectedPoNumber,
+                'pr_number' => $this->selectedPrNumber
+            ]);
+
+            // Optional: Log the filters for debugging
+            Log::info('Export Filters:', $filters);
+
+            return Excel::download(
+                new DistributionListDataExport($filters),
+                'distribution-lists-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed: ',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
+            return null;
+        }
     }
 
     public function render()
