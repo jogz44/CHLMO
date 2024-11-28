@@ -2,7 +2,7 @@
     <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
         <div class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
-            <div class="flex-1 h-screen p-6 overflow-auto">
+            <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                     <div class="flex items-center">
                         <h2 class="text-[13px] ml-5 text-gray-700">AWARDEE LIST</h2>
@@ -555,10 +555,10 @@
 
                     <!-- Third Modal - Document View Modal -->
                     <div x-show="$wire.showDocumentViewModal"
-                         class="fixed inset-0 z-50 overflow-y-auto"
-                         aria-labelledby="modal-title"
-                         role="dialog"
-                         aria-modal="true">
+                        class="fixed inset-0 z-50 overflow-y-auto"
+                        aria-labelledby="modal-title"
+                        role="dialog"
+                        aria-modal="true">
                         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
@@ -574,9 +574,13 @@
                                                 <div class="mt-2 p-4 bg-gray-50 rounded-lg">
                                                     <div class="flex items-center justify-between">
                                                         <div>
-                                                            <p class="text-sm text-gray-600">Selected for Transfer:</p>
+                                                            <p class="text-sm text-gray-600">Transferred to:</p>
                                                             <p class="font-medium text-lg">{{ $selectedDependentDetails['name'] }}</p>
                                                             <p class="text-sm text-gray-500">Relationship: {{ $selectedDependentDetails['relationship'] }}</p>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <p class="text-sm text-gray-500">Transfer Date:</p>
+                                                            <p class="text-sm font-medium">{{ Carbon\Carbon::parse($selectedDependentDetails['transfer_date'])->format('M d, Y') }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -589,19 +593,17 @@
                                                             <!-- Document Header -->
                                                             <div class="flex justify-between items-start">
                                                                 <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
-                                                                @if($editingDocumentId === $document['id'] || (!$document['exists'] && $attachment_id === $document['attachment_id']))
-                                                                    <!-- Show close/cancel button when editing -->
+                                                                @if($editingDocumentId === $document['id'])
                                                                     <button wire:click="cancelEdit"
-                                                                            class="text-gray-400 hover:text-gray-500">
+                                                                    class="text-gray-400 hover:text-gray-500">
                                                                         <span class="sr-only">Close</span>
                                                                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                                         </svg>
                                                                     </button>
                                                                 @else
-                                                                    <!-- Show Edit/Upload button when not editing -->
-                                                                    <button wire:click="startEditingDocument({{ $document['exists'] ? '\''.$document['id'].'\'' : 'null' }}, {{ $document['attachment_id'] }})"
-                                                                            class="bg-custom-green text-white px-4 py-2 rounded-full text-sm">
+                                                                    <button wire:click="startEditingDocument('{{ $document['id'] }}', {{ $document['attachment_id'] }})"
+                                                                            class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
                                                                         {{ $document['exists'] ? 'Edit Photo' : 'Upload Photo' }}
                                                                     </button>
                                                                 @endif
@@ -624,24 +626,26 @@
                                                             @endif
 
                                                             <!-- Edit Form -->
-                                                            @if($editingDocumentId === $document['id'] || (!$document['exists'] && $attachment_id === $document['attachment_id']))
-                                                                <div class="space-y-4 mt-4">
+                                                            @if($editingDocumentId === $document['id'])
+                                                                <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">
                                                                     <div>
                                                                         <label class="block text-sm font-medium text-gray-700 mb-2">
                                                                             Upload New Photo
                                                                         </label>
                                                                         <input type="file"
-                                                                               wire:model="newDocument"
-                                                                               class="mb-4"
-                                                                               accept="image/*">
-                                                                        @error('newDocument')
-                                                                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                                                                        @enderror
+                                                                                wire:model="newDocument"
+                                                                                class="block w-full text-sm text-gray-500
+                                                                                    file:mr-4 file:py-2 file:px-4
+                                                                                    file:rounded-full file:border-0
+                                                                                    file:text-sm file:font-semibold
+                                                                                    file:bg-custom-red file:text-white
+                                                                                    hover:file:bg-custom-green
+                                                                                    cursor-pointer"
+                                                                                accept="image/*">
                                                                     </div>
-
                                                                     <div class="flex justify-end space-x-2">
                                                                         <button wire:click="updateDocument"
-                                                                                class="bg-custom-green text-white px-4 py-2 rounded-full text-sm">
+                                                                                    class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
                                                                             Save Changes
                                                                         </button>
                                                                     </div>
