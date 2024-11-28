@@ -53,6 +53,9 @@ class ProfiledTaggedApplicantDetails extends Component
     public $selectedImage = null; // This is for the tagging image
     public $selectedAttachment = null; // this is for the awarding attachment
 
+    public $taggedDocuments = [];
+    public $selectedDocument = null;
+
     public function mount($profileNo): void
     {
         $this->profiledTaggedApplicant = ProfiledTaggedApplicant::with([
@@ -66,9 +69,12 @@ class ProfiledTaggedApplicantDetails extends Component
             'civilStatus',
             'shelterLiveInPartner',
             'shelterSpouse',
-            'structureStatus'
+            'structureStatus',
+            'taggedDocuments',
            
         ])->findOrFail($profileNo);
+
+        $this->taggedDocuments = $this->profiledTaggedApplicant->taggedDocuments;
 
         $this->loadFormData();
     }
@@ -296,6 +302,17 @@ class ProfiledTaggedApplicantDetails extends Component
 
         // Disable edit mode
         $this->isEditing = false;
+    }
+    public function viewDocument($documentId): void
+    {
+        $this->selectedDocument = array_filter($this->taggedDocuments, function($document) use ($documentId) {
+            return $document['id'] == $documentId;
+        });
+        $this->selectedDocument = reset($this->selectedDocument);
+    }
+    public function closeDocument(): void
+    {
+        $this->selectedDocument = null;
     }
     public function render()
     {

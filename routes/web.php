@@ -11,6 +11,7 @@ use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ApplicantsController;
 use App\Http\Controllers\PurokController;
+use App\Exports\GranteesDataExport;
 
 use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
@@ -171,6 +172,8 @@ Route::middleware([
     Route::get('/shelter-grantees', function () {
         return view('shelter-grantees');
     })->name('shelter-grantees');
+
+    Route::get('/export-pdf', [GranteesDataExport::class, 'exportGranteesPdf'])->name('export.pdf');
 
     Route::get('/shelter-reports-status-applicants', function () {
         return view('shelter-reports-status-applicants');

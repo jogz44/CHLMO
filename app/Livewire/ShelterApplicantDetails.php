@@ -19,11 +19,14 @@ use App\Models\CaseSpecification;
 use App\Models\RoofType;
 use App\Models\WallType;
 use App\Models\StructureStatusType;
+use App\Models\ProfiledApplicantsDocumentsSubmission;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Console\Scheduling\Schedule;
 use Livewire\WithFileUploads;
 
 class ShelterApplicantDetails extends Component
@@ -66,6 +69,12 @@ class ShelterApplicantDetails extends Component
     public $spouse_last_name;
     public $partner_first_name, $partner_middle_name, $partner_last_name;
     public $photos = [], $renamedFileName = [], $structure_status_id, $structureStatuses;
+
+    // For uploading of files
+    public $isFilePondUploadComplete = false, $isFilePonduploading = false, $selectedApplicant, $files,
+        $applicantToPreview, $isUploading = false, $attachmentLists = [], $awardeeId, $documents = [], $newFileImages = [];
+    public $houseStructureImages = [];
+    protected $listeners = ['fileUploadFinished' => 'handleFileUploadFinished'];
 
     public function mount($profileNo)
     {
@@ -118,6 +127,10 @@ class ShelterApplicantDetails extends Component
             $this->occupation = $this->applicant->occupation;
             $this->contact_number = $this->applicant->contact_number;
             $this->year_of_residency = $this->applicant->year_of_residency;
+
+            $this->houseStructureImages = [];
+            $this->isFilePondUploadComplete = false;
+            $this->isFilePonduploading = false;
 
             $this->date_tagged = now()->toDateString(); // YYYY-MM-DD format
 
@@ -173,7 +186,7 @@ class ShelterApplicantDetails extends Component
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
             'remarks' => 'nullable|string|max:255',
-            'photos.*' => 'required|file|mimes:jpeg,png,jpg,gif',
+            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
             'full_address' => 'nullable|string|max:255',
 
             // Live-in partner details
@@ -213,6 +226,72 @@ class ShelterApplicantDetails extends Component
             ],
 
         ];
+    }
+
+    public function updatedHouseStructureImages()
+    {
+        if (!is_array($this->houseStructureImages)) {
+            $this->houseStructureImages = [$this->houseStructureImages];
+        }
+
+        try {
+            Log::info('Files being uploaded:', [
+                'count' => count($this->houseStructureImages),
+                'files' => collect($this->houseStructureImages)->map(fn($file) => [
+                    'name' => $file->getClientOriginalName(),
+                    'size' => $file->getSize(),
+                    'type' => $file->getMimeType()
+                ])
+            ]);
+
+            $this->validate([
+                'houseStructureImages.*' => 'image|max:2048'
+            ]);
+
+            $this->isFilePondUploadComplete = true;
+        } catch (\Exception $e) {
+            Log::error('Upload validation error:', [
+                'error' => $e->getMessage()
+            ]);
+            $this->isFilePondUploadComplete = false;
+            throw $e;
+        }
+    }
+    public function removeUpload($property, $fileName, $load): void
+    {
+        if (Storage::disk('tagging-house-structure-images')->exists($fileName)) {
+            Storage::disk('tagging-house-structure-images')->delete($fileName);
+        }
+
+        // Also remove temporary files if they exist
+        $tempPath = storage_path('livewire-tmp/' . $fileName);
+        if (file_exists($tempPath)) {
+            try {
+                unlink($tempPath);
+            } catch (\Exception $e) {
+                Log::error('Failed to delete temporary file: ' . $e->getMessage());
+            }
+        }
+        $load('');
+    }
+    protected function schedule(Schedule $schedule): void
+    {
+        $schedule->call(function () {
+            $tmpPath = storage_path('livewire-tmp');
+            // Delete files older than 24 hours
+            foreach (glob("$tmpPath/*") as $file) {
+                if (time() - filemtime($file) > 24 * 3600) {
+                    unlink($file);
+                }
+            }
+        })->daily();
+    }
+    public function updatedAwardeeUpload(): void
+    {
+        $this->isFilePondUploadComplete = true;
+        $this->validate([
+            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
+        ]);
     }
 
     public function store()
@@ -267,16 +346,69 @@ class ShelterApplicantDetails extends Component
                 ]);
             }
 
-            // Save each uploaded photo
-            foreach ($this->photos as $photo) {
-                $path = $photo->store('housing-images', 'public'); // Adjust the storage path as needed
+            // // Save each uploaded photo
+            // foreach ($this->photos as $photo) {
+            //     $path = $photo->store('housing-images', 'public'); // Adjust the storage path as needed
 
-                ShelterImagesForHousing::create([
-                    'profiled_tagged_applicant_id' => $taggedApplicant->id, // Assuming this links the image to the applicant
-                    'image_path' => $path,
-                    'display_name' => $photo->getClientOriginalName(),
-                ]);
+            //     ShelterImagesForHousing::create([
+            //         'profiled_tagged_applicant_id' => $taggedApplicant->id, // Assuming this links the image to the applicant
+            //         'image_path' => $path,
+            //         'display_name' => $photo->getClientOriginalName(),
+            //     ]);
+            // }
+
+            logger()->info('Starting document submission for applicant', [
+                'profiled_tagged_applicant_id' => $taggedApplicant->id,
+            ]);
+
+            $this->isFilePonduploading = false;
+
+            // Validate and store files
+            $this->validate([
+                'houseStructureImages.*' => 'required|image|max:2048',
+            ]);
+
+            // Ensure files are an array and filter out any non-file entries
+            $files = array_filter($this->houseStructureImages, function($file) {
+                return $file instanceof \Illuminate\Http\UploadedFile;
+            });
+
+            if (!empty($this->houseStructureImages)) {
+                foreach ($this->houseStructureImages as $image) {
+                    if ($image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+                        try {
+                            $fileName = time() . '_' . $image->getClientOriginalName();
+
+                            // Store file using custom disk
+                            $filePath = $image->storeAs(
+                                '',
+                                $fileName,
+                                'tagging-house-structure-images'
+                            );
+
+                            Log::info('Stored image:', [
+                                'name' => $fileName,
+                                'path' => $filePath
+                            ]);
+
+                            ProfiledApplicantsDocumentsSubmission::create([
+                                'profiled_tagged_applicant_id' => $taggedApplicant->id,
+                                'file_path' => $filePath,
+                                'file_name' => $fileName,
+                                'file_type' => $image->getClientOriginalExtension(),
+                                'file_size' => $image->getSize(),
+                            ]);
+                        } catch (\Exception $e) {
+                            Log::error('Failed to store image:', [
+                                'error' => $e->getMessage(),
+                                'file' => $fileName ?? 'unknown'
+                            ]);
+                            throw $e;
+                        }
+                    }
+                }
             }
+
             
 
             // Find the applicant by ID and update the 'tagged' field
@@ -296,6 +428,35 @@ class ShelterApplicantDetails extends Component
             DB::rollBack();
             Log::error('Error creating applicant or dependents: ' . $e->getMessage());
             dd('Database Error: ' . $e->getMessage());
+        }
+    }
+
+    private function storeAttachment($fileInput): void
+    {
+        $this->isFilePonduploading = false;
+
+        // Validate and store files
+        $this->validate([
+            'houseStructureImages.*' => 'required|image|max:2048',
+        ]);
+
+        // Ensure files are an array and filter out any non-file entries
+        $files = array_filter($this->houseStructureImages, function($file) {
+            return $file instanceof \Illuminate\Http\UploadedFile;
+        });
+
+        // Store each document
+        foreach ($files as $file) {
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->storeAs('documents', $fileName, 'tagging-house-structure-images');
+
+            ProfiledApplicantsDocumentsSubmission::create([
+                'profiled_tagged_applicant_id' => $this -> profiledTaggedApplicantId,
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+                'file_type' => $file->extension(),
+                'file_size' => $file->getSize(),
+            ]);
         }
     }
 

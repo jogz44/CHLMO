@@ -23,6 +23,9 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+
 
 class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDrawings
 {
@@ -72,7 +75,7 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
 
         // Apply filters
         if (!empty($this->filters['request_origin_id'])) {
-            $query->whereHas('profiledTaggedApplicant.shelterApplicant', function($q) {
+            $query->whereHas('profiledTaggedApplicant.shelterApplicant', function ($q) {
                 $q->where('request_origin_id', $this->filters['request_origin_id']);
             });
         }
@@ -89,8 +92,8 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
     public function styles(Worksheet $sheet)
     {
         $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
-        $sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_A4);
-        
+        $sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_LEGAL);
+
         return [
             1 => ['font' => ['bold' => true]],
             'A1:M1' => ['alignment' => ['horizontal' => 'center']],
@@ -105,7 +108,7 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
         $drawing->setPath(public_path('storage/images/logo.png'));
         $drawing->setHeight(90);
         $drawing->setCoordinates('A1');
-        
+
         return $drawing;
     }
 
@@ -152,5 +155,17 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
                 $worksheet->getColumnDimension('M')->setWidth(15); // Remarks
             },
         ];
+    }
+    public function exportGranteesPdf(Request $request)
+    {
+        $orientation = $request->input('orientation', 'portrait'); // Default to portrait if not provided
+
+        $grantees = Grantee::all(); // Adjust query as needed for your data
+
+        $pdf = Pdf::loadView('exports.grantees', [
+            'grantees' => $grantees,
+        ])->setPaper('legal', $orientation); // Dynamically set orientation
+
+        return $pdf->download('grantees.pdf');
     }
 }

@@ -80,7 +80,7 @@
     </div>
 
     <!-- Monthly Report Section -->
-    <div class="flex-1 justify-center items-center mt-6 w-[80%] ml-24">
+    <div class="flex-1 justify-center items-center mt-6 ">
         <div class="bg-white shadow rounded-lg p-6">
             <h4 class="text-[14px] mb-2 font-semibold text-center">
                 Applicants and Granted Applicants per Origin of Request
@@ -103,7 +103,7 @@
                 @php
                 $colors = ['#FF9100', '#00712D']; // Orange for applicants, Green for grantees
                 @endphp
-                <div class="flex items-center mb-4">
+                <div class="flex items-center mb-4 bg-slate-100 shadow-sm px-4 py-2 rounded-sm">
                     <span class="w-1/6 text-gray-700 text-sm font-medium">{{ $origin }}</span>
                     <div class="flex-1">
                         <div class="flex items-center">

@@ -9,6 +9,7 @@ use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Shelter\ShelterLiveInPartner;
+use App\Models\ProfiledApplicantsDocumentsSubmission;
 use App\Models\Purok;
 use App\Models\Barangay;
 use App\Models\StructureStatusType;
@@ -138,5 +139,9 @@ class ProfiledTaggedApplicant extends Model
     public function granteeDocumentsSubmission()
     {
         return $this->hasMany(GranteeDocumentsSubmission::class, 'profiled_tagged_applicant_id');
+    }
+    public function taggedDocuments()
+    {
+        return $this->hasMany(ProfiledApplicantsDocumentsSubmission::class, 'profiled_tagged_applicant_id');
     }
 }

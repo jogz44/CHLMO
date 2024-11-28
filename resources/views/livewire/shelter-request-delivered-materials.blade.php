@@ -7,8 +7,12 @@
                     <h2 class="text-[13px] ml-5 text-gray-700 font-semibold">REPORT ON REQUEST AND DELIVERED MATERIALS UNDER THE SHELTER ASSISTANCE PROGRAM</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                <div class="relative z-0">
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
+                <div class="relative">
+                    <button wire:click="export" wire:ignore wire:loading.attr="disabled"
+                        class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
+                        <span wire:loading wire:target="export">Exporting Excel...</span>
+                        <span wire:loading.remove>Export to Excel</span>
+                    </button>
                 </div>
             </div>
 
@@ -74,7 +78,16 @@
                             <td colspan="5" class="py-4 px-2 text-center border-b">No records found</td>
                         </tr>
                         @endforelse
+                        <!-- Totals Row -->
+                        <tr class="bg-yellow-100 font-bold">
+                            <td class="py-4 px-2 text-center border-t"></td>
+                            <td class="py-4 px-2 text-center border-t" >TOTAL</td>
+                            <td class="py-4 px-2 text-center border-t">{{ $totals['total_requests'] }}</td>
+                            <td class="py-4 px-2 text-center border-t">{{ $totals['tagged_requests'] }}</td>
+                            <td class="py-4 px-2 text-center border-t">{{ $totals['delivered_requests'] }}</td>
+                        </tr>
                     </tbody>
+
                 </table>
             </div>
         </div>
