@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\ShelterUploadedFile;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
@@ -62,6 +63,11 @@ class ShelterProfiledTaggedApplicants extends Component
 
 
     public $shelterLivingStatusesFilter = [];
+    public $showDocumentModal = false;
+    public $currentDocuments = [];
+    public $editingDocumentId = null;
+    public $newDocument = null;
+
 
     // Reset pagination when search changes
     public function updatingSearch(): void
@@ -458,6 +464,86 @@ class ShelterProfiledTaggedApplicants extends Component
     public function viewApplicantDetails($profileNo): RedirectResponse
     {
         return redirect()->route('profiled-tagged-applicant-details', ['profileNo' => $profileNo]);
+    }
+
+    // Update the viewSubmittedDocuments method to include the attachment name
+    public function viewSubmittedDocuments($applicantId): void
+    {
+        $this->profiledTaggedApplicantId = $applicantId;
+        $attachmentsList = GranteeAttachmentList::all()->pluck('attachment_name', 'id');
+
+        $this->currentDocuments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $applicantId)
+            ->with('attachmentType')
+            ->get()
+            ->map(function ($doc) use ($attachmentsList) {
+                return [
+                    'id' => $doc->id,
+                    'attachment_name' => $attachmentsList[$doc->attachment_id] ?? 'Unknown Attachment',
+                    'file_name' => $doc->file_name,
+                    'file_path' => $doc->file_path,
+                    'attachment_id' => $doc->attachment_id,
+                    // Updated to use the correct path structure based on your filesystem config
+                    'file_url' => asset('grantee-photo-requirements/' . $doc->file_path)
+                ];
+            });
+        $this->showDocumentModal = true;
+    }
+
+    public function startEditingDocument($documentId): void
+    {
+        $this->editingDocumentId = $documentId;
+    }
+
+    public function updateDocument()
+    {
+        $this->validate([
+            'newDocument' => 'required|file|max:10240|mimes:jpeg,png,jpg,gif'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $document = GranteeDocumentsSubmission::find($this->editingDocumentId); // Updated property name
+
+            // Store the new file
+            $file = $this->newDocument;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('documents', $fileName, 'grantee-photo-requirements');
+
+            // Delete old file if it exists
+            if ($document->file_path) {
+                Storage::disk('grantee-photo-requirements')->delete($document->file_path);
+            }
+
+            // Update document record
+            $document->update([
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+                'file_type' => $file->extension(),
+                'file_size' => $file->getSize(),
+            ]);
+
+            DB::commit();
+
+            $this->editingDocumentId = null; // Updated property name
+            $this->newDocument = null;
+            $this->viewSubmittedDocuments($this->profiledTaggedApplicantId); // Refresh documents
+
+            $this->dispatch('alert', [
+                'title' => 'Document Updated',
+                'message' => 'Document has been successfully updated!',
+                'type' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->handleError('Failed to update document', $e);
+        }
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->editingDocumentId = null; // Updated property name
+        $this->newDocument = null;
     }
 
     public function render()
