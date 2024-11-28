@@ -11,9 +11,13 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Logs\ActivityLogs;
+use Livewire\WithPagination;
 
 class RelocationSites extends Component
 {
+    use WithPagination;
+    protected $paginationTheme = 'tailwind';
+
     public $selectedSiteId, $password = '', $newStatus = '', $showPasswordModal = false;
     public  $lot_number, $block_identifier, $relocation_site_name = '';
     public $barangay_id, $barangays = [], $purok_id, $puroks = [];
@@ -23,6 +27,18 @@ class RelocationSites extends Component
     public $showEditModal = false, $editingRelocationSite, $currentId, $newTotalLotSize;
     public $isAwardeesModalVisible = false; // Changed property name
     public $selectedRelocationSite = null;
+
+    public $search = '';
+    public $filterBarangay = '';
+    public $filterPurok = '';
+    public $barangaysForFilter; // For the filter dropdown
+    public $filterPuroks = []; // For the dynamic purok filter dropdown
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'filterBarangay' => ['except' => ''],
+        'filterPurok' => ['except' => '']
+    ];
 
     protected $rules = [
         'lot_number' => 'nullable|string|max:255',
@@ -55,9 +71,9 @@ class RelocationSites extends Component
     {
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
-
-//        $this->reset();
+        $this->barangaysForFilter = Barangay::orderBy('name')->get();
     }
+
     public function updatedBarangayId($barangayId): void
     {
         // Fetch the puroks based on the selected barangay
@@ -69,6 +85,30 @@ class RelocationSites extends Component
             'puroks' => $this->puroks
         ]);
     }
+
+    // Update puroks when barangay filter changes
+    public function updatedFilterBarangay($value): void
+    {
+        $this->filterPurok = ''; // Reset purok filter
+        $this->filterPuroks = $value ?
+            Purok::where('barangay_id', $value)->orderBy('name')->get() :
+            [];
+        $this->resetPage();
+    }
+
+    // Reset page on search update
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['search', 'filterBarangay', 'filterPurok']);
+        $this->filterPuroks = [];
+        $this->resetPage();
+    }
+
     public function getRemainingLotSize($relocationSiteId)
     {
         $relocationSite = RelocationSite::with('awardees')->find($relocationSiteId);
@@ -264,8 +304,32 @@ class RelocationSites extends Component
     }
     public function render()
     {
-        $relocationSites = RelocationSite::with('address')
-            ->orderBy('relocation_site_name')
+        $query = RelocationSite::with(['address.barangay', 'address.purok']);
+
+        // Apply search filter
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('relocation_site_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('lot_number', 'like', '%' . $this->search . '%')
+                    ->orWhere('block_identifier', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Apply barangay filter
+        if ($this->filterBarangay) {
+            $query->whereHas('address.barangay', function($q) {
+                $q->where('id', $this->filterBarangay);
+            });
+        }
+
+        // Apply purok filter
+        if ($this->filterPurok) {
+            $query->whereHas('address.purok', function($q) {
+                $q->where('id', $this->filterPurok);
+            });
+        }
+
+        $relocationSites = $query->orderBy('relocation_site_name', 'asc')
             ->paginate(5);
 
         return view('livewire.relocation-sites', [

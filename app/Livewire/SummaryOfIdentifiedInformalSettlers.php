@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Exports\ApplicantsDataExport;
 use App\Exports\SummaryOfIdentifiedInformalSettlersDataExport;
+use App\Models\Address;
 use App\Models\Barangay;
 use App\Models\CaseSpecification;
 use App\Models\LivingSituation;
@@ -26,6 +27,9 @@ class SummaryOfIdentifiedInformalSettlers extends Component
     public $search = '', $filterBarangay = '', $filterPurok = '', $filterLivingSituation = '', $filterCaseSpecification = '',
         $filterAssignedRelocationSite, $filterActualRelocationSite, $startDate, $endDate;
 
+    // Add property to store available puroks for selected barangay
+    public $availablePuroks = [];
+
     // Sorting properties
     public $sortField = 'tagging_date', $sortDirection = 'desc';
 
@@ -43,15 +47,108 @@ class SummaryOfIdentifiedInformalSettlers extends Component
         'page' => ['except' => 1],
     ];
 
+    public function mount(): void
+    {
+        if ($this->filterBarangay) {
+            $this->updateAvailablePuroks();
+        }
+    }
+
+    // Add method to update available puroks based on selected barangay
+    public function updateAvailablePuroks()
+    {
+        if ($this->filterBarangay) {
+            $this->availablePuroks = Purok::join('addresses', 'puroks.id', '=', 'addresses.purok_id')
+                ->join('barangays', 'addresses.barangay_id', '=', 'barangays.id')
+                ->where('barangays.name', $this->filterBarangay)
+                ->pluck('puroks.name')
+                ->unique()
+                ->sort()
+                ->values()
+                ->toArray();
+
+            // Reset purok filter if selected purok is not in the available puroks
+            if (!in_array($this->filterPurok, $this->availablePuroks)) {
+                $this->filterPurok = '';
+            }
+        } else {
+            $this->availablePuroks = [];
+            $this->filterPurok = '';
+        }
+
+    }
+
     // Reset pagination when search changes
     public function updatingSearch(): void
     {
         $this->resetPage();
     }
-    public function updatingFilterBarangay(): void
+    // Modify updatingFilterBarangay to update available puroks
+    public function updatingFilterBarangay($value): void
     {
         $this->resetPage();
+        $this->filterPurok = ''; // Reset purok when barangay changes
     }
+
+    public function updatedFilterBarangay(): void
+    {
+        if ($this->filterBarangay) {
+            $barangay = Barangay::where('name', $this->filterBarangay)->first();
+
+            if ($barangay) {
+                // Get puroks directly through the barangay relationship
+                $this->availablePuroks = Purok::where('barangay_id', $barangay->id)
+                    ->pluck('name')
+                    ->toArray();
+
+                // Debug logging
+                logger('Query Results:', [
+                    'barangay' => $this->filterBarangay,
+                    'barangay_id' => $barangay->id,
+                    'found_puroks' => $this->availablePuroks
+                ]);
+            }
+        } else {
+            $this->availablePuroks = [];
+        }
+
+        $this->filterPurok = '';
+    }
+
+//    public function updatedFilterBarangay(): void
+//    {
+//        if ($this->filterBarangay) {
+//            $barangay = Barangay::where('name', $this->filterBarangay)->first();
+//
+//            if ($barangay) {
+//                $this->availablePuroks = Purok::join('addresses', 'puroks.id', '=', 'addresses.purok_id')
+//                    ->where('addresses.barangay_id', $barangay->id)
+//                    ->distinct()
+//                    ->pluck('puroks.name')
+//                    ->toArray();
+//
+//                // Add this for debugging
+//                logger('Available Puroks:', $this->availablePuroks);
+//            }
+//        } else {
+//            $this->availablePuroks = [];
+//        }
+//
+//        $this->filterPurok = '';
+//        if ($this->filterBarangay) {
+//            $barangay = Barangay::where('name', $this->filterBarangay)->first();
+//            if ($barangay) {
+//                $query = Purok::join('addresses', 'puroks.id', '=', 'addresses.purok_id')
+//                    ->where('addresses.barangay_id', $barangay->id)
+//                    ->distinct();
+//
+//                // Log the SQL query and results
+//                logger('SQL Query: ' . $query->toSql());
+//                logger('Query Bindings:', $query->getBindings());
+//                logger('Results:', $query->pluck('puroks.name')->toArray());
+//            }
+//        }
+//    }
     public function updatingFilterPurok(): void
     {
         $this->resetPage();
@@ -89,7 +186,6 @@ class SummaryOfIdentifiedInformalSettlers extends Component
         ]);
         $this->resetPage();
     }
-// todo try checking comparing table's data in the system and in the excel
     public function export()
     {
         try {
@@ -148,9 +244,7 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             })
             ->leftJoin('relocation_sites', 'tagged_and_validated_applicants.relocation_lot_id', '=', 'relocation_sites.id')
             ->leftJoin('awardees', 'tagged_and_validated_applicants.id', '=', 'awardees.tagged_and_validated_applicant_id')
-            // New join for Actual Relocation Site
             ->leftJoin('relocation_sites as relocation_lots', 'awardees.relocation_lot_id', '=', 'relocation_lots.id');
-//            ->where('tagged_and_validated_applicants.is_tagged', true);
 
         // Apply filters
         if ($this->filterBarangay) {
@@ -190,11 +284,14 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             $query->where('relocation_sites.relocation_site_name', $this->filterAssignedRelocationSite);
         }
 
-        // Actual Relocation Site Filter
+        // Modified Actual Relocation Site Filter
         if ($this->filterActualRelocationSite) {
-            $query->where(function($q) {
-                $q->where('relocation_lots.relocation_site_name', $this->filterActualRelocationSite)
-                    ->orWhereNull('relocation_lots.relocation_site_name'); // Handle cases where the actual relocation site may be null
+            $query->whereExists(function ($subquery) {
+                $subquery->select(DB::raw(1))
+                    ->from('awardees as a')
+                    ->join('relocation_sites as rs', 'a.relocation_lot_id', '=', 'rs.id')
+                    ->whereColumn('a.tagged_and_validated_applicant_id', 'tagged_and_validated_applicants.id')
+                    ->where('rs.relocation_site_name', $this->filterActualRelocationSite);
             });
         }
 
@@ -254,7 +351,7 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             'groupedApplicants' => $query->paginate(5),
             'totals' => $totals,
             'barangays' => $this->filterOptions['barangays'],
-            'puroks' => $this->filterOptions['puroks'],
+            'puroks' => $this->availablePuroks, // Use dynamic puroks instead of all puroks
             'livingSituations' => $this->filterOptions['livingSituations'],
             'caseSpecifications' => $this->filterOptions['caseSpecifications'],
             'relocationSites' => $this->filterOptions['relocationSites'],

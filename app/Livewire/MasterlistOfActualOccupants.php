@@ -22,6 +22,7 @@ class MasterlistOfActualOccupants extends Component
     public $barangays, $puroks, $civilStatuses, $livingSituations, $livingStatuses, $caseSpecifications, $livingSituationCaseSpecifications;
     public $sortField = 'last_name';  // default sort field
     public $sortDirection = 'asc';    // default sort direction
+    public $availablePuroks = [];
     // Search and filter properties
     public $search = '';
     public $filters = [
@@ -85,11 +86,39 @@ class MasterlistOfActualOccupants extends Component
     public function mount()
     {
         $this->barangays = Barangay::orderBy('name')->get();
-        $this->puroks = Purok::orderBy('name')->get();
+        // Remove the puroks initialization since we'll load them dynamically
         $this->civilStatuses = CivilStatus::all();
         $this->livingSituations = LivingSituation::all();
         $this->livingStatuses = LivingStatus::all();
         $this->caseSpecifications = CaseSpecification::all();
+
+        // Initialize puroks if barangay is already selected
+        if ($this->filters['barangay']) {
+            $this->updateAvailablePuroks();
+        }
+    }
+
+    // Add method to update available puroks
+    public function updatedFiltersBarangay(): void
+    {
+        $this->updateAvailablePuroks();
+        // Reset purok filter when barangay changes
+        $this->filters['purok'] = '';
+    }
+
+    protected function updateAvailablePuroks(): void
+    {
+        if ($this->filters['barangay']) {
+            $barangay = Barangay::where('name', $this->filters['barangay'])->first();
+            if ($barangay) {
+                $this->availablePuroks = Purok::where('barangay_id', $barangay->id)
+                    ->orderBy('name')
+                    ->pluck('name')
+                    ->toArray();
+            }
+        } else {
+            $this->availablePuroks = [];
+        }
     }
     // In your Livewire component
     public function getLivingSituationSpecifications(): array

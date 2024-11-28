@@ -47,12 +47,13 @@ class AwardeeDetails extends Component
     public $selectedAttachment = null; // this is for the awarding attachment
 
     // For blacklisting
-    public $showBlacklistConfirmationModal = false, $awardeeToBlacklist, $confirmationPassword = '', $blacklistError = '';
+    public $openModalBlacklist = false, $showBlacklistConfirmationModal = false, $awardeeToBlacklist, $confirmationPassword = '', $blacklistError = '';
     // Track deleted dependents
     public $deletedDependentIds = [];
 
     // Blacklisting
     public $date_blacklisted, $blacklist_reason_description, $updated_by;
+
     public function mount($applicantId): void
     {
         $this->awardee = Awardee::with([
@@ -238,6 +239,17 @@ class AwardeeDetails extends Component
             $this->loadFormData(); // Reset form data if canceling edit
         }
     }
+    public function proceedToConfirmation(): void
+    {
+        // Validate the first form
+        $this->validate([
+            'date_blacklisted' => 'required|date',
+            'blacklist_reason_description' => 'required|string|max:255',
+        ]);
+
+        $this->openModalBlacklist = false;
+        $this->showBlacklistConfirmationModal = true;
+    }
     protected function rules()
     {
         return [
@@ -248,14 +260,14 @@ class AwardeeDetails extends Component
     }
     public function store()
     {
+        // Validate the input data
+        $this->validate();
+
         // Verify password first
         if (!Hash::check($this->confirmationPassword, Auth::user()->password)) {
             $this->blacklistError = 'Incorrect password. Please try again.';
             return;
         }
-
-        // Validate the input data
-        $this->validate();
 
         // Create the new applicant record and get the ID of the newly created applicant
         $blacklist = Blacklist::create([
@@ -275,6 +287,7 @@ class AwardeeDetails extends Component
         $logger->logActivity('Blacklisted an Awardee', $user);
 
         $this->resetForm();
+        $this->openModalBlacklist = false;
         $this->showBlacklistConfirmationModal = false;
 
         // Trigger the alert message
@@ -288,7 +301,15 @@ class AwardeeDetails extends Component
     }
     public function resetForm(): void
     {
-        $this->reset(['date_blacklisted', 'blacklist_reason_description', 'updated_by']);
+        $this->reset([
+            'date_blacklisted',
+            'blacklist_reason_description',
+            'updated_by',
+            'confirmationPassword',
+            'blacklistError',
+            'openModalBlacklist',
+            'showBlacklistConfirmationModal'
+        ]);
     }
     public function confirmBlacklisting($awardeeId): void
     {
@@ -299,8 +320,9 @@ class AwardeeDetails extends Component
     }
     public function cancelBlacklisting(): void
     {
+        $this->openModalBlacklist = false;
         $this->showBlacklistConfirmationModal = false;
-        $this->awardeeToBlacklist = '';
+        $this->awardeeToBlacklist = null;
         $this->confirmationPassword = '';
         $this->blacklistError = '';
     }
