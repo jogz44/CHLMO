@@ -190,8 +190,7 @@
                                                 @endif
                                             @elseif($awardee->documents_submitted)
                                                 <!-- Documents Submitted Button and Transfer -->
-                                                <button wire:click="viewSubmittedDocuments({{ $awardee->id }})"
-                                                        class="px-4 py-2 bg-green-600 text-white rounded-full cursor-default cursor-pointer">
+                                                <button class="px-4 py-2 bg-amber-500 text-white rounded-full cursor-default">
                                                     Submitted
                                                 </button>
                                                 <button wire:click="openConfirmModal({{ $awardee->id }})"
@@ -249,17 +248,16 @@
                                                 </div>
                                             </div>
                                         @endif
-
                                         @foreach($eligibleDependents as $dependent)
-                                                <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
-                                                     wire:click="confirmTransfer({{ $dependent->id }})">
-                                                    <div class="font-semibold">
-                                                        {{ $dependent->dependent_last_name }}, {{ $dependent->dependent_first_name }} {{ $dependent->dependent_middle_name }}
-                                                    </div>
-                                                    <div class="text-sm text-gray-600">
-                                                        Relationship: {{ $dependent->dependentRelationship->relationship }}
-                                                    </div>
+                                            <div class="p-4 border rounded hover:bg-gray-50 cursor-pointer transition duration-150"
+                                                 wire:click="confirmTransfer({{ $dependent->id }})">
+                                                <div class="font-semibold">
+                                                    {{ $dependent->dependent_last_name }}, {{ $dependent->dependent_first_name }} {{ $dependent->dependent_middle_name }}
                                                 </div>
+                                                <div class="text-sm text-gray-600">
+                                                    Relationship: {{ $dependent->dependentRelationship->relationship }}
+                                                </div>
+                                            </div>
                                         @endforeach
                                     </div>
                                 </div>
@@ -554,123 +552,123 @@
                     </div>
 
                     <!-- Third Modal - Document View Modal -->
-                    <div x-show="$wire.showDocumentViewModal"
-                        class="fixed inset-0 z-50 overflow-y-auto"
-                        aria-labelledby="modal-title"
-                        role="dialog"
-                        aria-modal="true">
-                        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+{{--                    <div x-show="$wire.showDocumentViewModal"--}}
+{{--                        class="fixed inset-0 z-50 overflow-y-auto"--}}
+{{--                        aria-labelledby="modal-title"--}}
+{{--                        role="dialog"--}}
+{{--                        aria-modal="true">--}}
+{{--                        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">--}}
+{{--                            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>--}}
 
-                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <div class="sm:flex sm:items-start">
-                                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                                Submitted Documents
-                                            </h3>
+{{--                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">--}}
+{{--                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">--}}
+{{--                                    <div class="sm:flex sm:items-start">--}}
+{{--                                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">--}}
+{{--                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">--}}
+{{--                                                Submitted Documents--}}
+{{--                                            </h3>--}}
 
-                                            @if($selectedDependentDetails)
-                                                <div class="mt-2 p-4 bg-gray-50 rounded-lg">
-                                                    <div class="flex items-center justify-between">
-                                                        <div>
-                                                            <p class="text-sm text-gray-600">Transferred to:</p>
-                                                            <p class="font-medium text-lg">{{ $selectedDependentDetails['name'] }}</p>
-                                                            <p class="text-sm text-gray-500">Relationship: {{ $selectedDependentDetails['relationship'] }}</p>
-                                                        </div>
-                                                        <div class="text-right">
-                                                            <p class="text-sm text-gray-500">Transfer Date:</p>
-                                                            <p class="text-sm font-medium">{{ Carbon\Carbon::parse($selectedDependentDetails['transfer_date'])->format('M d, Y') }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
+{{--                                            @if($selectedDependentDetails)--}}
+{{--                                                <div class="mt-2 p-4 bg-gray-50 rounded-lg">--}}
+{{--                                                    <div class="flex items-center justify-between">--}}
+{{--                                                        <div>--}}
+{{--                                                            <p class="text-sm text-gray-600">Transferred to:</p>--}}
+{{--                                                            <p class="font-medium text-lg">{{ $selectedDependentDetails['name'] }}</p>--}}
+{{--                                                            <p class="text-sm text-gray-500">Relationship: {{ $selectedDependentDetails['relationship'] }}</p>--}}
+{{--                                                        </div>--}}
+{{--                                                        <div class="text-right">--}}
+{{--                                                            <p class="text-sm text-gray-500">Transfer Date:</p>--}}
+{{--                                                            <p class="text-sm font-medium">{{ Carbon\Carbon::parse($selectedDependentDetails['transfer_date'])->format('M d, Y') }}</p>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            @endif--}}
 
-                                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                @foreach($currentDocuments as $document)
-                                                    <div class="border rounded-lg p-4 bg-gray-50">
-                                                        <div class="space-y-4">
-                                                            <!-- Document Header -->
-                                                            <div class="flex justify-between items-start">
-                                                                <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
-                                                                @if($editingDocumentId === $document['id'])
-                                                                    <button wire:click="cancelEdit"
-                                                                    class="text-gray-400 hover:text-gray-500">
-                                                                        <span class="sr-only">Close</span>
-                                                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                        </svg>
-                                                                    </button>
-                                                                @else
-                                                                    <button wire:click="startEditingDocument('{{ $document['id'] }}', {{ $document['attachment_id'] }})"
-                                                                            class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                        {{ $document['exists'] ? 'Edit Photo' : 'Upload Photo' }}
-                                                                    </button>
-                                                                @endif
-                                                            </div>
+{{--                                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">--}}
+{{--                                                @foreach($currentDocuments as $document)--}}
+{{--                                                    <div class="border rounded-lg p-4 bg-gray-50">--}}
+{{--                                                        <div class="space-y-4">--}}
+{{--                                                            <!-- Document Header -->--}}
+{{--                                                            <div class="flex justify-between items-start">--}}
+{{--                                                                <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>--}}
+{{--                                                                @if($editingDocumentId === $document['id'])--}}
+{{--                                                                    <button wire:click="cancelEdit"--}}
+{{--                                                                    class="text-gray-400 hover:text-gray-500">--}}
+{{--                                                                        <span class="sr-only">Close</span>--}}
+{{--                                                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
+{{--                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />--}}
+{{--                                                                        </svg>--}}
+{{--                                                                    </button>--}}
+{{--                                                                @else--}}
+{{--                                                                    <button wire:click="startEditingDocument('{{ $document['id'] }}', {{ $document['attachment_id'] }})"--}}
+{{--                                                                            class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">--}}
+{{--                                                                        {{ $document['exists'] ? 'Edit Photo' : 'Upload Photo' }}--}}
+{{--                                                                    </button>--}}
+{{--                                                                @endif--}}
+{{--                                                            </div>--}}
 
-                                                            @if($document['exists'])
-                                                                <!-- Current File Info -->
-                                                                <div class="text-sm text-gray-600">
-                                                                    Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>
-                                                                </div>
+{{--                                                            @if($document['exists'])--}}
+{{--                                                                <!-- Current File Info -->--}}
+{{--                                                                <div class="text-sm text-gray-600">--}}
+{{--                                                                    Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>--}}
+{{--                                                                </div>--}}
 
-                                                                <!-- Image Preview -->
-                                                                <div class="relative">
-                                                                    <img src="{{ $document['file_url'] }}"
-                                                                         alt="{{ $document['attachment_name'] }}"
-                                                                         class="rounded-lg shadow-sm max-h-48 object-cover">
-                                                                </div>
-                                                            @else
-                                                                <div class="text-sm text-gray-500 italic">No file uploaded yet</div>
-                                                            @endif
+{{--                                                                <!-- Image Preview -->--}}
+{{--                                                                <div class="relative">--}}
+{{--                                                                    <img src="{{ $document['file_url'] }}"--}}
+{{--                                                                         alt="{{ $document['attachment_name'] }}"--}}
+{{--                                                                         class="rounded-lg shadow-sm max-h-48 object-cover">--}}
+{{--                                                                </div>--}}
+{{--                                                            @else--}}
+{{--                                                                <div class="text-sm text-gray-500 italic">No file uploaded yet</div>--}}
+{{--                                                            @endif--}}
 
-                                                            <!-- Edit Form -->
-                                                            @if($editingDocumentId === $document['id'])
-                                                                <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">
-                                                                    <div>
-                                                                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                                            Upload New Photo
-                                                                        </label>
-                                                                        <input type="file"
-                                                                                wire:model="newDocument"
-                                                                                class="block w-full text-sm text-gray-500
-                                                                                    file:mr-4 file:py-2 file:px-4
-                                                                                    file:rounded-full file:border-0
-                                                                                    file:text-sm file:font-semibold
-                                                                                    file:bg-custom-red file:text-white
-                                                                                    hover:file:bg-custom-green
-                                                                                    cursor-pointer"
-                                                                                accept="image/*">
-                                                                    </div>
-                                                                    <div class="flex justify-end space-x-2">
-                                                                        <button wire:click="updateDocument"
-                                                                                    class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                            Save Changes
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                                            <!-- Edit Form -->--}}
+{{--                                                            @if($editingDocumentId === $document['id'])--}}
+{{--                                                                <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">--}}
+{{--                                                                    <div>--}}
+{{--                                                                        <label class="block text-sm font-medium text-gray-700 mb-2">--}}
+{{--                                                                            Upload New Photo--}}
+{{--                                                                        </label>--}}
+{{--                                                                        <input type="file"--}}
+{{--                                                                                wire:model="newDocument"--}}
+{{--                                                                                class="block w-full text-sm text-gray-500--}}
+{{--                                                                                    file:mr-4 file:py-2 file:px-4--}}
+{{--                                                                                    file:rounded-full file:border-0--}}
+{{--                                                                                    file:text-sm file:font-semibold--}}
+{{--                                                                                    file:bg-custom-red file:text-white--}}
+{{--                                                                                    hover:file:bg-custom-green--}}
+{{--                                                                                    cursor-pointer"--}}
+{{--                                                                                accept="image/*">--}}
+{{--                                                                    </div>--}}
+{{--                                                                    <div class="flex justify-end space-x-2">--}}
+{{--                                                                        <button wire:click="updateDocument"--}}
+{{--                                                                                    class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">--}}
+{{--                                                                            Save Changes--}}
+{{--                                                                        </button>--}}
+{{--                                                                    </div>--}}
+{{--                                                                </div>--}}
+{{--                                                            @endif--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                @endforeach--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                    <button type="button"
-                                            wire:click="$set('showDocumentViewModal', false)"
-                                            class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+{{--                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">--}}
+{{--                                    <button type="button"--}}
+{{--                                            wire:click="$set('showDocumentViewModal', false)"--}}
+{{--                                            class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">--}}
+{{--                                        Close--}}
+{{--                                    </button>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
 
-                    <!-- Fourth Modal - Confirmation -->
+                    <!-- Third Modal - Confirmation -->
                     <div x-show="$wire.showConfirmationModal"
                          class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                          x-cloak>
