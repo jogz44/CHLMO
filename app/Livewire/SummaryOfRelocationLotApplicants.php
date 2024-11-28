@@ -18,17 +18,29 @@ class SummaryOfRelocationLotApplicants extends Component
             $query->where('id', 1);
         })->count();
 
-        // Count Tagged and Validated Applicants
+        // Count ALL Tagged and Validated Applicants
         $this->taggedAndValidated = TaggedAndValidatedApplicant::where('is_tagged', true)->count();
 
         // Count Identified Informal Settlers
         // Specific living situation IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9
-        $this->identifiedInformalSettlers = TaggedAndValidatedApplicant::whereHas('livingSituation', function ($query) {
-            $query->whereBetween('id', [1, 2, 3, 4, 5, 6, 7, 8, 9]);
-        })->count();
+        $this->identifiedInformalSettlers = TaggedAndValidatedApplicant::where('is_tagged', true)
+            ->whereBetween('living_situation_id', [1, 9])
+            ->count();
+        // Add this debug code
+//        $settlers = TaggedAndValidatedApplicant::where('is_tagged', true)
+//            ->whereBetween('living_situation_id', [1, 9])
+//            ->get();
+//        dd([
+//            'total_records' => $settlers->count(),
+//            'living_situation_ids' => $settlers->pluck('living_situation_id')->toArray()
+//        ]);
 
         // Calculate Total Relocation Lot Applicants
-        $this->totalRelocationLotApplicants = $this->walkInApplicants + $this->taggedAndValidated + $this->identifiedInformalSettlers;
+//        $this->totalRelocationLotApplicants = $this->walkInApplicants + $this->taggedAndValidated + $this->identifiedInformalSettlers;
+
+        // Modified total calculation - only add walk-in and tagged/validated
+        // since informal settlers are already included in tagged/validated
+        $this->totalRelocationLotApplicants = $this->walkInApplicants + $this->taggedAndValidated;
     }
 
     public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
