@@ -18,6 +18,7 @@ use App\Models\Tribe;
 use App\Models\WallType;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class TaggedAndValidatedApplicantDetails extends Component
@@ -74,6 +75,14 @@ class TaggedAndValidatedApplicantDetails extends Component
         ])->findOrFail($applicantId);
 
         $this->taggedDocuments = $this->taggedAndValidatedApplicant->taggedDocuments;
+
+        // Add this debug
+        if($this->taggedDocuments->count() > 0) {
+            \Log::info('First document path:', [
+                'file_path' => $this->taggedDocuments->first()->file_path,
+                'url' => Storage::disk('tagging-house-structure-images')->url($this->taggedDocuments->first()->file_path)
+            ]);
+        }
 
         $this->loadFormData();
     }
