@@ -53,7 +53,7 @@ class ApplicantDetails extends Component
         $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes, $structure_status_id, $structureStatuses,
         $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $room_rent_fee, $room_landlord,
         $house_rent_fee, $house_landlord, $lot_rent_fee, $lot_landlord, $house_owner, $relationship_to_house_owner,
-        $tagger_name, $years_of_residency, $remarks;
+        $tagger_name, $years_of_residency, $voters_id_number, $remarks;
 
     // Live-in partner's details
     public $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
@@ -207,19 +207,38 @@ class ApplicantDetails extends Component
     {
         $this->dispatch('openQuestionModal');
     }
-    public function handleRelocationResponse($response): void
+
+    public function setRelocation($value): void
     {
-        $this->shouldAssignRelocation = $response;
-        if ($response) {
-            // If Yes was clicked, show the relocation modal
-//            $this->showRelocationModal = true;
+        $this->shouldAssignRelocation = $value;
+    }
+    public function prepareForSubmission($relocate): void
+    {
+        $this->shouldAssignRelocation = $relocate;
+        if ($relocate) {
             $this->showRelocationModal = true;
-            $this->shouldAssignRelocation = true;
         } else {
-            // If No was clicked, proceed with storage
-//            $this->store();
             $this->showConfirmationModal = true;
         }
+    }
+    public function setRelocationAndShowConfirm($relocate): void
+    {
+        $this->shouldAssignRelocation = $relocate;
+        $this->showConfirmationModal = true;
+    }
+    public function showConfirmationModalAfterNo(): void
+    {
+        $this->shouldAssignRelocation = false;
+        $this->showConfirmationModal = true;
+    }
+    public function setRelocationOnly($value): void
+    {
+        $this->shouldAssignRelocation = $value;
+    }
+
+    public function finalSubmit(): void
+    {
+        $this->store();
     }
     protected function rules(): array
     {
@@ -305,6 +324,7 @@ class ApplicantDetails extends Component
                 'required',
                 'integer',
             ],
+            'voters_id_number' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
             'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
 
@@ -495,6 +515,7 @@ class ApplicantDetails extends Component
             'structure_status_id' => $this->structure_status_id,
             'relocation_lot_id' => $this->relocation_lot_id,
             'years_of_residency' => $this->years_of_residency,
+            'voters_id_number' => $this->voters_id_number,
             'remarks' => $this->remarks,
             'dependents' => $this->dependents,
             // Live-in partner details
@@ -565,6 +586,7 @@ class ApplicantDetails extends Component
                     'structure_status_id' => $this->structure_status_id,
                     'relocation_lot_id' => $this->relocation_lot_id,
                     'years_of_residency' => $this->years_of_residency ?: 'N/A',
+                    'voters_id_number' => $this->voters_id_number ?: 'N/A',
                     'remarks' => $this->remarks ?: 'N/A',
                     // These two are auto-generated
                     'is_tagged' => true,

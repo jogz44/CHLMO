@@ -12,7 +12,7 @@
             </div>
         @endsession
 
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" class="w-full max-w-md mx-auto px-4 sm:px-6">
             @csrf
             <div class="mb-5 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 mt-5 flex items-center pointer-events-none">
@@ -58,20 +58,7 @@
                          placeholder="Password"/>
             </div>
 
-{{--            <div class="block mt-4">--}}
-{{--                <label for="remember_me" class="flex items-center">--}}
-{{--                    <x-checkbox id="remember_me" name="remember" />--}}
-{{--                    <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>--}}
-{{--                </label>--}}
-{{--            </div>--}}
-
             <div class="flex items-center justify-end mt-4">
-{{--                @if (Route::has('password.request'))--}}
-{{--                    <a class="underline text-sm text-green-600 hover:text-green-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">--}}
-{{--                        {{ __('Forgot your password?') }}--}}
-{{--                    </a>--}}
-{{--                @endif--}}
-
                 <x-button class="ms-4">
                     {{ __('Log in') }}
                 </x-button>

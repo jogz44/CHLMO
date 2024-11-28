@@ -22,6 +22,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -65,6 +66,12 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $newFileImages = [];
 
     public $taggedAndValidatedApplicant;
+
+    // For viewing the submitted requirements:
+    public $showDocumentModal = false;
+    public $currentDocuments = [];
+    public $editingDocumentId = null; // Changed from editingDocument to editingDocumentId
+    public $newDocument = null;
 
     public function updatingSearch(): void
     {
@@ -215,7 +222,11 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $this->redirect('transaction-request');
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->handleError('Failed to complete award process', $e);
+            $this->dispatch('alert', [
+                'title' => 'Failed to complete award process',
+                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                'type' => 'danger'
+            ]);
         }
     }
     public function resetForm(): void
@@ -324,32 +335,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         }
     }
 
-    public function exportCertificate($applicantId)
-    {
-        try {
-            // Find the awardee directly
-            $awardee = Awardee::where('tagged_and_validated_applicant_id', $applicantId)
-                ->where('is_awarded', true)
-                ->firstOrFail();
-
-            $html = view('pdfs.awarding-certificate', [
-                'awardee' => $awardee,
-               'applicant' => $awardee->taggedAndValidatedApplicant->applicant
-            ])->render();
-
-            // Load the PDF with the generated HTML
-            $pdf = Pdf::loadHTML($html);
-            $pdf->setPaper('legal', 'portrait');
-
-            // Stream the PDF for download
-            return response()->streamDownload(function () use ($pdf) {
-                echo $pdf->stream();
-            }, 'Award_Certificate_' . $applicantId . '.pdf');
-        } catch (\Exception $e) {
-            $this->handleError('Failed to export certificate: ' . $e->getMessage());
-        }
-    }
-
     private function handleError(string $message, \Exception $e = null): void
     {
         if ($e) {
@@ -386,6 +371,87 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         return redirect()->route('tagged-and-validated-applicant-details', ['applicantId' => $applicantId]);
     }
 
+    // Update the viewSubmittedDocuments method to include the attachment name
+    public function viewSubmittedDocuments($applicantId): void
+    {
+        $this->taggedAndValidatedApplicantId = $applicantId;
+        $attachmentsList = AwardeeAttachmentsList::all()->pluck('attachment_name', 'id');
+
+        $this->currentDocuments = AwardeeDocumentsSubmission::where('tagged_applicant_id', $applicantId)
+            ->with('attachmentType')
+            ->get()
+            ->map(function ($doc) use ($attachmentsList) {
+                return [
+                    'id' => $doc->id,
+                    'attachment_name' => $attachmentsList[$doc->attachment_id] ?? 'Unknown Attachment',
+                    'file_name' => $doc->file_name,
+                    'file_path' => $doc->file_path,
+                    'attachment_id' => $doc->attachment_id,
+                    // Updated to use the correct path structure based on your filesystem config
+                    'file_url' => asset('awardee-photo-requirements/' . $doc->file_path)
+                ];
+            });
+        $this->showDocumentModal = true;
+    }
+
+    public function startEditingDocument($documentId): void
+    {
+        $this->editingDocumentId = $documentId;
+    }
+
+    public function updateDocument()
+    {
+        $this->validate([
+            'newDocument' => 'required|file|max:10240|mimes:jpeg,png,jpg,gif'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $document = AwardeeDocumentsSubmission::find($this->editingDocumentId); // Updated property name
+
+            // Store the new file
+            $file = $this->newDocument;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
+
+            // Delete old file if it exists
+            if ($document->file_path) {
+                Storage::disk('awardee-photo-requirements')->delete($document->file_path);
+            }
+
+            // Update document record
+            $document->update([
+                'file_path' => $filePath,
+                'file_name' => $fileName,
+                'file_type' => $file->extension(),
+                'file_size' => $file->getSize(),
+            ]);
+
+            DB::commit();
+
+            $this->editingDocumentId = null; // Updated property name
+            $this->newDocument = null;
+            $this->viewSubmittedDocuments($this->taggedAndValidatedApplicantId); // Refresh documents
+
+            $this->dispatch('alert', [
+                'title' => 'Document Updated',
+                'message' => 'Document has been successfully updated!',
+                'type' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->handleError('Failed to update document', $e);
+        }
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->editingDocumentId = null; // Updated property name
+        $this->newDocument = null;
+    }
+
+
     public function render()
     {
         $query = TaggedAndValidatedApplicant::with([
@@ -402,11 +468,13 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         if ($this->search) {
             $query->whereHas('applicant', function($q) {
                 $q->where('applicant_id', 'like', '%'.$this->search.'%')
-                    ->orWhere('first_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('last_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
-                    ->orWhere('contact_number', 'like', '%'.$this->search.'%')
+                    ->orWhereHas('person', function($personQuery) {
+                        $personQuery->where('first_name', 'like', '%'.$this->search.'%')
+                            ->orWhere('middle_name', 'like', '%'.$this->search.'%')
+                            ->orWhere('last_name', 'like', '%'.$this->search.'%')
+                            ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
+                            ->orWhere('contact_number', 'like', '%'.$this->search.'%');
+                    })
                     ->orWhereHas('address.purok', function ($subQuery) {
                         $subQuery->where('name', 'like', '%'.$this->search.'%');
                     })
@@ -455,7 +523,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         }
 
         // Paginate the filtered results
-//        $taggedAndValidatedApplicants = $query->paginate(10);
         $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
         return view('livewire.tagged_and_validated_applicants_for_awarding', [
@@ -467,7 +534,3 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         ]);
     }
 }
-
-// Optional: Create an observer to automatically update status when awardees change
-// see in the app/Observers
-// registered in the AppServiceProvider

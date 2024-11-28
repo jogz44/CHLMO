@@ -37,10 +37,6 @@ class Address extends Model
     {
         return $this->hasMany(Applicant::class, 'address_id'); // `address_id` should be in the `applicants` table
     }
-    // public function profiledTaggedApplicants(): HasMany
-    // {
-    //     return $this->hasMany(ProfiledTaggedApplicant::class, 'address_id'); 
-    // }
     public function shelterApplicants(): HasMany
     {
         return $this->hasMany(ShelterApplicant::class, 'address_id');
