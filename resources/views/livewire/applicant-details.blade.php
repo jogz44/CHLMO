@@ -173,7 +173,7 @@
 
                             <!-- Confirmation Modal -->
                             <template x-if="showConfirmationModal">
-                                <div class="fixed inset-0 z-[1000] bg-gray-600 bg-opacity-65 overflow-y-auto flex items-center justify-center"
+                                <div class="fixed inset-0 z-20 bg-gray-600 bg-opacity-65 overflow-y-auto flex items-center justify-center"
                                     @click.away="showConfirmationModal = false">
                                     <div class="relative bg-white rounded-lg max-w-md w-full p-6">
                                         <!-- Modal content -->

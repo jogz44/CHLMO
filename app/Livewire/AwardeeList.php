@@ -17,6 +17,7 @@ use App\Models\TransferDocumentsSubmissions;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -44,6 +45,13 @@ class AwardeeList extends Component
         $newFileImages = [];
     public $hasSubmittedDocuments = false;
     public $transferredAwardees = [];  // To track which awardees have been transferred
+
+    // For viewing the submitted requirements/images
+    public $showDocumentViewModal = false;
+    public $currentDocuments = [];
+    public $editingDocumentId = null;
+    public $newDocument = null;
+    public $selectedDependentDetails = null;
 
     public function openTransferModal($awardeeId): void
     {
@@ -267,6 +275,149 @@ class AwardeeList extends Component
     public function openConfirmModal(): void
     {
         $this->showConfirmationModal = true;
+    }
+
+    // Method to view submitted documents
+    public function viewSubmittedDocuments($awardeeId): void
+    {
+        $this->selectedAwardeeIdForTransfer = $awardeeId;
+        $attachmentList = TransferAttachmentsList::all()->pluck('attachment_name', 'id');
+
+        // Get the awardee with the selected dependent
+        $awardee = Awardee::with([
+            'taggedAndValidatedApplicant.applicant.person',
+            'taggedAndValidatedApplicant.spouse',
+            'taggedAndValidatedApplicant.dependents.dependentRelationship'
+        ])->find($awardeeId);
+
+        if ($awardee) {
+            // Get the selected dependent based on your previous selection
+            if ($this->selectedDependentId) {
+                if ($this->isSpouseTransfer) {
+                    $spouse = $awardee->taggedAndValidatedApplicant->spouse;
+                    $this->selectedDependentDetails = [
+                        'name' => "{$spouse->spouse_last_name}, {$spouse->spouse_first_name} {$spouse->spouse_middle_name}",
+                        'relationship' => 'Spouse'
+                    ];
+                } else {
+                    $dependent = $awardee->taggedAndValidatedApplicant->dependents
+                        ->where('id', $this->selectedDependentId)
+                        ->first();
+
+                    if ($dependent) {
+                        $this->selectedDependentDetails = [
+                            'name' => "{$dependent->dependent_last_name}, {$dependent->dependent_first_name} {$dependent->dependent_middle_name}",
+                            'relationship' => $dependent->dependentRelationship->relationship
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Get all documents, even if they don't exist yet
+        $this->currentDocuments = collect($attachmentList)->map(function ($name, $id) {
+            $document = TransferDocumentsSubmissions::where([
+                'awardee_id' => $this->selectedAwardeeIdForTransfer,
+                'attachment_id' => $id
+            ])->first();
+
+            return[
+                'id' => $document ? $document->id : null,
+                'attachment_id' => $id,
+                'attachment_name' => $name,
+                'file_name' => $document ? $document->file_name : null,
+                'file_path' => $document ? $document->file_path : null,
+                'file_url' => $document ? asset('transfer-photo-requirements/' . $document->file_path) : null,
+                'exists' => (bool) $document
+            ];
+        })->values();
+
+        $this->showDocumentViewModal = true;
+    }
+
+    public function startEditingDocument($documentId, $attachmentId): void
+    {
+        $this->editingDocumentId = $documentId;
+        $this->attachment_id = $attachmentId;
+        $this->newDocument = null; // Reset any previous file selection
+    }
+
+    public function updateDocument(): void
+    {
+        $this->validate([
+            'newDocument' => 'required|file|max:10240|mimes:jpeg,png,jpg,gif'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $file = $this->newDocument;
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('documents', $fileName, 'transfer-photo-requirements');
+
+            // For new uploads where there's no existing document
+            if (!$this->editingDocumentId) {
+                // Create new document
+                TransferDocumentsSubmissions::create([
+                    'awardee_id' => $this->selectedAwardeeIdForTransfer,
+                    'attachment_id' => $this->attachment_id,
+                    'file_path' => $filePath,
+                    'file_name' => $fileName,
+                    'file_type' => $file->extension(),
+                    'file_size' => $file->getSize(),
+                ]);
+            } else {
+                // Update existing document
+                $document = TransferDocumentsSubmissions::find($this->editingDocumentId);
+
+                // Delete old file if it exists
+                if ($document && $document->file_path) {
+                    Storage::disk('transfer-photo-requirements')->delete($document->file_path);
+                }
+
+                $document->update([
+                    'file_path' => $filePath,
+                    'file_name' => $fileName,
+                    'file_type' => $file->extension(),
+                    'file_size' => $file->getSize(),
+                ]);
+            }
+
+            DB::commit();
+
+            // Reset states
+            $this->editingDocumentId = null;
+            $this->newDocument = null;
+            $this->attachment_id = null;
+
+            // Refresh the documents list
+            $this->viewSubmittedDocuments($this->selectedAwardeeIdForTransfer);
+
+            $this->dispatch('alert', [
+                'title' => 'Success',
+                'message' => 'Document has been successfully ' . ($this->editingDocumentId ? 'updated' : 'uploaded') . '!',
+                'type' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Document upload failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $this->dispatch('alert', [
+                'title' => 'Error',
+                'message' => 'Failed to upload document: ' . $e->getMessage(),
+                'type' => 'error'
+            ]);
+        }
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->editingDocumentId = null;
+        $this->newDocument = null;
+        $this->attachment_id = null;
     }
 
     public function confirmTransfer($id): void

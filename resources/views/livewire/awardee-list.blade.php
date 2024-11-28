@@ -2,7 +2,7 @@
     <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
         <div class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
-            <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
+            <div class="flex-1 h-screen p-6 overflow-auto">
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                     <div class="flex items-center">
                         <h2 class="text-[13px] ml-5 text-gray-700">AWARDEE LIST</h2>
@@ -190,7 +190,8 @@
                                                 @endif
                                             @elseif($awardee->documents_submitted)
                                                 <!-- Documents Submitted Button and Transfer -->
-                                                <button class="px-4 py-2 bg-green-600 text-white rounded-full cursor-default">
+                                                <button wire:click="viewSubmittedDocuments({{ $awardee->id }})"
+                                                        class="px-4 py-2 bg-green-600 text-white rounded-full cursor-default cursor-pointer">
                                                     Submitted
                                                 </button>
                                                 <button wire:click="openConfirmModal({{ $awardee->id }})"
@@ -227,7 +228,7 @@
 
                     <!-- First Modal - Dependent Selection -->
                     <div x-show="$wire.showTransferModal"
-                         class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center overflow-y-auto"
+                         class="fixed inset-0 z-30 bg-gray-500 bg-opacity-75 flex items-center justify-center overflow-y-auto"
                          x-cloak>
                         <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 my-8">
                             <h2 class="text-xl font-bold mb-4">Transfer Award</h2>
@@ -552,7 +553,120 @@
                         </div>
                     </div>
 
-                    <!-- Third Modal - Confirmation -->
+                    <!-- Third Modal - Document View Modal -->
+                    <div x-show="$wire.showDocumentViewModal"
+                         class="fixed inset-0 z-50 overflow-y-auto"
+                         aria-labelledby="modal-title"
+                         role="dialog"
+                         aria-modal="true">
+                        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                                Submitted Documents
+                                            </h3>
+
+                                            @if($selectedDependentDetails)
+                                                <div class="mt-2 p-4 bg-gray-50 rounded-lg">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <p class="text-sm text-gray-600">Selected for Transfer:</p>
+                                                            <p class="font-medium text-lg">{{ $selectedDependentDetails['name'] }}</p>
+                                                            <p class="text-sm text-gray-500">Relationship: {{ $selectedDependentDetails['relationship'] }}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                @foreach($currentDocuments as $document)
+                                                    <div class="border rounded-lg p-4 bg-gray-50">
+                                                        <div class="space-y-4">
+                                                            <!-- Document Header -->
+                                                            <div class="flex justify-between items-start">
+                                                                <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
+                                                                @if($editingDocumentId === $document['id'] || (!$document['exists'] && $attachment_id === $document['attachment_id']))
+                                                                    <!-- Show close/cancel button when editing -->
+                                                                    <button wire:click="cancelEdit"
+                                                                            class="text-gray-400 hover:text-gray-500">
+                                                                        <span class="sr-only">Close</span>
+                                                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                        </svg>
+                                                                    </button>
+                                                                @else
+                                                                    <!-- Show Edit/Upload button when not editing -->
+                                                                    <button wire:click="startEditingDocument({{ $document['exists'] ? '\''.$document['id'].'\'' : 'null' }}, {{ $document['attachment_id'] }})"
+                                                                            class="bg-custom-green text-white px-4 py-2 rounded-full text-sm">
+                                                                        {{ $document['exists'] ? 'Edit Photo' : 'Upload Photo' }}
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+
+                                                            @if($document['exists'])
+                                                                <!-- Current File Info -->
+                                                                <div class="text-sm text-gray-600">
+                                                                    Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>
+                                                                </div>
+
+                                                                <!-- Image Preview -->
+                                                                <div class="relative">
+                                                                    <img src="{{ $document['file_url'] }}"
+                                                                         alt="{{ $document['attachment_name'] }}"
+                                                                         class="rounded-lg shadow-sm max-h-48 object-cover">
+                                                                </div>
+                                                            @else
+                                                                <div class="text-sm text-gray-500 italic">No file uploaded yet</div>
+                                                            @endif
+
+                                                            <!-- Edit Form -->
+                                                            @if($editingDocumentId === $document['id'] || (!$document['exists'] && $attachment_id === $document['attachment_id']))
+                                                                <div class="space-y-4 mt-4">
+                                                                    <div>
+                                                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                                            Upload New Photo
+                                                                        </label>
+                                                                        <input type="file"
+                                                                               wire:model="newDocument"
+                                                                               class="mb-4"
+                                                                               accept="image/*">
+                                                                        @error('newDocument')
+                                                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
+
+                                                                    <div class="flex justify-end space-x-2">
+                                                                        <button wire:click="updateDocument"
+                                                                                class="bg-custom-green text-white px-4 py-2 rounded-full text-sm">
+                                                                            Save Changes
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <button type="button"
+                                            wire:click="$set('showDocumentViewModal', false)"
+                                            class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fourth Modal - Confirmation -->
                     <div x-show="$wire.showConfirmationModal"
                          class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center"
                          x-cloak>
