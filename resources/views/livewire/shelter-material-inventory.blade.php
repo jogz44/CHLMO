@@ -15,19 +15,19 @@
                         <div class="flex flex-wrap -mx-2 mb-1 items-center">
                             <!-- Purchase Order No. -->
                             <div class="w-full md:w-1/3 px-3">
-                                <label class=" whitespace-nowrap text-[12px] font-medium mb-2 text-black">
+                                <label class=" whitespace-nowrap text-[12px] font-medium mb-4 text-black">
                                     PURCHASE ORDER NO.
                                 </label>
-                                <input type="text" wire:model="purchaseOrderNo" class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]" required>
+                                <input type="text" wire:model="purchaseOrderNo" class="uppercase w-full px-3 mt-2 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]" required>
                                 @error('purchaseOrderNo') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
                             <!-- Purchase Requisition No. -->
-                            <div class="w-full md:w-1/3 px-3 whitespace-nowrap">
+                            <div class="w-full md:w-1/3 px-3">
                                 <label class=" whitespace-nowrap block text-[12px] font-medium mb-2 text-black">
                                     PURCHASE REQUISITION NO.
                                 </label>
-                                <input type="text" wire:model="purchaseRequisitionNo" class="uppercase w-full px-1 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]" required>
+                                <input type="text" wire:model="purchaseRequisitionNo" class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#828181] focus:border-[#828181] rounded-md text-gray-800 text-[12px]" required>
                                 @error('purchaseRequisitionNo') <span class="error">{{ $message }}</span> @enderror
                             </div>
 
