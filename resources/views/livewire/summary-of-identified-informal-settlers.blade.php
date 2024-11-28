@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <div x-show="openFilters" class="grid grid-cols-3 mb-1 mt-5">
+                <div x-show="openFilters" class="grid grid-cols-3 gap-2 mb-1 mt-5">
                     <!-- Barangay Filter -->
                     <select wire:model.live="filterBarangay"
                             class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
@@ -112,7 +112,7 @@
                     <select wire:model.live="filterPurok"
                             class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">All Puroks</option>
-                        @foreach ($puroks as $purok)
+                        @foreach ($availablePuroks as $purok)
                             <option value="{{ $purok }}">{{ $purok }}</option>
                         @endforeach
                     </select>
