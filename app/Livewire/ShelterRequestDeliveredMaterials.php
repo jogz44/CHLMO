@@ -2,8 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Exports\ShelterRequestDeliveredMaterialsDataExport;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class ShelterRequestDeliveredMaterials extends Component
 {
@@ -42,11 +45,49 @@ class ShelterRequestDeliveredMaterials extends Component
         $this->governmentProgram = ''; // Reset the filter
     }
 
+    public function export()
+    {
+        try {
+            // Collect the active filters
+            $filters = [
+                'startDate' => $this->filters['startDate'] ?? null,
+                'endDate' => $this->filters['endDate'] ?? null,
+                'government_program_id' => $this->governmentProgram,
+            ];
+
+            // Pass the filters to the export class
+            return Excel::download(
+                new ShelterRequestDeliveredMaterialsDataExport($filters),
+                'shelter-request-delivered-materials-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed: ',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger',
+            ]);
+            return null;
+        }
+    }
+
+
+
+    public function getTotals($statistics)
+    {
+        return [
+            'total_requests' => $statistics->sum('total_requests'),
+            'tagged_requests' => $statistics->sum('tagged_requests'),
+            'delivered_requests' => $statistics->sum('delivered_requests'),
+        ];
+    }
+
     public function render()
     {
         $statistics = $this->getStatistics();
 
-        // Fetch all government programs for the filter dropdown
+        $totals = $this->getTotals($statistics); // Calculate totals
+
         $GovernmentPrograms = DB::table('government_programs')
             ->select('id', 'program_name')
             ->orderBy('program_name', 'asc')
@@ -54,7 +95,8 @@ class ShelterRequestDeliveredMaterials extends Component
 
         return view('livewire.shelter-request-delivered-materials', [
             'statistics' => $statistics,
-            'GovernmentPrograms' => $GovernmentPrograms
+            'GovernmentPrograms' => $GovernmentPrograms,
+            'totals' => $totals, // Pass totals to the Blade view
         ]);
     }
 }
