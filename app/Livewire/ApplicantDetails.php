@@ -212,6 +212,17 @@ class ApplicantDetails extends Component
     {
         $this->shouldAssignRelocation = $value;
     }
+
+    // Add this method to validate the relocation site selection
+    public function validateRelocation(): true
+    {
+        $this->validate([
+            'relocation_lot_id' => 'required|exists:relocation_sites,id'
+        ]);
+
+        return true;
+    }
+
     public function prepareForSubmission($relocate): void
     {
         $this->shouldAssignRelocation = $relocate;
@@ -410,7 +421,7 @@ class ApplicantDetails extends Component
             'dependents.*.dependent_relationship_id' => 'required|exists:dependents_relationships,id',
         ];
     }
-    public function updatedHouseStructureImages()
+    public function updatedHouseStructureImages(): void
     {
         if (!is_array($this->houseStructureImages)) {
             $this->houseStructureImages = [$this->houseStructureImages];
@@ -478,9 +489,8 @@ class ApplicantDetails extends Component
     public function confirmRelocation(): void
     {
         // Validate relocation data before proceeding
-        $this->validate([
-            'relocation_lot_id' => 'required|exists:relocation_sites,id',
-        ]);
+        $this->validateRelocation();
+
         // If validation passes,
         $this->showConfirmationModal = true;
     }
@@ -655,36 +665,14 @@ class ApplicantDetails extends Component
 
                 if (!empty($this->houseStructureImages)) {
                     foreach ($this->houseStructureImages as $image) {
-                        if ($image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
-                            try {
-                                $fileName = time() . '_' . $image->getClientOriginalName();
-
-                                // Store file using custom disk
-                                $filePath = $image->storeAs(
-                                    '',
-                                    $fileName,
-                                    'tagging-house-structure-images'
-                                );
-
-                                \Log::info('Stored image:', [
-                                    'name' => $fileName,
-                                    'path' => $filePath
-                                ]);
-
-                                TaggedDocumentsSubmission::create([
-                                    'tagged_applicant_id' => $taggedApplicant->id,
-                                    'file_path' => $filePath,
-                                    'file_name' => $fileName,
-                                    'file_type' => $image->getClientOriginalExtension(),
-                                    'file_size' => $image->getSize(),
-                                ]);
-                            } catch (\Exception $e) {
-                                \Log::error('Failed to store image:', [
-                                    'error' => $e->getMessage(),
-                                    'file' => $fileName ?? 'unknown'
-                                ]);
-                                throw $e;
-                            }
+                        try {
+                            $this->storeAttachment($image, $taggedApplicant->id);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to store image:', [
+                                'error' => $e->getMessage(),
+                                'file' => $image->getClientOriginalName() ?? 'unknown'
+                            ]);
+                            throw $e;
                         }
                     }
                 }
@@ -733,31 +721,19 @@ class ApplicantDetails extends Component
     /**
      * Store individual attachment
      */
-    private function storeAttachment($fileInput): void
+    private function storeAttachment($image, $taggedApplicantId): void
     {
-        $this->isFilePonduploading = false;
-
-        // Validate and store files
-        $this->validate([
-            'houseStructureImages.*' => 'required|image|max:2048',
-        ]);
-
-        // Ensure files are an array and filter out any non-file entries
-        $files = array_filter($this->houseStructureImages, function($file) {
-            return $file instanceof \Illuminate\Http\UploadedFile;
-        });
-
-        // Store each document
-        foreach ($files as $file) {
-            $fileName = $file->getClientOriginalName();
-            $filePath = $file->storeAs('documents', $fileName, 'tagging-house-structure-images');
+        if ($image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            // Changed from 'public/tagging-house-structure-images' to just 'tagging-house-structure-images'
+            $filePath = $image->storeAs('documents', $fileName, 'tagging-house-structure-images');
 
             TaggedDocumentsSubmission::create([
-                'tagged_applicant_id' => $this->taggedAndValidatedApplicantId,
+                'tagged_applicant_id' => $taggedApplicantId,
                 'file_path' => $filePath,
                 'file_name' => $fileName,
-                'file_type' => $file->extension(),
-                'file_size' => $file->getSize(),
+                'file_type' => $image->getClientOriginalExtension(),
+                'file_size' => $image->getSize(),
             ]);
         }
     }
