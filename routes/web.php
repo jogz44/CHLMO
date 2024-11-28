@@ -136,7 +136,6 @@ Route::middleware([
     Route::get('/applicants', function () {
         return view('applicants');
     })->name('applicants');
-    //    Route::get('/transaction-walkin', TransactionWalkin::class)->name('transaction-walkin');
 
     Route::get('/system-configuration', function () {
         return view('system-configuration');
@@ -146,17 +145,10 @@ Route::middleware([
     Route::get('/shelter-dashboard', function () {
         return view('shelter-dashboard');
     })->name('shelter-dashboard');
-    //    Route::middleware(['role.shelterAdmin'])->get('/shelter-dashboard', function () {
-    //        return view('shelter-dashboard');
-    //    })->name('shelter-dashboard');
 
     Route::get('/shelter-transaction-applicants', function () {
         return view('shelter-transaction-applicants');
     })->name('shelter-transaction-applicants');
-
-    //Route::get('/shelter-tag-applicant', function () {
-    //    return view('shelter-tag-applicant');
-    //})->name('shelter-tag-applicant');
 
     Route::get('/shelter-applicant-details/{profileNo}', ShelterApplicantDetails::class)
         ->name('shelter-applicant-details');
@@ -165,10 +157,6 @@ Route::middleware([
         return view('shelter-profiled-tagged-applicants');
     })->name('shelter-profiled-tagged-applicants');
 
-    // Route::get('/shelter-applicant-details', function () {
-    //     return view('shelter-applicant-details');
-    // })->name('shelter-applicant-details');
-
     Route::get('/shelter-material-inventory', function () {
         return view('shelter-material-inventory');
     })->name('shelter-material-inventory');
@@ -176,10 +164,6 @@ Route::middleware([
     Route::get('/shelter-materials-list', function () {
         return view('shelter-materials-list');
     })->name('shelter-materials-list');
-
-    // Route::get('/shelter-grantees-details', function () {
-    //     return view('shelter-grantees-details');
-    // })->name('shelter-grantees-details');
 
     Route::get('/grantee-details/{profileNo}', GranteeDetails::class)->name('grantee-details');
     Route::get('/profiled-tagged-applicant-details/{profileNo}', ProfiledTaggedApplicantDetails::class)->name('profiled-tagged-applicant-details');
@@ -200,12 +184,6 @@ Route::middleware([
         return view('shelter-reports-availability-materials');
     })->name('shelter-reports-availability-materials');
 
-
-
-    // Route::get('/shelter-report-availability-materials', ShelterReportAvailabilityMaterials::class)
-    //     ->name('shelter-report-availability-materials');
-
-
     Route::get('/shelter-reports-distribution-list', function () {
         return view('shelter-reports-distribution-list');
     })->name('shelter-reports-distribution-list');
@@ -225,29 +203,29 @@ Route::middleware([
 });
 
 
-// Housing Admin routes
-Route::middleware([
-    'auth:web', // Session-based authentication via web guard
-    'role:Housing System Admin', // Spatie permission middleware to check if the user has the 'Housing System' role
-    'verified', // Ensures the user has verified their email
-])->name('admin.')->prefix('admin')->group(function () {
-
-});
-
-// Shelter Admin routes
-Route::middleware([
-    'auth:web', // Session-based authentication via web guard
-    'role:ShelterAdmin', // Spatie permission middleware to check if the user has the 'ShelterAdmin' role
-    'verified', // Ensures the user has verified their email
-])->name('shelter-admin.')->prefix('shelter-admin')->group(function () {
-    Route::get('/', [ShelterIndexController::class, 'index'])->name('index');
-});
-
-// Shelter Admin routes
-Route::middleware([
-    'auth:web', 
-    'role:HousingStaff', // Correct Spatie role middleware syntax
-    'verified'
-])->name('housing-staff.')->prefix('housing-staff')->group(function () {
-    Route::get('/', [HousingStaffIndexController::class, 'index'])->name('index');
-});
+//// Housing Admin routes
+//Route::middleware([
+//    'auth:web', // Session-based authentication via web guard
+//    'role:Housing System Admin', // Spatie permission middleware to check if the user has the 'Housing System' role
+//    'verified', // Ensures the user has verified their email
+//])->name('admin.')->prefix('admin')->group(function () {
+//
+//});
+//
+//// Shelter Admin routes
+//Route::middleware([
+//    'auth:web', // Session-based authentication via web guard
+//    'role:ShelterAdmin', // Spatie permission middleware to check if the user has the 'ShelterAdmin' role
+//    'verified', // Ensures the user has verified their email
+//])->name('shelter-admin.')->prefix('shelter-admin')->group(function () {
+//    Route::get('/', [ShelterIndexController::class, 'index'])->name('index');
+//});
+//
+//// Shelter Admin routes
+//Route::middleware([
+//    'auth:web',
+//    'role:HousingStaff', // Correct Spatie role middleware syntax
+//    'verified'
+//])->name('housing-staff.')->prefix('housing-staff')->group(function () {
+//    Route::get('/', [HousingStaffIndexController::class, 'index'])->name('index');
+//});
