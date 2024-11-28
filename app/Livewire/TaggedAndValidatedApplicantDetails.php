@@ -35,7 +35,8 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $full_address, $civil_status_id, $civilStatuses, $religion, $tribe;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
-        $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $family_income, $tagging_date, $rent_fee, $landlord,
+        $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $years_of_residency, $voters_id_number,
+        $tagging_date, $rent_fee, $landlord,
         $house_owner, $tagger_name, $remarks;
 
     // Live-in partner's details
@@ -122,6 +123,8 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->tribe = $this->taggedAndValidatedApplicant->tribe ?? null;
         $this->religion = $this->taggedAndValidatedApplicant->religion ?? null;
         $this->monthly_income = $this->taggedAndValidatedApplicant->monthly_income ?? null;
+        $this->years_of_residency = $this->taggedAndValidatedApplicant->years_of_residency ?? null;
+        $this->voters_id_number = $this->taggedAndValidatedApplicant->voters_id_number ?? null;
         // Load initial puroks if barangay is selected
         if ($this->barangay_id) {
             $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
