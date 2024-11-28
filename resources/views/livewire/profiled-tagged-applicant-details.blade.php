@@ -14,13 +14,13 @@
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <!-- <div x-data="{ saved: false }" class="flex space-x-2 z-0"> -->
-                    <!-- <button
+                <!-- <button
                         :disabled="!isEditable || saved"
                         class="bg-gradient-to-r from-custom-yellow to-iroad-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-yellow text-white text-xs font-medium px-6 py-2 rounded"
                         @click="saved = true; message = 'Data has been saved successfully!'; isEditable = false">
                         SAVE
                     </button> -->
-                    <!-- <button
+                <!-- <button
                         @click="isEditable = !isEditable"
                         type="button"
                         class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
@@ -523,50 +523,49 @@
                 <div class="p-3 rounded">
                     <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">UPLOADED DOCUMENTS DURING TAGGING</h2>
                 </div>
+                
                 <!-- Display images -->
                 <div class="bg-white p-6 rounded shadow mb-6">
-                    <div>
-                        <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">BEFORE</h2>
-                        <!-- Image Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                            @forelse($photo as $image)
-                            <div class="relative group cursor-pointer" wire:click="viewImage({{ $image->id }})">
-                                <img
-                                    src="{{ asset('storage/' . $image->image_path) }}"
-                                    alt="{{ $image->display_name }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                    {{ $image->display_name }}
-                                </div>
-                            </div>
-                            @empty
-                            <div class="col-span-full text-center py-4 text-gray-500">
-                                No images available
-                            </div>
-                            @endforelse
-                        </div>
-
-                        <!-- Modal -->
-                        @if($selectedImage)
-                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
-                                <div class="flex justify-end mb-2">
-                                    <button wire:click="closeImage" class="text-gray-500 hover:text-gray-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <img src="{{ asset('storage/' . $selectedImage->image_path) }}"
-                                    alt="{{ $selectedImage->display_name }}"
-                                    class="max-w-full h-auto">
-                                <div class="mt-2 text-center text-gray-700">
-                                    {{ $selectedImage->display_name }}
-                                </div>
+                    <!-- Document Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                        @forelse($taggedDocuments as $document)
+                        <div class="relative group cursor-pointer" wire:click="viewDocument({{ $document->id }})">
+                            <img
+                                src="{{ asset('tagging-house-structure-images/' . $document->file_path) }}"
+                                alt="{{ $document->file_name }}"
+                                class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                            <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                {{ $document->file_name }}
                             </div>
                         </div>
-                        @endif
+                        @empty
+                        <div class="col-span-full text-center py-4 text-gray-500">
+                            No documents available
+                        </div>
+                        @endforelse
                     </div>
+
+                    <!-- Document Viewer Modal -->
+                    @if($selectedDocument)
+                    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                            <div class="flex justify-end mb-2">
+                                <button wire:click="closeDocument" class="text-gray-500 hover:text-gray-700">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <img
+                                src="{{ asset('tagging-house-structure-images/' . $selectedDocument->file_path) }}"
+                                alt="{{ $selectedDocument->file_name }}"
+                                class="max-w-full h-auto">
+                            <div class="mt-2 text-center text-gray-700">
+                                {{ $selectedDocument->file_name }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </form>
         </div>

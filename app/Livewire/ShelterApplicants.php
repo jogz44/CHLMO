@@ -39,7 +39,7 @@ class ShelterApplicants extends Component
     public $selectedOriginOfRequest = null, $profileNo, $date_request, $first_name, $middle_name, $last_name, $person_id,
         $suffix_name, $request_origin_id, $editingProfileNo = null, $origin_name, $selectedTaggingStatus, $taggingStatuses;
 
-    public $barangay_id, $barangays = [], $purok_id, $puroks = [], $selectedPurok_id, $selectedBarangay_id, $puroksFilter = [];
+    public $barangay_id, $barangays = [], $purok_id, $puroks = [], $selectedPurok_id, $selectedBarangay_id, $puroksFilter = [], $barangaysFilter = [];
 
     // FOR CHECKING DUPLICATE APPLICANTS
     public $showShelterDuplicateWarning = false, $shelterDuplicateData = null, $proceedWithDuplicate = false;
@@ -84,7 +84,6 @@ class ShelterApplicants extends Component
         $this->request_origin_id = $applicant->request_origin_id;
         $this->barangay_id = $applicant->address->barangay_id ?? null;
         $this->purok_id = $applicant->address->purok_id ?? null;
-        $this->origin_name = $applicant->originOfRequest->name ?? 'Unknown';
 
         $this->isEditModalOpen = true; // Open the modal
     }
@@ -137,7 +136,7 @@ class ShelterApplicants extends Component
             'purok_id' => 'required|exists:puroks,id',
             'request_origin_id' => 'required|exists:origin_of_requests,id',
         ]);
-
+        
         if (!$this->proceedWithDuplicate) {
             $people = new People();
             $result = $people->checkExistingApplications(
@@ -163,7 +162,7 @@ class ShelterApplicants extends Component
     }
     private function storeShelterApplicant(): void
     {
-        try {
+        try {   
             logger()->info('Starting shelter applicant storage process', [
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name
@@ -190,35 +189,42 @@ class ShelterApplicants extends Component
         }
     }
     private function updateExistingApplicant(): void
-    {
-        $applicant = ShelterApplicant::findOrFail($this->editingProfileNo);
+{
+    $applicant = ShelterApplicant::findOrFail($this->editingProfileNo);
 
-        $applicant->update([
-            'date_request' => $this->date_request,
-            'suffix_name' => $this->suffix_name,
-            'request_origin_id' => $this->request_origin_id,
+    // Update the ShelterApplicant
+    $applicant->update([
+        'date_request' => $this->date_request,
+        'suffix_name' => $this->suffix_name,
+        'request_origin_id' => $this->request_origin_id,
+    ]);
+
+    // Update the Address
+    if ($applicant->address) {
+        $applicant->address->update([
             'barangay_id' => $this->barangay_id,
             'purok_id' => $this->purok_id,
         ]);
-
-        // Update related 'person' record
-        $applicant->person()->update([
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name,
-            'last_name' => $this->last_name,
-        ]);
-
-                // Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Updated a Shelter Applicant', $user);
-
-        $this->dispatch('alert', [
-            'title' => 'Applicant Updated!',
-            'message' => 'Applicant details updated successfully!',
-            'type' => 'success',
-        ]);
     }
+
+    // Update related 'person' record
+    $applicant->person()->update([
+        'first_name' => $this->first_name,
+        'middle_name' => $this->middle_name,
+        'last_name' => $this->last_name,
+    ]);
+
+    $logger = new ActivityLogs();
+    $user = Auth::user();
+    $logger->logActivity('Updated a Shelter Applicant', $user);
+
+    $this->dispatch('alert', [
+        'title' => 'Applicant Updated!',
+        'message' => 'Applicant details updated successfully!',
+        'type' => 'success',
+    ]);
+}
+
 
 
     private function createNewApplicant(): void
@@ -292,6 +298,9 @@ class ShelterApplicants extends Component
         // Initialize dropdowns
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
+        $this->barangaysFilter = Cache::remember('barangays', 60*60, function() {
+            return Barangay::all();
+        });
     }
     public function updatedBarangayId($barangayId): void
     {
@@ -335,6 +344,8 @@ class ShelterApplicants extends Component
         $this->search = '';
         $this->selectedOriginOfRequest = null;
         $this->selectedTaggingStatus = null;
+        $this->selectedPurok_id = null;
+        $this->selectedBarangay_id = null;
         $this->resetPage();
     }
 
@@ -359,8 +370,10 @@ class ShelterApplicants extends Component
             $filters = array_filter([
                 'start_date' => $this->startDate,
                 'end_date' => $this->endDate,
+                'barangay_id' => $this->selectedBarangay_id,
+                'purok_id' => $this->selectedPurok_id,
                 'request_origin_id' => $this->selectedOriginOfRequest,
-                'tagging_status' => $this->selectedTaggingStatus,
+                'is_tagged' => $this->selectedTaggingStatus,
             ]);
 
             return Excel::download(
@@ -384,6 +397,8 @@ class ShelterApplicants extends Component
         // Fetch Applicants based on filters
         $query = ShelterApplicant::with([
             'person',
+            'address.barangay',
+            'address.purok',
             'originOfRequest',
         ]);
 
@@ -391,15 +406,50 @@ class ShelterApplicants extends Component
         $filters = array_filter([
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
+            'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
+            'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
             'request_origin_id' => $this->selectedOriginOfRequest,
-            'tagging_status' => $this->selectedTaggingStatus
+            'is_tagged' => $this->selectedTaggingStatus
         ]);
 
         // Fetch Applicants based on filters
         $query = ShelterApplicant::with([
             'person',
             'originOfRequest',
+            'address.barangay',
+            'address.purok',
         ]);
+
+        
+        // Apply filters
+        if ($this->startDate && $this->endDate) {
+            $query->whereBetween('date_request', [
+                $this->startDate,
+                $this->endDate
+            ]);
+        }
+
+        if ($this->selectedBarangay_id) {    // Changed from barangay_id
+            $query->whereHas('address', function($q) {
+                $q->where('barangay_id', $this->selectedBarangay_id);
+            });
+        }
+
+        if ($this->selectedPurok_id) {       // Changed from purok_id
+            $query->whereHas('address', function($q) {
+                $q->where('purok_id', $this->selectedPurok_id);
+            });
+        }
+
+        if ($this->selectedOriginOfRequest) {  // Changed from request_origin_id
+            $query->where('request_origin_id', $this->selectedOriginOfRequest);
+        }
+
+        
+        if ($this->selectedTaggingStatus) {   // Added to match Excel export
+            $query->where('is_tagged', $this->selectedTaggingStatus);
+        }
+        
 
         $shelterApplicants = $query->get();
 
@@ -409,6 +459,18 @@ class ShelterApplicants extends Component
         if ($this->selectedOriginOfRequest) {
             $originOfRequest = OriginOfRequest::find($this->selectedOriginOfRequest);
             $subtitle[] = "ORIGIN OF REQUEST: {$originOfRequest->name}";
+        }
+
+        if ($this->selectedBarangay_id) {     // Changed from barangay_id
+            $barangay = Barangay::find($this->selectedBarangay_id);
+            $subtitle[] = "BARANGAY: {$barangay->name}";
+        }
+
+        if ($this->selectedPurok_id) {        // Changed from purok_id
+            $purok = Purok::find($this->selectedPurok_id);
+            $subtitle[] = "PUROK: {$purok->name}";
+        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
+            $subtitle[] = "PUROK: All Purok";
         }
 
         if ($this->startDate && $this->endDate) {

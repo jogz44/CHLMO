@@ -103,9 +103,6 @@
                                                 </g>
                                             </svg>
                                         </button>
-                                        {{--                                    <p class="absolute opacity-0 w-12/12 group-hover:opacity-50 transition-opacity duration-300 rounded-md bg-gray-700 text-[11px] text-white mt-1 p-1">--}}
-                                        {{--                                        Reset--}}
-                                        {{--                                    </p>--}}
                                     </div>
                                 @endhasanyrole
                             </div>
@@ -247,13 +244,6 @@
                             </div>
                         </div>
                     </div>
-{{--                    <script>--}}
-{{--                        window.addEventListener('confirm-housing-duplicate', event => {--}}
-{{--                            if (confirm(event.detail.message)) {--}}
-{{--                                @this.call('store'); // or submitForm for shelter--}}
-{{--                            }--}}
-{{--                        });--}}
-{{--                    </script>--}}
 
                     <!-- ADD APPLICANT MODAL -->
                     <div x-show="isModalOpen" x-cloak

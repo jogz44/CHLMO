@@ -16,7 +16,7 @@
                     @hasanyrole('Super Admin|Housing System Admin')
                     <div class="@role('Housing System Tagger') relative z-0 flex flex-col sm:flex-row gap-2 @else relative z-0 @endrole">
                         <button wire:click="export" wire:ignore wire:loading.attr="disabled"
-                                class="@role('Housing System Tagger') w-full sm:w-auto bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded text-sm @else bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded @endrole">
+                                class="@role('Housing System Tagger') w-full sm:w-auto bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded text-sm @else bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded @endrole">
                             <span wire:loading wire:target="export">Exporting Excel...</span>
                             <span wire:loading.remove>Export to Excel</span>
                         </button>
@@ -69,8 +69,8 @@
                         <select wire:model.live="filters.purok"
                                 class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                             <option value="">All Puroks</option>
-                            @foreach($puroks as $purok)
-                                <option value="{{ $purok->name }}">{{ $purok->name }}</option>
+                            @foreach ($availablePuroks as $purok)
+                                <option value="{{ $purok }}">{{ $purok }}</option>
                             @endforeach
                         </select>
                         <select wire:model.live="filters.civil_status"

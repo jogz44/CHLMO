@@ -8,7 +8,7 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative z-0">
-                    <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button>
+                    <!-- <button class="bg-custom-green text-white px-4 py-2 rounded">Export</button> -->
                 </div>
             </div>
 
@@ -471,7 +471,7 @@
                                             <div class="mb-1">
                                                 <p class="uppercase font-bold text-gray-900 text-sm">
                                                     {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Consent Letter (if the land is not theirs)' }}
-                                                    <span class="text-red-500">*</span>
+                                                    
                                                 </p>
                                             </div>
 
@@ -501,7 +501,6 @@
                                             <div class="mb-1">
                                                 <p class="uppercase font-bold text-gray-900 text-sm">
                                                     {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Photocopy of ID from the Land Owner (if the land is not theirs) ' }}
-                                                    <span class="text-red-500">*</span>
                                                 </p>
                                             </div>
 

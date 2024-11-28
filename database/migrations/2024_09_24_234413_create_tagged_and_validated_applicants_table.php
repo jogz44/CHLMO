@@ -42,6 +42,7 @@ return new class extends Migration
             $table->string('relationship_to_house_owner', 255)->nullable();
             $table->string('tagger_name', 100)->nullable();
             $table->integer('years_of_residency');
+            $table->string('voters_id_number');
             $table->text('remarks')->nullable();
             $table->boolean('is_tagged')->default(false);
             $table->boolean('is_awarding_on_going')->default(false);

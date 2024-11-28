@@ -554,6 +554,7 @@
             </div>
         </div>
 
+        <!-- First Modal for Blacklist Details -->
         <div x-show="openModalBlacklist" x-cloak
              class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-40">
             <!-- Modal -->
@@ -569,7 +570,7 @@
                     </button>
                 </div>
 
-                <form wire:submit.prevent="store">
+                <form wire:submit.prevent="proceedToConfirmation">
                     <!-- Date blacklisted (default now()) -->
                     <div class="mb-4">
                         <label class="block text-[12px] font-semibold mb-2 text-gray-700" for="date_blacklisted">
@@ -627,7 +628,7 @@
                                 <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
                             </div>
                             <!-- Blacklist Button -->
-                            <button type="submit" wire:click.prevent="store"
+                            <button type="submit"
                                     class="px-4 py-2 bg-red-600 text-[12px] text-white rounded-lg hover:bg-red-700">
                                 BLACKLIST
                                 <div wire:loading>
@@ -655,48 +656,48 @@
             </div>
         </div>
 
-        <div>
-            @if($showBlacklistConfirmationModal)
-                <div class="modal">
-                    <div class="modal-content">
-                        <h2 class="text-red-600 font-bold mb-4">Confirm Blacklisting</h2>
+        <!-- Second Modal for Password Confirmation -->
+        @if($showBlacklistConfirmationModal)
+            <div class="modal fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-40">
+                <div class="modal-content bg-white rounded-lg shadow-lg w-[400px] p-6 relative z-50">
+                    <h2 class="text-red-600 font-bold mb-4">Confirm Blacklisting</h2>
 
-                        <p class="text-red-500 mb-4 font-semibold">
-                            ⚠️ WARNING: This action CANNOT be undone.
-                            Please double-check your transaction before proceeding.
-                        </p>
+                    <p class="text-red-500 mb-4 font-semibold">
+                        ⚠️ WARNING: This action CANNOT be undone.
+                        Please double-check your transaction before proceeding.
+                    </p>
 
-                        @if($blacklistError)
-                            <p class="text-red-500 mb-2">{{ $blacklistError }}</p>
-                        @endif
+                    @if($blacklistError)
+                        <p class="text-red-500 mb-2">{{ $blacklistError }}</p>
+                    @endif
 
-                        <div class="mb-4">
-                            <label for="confirmPassword" class="block mb-2">
-                                Enter your password to confirm:
-                            </label>
-                            <input
-                                    type="password"
-                                    wire:model="confirmationPassword"
-                                    class="w-full px-3 py-2 border rounded-md"
-                                    required>
-                        </div>
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="block mb-2">
+                            Enter your password to confirm:
+                        </label>
+                        <input
+                                type="password"
+                                wire:model="confirmationPassword"
+                                class="w-full px-3 py-2 border rounded-md"
+                                required>
+                    </div>
 
-                        <div class="flex justify-between">
-                            <button
-                                    wire:click="cancelBlacklisting"
-                                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg">
-                                Cancel
-                            </button>
-                            <button
-                                    wire:click="store"
-                                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-                                Confirm Blacklist
-                            </button>
-                        </div>
+                    <div class="flex justify-between">
+                        <button
+                                wire:click="cancelBlacklisting"
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg">
+                            Cancel
+                        </button>
+                        <button
+                                wire:click="store"
+                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                            Confirm Blacklist
+                        </button>
                     </div>
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
+
     </div>
 </div>
 <script>

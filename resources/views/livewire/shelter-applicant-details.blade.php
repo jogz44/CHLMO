@@ -2,7 +2,7 @@
     <div class="flex bg-gray-100 text-[12px]">
         <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
             <form wire:submit.prevent="store">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%]">
+                <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-10 p-3 fixed top-[80px] left-[20%] right-[3%]">
                     <div class="flex items-center">
                         <a href="{{ route('shelter-transaction-applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -14,10 +14,10 @@
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <div class="flex space-x-2 z-10">
+                    <div class="flex space-x-2  z-[60]">
                         <div x-data="{ showModal: false }"
                             x-on:keydown.escape.window="showModal = false">
-                            <div class="z-50">
+                            <div >
                                 <div class="alert mt-14"
                                     :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
                                     x-data="{ open:false, alert:{} }"
@@ -61,8 +61,8 @@
                                 x-transition:leave="transition ease-in duration-200"
                                 x-transition:leave-start="opacity-100"
                                 x-transition:leave-end="opacity-0"
-                                class="fixed inset-0 z-50 overflow-y-auto"
-                                style="display: none;">
+                                class="fixed inset-0 flex z-50 overflow-y-auto items-center justify-center"
+                                style="display: none;" x-cloak>
 
                                 <!-- Background overlay -->
                                 <div class="fixed inset-0 bg-black opacity-50"></div>
@@ -454,84 +454,45 @@
                 </div>
 
                 <!-- File Uploads -->
-                <div x-data="multipleImageUpload()" class="bg-white p-6 rounded shadow mb-6">
-                    <div class="flex flex-col space-y-4">
+                <div class="bg-white p-6 rounded shadow mb-6 z-0">
+                    <div class="mb-4">
                         <!-- Upload Area -->
-                        <div class="border-2 border-dashed border-green-500 rounded-lg p-4 flex flex-col items-center space-y-2">
-                            <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                            </svg>
-                            <p class="text-sm text-gray-600">Upload images of the housing structure</p>
-                            <button type="button" class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                @click="$refs.fileInput.click()">
-                                BROWSE FILES
-                            </button>
-
-                            <!-- Hidden File Input -->
-                            <input wire:model="photos" type="file" accept="image/*" id="photos" x-ref="fileInput" multiple
-                                @change="handleFilesSelect" class="hidden z-5" />
-                            @error('photos.*') <span class="error text-red-600">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Preview Area -->
-                        <div class="space-y-4">
-                            <template x-for="(image, index) in images" :key="index">
-                                <div class="border-2 border-green-500 rounded-lg p-4">
-                                    <div class="relative" >
-                                        <img :src="image.url" alt="Preview" class="w-full h-64 object-contain rounded-lg">
-                                        <!-- Remove Button -->
-                                        <button type="button" @click="removeImage(index)"
-                                            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600  z-0">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <!-- Filename Display -->
-                                    <div class="bg-gray-50 px-3 py-2 rounded">
-                                        <span class="text-sm text-gray-600  z-0" x-text="image.name"></span>
-                                    </div>
-                                </div>
-                            </template>
+                        <p class="text-sm text-gray-600">Upload images of the house structure</p>
+                        <!-- House Structure Images -->
+                        <div wire:ignore x-data="{ isUploading: false }" x-init="
+                                FilePond.registerPlugin(FilePondPluginImagePreview);
+                                const pond = FilePond.create($refs.input, {
+                                    allowMultiple: true,
+                                    server: {
+                                        process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                            @this.upload('houseStructureImages', file,
+                                                (uploadedFileName) => {
+                                                    load(uploadedFileName);
+                                                    console.log('File uploaded successfully');
+                                                },
+                                                (error) => {
+                                                    console.error('Upload error:', error);
+                                                    error('Upload failed');
+                                                },
+                                                (event) => {
+                                                    progress(event.lengthComputable ? event.loaded/event.total : 0.5);
+                                                }
+                                            );
+                                        },
+                                        revert: (filename, load) => {
+                                            @this.removeUpload('houseStructureImages', filename, load);
+                                        }
+                                    },
+                                    allowProcess: true
+                                });
+                            ">
+                            <input type="file" x-ref="input" multiple accept="image/*" required class="-z-5">
+                            @error('houseStructureImages.*')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
                 </div>
-
-                <script>
-                    function multipleImageUpload() {
-                        return {
-                            images: [],
-
-                            handleFilesSelect() {
-                                const files = this.$refs.fileInput.files;
-                                Array.from(files).forEach(file => {
-                                    // Validate file type
-                                    if (!file.type.startsWith('image/')) {
-                                        alert('Please select valid image files');
-                                        return;
-                                    }
-
-                                    this.images.push({
-                                        name: file.name,
-                                        url: URL.createObjectURL(file),
-                                        file: file,
-                                    });
-                                });
-
-                                // Sync files with Livewire
-                                this.$refs.fileInput.value = ''; // Clear the file input for subsequent uploads
-                            },
-
-                            removeImage(index) {
-                                this.images.splice(index, 1);
-                                // Clear file from Livewire model
-                                this.$wire.set('photos', this.images.map(img => img.file));
-                            }
-                        }
-                    }
-                </script>
 
             </form>
         </div>

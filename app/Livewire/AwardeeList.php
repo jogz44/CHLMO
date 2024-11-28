@@ -34,6 +34,7 @@ class AwardeeList extends Component
 
     // Filter properties
     public $relocation_site = '', $barangay = '', $purok = '', $status = '', $search = '', $startDate = '', $endDate = '';
+    public $lot_number = '', $block_identifier = '';
 
     // For uploading of files
     public $showRequirementsModal = false, $selectedAwardeeIdForTransfer;
@@ -43,18 +44,21 @@ class AwardeeList extends Component
         $newFileImages = [];
     public $hasSubmittedDocuments = false;
     public $transferredAwardees = [];  // To track which awardees have been transferred
+
     public function openTransferModal($awardeeId): void
     {
-//        $this->selectedAwardeeId = $awardeeId;
-//        $this->loadEligibleDependents();
-//        $this->showTransferModal = true;
-        $this->awardee = Awardee::findOrFail($awardeeId);
+        $this->selectedAwardeeId = $awardeeId; // Add this line
+        $this->awardee = Awardee::with([
+            'taggedAndValidatedApplicant.spouse',
+            'taggedAndValidatedApplicant.dependents.dependentRelationship'
+        ])->findOrFail($awardeeId);
 
-        // Fetch eligible dependents
-        $this->spouse = Spouse::where('tagged_and_validated_applicant_id', $this->awardee->applicant_id)->first();
-        $this->eligibleDependents = Dependent::where('tagged_and_validated_applicant_id', $this->awardee->applicant_id)
+        // Get spouse if exists
+        $this->spouse = $this->awardee->taggedAndValidatedApplicant->spouse;
+
+        // Get eligible dependents
+        $this->eligibleDependents = $this->awardee->taggedAndValidatedApplicant->dependents()
             ->whereHas('dependentRelationship', function($query) {
-                // Add your eligibility criteria here
                 $query->whereIn('relationship', [
                     'Child (Biological)',
                     'Mother',
@@ -120,7 +124,7 @@ class AwardeeList extends Component
         'extraJudicialSettlement' => 'nullable|file|max:10240',
         'certOfNoLandHolding' => 'nullable|file|max:10240',
     ];
-    public function openRequirementsModal($awardeeIdForTransfer)
+    public function openRequirementsModal($awardeeIdForTransfer): void
     {
         $this->selectedAwardeeIdForTransfer = $awardeeIdForTransfer;
         $this->showRequirementsModal = true;
@@ -170,9 +174,7 @@ class AwardeeList extends Component
 
             DB::commit();
 
-//            $this->hasSubmittedDocuments = true;
             $this->showRequirementsModal = false;
-//            $this->showConfirmationModal = true; // Show confirmation modal after requirements submitted
 
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
@@ -180,7 +182,6 @@ class AwardeeList extends Component
                 'type' => 'success'
             ]);
 
-//            $this->redirect('awardee-list');
         } catch (\Exception $e) {
             DB::rollBack();
             $this->handleError('Document submission failed', $e);
@@ -204,7 +205,7 @@ class AwardeeList extends Component
     /**
      * Store individual attachment
      */
-    private function storeAttachment($fileInput, $attachmentId)
+    private function storeAttachment($fileInput, $attachmentId): void
     {
         $file = $this->$fileInput;
         if ($file) {
@@ -259,7 +260,7 @@ class AwardeeList extends Component
         $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
         $this->show = false;  // Close the modal or hide any UI related to uploads if needed
     }
-    public function closeRequirementsModal()
+    public function closeRequirementsModal(): void
     {
         $this->showRequirementsModal = false;
     }
@@ -462,44 +463,52 @@ class AwardeeList extends Component
     {
         $query = Awardee::with([
             'taggedAndValidatedApplicant.applicant.person',
-            'relocationLot.address',
+            'relocationLot.address.barangay',
+            'relocationLot.address.purok',
             'lotSizeUnit'
         ]);
 
         // Apply filters
-        if (!empty($this->relocation_site)) {
+        if ($this->relocation_site) {
             $query->whereHas('relocationLot', function ($q) {
                 $q->where('relocation_site_name', 'like', '%' . $this->relocation_site . '%');
             });
         }
-        if (!empty($this->barangay)) {
+
+        if ($this->lot_number) {
+            $query->whereHas('relocationLot', function ($q) {
+                $q->where('lot_number', $this->lot_number);
+            });
+        }
+
+        if ($this->block_identifier) {
+            $query->whereHas('relocationLot', function ($q) {
+                $q->where('block_identifier', $this->block_identifier);
+            });
+        }
+
+        if ($this->barangay) {
             $query->whereHas('relocationLot.address.barangay', function ($q) {
                 $q->where('name', 'like', '%' . $this->barangay . '%');
             });
         }
-        if (!empty($this->purok)) {
+
+        if ($this->purok) {
             $query->whereHas('relocationLot.address.purok', function ($q) {
                 $q->where('name', 'like', '%' . $this->purok . '%');
             });
         }
-        if (!empty($this->status)) {
-            $query->where('status', $this->status);
-        }
 
         // Date range filter
-        if (!empty($this->startDate) && !empty($this->endDate)) {
+        if ($this->startDate && $this->endDate) {
             $query->whereBetween('grant_date', [
                 Carbon::parse($this->startDate)->startOfDay(),
                 Carbon::parse($this->endDate)->endOfDay()
             ]);
-        } elseif (!empty($this->startDate)) {
-            $query->where('grant_date', '>=', Carbon::parse($this->startDate)->startOfDay());
-        } elseif (!empty($this->endDate)) {
-            $query->where('grant_date', '<=', Carbon::parse($this->endDate)->endOfDay());
         }
 
-        // Global search across multiple fields
-        if (!empty($this->search)) {
+        // Search
+        if ($this->search) {
             $query->where(function ($q) {
                 $q->whereHas('taggedAndValidatedApplicant.applicant.person', function ($subQuery) {
                     $subQuery->where('first_name', 'like', '%' . $this->search . '%')
@@ -507,43 +516,34 @@ class AwardeeList extends Component
                 })
                     ->orWhereHas('relocationLot', function ($subQuery) {
                         $subQuery->where('relocation_site_name', 'like', '%' . $this->search . '%')
-                            ->orWhereHas('address.purok', function ($query) {
-                                $query->where('name', 'like', '%'.$this->search.'%');
-                            })
-                            ->orWhereHas('address.barangay', function ($query) {
-                                $query->where('name', 'like', '%'.$this->search.'%');
-                            });
+                            ->orWhere('lot_number', 'like', '%' . $this->search . '%')
+                            ->orWhere('block_identifier', 'like', '%' . $this->search . '%');
                     });
             });
         }
 
         $awardees = $query->orderBy('created_at', 'desc')->paginate(5);
-
-        // Get dropdown options for filters
         $relocationSites = RelocationSite::distinct()->pluck('relocation_site_name');
-//        $barangays = Barangay::distinct()->pluck('name');
-//        $puroks = Purok::distinct()->pluck('name');
-
-        // Dynamically fetch puroks based on selected barangay
         $barangays = Barangay::distinct()->pluck('name');
-        $puroks = [];
 
-        if (!empty($this->barangay)) {
-            // Fetch puroks specific to the selected barangay
-            $puroks = Purok::whereHas('barangay', function ($query) {
+        // Get unique lot numbers and block identifiers
+        $lotNumbers = RelocationSite::distinct()->orderBy('lot_number')->pluck('lot_number');
+        $blockIdentifiers = RelocationSite::distinct()->orderBy('block_identifier')->pluck('block_identifier');
+
+        // Get puroks based on selected barangay
+        $puroks = !empty($this->barangay)
+            ? Purok::whereHas('barangay', function ($query) {
                 $query->where('name', $this->barangay);
-            })->pluck('name');
-        } else {
-            // If no barangay selected, show all puroks
-            $puroks = Purok::distinct()->pluck('name');
-        }
+            })->pluck('name')
+            : Purok::distinct()->pluck('name');
 
         return view('livewire.awardee-list', [
             'awardees' => $awardees,
             'relocationSites' => $relocationSites,
             'barangays' => $barangays,
             'puroks' => $puroks,
-//            'statuses' => $statuses
+            'lotNumbers' => $lotNumbers,
+            'blockIdentifiers' => $blockIdentifiers,
         ]);
     }
 }
