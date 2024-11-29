@@ -73,14 +73,14 @@ class ShelterApplicants extends Component
 
     public function openModalEdit($profileNo)
     {
-        $applicant = ShelterApplicant::with('person', 'originOfRequest')->findOrFail($profileNo);
+        $applicant = ShelterApplicant::with('person', 'address', 'originOfRequest')->findOrFail($profileNo);
 
         $this->editingProfileNo = $applicant->id;
         $this->date_request = $applicant->date_request;
         $this->first_name = $applicant->person->first_name ?? null;
         $this->middle_name = $applicant->person->middle_name ?? null;
         $this->last_name = $applicant->person->last_name ?? null;
-        $this->suffix_name = $applicant->suffix_name ?? null;
+        $this->suffix_name = $applicant->person->suffix_name ?? null;
         $this->request_origin_id = $applicant->request_origin_id;
         $this->barangay_id = $applicant->address->barangay_id ?? null;
         $this->purok_id = $applicant->address->purok_id ?? null;
@@ -97,7 +97,7 @@ class ShelterApplicants extends Component
     {
         if (
             !$this->showShelterDuplicateWarning &&
-            in_array($propertyName, ['first_name', 'last_name', 'middle_name']) &&
+            in_array($propertyName, ['first_name', 'last_name', 'middle_name', 'suffix_name']) &&
             $this->first_name && $this->last_name
         ) {
 
@@ -106,6 +106,7 @@ class ShelterApplicants extends Component
                 $this->first_name,
                 $this->last_name,
                 $this->middle_name,
+                $this->suffix_name,
                 'Shelter Applicant'
             );
 
@@ -143,6 +144,7 @@ class ShelterApplicants extends Component
                 $this->first_name,
                 $this->last_name,
                 $this->middle_name,
+                $this->suffix_name,                         
                 'Shelter Applicant'
             );
 
@@ -207,11 +209,12 @@ class ShelterApplicants extends Component
         ]);
     }
 
-    // Update related 'person' record
+      // Update related 'person' record
     $applicant->person()->update([
         'first_name' => $this->first_name,
         'middle_name' => $this->middle_name,
         'last_name' => $this->last_name,
+        'suffix_name' => $this->suffix_name,
     ]);
 
     $logger = new ActivityLogs();
@@ -240,6 +243,7 @@ class ShelterApplicants extends Component
                 'first_name' => $this->first_name,
                 'middle_name' => $this->middle_name,
                 'last_name' => $this->last_name,
+                'suffix_name' => $this->suffix_name,
                 'application_type' => 'Shelter Applicant',
             ]);
 
@@ -504,7 +508,8 @@ class ShelterApplicants extends Component
                 $query->whereHas('person', function ($q) {
                     $q->where('first_name', 'like', '%' . $this->search . '%')
                         ->orWhere('middle_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('suffix_name', 'like', '%' . $this->search . '%');
                 })
                     ->orWhere('request_origin_id', 'like', '%' . $this->search . '%')
                     ->orWhere('profile_no', 'like', '%' . $this->search . '%')
