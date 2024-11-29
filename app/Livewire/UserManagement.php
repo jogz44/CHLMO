@@ -219,6 +219,30 @@ class UserManagement extends Component
         }
     }
 
+    public function confirmEnable($userId): void
+    {
+        try {
+            $user = User::findOrFail($userId);
+            $user->update(['is_disabled' => false]);
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity('Enabled User', $user);
+
+            $this->dispatch('alert', [
+                'title' => 'User enabled successfully!',
+                'message' => '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'success'
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('alert', [
+                'title' => 'Error enabling user!',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
+                'type' => 'danger'
+            ]);
+        }
+    }
+
     public function render()
     {
         $query = User::query()

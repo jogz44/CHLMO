@@ -47,12 +47,18 @@ return [
             'visibility' => 'public',
         ],
         // newly created one
+//        'tagging-house-structure-images' => [
+//            'driver' => 'local',
+//            'root' => storage_path('app/tagging-house-structure-images'),
+//            'serve' => true,
+//            'throw' => false,
+//            'url' => env('APP_URL').'/tagging-house-structure-images',
+//            'visibility' => 'public',
+//        ],
         'tagging-house-structure-images' => [
             'driver' => 'local',
-            'root' => storage_path('app/tagging-house-structure-images'),
-            'serve' => true,
-            'throw' => false,
-            'url' => env('APP_URL').'/tagging-house-structure-images',
+            'root' => storage_path('app/public/tagging-house-structure-images'),
+            'url' => env('APP_URL').'/storage/tagging-house-structure-images',
             'visibility' => 'public',
         ],
         // newly created one
@@ -108,6 +114,8 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
         public_path('awardee-photo-requirements') => storage_path('app/awardee-photo-requirements'),
+        public_path('tagging-house-structure-images') => storage_path('app/public/tagging-house-structure-images'), // Updated path
+        public_path('transfer-photo-requirements') => storage_path('app/transfer-photo-requirements'),
         public_path('grantee-photo-requirements') => storage_path('app/grantee-photo-requirements'),
     ],
 //    'links' => [

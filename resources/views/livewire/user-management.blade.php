@@ -1,3 +1,4 @@
+@php use App\Models\User; @endphp
 <div>
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
@@ -45,37 +46,52 @@
                     Role
                 </th>
                 <th class="px-6 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Status
+                </th>
+                <th class="px-6 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                 </th>
             </tr>
             </thead>
             <tbody>
-            @foreach($users as $user)
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                        {{ $user->username }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                        {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                        {{ $user->roles->first()->name ?? 'No Role' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
-                        <button
-                                wire:click="edit({{ $user->id }})"
-                                class="text-custom-green mr-2 underline">
-                            Edit
-                        </button>
-                        <button
-                                wire:click="confirmDisable({{ $user->id }})"
-                                class="{{ $user->is_disabled ? 'bg-gray-500 text-white cursor-not-allowed' : 'bg-custom-dark-green text-white' }} px-2 py-1 rounded-md"
-                                {{ $user->is_disabled ? 'disabled' : '' }}>
-                            {{ $user->is_disabled ? 'Disabled' : 'Disable' }}
-                        </button>
-                    </td>
-                </tr>
-            @endforeach
+                @foreach($users as $user)
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                            {{ $user->username }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                            {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                            {{ $user->roles->first()->name ?? 'No Role' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->is_disabled ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                {{ $user->is_disabled ? 'Disabled' : 'Active' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap border-b border-gray-200">
+                            @if(!$user->is_disabled)
+                                <button
+                                        wire:click="edit({{ $user->id }})"
+                                        class="text-custom-green mr-2 underline">
+                                    Edit
+                                </button>
+                                <button
+                                        wire:click="confirmDisable({{ $user->id }})"
+                                        class="bg-custom-dark-green text-white px-2 py-1 rounded-md">
+                                    Disable
+                                </button>
+                            @else
+                                <button
+                                        wire:click="confirmEnable({{ $user->id }})"
+                                        class="bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700">
+                                    Enable User
+                                </button>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -257,11 +273,15 @@
                                         <p class="text-sm text-red-500 font-medium">
                                             You cannot disable your own account.
                                         </p>
-                                    @elseif(User::find($userToDisable)?->hasRole('super_admin'))
+                                    @elseif(User::find($userToDisable)?->hasRole('Super Admin'))
                                         <p class="text-sm text-red-500 font-medium">
                                             Super Admin accounts cannot be disabled.
                                         </p>
-                                    @elseif(User::find($userToDisable)?->hasRole('admin') && !auth()->user()->hasRole('super_admin'))
+                                    @elseif(User::find($userToDisable)?->hasRole('Housing System Admin') && !auth()->user()->hasRole('Super Admin'))
+                                        <p class="text-sm text-red-500 font-medium">
+                                            Only Super Admins can disable Administrator accounts.
+                                        </p>
+                                    @elseif(User::find($userToDisable)?->hasRole('Shelter System Admin') && !auth()->user()->hasRole('Super Admin'))
                                         <p class="text-sm text-red-500 font-medium">
                                             Only Super Admins can disable Administrator accounts.
                                         </p>
@@ -304,33 +324,39 @@
 
                     <!-- Action Buttons -->
                     <div class="sm:flex sm:flex-row-reverse">
-                        @if($userToDisable &&
-                            $userToDisable !== auth()->id() &&
-                            !User::find($userToDisable)?->hasRole('super_admin') &&
-                            !(User::find($userToDisable)?->hasRole('admin') && !auth()->user()->hasRole('super_admin')))
-                            <button wire:click="disableUser"
-                                    class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                Disable User
-                                <div wire:loading wire:target="disableUser">
-                                    <svg aria-hidden="true"
-                                         class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                         viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                                    </svg>
-                                    <span class="sr-only">Loading...</span>
-                                </div>
+                        @if($userToDisable)
+                            @php
+                                $userToDisableModel = User::find($userToDisable);
+                            @endphp
+
+                            @if(!($userToDisable === auth()->id() ||
+                                $userToDisableModel?->hasRole('Super Admin') ||
+                                ($userToDisableModel?->hasRole('Housing System Admin') && !auth()->user()->hasRole('Super Admin')) ||
+                                ($userToDisableModel?->hasRole('Shelter System Admin') && !auth()->user()->hasRole('Super Admin'))))
+                                <button wire:click="disableUser"
+                                        class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                    Disable User
+                                    <div wire:loading wire:target="disableUser">
+                                        <svg aria-hidden="true"
+                                             class="w-3.5 h-3.5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                             viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                        </svg>
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </button>
+                            @endif
+
+                            <button wire:click="closeDisableModal"
+                                    class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
+                                {{ $userToDisable === auth()->id() ||
+                                   $userToDisableModel?->hasRole('Super Admin') ||
+                                   ($userToDisableModel?->hasRole('Housing System Admin') && !auth()->user()->hasRole('Super Admin')) ||
+                                   ($userToDisableModel?->hasRole('Shelter System Admin') && !auth()->user()->hasRole('Super Admin'))
+                                   ? 'Close' : 'Cancel' }}
                             </button>
                         @endif
-
-                        <button wire:click="closeDisableModal"
-                                class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm">
-                            {{ $userToDisable &&
-                               ($userToDisable === auth()->id() ||
-                                User::find($userToDisable)?->hasRole('super_admin') ||
-                                (User::find($userToDisable)?->hasRole('admin') && !auth()->user()->hasRole('super_admin')))
-                               ? 'Close' : 'Cancel' }}
-                        </button>
                     </div>
                 </div>
             </div>

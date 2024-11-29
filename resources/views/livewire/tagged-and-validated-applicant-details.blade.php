@@ -637,10 +637,9 @@
                     @forelse($taggedDocuments as $document)
                         <div class="relative group cursor-pointer" wire:click="viewDocument({{ $document->id }})">
                             <img
-                                    src="{{ asset('tagging-house-structure-images/' . $document->file_path) }}"
+                                    src="{{ url('storage/tagging-house-structure-images/' . $document->file_path) }}"
                                     alt="{{ $document->file_name }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                            >
+                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                             <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
                                 {{ $document->file_name }}
                             </div>
@@ -664,10 +663,9 @@
                                 </button>
                             </div>
                             <img
-                                    src="{{ asset('tagging-house-structure-images/' . $selectedDocument->file_path) }}"
+                                    src="{{ url('storage/tagging-house-structure-images/' . $selectedDocument->file_path) }}"
                                     alt="{{ $selectedDocument->file_name }}"
-                                    class="max-w-full h-auto"
-                            >
+                                    class="max-w-full h-auto">
                             <div class="mt-2 text-center text-gray-700">
                                 {{ $selectedDocument->file_name }}
                             </div>
