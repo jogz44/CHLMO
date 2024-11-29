@@ -37,7 +37,6 @@ class ShelterReportAvailabilityMaterials extends Component
         $this->fetchMaterials();
     }
 
-    
     public function fetchPrPoHeaders()
     {
         $this->prPoHeaders = DB::table('purchase_orders')
@@ -49,87 +48,85 @@ class ShelterReportAvailabilityMaterials extends Component
             ->distinct()
             ->get();
     }
-    
 
     public function fetchMaterials()
-{
-    $query = DB::table('materials')
-        ->join('material_units', 'materials.material_unit_id', '=', 'material_units.id')
-        ->leftJoin('purchase_orders', 'materials.purchase_order_id', '=', 'purchase_orders.id')
-        ->leftJoin('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
-        ->leftJoin('delivered_materials', 'materials.id', '=', 'delivered_materials.material_id')
-        ->select(
-            'materials.id as material_id',
-            'materials.item_description as description',
-            'material_units.unit as unit',
-            DB::raw('SUM(materials.quantity) as total_quantity'),
-            DB::raw('SUM(delivered_materials.grantee_quantity) as delivered_quantity'),
-            DB::raw('SUM(materials.quantity - COALESCE(delivered_materials.grantee_quantity, 0)) as available_quantity'),
-            'purchase_requisitions.pr_number',
-            'purchase_orders.po_number'
-        )
-        ->groupBy(
-            'materials.id',
-            'materials.item_description',
-            'material_units.unit',
-            'purchase_requisitions.pr_number',
-            'purchase_orders.po_number'
-        );
-        
+    {
+        $query = DB::table('materials')
+            ->join('material_units', 'materials.material_unit_id', '=', 'material_units.id')
+            ->leftJoin('purchase_orders', 'materials.purchase_order_id', '=', 'purchase_orders.id')
+            ->leftJoin('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
+            ->leftJoin('delivered_materials', 'materials.id', '=', 'delivered_materials.material_id')
+            ->select(
+                'materials.id as material_id',
+                'materials.item_description as description',
+                'material_units.unit as unit',
+                DB::raw('SUM(materials.quantity) as total_quantity'),
+                DB::raw('SUM(delivered_materials.grantee_quantity) as delivered_quantity'),
+                DB::raw('SUM(materials.quantity - COALESCE(delivered_materials.grantee_quantity, 0)) as available_quantity'),
+                'purchase_requisitions.pr_number',
+                'purchase_orders.po_number'
+            )
 
-    $this->materials = $query->get()->groupBy('material_id');
-}
+            ->groupBy(
+                'materials.id',
+                'materials.item_description',
+                'material_units.unit',
+                'purchase_requisitions.pr_number',
+                'purchase_orders.po_number'
+            );
+        if ($this->selectedPrPo) {
+            $prPo = explode('-', $this->selectedPrPo);
+            Log::info('Filtering materials with PR: ' . $prPo[0] . ' and PO: ' . $prPo[1]);
+
+            $query->where('purchase_requisitions.pr_number', $prPo[0])
+                ->where('purchase_orders.po_number', $prPo[1]);
+            $this->isFiltered = true;
+        }
+        $this->materials = $query->get()->groupBy('material_id');
+        Log::info($query->toSql()); // Outputs the SQL query
+        Log::info($query->get()->toArray()); // Outputs fetched data
+    }
 
     public function updatedSelectedPrPo()
     {
-    // $this->isFiltered = !empty($this->selectedPrPo); // Set filter flag
-    $this->isFiltered = true;
-    $this->fetchMaterials();
+        $this->fetchMaterials();
+    }
+    public function clearFilter()
+    {
+        $this->selectedPrPo = null;
+        $this->fetchMaterials();
     }
 
 
-    // public function clearFilter()
-    // {
-    //     $this->selectedPrPo = null;
-    //     $this->fetchMaterials();
-    // }
-    public function clearFilter()
-{
-    $this->selectedPrPo = null;
-    $this->isFiltered = false;  // Reset the filter flag
-    $this->fetchMaterials();
-}
-
-
     public function export()
-{
-    try {
-        $filters = array_filter([
-            'po_number' => $this->poNumber,        // PO Number filter
-            'pr_number' => $this->prNumber,        // PR Number filter
-            'item_description' => $this->itemsDescription,  // Filter for item description
-            'availability_status' => $this->available_quantity > 0 ? 1 : 0,  // Filter for availability
-        ]);
+    {
+        try {
+            $filters = array_filter([
+                'po_number' => $this->poNumber,        // PO Number filter
+                'pr_number' => $this->prNumber,        // PR Number filter
+                'item_description' => $this->itemsDescription,  // Filter for item description
+                'availability_status' => $this->available_quantity > 0 ? 1 : 0,  // Filter for availability
+            ]);
 
-        return Excel::download(
-            new ShelterReportMaterialAvailabilityDataExport($filters),
-            'shelter-' . now()->format('Y-m-d') . '.xlsx'
-        );
-    } catch (\Exception $e) {
-        Log::error('Export error: ' . $e->getMessage());
+            return Excel::download(
+                new ShelterReportMaterialAvailabilityDataExport($filters),
+                'shelter-' . now()->format('Y-m-d') . '.xlsx'
+            );
+        } catch (\Exception $e) {
+            Log::error('Export error: ' . $e->getMessage());
+            $this->dispatch('alert', [
+                'title' => 'Export failed:',
+                'message' => $e->getMessage(),
+                'type' => 'danger',
+            ]);
+        }
+        // Dispatch a browser event in case of an error
         $this->dispatch('alert', [
             'title' => 'Export failed:',
             'message' => $e->getMessage(),
             'type' => 'danger',
         ]);
     }
-    // Dispatch a browser event in case of an error
-    $this->dispatch('alert', [
-        'title' => 'Export failed:',
-        'message' => $e->getMessage(),
-        'type' => 'danger',
-    ]);
-}
 
 
     public function render()
@@ -141,4 +138,3 @@ class ShelterReportAvailabilityMaterials extends Component
         ]);
     }
 }
-
