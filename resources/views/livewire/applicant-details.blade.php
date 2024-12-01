@@ -1,8 +1,8 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="@role('Housing System Tagger') p-10 h-screen mt-[60px] @else p-10 h-screen ml-[17%] mt-[60px] @endrole">
     <div class="flex bg-gray-100 text-[12px]">
         <div class="flex-1 p-6 overflow-auto">
             <form wire:submit.prevent="store">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-10">
+                <div class=" @role('Housing System Tagger') w-[92%] bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[90px] left-[3%] z-0 ml-4 @else bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-10 @endrole">
                     <div class="flex items-center">
                         <a href="{{ route('applicants') }}">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -15,16 +15,7 @@
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                         class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                     <div class="flex space-x-2 z-10">
-                        <div x-data="{
-                                    showQuestionModal: false,
-                                    showConfirmationModal: false,
-                                    openModalRelocate: false,
-                                    handleNoClick() {
-                                        this.showQuestionModal = false;
-                                        $wire.setRelocationOnly(false);
-                                        this.showConfirmationModal = true;
-                                    }
-                                }">
+                        <div x-data="{ showConfirmationModal: false }">
                             <div class="z-50">
                                 <div class="alert mt-14"
                                      :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
@@ -42,7 +33,7 @@
                             </div>
                             <!-- Submit Button -->
                             <button type="button"
-                                    @click="showQuestionModal = true"
+                                    @click="showConfirmationModal = true"
                                     class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-semibold px-6 py-2 rounded">
                                     SUBMIT
                                 <div wire:loading>
@@ -60,168 +51,59 @@
                                 </div>
                             </button>
 
-                            <!-- Question Modal -->
-                            <template x-if="showQuestionModal">
-                                <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                                    <div class="bg-white p-6 rounded-lg shadow-lg">
-                                        <h3 class="text-lg font-medium mb-4">
-                                            Do you want to <strong>ASSIGN A RELOCATION SITE</strong> for this <bold>Tagged And Validated Applicant</bold>?
-                                        </h3>
-                                        <div class="flex justify-end space-x-3">
-                                            <button @click="handleNoClick()"
-                                                    class="px-4 py-2 bg-gray-500 text-white rounded-lg">
-                                                No
-                                            </button>
-                                            <button @click="showQuestionModal = false; $wire.showRelocationModal = true; $wire.setRelocationOnly(true)"
-                                                    class="px-4 py-2 bg-custom-red text-white rounded-lg">
-                                                Yes
-                                            </button>
+                            <!-- Confirmation Modal -->
+                            <div x-show="showConfirmationModal"
+                                 x-cloak
+                                 class="fixed inset-0 z-20 bg-gray-600 bg-opacity-65 overflow-y-auto flex items-center justify-center"
+                                 @click.away="showConfirmationModal = false"
+                                 @keydown.escape.window="showConfirmationModal = false">
+                                <div class="relative bg-white rounded-lg max-w-md w-full p-6">
+                                    <!-- Modal content -->
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 text-yellow-400">
+                                                <!-- Warning icon -->
+                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <h3 class="text-lg font-medium text-gray-900">
+                                                    Confirm Submission
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </template>
 
-                            <!-- Modal for Assigning Relocation Site -->
-                            <div x-show="$wire.showRelocationModal"
-                                 class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                                 x-cloak>
-                                <!-- Modal -->
-                                <div class="bg-white text-white w-[400px] rounded-lg shadow-lg p-6 relative">
-                                    <!-- Modal Header -->
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h3 class="text-md font-semibold text-black">ASSIGN RELOCATION SITE</h3>
-                                        <button @click="$wire.showRelocationModal = false" class="text-gray-400 hover:text-gray-200">
-                                            &times;
+
+                                    <div class="mt-4">
+                                        <p class="text-sm text-gray-500">
+                                            Please ensure all fields are filled out correctly. This action cannot be undone once submitted.
+                                            Are you sure you want to proceed?
+                                        </p>
+                                    </div>
+
+                                    <div class="mt-6 flex justify-end space-x-3">
+                                        <button @click="showConfirmationModal = false"
+                                                type="button"
+                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
+                                            Cancel
+                                        </button>
+                                        <button type="button"
+                                                wire:click="store"
+                                                class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-custom-red border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-red">
+                                            <span>Proceed</span>
+                                            <div wire:loading wire:target="proceedWithSubmission">
+                                                <svg aria-hidden="true" class="w-5 h-5 ml-2 text-gray-200 animate-spin" viewBox="0 0 100 101" fill="none">
+                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                                </svg>
+                                            </div>
                                         </button>
                                     </div>
-                                    <form>
-                                        <label class="block text-sm font-medium mb-2 text-black">
-                                            LOT ALLOCATION (ASSIGNED RELOCATION SITE)
-                                        </label>
-                                        <br>
-                                        <div class="mb-4">
-                                            <div class="mb-4">
-                                                <label class="block text-[12px] font-medium mb-2 text-black"
-                                                       for="lot_name">RELOCATION SITE <span class="text-red-500">*</span>
-                                                </label>
-                                                <select wire:model="relocation_lot_id"
-                                                        class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                                    <option value="">Select Relocation Site </option>
-                                                    @forelse($relocationSites as $relocationSite)
-                                                        <option value="{{ $relocationSite->id }}">{{ $relocationSite->relocation_site_name }}</option>
-                                                    @empty
-                                                        <option disabled>There's no record available yet.</option>
-                                                    @endforelse
-                                                </select>
-                                                @error('relocation_lot_id') <span class="error">{{ $message }}</span> @enderror
-                                            </div>
-                                        </div>
-                                        <br>
-                                        <div class="grid grid-cols-2 gap-4 mb-4">
-                                            <div>
-                                                <div class="alert"
-                                                     :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
-                                                     x-data="{ open:false, alert:{} }"
-                                                     x-show="open" x-cloak
-                                                     x-transition:enter="animate-alert-show"
-                                                     x-transition:leave="animate-alert-hide"
-                                                     @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
-                                                    <div class="alert-wrapper">
-                                                        <strong x-html="alert.title">Title</strong>
-                                                        <p x-html="alert.message">Description</p>
-                                                    </div>
-                                                    <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
-                                                </div>
-                                                <button type="button"
-                                                        @click="$wire.confirmRelocation().then(() => { $wire.showRelocationModal = false; showConfirmationModal = true; })"
-                                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                                    <span class="text-[12px]">CONFIRM</span>
-                                                    <div wire:loading>
-                                                        <svg aria-hidden="true"
-                                                             class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                                             viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path
-                                                                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                                                    fill="currentColor" />
-                                                            <path
-                                                                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                                                    fill="currentFill" />
-                                                        </svg>
-                                                        <span class="sr-only">Loading...</span>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                            <script>
-                                                document.addEventListener('livewire.initialized', () => {
-                                                    let obj = @json(session('alert') ?? []);
-                                                    if (Object.keys(obj).length){
-                                                        Livewire.dispatch('alert', [obj])
-                                                    }
-                                                })
-                                            </script>
-
-                                            <!-- Cancel Button -->
-                                            <button type="button"
-                                                    @click="$wire.showRelocationModal = false"
-                                                    class="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white font-semibold rounded-lg flex items-center justify-center space-x-2 cursor-pointer">
-                                                <span class="text-[12px]">CANCEL</span>
-                                            </button>
-                                        </div>
-                                    </form>
                                 </div>
                             </div>
-
-                            <!-- Confirmation Modal -->
-                            <template x-if="showConfirmationModal">
-                                <div class="fixed inset-0 z-20 bg-gray-600 bg-opacity-65 overflow-y-auto flex items-center justify-center"
-                                    @click.away="showConfirmationModal = false">
-                                    <div class="relative bg-white rounded-lg max-w-md w-full p-6">
-                                        <!-- Modal content -->
-                                        <div class="flex items-start justify-between">
-                                            <div class="flex items-center">
-                                                <div class="flex-shrink-0 text-yellow-400">
-                                                    <!-- Warning icon -->
-                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                                    </svg>
-                                                </div>
-                                                <div class="ml-3">
-                                                    <h3 class="text-lg font-medium text-gray-900">
-                                                        Confirm Submission
-                                                    </h3>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="mt-4">
-                                            <p class="text-sm text-gray-500">
-                                                Please ensure all fields are filled out correctly. This action cannot be undone once submitted.
-                                                Are you sure you want to proceed?
-                                            </p>
-                                        </div>
-
-                                        <div class="mt-6 flex justify-end space-x-3">
-                                            <button @click="showConfirmationModal = false"
-                                                    type="button"
-                                                    class="inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
-                                                Cancel
-                                            </button>
-                                            <button type="button"
-                                                    wire:click="finalSubmit"
-                                                    class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-custom-red border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-red">
-                                                <span>Proceed</span>
-                                                <div wire:loading wire:target="proceedWithSubmission">
-                                                    <svg aria-hidden="true" class="w-5 h-5 ml-2 text-gray-200 animate-spin" viewBox="0 0 100 101" fill="none">
-                                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                                                    </svg>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
                         </div>
                         <script>
                             document.addEventListener('livewire.initialized', () => {

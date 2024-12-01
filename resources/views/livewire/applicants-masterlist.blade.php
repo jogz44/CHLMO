@@ -53,7 +53,7 @@
                     </div>
                 </div>
 
-                <!-- Table for Applicants Master   list -->
+                <!-- Table for Applicants Masterlist -->
                 <div x-data="{ openModalAward: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: '' }" class="overflow-x-auto">
                     <table class="min-w-full bg-white border border-gray-200">
                         <thead class="bg-gray-100">
@@ -109,12 +109,46 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                                {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'bg-green-100 text-green-800' :
-                                                   ($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first()?->is_tagged ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
-                                                {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'Tagged' :
-                                                   ($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first()?->is_tagged ? 'Tagged' : 'Pending') }}
-                                            </span>
+{{--                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full--}}
+{{--                                                {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'bg-green-100 text-green-800' :--}}
+{{--                                                   ($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first()?->is_tagged ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">--}}
+{{--                                                {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'Tagged' :--}}
+{{--                                                   ($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first()?->is_tagged ? 'Tagged' : 'Pending') }}--}}
+{{--                                            </span>--}}
+                                        <!-- Status -->
+                                        @if($person->application_type === 'Housing Applicant' && $person->applicants->first())
+                                            @php
+                                                $applicant = $person->applicants->first();
+                                                $taggedApplicant = $applicant->taggedAndValidated;
+                                                $awardee = $taggedApplicant ? $taggedApplicant->awardees->first() : null;
+
+                                                $isTagged = (bool)$applicant->is_tagged;  // Explicit casting to boolean
+
+                                                $statusClass = match(true) {
+                                                    $awardee?->is_awarded => 'bg-green-100 text-green-800',
+                                                    $awardee?->has_assigned_relocation_site => 'bg-yellow-100 text-yellow-800',
+                                                    $isTagged => 'bg-blue-100 text-blue-800',
+                                                    default => 'bg-gray-100 text-gray-800'
+                                                };
+
+                                                $status = match(true) {
+                                                    $awardee?->is_awarded => 'Awarded',
+                                                    $awardee?->has_assigned_relocation_site => 'Pending Awarding',
+                                                    $isTagged => 'Tagged',
+                                                    default => 'Pending Tagging'
+                                                };
+                                            @endphp
+                                        @elseif($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first())
+                                            @php
+                                                $shelterApplicant = $person->shelterApplicants->first();
+                                                $statusClass = $shelterApplicant->is_tagged ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800';
+                                                $status = $shelterApplicant->is_tagged ? 'Tagged' : 'Pending Tagging';
+                                            @endphp
+                                        @endif
+
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClass ?? 'bg-gray-100 text-gray-800' }}">
+                                            {{ $status ?? 'Pending Tagging' }}
+                                        </span>
                                     </td>
                                     <td class="py-4 px-2 text-center text-red-600 border-b whitespace-normal break-words">
                                         <div class="flex items-center justify-center w-full">
