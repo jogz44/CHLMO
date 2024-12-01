@@ -50,10 +50,10 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             UserSeeder::class,
 //            PermissionSeeder::class,
-            AddressSeeder::class,
-            ApplicantSeeder::class,
-//            ShelterApplicantSeeder::class,
-            PeopleSeeder::class,
+//            AddressSeeder::class,
+//            ApplicantSeeder::class,
+////            ShelterApplicantSeeder::class,
+//            PeopleSeeder::class,
         ]);
 
         // if (OriginOfRequest::count() == 0){
