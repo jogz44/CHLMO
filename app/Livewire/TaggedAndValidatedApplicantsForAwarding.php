@@ -51,11 +51,15 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $living_situation, $contact_number,
         $occupation, $monthly_income, $transaction_type;
 
+    // For assigning relocation site
+    public $assigned_relocation_site_id,
+        $assignedRelocationSites = [];
+
     // For awarding modal
     public $grant_date,
         $taggedAndValidatedApplicantId,
-        $relocation_lot_id,
-        $relocationSites = [],
+        $actual_relocation_site_id,
+        $actualRelocationSites = [],
         $lot_size,
         $unit = 'm²';
 
@@ -123,7 +127,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->grant_date = now()->toDateString(); // YYYY-MM-DD format
 
         // Initialize dropdowns
-        $this->relocationSites = RelocationSite::all(); // Fetch all relocation sites
+        $this->assignedRelocationSites = RelocationSite::all(); // Fetch all relocation sites
+        $this->actualRelocationSites = RelocationSite::all(); // Fetch all relocation sites
 
         // Fetch attachment types for the dropdown
         $this->attachmentLists = AwardeeAttachmentsList::all(); // Fetch all attachment lists
@@ -167,7 +172,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             // Validate the input data
             $this->validate([
                 'grant_date' => 'required|date',
-                'relocation_lot_id' => 'required|exists:relocation_sites,id',
+                'actual_relocation_site_id' => 'required|exists:relocation_sites,id',
                 'lot_size' => 'required|numeric',
                 'unit' => 'in:m²',
             ]);
@@ -189,7 +194,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             // Create awardee record
             $awardee = Awardee::create([
                 'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicantId,
-                'relocation_lot_id' => $this->relocation_lot_id,
+                'actual_relocation_site_id' => $this->actual_relocation_site_id,
                 'lot_size' => $this->lot_size,
                 'unit' => $this->unit,
                 'grant_date' => $this->grant_date,
@@ -232,7 +237,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'relocation_lot_id', 'lot_size', 'grant_date',
+            'actual_relocation_site_id', 'lot_size', 'grant_date',
         ]);
     }
     public function removeUpload($property, $fileName, $load): void
@@ -461,7 +466,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'applicant.transactionType',
             'livingSituation',
             'caseSpecification',
-            'relocationSite'
         ]);
 
         // Apply search filter
