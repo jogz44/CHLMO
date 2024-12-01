@@ -63,10 +63,6 @@ class ApplicantDetails extends Component
     // Dependent's details
     public $dependents = [], $dependent_civil_status_id, $dependent_civil_statuses, $dependent_relationship_id, $dependentRelationships; // For preview purposes
     public $renamedFileName = [];
-
-    public $relocation_lot_id, $relocationSites = [];
-    public $shouldAssignRelocation = false;
-    public $showRelocationModal = false;
     public $showConfirmationModal = false;
 
     // For uploading of files
@@ -75,8 +71,7 @@ class ApplicantDetails extends Component
     public $houseStructureImages = [];
     protected $listeners = ['fileUploadFinished' => 'handleFileUploadFinished'];
 
-
-    public function handleFileUploadFinished()
+    public function handleFileUploadFinished(): void
     {
         $this->isFilePondUploadComplete = true;
     }
@@ -86,8 +81,6 @@ class ApplicantDetails extends Component
         $this->applicantId = $applicantId;
         $this->applicant = Applicant::with(['person'])->findOrFail($applicantId);
         $person = $this->applicant->person;
-
-        $this->relocationSites = RelocationSite::all();
 
         // Clear dependents array before populating it again
         $this->dependents = [];
@@ -203,54 +196,6 @@ class ApplicantDetails extends Component
     {
         unset($this->dependents[$index]);
     }
-    public function askAboutRelocation(): void
-    {
-        $this->dispatch('openQuestionModal');
-    }
-
-    public function setRelocation($value): void
-    {
-        $this->shouldAssignRelocation = $value;
-    }
-
-    // Add this method to validate the relocation site selection
-    public function validateRelocation(): true
-    {
-        $this->validate([
-            'relocation_lot_id' => 'required|exists:relocation_sites,id'
-        ]);
-
-        return true;
-    }
-
-    public function prepareForSubmission($relocate): void
-    {
-        $this->shouldAssignRelocation = $relocate;
-        if ($relocate) {
-            $this->showRelocationModal = true;
-        } else {
-            $this->showConfirmationModal = true;
-        }
-    }
-    public function setRelocationAndShowConfirm($relocate): void
-    {
-        $this->shouldAssignRelocation = $relocate;
-        $this->showConfirmationModal = true;
-    }
-    public function showConfirmationModalAfterNo(): void
-    {
-        $this->shouldAssignRelocation = false;
-        $this->showConfirmationModal = true;
-    }
-    public function setRelocationOnly($value): void
-    {
-        $this->shouldAssignRelocation = $value;
-    }
-
-    public function finalSubmit(): void
-    {
-        $this->store();
-    }
     protected function rules(): array
     {
         return [
@@ -326,11 +271,6 @@ class ApplicantDetails extends Component
             'roof_type_id' => 'required|exists:roof_types,id',
             'wall_type_id' => 'required|exists:wall_types,id',
             'structure_status_id' => 'required|exists:structure_status_types,id',
-            'relocation_lot_id' => [
-                'required_if:shouldAssignRelocation,true',
-                'nullable',
-                'exists:relocation_sites,id'
-            ],
             'years_of_residency' => [
                 'required',
                 'integer',
@@ -486,14 +426,6 @@ class ApplicantDetails extends Component
             'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
         ]);
     }
-    public function confirmRelocation(): void
-    {
-        // Validate relocation data before proceeding
-        $this->validateRelocation();
-
-        // If validation passes,
-        $this->showConfirmationModal = true;
-    }
     protected function getValidationData(): array
     {
         return [
@@ -523,7 +455,6 @@ class ApplicantDetails extends Component
             'roof_type_id' => $this->roof_type_id,
             'wall_type_id' => $this->wall_type_id,
             'structure_status_id' => $this->structure_status_id,
-            'relocation_lot_id' => $this->relocation_lot_id,
             'years_of_residency' => $this->years_of_residency,
             'voters_id_number' => $this->voters_id_number,
             'remarks' => $this->remarks,
@@ -547,174 +478,169 @@ class ApplicantDetails extends Component
 
     public function store()
     {
-        // Only proceed if either relocation is not required OR relocation data is provided
-        if (!$this->shouldAssignRelocation || ($this->shouldAssignRelocation && $this->relocation_lot_id)) {
-
-            // Validate the input data
-            $this->validate();
+        // Validate the input data
+        $this->validate();
 
         Log::info('Creating tagged applicant', ['is_tagged' => true]);
 
-            \Log::info('Store method called', [
-                'applicantId' => $this->applicantId,
-                'houseStructureImages' => count($this->houseStructureImages),
-                'all_input' => $this->all(),
-                'validation_data' => $this->getValidationData()
+        \Log::info('Store method called', [
+            'applicantId' => $this->applicantId,
+            'houseStructureImages' => count($this->houseStructureImages),
+            'all_input' => $this->all(),
+            'validation_data' => $this->getValidationData()
+        ]);
+
+        DB::beginTransaction();
+
+        // Attempt to create the new tagged and validated applicant record
+        try {
+            $taggedApplicant = TaggedAndValidatedApplicant::create([
+                'applicant_id' => $this->applicantId,
+                'transaction_type_id' => $this->transaction_type_id,
+                'full_address' => $this->full_address ?: null,
+                'civil_status_id' => $this->civil_status_id,
+                'tribe' => $this->tribe,
+                'sex' => $this->sex,
+                'date_of_birth' => $this->date_of_birth,
+                'religion' => $this->religion ?: null,
+                'occupation' => $this->occupation ?: null,
+                'monthly_income' => $this->monthly_income,
+                'tagging_date' => $this->tagging_date,
+                'living_situation_id' => $this->living_situation_id,
+                'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
+                'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
+                'government_program_id' => $this->government_program_id,
+                'living_status_id' => $this->living_status_id,
+                'room_rent_fee' => $this->living_status_id == 1 ? $this->room_rent_fee : null, // Store rent fee only if living_status_id is 1,
+                'room_landlord' => $this->living_status_id == 1 ? $this->room_landlord : null, // Store landlord only if living_status_id is 1,
+                'house_rent_fee' => $this->living_status_id == 2 ? $this->house_rent_fee : null, // Store rent fee only if living_status_id is 2,
+                'house_landlord' => $this->living_status_id == 2 ? $this->house_landlord : null, // Store landlord only if living_status_id is 2,
+                'lot_rent_fee' => $this->living_status_id == 3 ? $this->lot_rent_fee : null, // Store rent fee only if living_status_id is 3,
+                'lot_landlord' => $this->living_status_id == 3 ? $this->lot_landlord : null, // Store landlord only if living_status_id is 3,
+                'house_owner' => $this->living_status_id == 5 ? $this->house_owner : null, // Store house owner only if living_status_id is 5,
+                'relationship_to_house_owner' => $this->living_status_id == 5 ? $this->relationship_to_house_owner : null,
+                'roof_type_id' => $this->roof_type_id,
+                'wall_type_id' => $this->wall_type_id,
+                'structure_status_id' => $this->structure_status_id,
+                'years_of_residency' => $this->years_of_residency ?: 'N/A',
+                'voters_id_number' => $this->voters_id_number ?: 'N/A',
+                'remarks' => $this->remarks ?: 'N/A',
+                // These two are auto-generated
+                'is_tagged' => true,
+                'tagger_name' => $this->tagger_name,
             ]);
 
-            DB::beginTransaction();
-
-            // Attempt to create the new tagged and validated applicant record
-            try {
-                $taggedApplicant = TaggedAndValidatedApplicant::create([
-                    'applicant_id' => $this->applicantId,
-                    'transaction_type_id' => $this->transaction_type_id,
-                    'full_address' => $this->full_address ?: null,
-                    'civil_status_id' => $this->civil_status_id,
-                    'tribe' => $this->tribe,
-                    'sex' => $this->sex,
-                    'date_of_birth' => $this->date_of_birth,
-                    'religion' => $this->religion ?: null,
-                    'occupation' => $this->occupation ?: null,
-                    'monthly_income' => $this->monthly_income,
-                    'tagging_date' => $this->tagging_date,
-                    'living_situation_id' => $this->living_situation_id,
-                    'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
-                    'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
-                    'government_program_id' => $this->government_program_id,
-                    'living_status_id' => $this->living_status_id,
-                    'room_rent_fee' => $this->living_status_id == 1 ? $this->room_rent_fee : null, // Store rent fee only if living_status_id is 1,
-                    'room_landlord' => $this->living_status_id == 1 ? $this->room_landlord : null, // Store landlord only if living_status_id is 1,
-                    'house_rent_fee' => $this->living_status_id == 2 ? $this->house_rent_fee : null, // Store rent fee only if living_status_id is 2,
-                    'house_landlord' => $this->living_status_id == 2 ? $this->house_landlord : null, // Store landlord only if living_status_id is 2,
-                    'lot_rent_fee' => $this->living_status_id == 3 ? $this->lot_rent_fee : null, // Store rent fee only if living_status_id is 3,
-                    'lot_landlord' => $this->living_status_id == 3 ? $this->lot_landlord : null, // Store landlord only if living_status_id is 3,
-                    'house_owner' => $this->living_status_id == 5 ? $this->house_owner : null, // Store house owner only if living_status_id is 5,
-                    'relationship_to_house_owner' => $this->living_status_id == 5 ? $this->relationship_to_house_owner : null,
-                    'roof_type_id' => $this->roof_type_id,
-                    'wall_type_id' => $this->wall_type_id,
-                    'structure_status_id' => $this->structure_status_id,
-                    'relocation_lot_id' => $this->relocation_lot_id,
-                    'years_of_residency' => $this->years_of_residency ?: 'N/A',
-                    'voters_id_number' => $this->voters_id_number ?: 'N/A',
-                    'remarks' => $this->remarks ?: 'N/A',
-                    // These two are auto-generated
-                    'is_tagged' => true,
-                    'tagger_name' => $this->tagger_name,
+            // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
+            if ($this->civil_status_id == '2') {
+                LiveInPartner::create([
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
+                    'partner_first_name' => $this->partner_first_name,
+                    'partner_middle_name' => $this->partner_middle_name,
+                    'partner_last_name' => $this->partner_last_name,
+                    'partner_occupation' => $this->partner_occupation,
+                    'partner_monthly_income' => $this->partner_monthly_income,
                 ]);
+            }
 
-                // Check if civil_status_id is 2 (Live-in) before creating LiveInPartner record
-                if ($this->civil_status_id == '2') {
-                    LiveInPartner::create([
-                        'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link live-in partner to the applicant
-                        'partner_first_name' => $this->partner_first_name,
-                        'partner_middle_name' => $this->partner_middle_name,
-                        'partner_last_name' => $this->partner_last_name,
-                        'partner_occupation' => $this->partner_occupation,
-                        'partner_monthly_income' => $this->partner_monthly_income,
-                    ]);
-                }
-
-                // Check if civil_status_id is 3 (Married) before creating Spouse record
-                if ($this->civil_status_id == '3') {
-                    Spouse::create([
-                        'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
-                        'spouse_first_name' => $this->spouse_first_name,
-                        'spouse_middle_name' => $this->spouse_middle_name,
-                        'spouse_last_name' => $this->spouse_last_name,
-                        'spouse_occupation' => $this->spouse_occupation,
-                        'spouse_monthly_income' => $this->spouse_monthly_income,
-                    ]);
-                }
-
-                // batching the database for large data
-                $dependentData = [];
-                // Create dependent records associated with the applicant
-                foreach ($this->dependents as $dependent) {
-                    $dependentData[] = ([
-                        'tagged_and_validated_applicant_id' => $taggedApplicant->id,
-                        'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
-                        'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
-                        'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
-                        'dependent_sex' => $dependent['dependent_sex'] ?: null,
-                        'dependent_civil_status_id' => $dependent['dependent_civil_status_id'] ?: null,
-                        'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
-                        'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
-                        'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?? null,
-                        'dependent_relationship_id' => $dependent['dependent_relationship_id'] ?: null,
-                    ]);
-                }
-
-                Dependent::insert($dependentData);
-
-                logger()->info('Starting document submission for applicant', [
-                    'tagged_applicant_id' => $taggedApplicant->id,
+            // Check if civil_status_id is 3 (Married) before creating Spouse record
+            if ($this->civil_status_id == '3') {
+                Spouse::create([
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id, // Link spouse to the applicant
+                    'spouse_first_name' => $this->spouse_first_name,
+                    'spouse_middle_name' => $this->spouse_middle_name,
+                    'spouse_last_name' => $this->spouse_last_name,
+                    'spouse_occupation' => $this->spouse_occupation,
+                    'spouse_monthly_income' => $this->spouse_monthly_income,
                 ]);
+            }
 
-                $this->isFilePonduploading = false;
-
-                // Validate and store files
-                $this->validate([
-                    'houseStructureImages.*' => 'required|image|max:2048',
+            // batching the database for large data
+            $dependentData = [];
+            // Create dependent records associated with the applicant
+            foreach ($this->dependents as $dependent) {
+                $dependentData[] = ([
+                    'tagged_and_validated_applicant_id' => $taggedApplicant->id,
+                    'dependent_first_name' => $dependent['dependent_first_name'] ?: null,
+                    'dependent_middle_name' => $dependent['dependent_middle_name'] ?: null,
+                    'dependent_last_name' => $dependent['dependent_last_name'] ?: null,
+                    'dependent_sex' => $dependent['dependent_sex'] ?: null,
+                    'dependent_civil_status_id' => $dependent['dependent_civil_status_id'] ?: null,
+                    'dependent_date_of_birth' => $dependent['dependent_date_of_birth'] ?: null,
+                    'dependent_occupation' => $dependent['dependent_occupation'] ?: null,
+                    'dependent_monthly_income' => $dependent['dependent_monthly_income'] ?? null,
+                    'dependent_relationship_id' => $dependent['dependent_relationship_id'] ?: null,
                 ]);
+            }
 
-                // Ensure files are an array and filter out any non-file entries
-                $files = array_filter($this->houseStructureImages, function($file) {
-                    return $file instanceof \Illuminate\Http\UploadedFile;
-                });
+            Dependent::insert($dependentData);
 
-                if (!empty($this->houseStructureImages)) {
-                    foreach ($this->houseStructureImages as $image) {
-                        try {
-                            $this->storeAttachment($image, $taggedApplicant->id);
-                        } catch (\Exception $e) {
-                            \Log::error('Failed to store image:', [
-                                'error' => $e->getMessage(),
-                                'file' => $image->getClientOriginalName() ?? 'unknown'
-                            ]);
-                            throw $e;
-                        }
+            logger()->info('Starting document submission for applicant', [
+                'tagged_applicant_id' => $taggedApplicant->id,
+            ]);
+
+            $this->isFilePonduploading = false;
+
+            // Validate and store files
+            $this->validate([
+                'houseStructureImages.*' => 'required|image|max:2048',
+            ]);
+
+            // Ensure files are an array and filter out any non-file entries
+            $files = array_filter($this->houseStructureImages, function($file) {
+                return $file instanceof \Illuminate\Http\UploadedFile;
+            });
+
+            if (!empty($this->houseStructureImages)) {
+                foreach ($this->houseStructureImages as $image) {
+                    try {
+                        $this->storeAttachment($image, $taggedApplicant->id);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to store image:', [
+                            'error' => $e->getMessage(),
+                            'file' => $image->getClientOriginalName() ?? 'unknown'
+                        ]);
+                        throw $e;
                     }
                 }
+            }
 
-                // Find the applicant by ID and update the 'tagged' field
-                $applicant = Applicant::findOrFail($this->applicantId);
-                $applicant->update(['is_tagged' => true]);
+            // Find the applicant by ID and update the 'tagged' field
+            $applicant = Applicant::findOrFail($this->applicantId);
+            $applicant->update(['is_tagged' => true]);
 
-                DB::commit();
+            DB::commit();
 
-                // Log the activity
-                $logger = new ActivityLogs();
-                $user = Auth::user();
-                $logger->logActivity('Uploaded house structure images during tagging', $user);
+            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Uploaded house structure images during tagging', $user);
 
+            $this->dispatch('alert', [
+                'title' => 'Tagging successful!',
+                'message' => 'Applicant has been successfully tagged and validated. <br><small>'. now()->calendar() .'</small>',
+                'type' => 'success'
+            ]);
+            $this->dependents = [];
+
+            return redirect()->route('applicants');
+
+        } catch (QueryException $e) {
+            DB::rollBack();
+            \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
+            // Check for numeric range error (SQL state 22003)
+            if ($e->getCode() === '22003') {
                 $this->dispatch('alert', [
-                    'title' => 'Tagging successful!',
-                    'message' => 'Applicant has been successfully tagged and validated. <br><small>'. now()->calendar() .'</small>',
-                    'type' => 'success'
+                    'title' => 'Invalid Amount',
+                    'message' => 'The rent fee amount is too large. Please enter a smaller amount (maximum allowed is ₱999,999.99).',
+                    'type' => 'warning'
                 ]);
-                $this->dependents = [];
-
-                return redirect()->route('applicants');
-
-            } catch (QueryException $e) {
-                DB::rollBack();
-                \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
-                // Check for numeric range error (SQL state 22003)
-                if ($e->getCode() === '22003') {
-                    $this->dispatch('alert', [
-                        'title' => 'Invalid Amount',
-                        'message' => 'The rent fee amount is too large. Please enter a smaller amount (maximum allowed is ₱999,999.99).',
-                        'type' => 'warning'
-                    ]);
-                } else {
-                    // For other database errors
-                    $this->dispatch('alert', [
-                        'title' => 'Something went wrong!',
-                        'message' => 'Unable to save the information. Please try again or contact support if the problem persists.',
-                        'type' => 'danger'
-                    ]);
-                }
+            } else {
+                // For other database errors
+                $this->dispatch('alert', [
+                    'title' => 'Something went wrong!',
+                    'message' => 'Unable to save the information. Please try again or contact support if the problem persists.',
+                    'type' => 'danger'
+                ]);
             }
         }
     }
@@ -737,7 +663,6 @@ class ApplicantDetails extends Component
             ]);
         }
     }
-
     public function render()
     {
         return view('livewire.applicant-details', [
