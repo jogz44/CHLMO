@@ -55,6 +55,10 @@ return [
 //            'url' => env('APP_URL').'/tagging-house-structure-images',
 //            'visibility' => 'public',
 //        ],
+        'livewire-tmp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/livewire-tmp'),
+        ],
         'tagging-house-structure-images' => [
             'driver' => 'local',
             'root' => storage_path('app/public/tagging-house-structure-images'),
