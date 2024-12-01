@@ -175,7 +175,7 @@
                             <label for="name-suffix" class="block text-[13px] font-medium text-gray-700 mb-1">NAME
                                 SUFFIX</label>
                             <input type="text" id="name-suffix" name="name-suffix"
-                                :disabled="!isEditable"
+                                :disabled="!isEditable" wire:model="name_suffix"
                                 class="capitalize w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                     </div>
@@ -355,7 +355,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap -mx-2">
+                    <div class="flex flex-wrap -mx-2">  
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="barangay" class="block text-[13px] font-medium text-gray-700 mb-1">
                                 BARANGAY <span class="text-red-500">*</span>

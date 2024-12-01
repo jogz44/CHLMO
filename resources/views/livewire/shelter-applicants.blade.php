@@ -264,7 +264,7 @@
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
-                                    <input type="text" id="suffix-name" wire:model="suffix_name"
+                                    <input type="text" id="suffix-name" wire:model="suffix_name" 
                                         class="w-full uppercase px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]"
                                         placeholder="Suffix Name" oninput="capitalizeInput(this)">
                                     @error('suffix_name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
@@ -359,13 +359,13 @@
 
                                 <div>
                                     <label class="block text-[12px] font-medium mb-2 text-black" for="suffix-name">SUFFIX NAME</label>
-                                    <input type="text" id="suffix-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" wire:model="suffix_name" oninput="capitalizeInput(this)">
+                                    <input type="text" id="suffix-name" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px] uppercase" oninput="capitalizeInput(this)">
                                 </div>
                             </div>
                             <!-- Barangay Field -->
                             <div class="mb-3">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">BARANGAY </label>
-                                <select id="barangay" wire:model.defer="barangay_id"
+                                <select id="barangay" wire:model.live="barangay_id"
                                     class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
                                     <option value="">Select Barangay</option>
                                     @foreach($barangays as $barangay)
@@ -377,7 +377,7 @@
                             <!-- Purok Field -->
                             <div class="mb-3">
                                 <label class="block text-[12px] font-medium mb-2 text-black" for="purok">PUROK </label>
-                                <select id="purok" wire:model.defer="purok_id"
+                                <select id="purok" wire:model.live="purok_id"
                                     class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase" required>
                                     <option value="">Select Purok</option>
                                     @foreach($puroks as $purok)

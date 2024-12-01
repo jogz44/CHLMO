@@ -8,11 +8,13 @@
                         <h2 class="text-[13px] ml-5 text-gray-700 font-semibold">REPORT ON AVAILABILITY OF MATERIALS UNDER THE SHELTER ASSISTANCE PROGRAM</h2>
                     </div>
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
-                    <button wire:click="export" wire:ignore wire:loading.attr="disabled"
-                        class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
-                        <span wire:loading wire:target="export">Exporting Excel...</span>
-                        <span wire:loading.remove>Export to Excel</span>
-                    </button>
+                    <div class="relative">
+                        <button wire:click="export" wire:ignore wire:loading.attr="disabled"
+                            class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
+                            <span wire:loading wire:target="export">Exporting Excel...</span>
+                            <span wire:loading.remove>Export to Excel</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="bg-white p-6 rounded shadow">
