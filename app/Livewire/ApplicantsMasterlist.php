@@ -28,6 +28,7 @@ class ApplicantsMasterlist extends Component
                         'address.purok',
                         'address.barangay',
                         'transactionType',
+                        'taggedAndValidated.awardees',
                         'taggedAndValidated.livingSituation',
                     ]);
                 },
@@ -37,6 +38,16 @@ class ApplicantsMasterlist extends Component
                     ]);
                 }
             ]);
+
+        // Add debugging to check values
+        \Log::info('Checking applicant statuses:');
+        $peopleQuery->get()->each(function($person) {
+            if ($person->applicants->first()) {
+                \Log::info("Person {$person->id} - Applicant {$person->applicants->first()->id}: is_tagged = " .
+                    ($person->applicants->first()->is_tagged ? 'true' : 'false'));
+            }
+        });
+
 
         // Apply search if provided
         if ($this->search) {
