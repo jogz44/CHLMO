@@ -117,12 +117,17 @@ class ShelterDistributionList extends Component
             // Optional: Log the filters for debugging
             Log::info('Export Filters:', $filters);
 
+            $granteeCount = Grantee::count();
+            $materialCount = Material::count();
+            Log::info("Grantee Count: {$granteeCount}, Material Count: {$materialCount}");
+
             return Excel::download(
                 new DistributionListDataExport($filters),
                 'distribution-lists-' . now()->format('Y-m-d') . '.xlsx'
             );
         } catch (\Exception $e) {
             Log::error('Export error: ' . $e->getMessage());
+            Log::error('Export trace: ' . $e->getTraceAsString());
             $this->dispatch('alert', [
                 'title' => 'Export failed: ',
                 'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
