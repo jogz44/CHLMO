@@ -50,6 +50,14 @@
                                     <span class="sr-only">Loading...</span>
                                 </div>
                             </button>
+                            <script>
+                                document.addEventListener('livewire.initialized', () => {
+                                    let obj = @json(session('alert') ?? []);
+                                    if (Object.keys(obj).length){
+                                        Livewire.dispatch('alert', [obj])
+                                    }
+                                })
+                            </script>
 
                             <!-- Confirmation Modal -->
                             <div x-show="showConfirmationModal"
@@ -105,14 +113,6 @@
                                 </div>
                             </div>
                         </div>
-                        <script>
-                            document.addEventListener('livewire.initialized', () => {
-                                let obj = @json(session('alert') ?? []);
-                                if (Object.keys(obj).length){
-                                    Livewire.dispatch('alert', [obj])
-                                }
-                            })
-                        </script>
                     </div>
                 </div>
 
@@ -615,7 +615,7 @@
                             </select>
                             @error('living_situation') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
-                        <template x-if="livingSituation >= '1' && livingSituation <= '7'  || livingSituation === '9'">
+                        <template x-if="livingSituation >= '1' && livingSituation <= '7'">
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="living_situation_case_specification"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
@@ -632,7 +632,7 @@
                                 @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </template>
-                        <template x-if="livingSituation == '8'">
+                        <template x-if="livingSituation === '8'">
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="case_specification"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
@@ -647,6 +647,22 @@
                                     @endforeach
                                 </select>
                                 @error('case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                        </template>
+                        <template x-if="livingSituation === '9'">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="non_informal_settler_case_specification"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                   NON-INFORMAL SETTLER CASE SPECIFICATION <span class="text-red-500">*</span>
+                                </label>
+                                <textarea wire:model="non_informal_settler_case_specification"
+                                          type="text"
+                                          placeholder="Non-Dwelling"
+                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                          required
+                                          oninput="capitalizeInput(this)">
+                                </textarea>
+                                @error('non_informal_settler_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </template>
                     </div>
