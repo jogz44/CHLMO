@@ -7,7 +7,13 @@
                 <div class="flex items-center">
                     <h2 class="text-[13px] ml-5 text-gray-700">TAGGED AND VALIDATED</h2>
                 </div>
-                <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+                <img src="{{ asset('storage/images/design.png') }}" alt="Design"
+                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+                <button
+                        onclick="window.location='{{ route('add-new-occupant') }}'"
+                        class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded z-10">
+                    ADD OCCUPANT
+                </button>
             </div>
 
             <div class="bg-white p-6 rounded shadow">
@@ -98,7 +104,7 @@
                 </div>
             </div>
 
-            <!-- Table with transaction requests -->
+            <!-- Tagged and Validated Applicants for Awarding -->
             <div x-data="{openModalRelocate: false, openModalDocumentsChecklist: false, openModalTag: false, openPreviewModal: false, selectedFile: null, fileName: ''}"
                  class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
@@ -113,7 +119,7 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TAGGING DATE</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">ACTIONS</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">STATUS</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -155,32 +161,32 @@
                                     class="py-4 px-2 text-center border-b capitalize whitespace-nowrap cursor-pointer">
                                     {{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">
-                                    @if(!$applicant->documents->count() && !$applicant->is_awarding_on_going)
-                                        <!-- Initial state: Show Details and Submit Requirements -->
-{{--                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"--}}
-{{--                                                class="text-custom-red text-bold underline px-4 py-1.5 mr-2">--}}
-{{--                                            Details--}}
-{{--                                        </button>--}}
-                                        <button @click="openModalDocumentsChecklist = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
-                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
-                                            Submit Requirements
-                                        </button>
-                                    @elseif($applicant->documents->count() && !$applicant->is_awarding_on_going)
-                                        <!-- Documents submitted: Show Submitted status and Award button -->
-                                        <button wire:click="viewSubmittedDocuments({{ $applicant->id }})"
-                                                class="bg-amber-500 text-white px-4 py-1.5 rounded-full">
-                                            Submitted
-                                        </button>
-                                        <button @click="openModalRelocate = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
-                                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
-                                            Award
-                                        </button>
-                                    @elseif($applicant->awardees && $applicant->awardees->isNotEmpty() && $applicant->awardees->first()->is_awarded)
-                                        <!-- Final state: Show Awarded status and Export Certificate -->
-                                        <button disabled class="bg-gray-400 text-white px-4 py-1.5 rounded-full cursor-not-allowed mr-2">
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                        class="py-4 px-2 text-center border-b whitespace-nowrap">
+                                    @php
+                                        $awardee = $applicant->awardees->first();
+                                    @endphp
+
+                                    @if(!$awardee)
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            No Relocation Site
+                                        </span>
+                                    @elseif($awardee->is_awarded)
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                                             Awarded
-                                        </button>
+                                        </span>
+                                    @elseif($awardee->actual_relocation_site_id)
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Has Actual Relocation Site
+                                        </span>
+                                    @elseif($awardee->assigned_relocation_site_id)
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Has Assigned Relocation Site
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            Pending for Awarding
+                                        </span>
                                     @endif
                                 </td>
                             </tr>
@@ -320,347 +326,347 @@
                 </div>
 
                 <!-- Modal Relocate - Requirements -->
-                <div x-show="openModalDocumentsChecklist"
-                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
-                     x-cloak
-                     style="font-family: 'Poppins', sans-serif;">
-                    <!-- Modal -->
-                    <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">
-                        <!-- Modal Header -->
-                        <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
-                            <h3 class="text-lg font-bold text-gray-900">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>
-                            <button @click="openModalDocumentsChecklist = false" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
-                                &times;
-                            </button>
-                        </div>
+{{--                <div x-show="openModalDocumentsChecklist"--}}
+{{--                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"--}}
+{{--                     x-cloak--}}
+{{--                     style="font-family: 'Poppins', sans-serif;">--}}
+{{--                    <!-- Modal -->--}}
+{{--                    <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">--}}
+{{--                        <!-- Modal Header -->--}}
+{{--                        <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">--}}
+{{--                            <h3 class="text-lg font-bold text-gray-900">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>--}}
+{{--                            <button @click="openModalDocumentsChecklist = false" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">--}}
+{{--                                &times;--}}
+{{--                            </button>--}}
+{{--                        </div>--}}
 
-                        <!-- Modal Content - Scrollable Area -->
-                        <div class="flex-1 p-8 overflow-y-auto">
-                            <form wire:submit.prevent="submit">
-                                <!-- Horizontal Scrollable Container -->
-                                <div class="w-full overflow-x-auto pb-4">
-                                    <div class="flex flex-nowrap gap-4 min-w-full">
-                                        <!-- 1st Attachment - LETTER OF INTENT -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <p class="uppercase font-bold text-gray-900 text-sm">
-                                                {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Letter of Intent' }}
-                                                <span class="text-red-500">*</span>
-                                            </p>
+{{--                        <!-- Modal Content - Scrollable Area -->--}}
+{{--                        <div class="flex-1 p-8 overflow-y-auto">--}}
+{{--                            <form wire:submit.prevent="submit">--}}
+{{--                                <!-- Horizontal Scrollable Container -->--}}
+{{--                                <div class="w-full overflow-x-auto pb-4">--}}
+{{--                                    <div class="flex flex-nowrap gap-4 min-w-full">--}}
+{{--                                        <!-- 1st Attachment - LETTER OF INTENT -->--}}
+{{--                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">--}}
+{{--                                            <p class="uppercase font-bold text-gray-900 text-sm">--}}
+{{--                                                {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Letter of Intent' }}--}}
+{{--                                                <span class="text-red-500">*</span>--}}
+{{--                                            </p>--}}
 
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('letterOfIntent', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('letterOfIntent', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="letterOfIntent" required>
-                                                @error('letterOfIntent')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                            </div>
-                                        </div>
+{{--                                            <!-- File upload -->--}}
+{{--                                            <div wire:ignore x-data="{ isUploading: false }" x-init="--}}
+{{--                                                FilePond.registerPlugin(FilePondPluginImagePreview);--}}
+{{--                                                const pond = FilePond.create($refs.input, {--}}
+{{--                                                    allowFileEncode: true,--}}
+{{--                                                    onprocessfilestart: () => { isUploading = true; },--}}
+{{--                                                    onprocessfile: (error, file) => { isUploading = false; },--}}
+{{--                                                    server: {--}}
+{{--                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                            @this.upload('letterOfIntent', file, load, error, progress);--}}
+{{--                                                        },--}}
+{{--                                                        revert: (fileName, load) => {--}}
+{{--                                                            @this.removeUpload('letterOfIntent', fileName, load);--}}
+{{--                                                        },--}}
+{{--                                                    },--}}
+{{--                                                });">--}}
+{{--                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="letterOfIntent" required>--}}
+{{--                                                @error('letterOfIntent')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- 2nd attachment - VOTER'S ID -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Voter\'s ID' }}
-                                                    <span class="text-red-500">*</span>
-                                                </p>
-                                            </div>
+{{--                                        <!-- 2nd attachment - VOTER'S ID -->--}}
+{{--                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">--}}
+{{--                                            <div class="mb-1">--}}
+{{--                                                <p class="uppercase font-bold text-gray-900 text-sm">--}}
+{{--                                                    {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Voter\'s ID' }}--}}
+{{--                                                    <span class="text-red-500">*</span>--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
 
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('votersID', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('votersID', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="votersID" required>
-                                                @error('votersID')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                            </div>
-                                        </div>
+{{--                                            <!-- File upload -->--}}
+{{--                                            <div wire:ignore x-data="{ isUploading: false }" x-init="--}}
+{{--                                                FilePond.registerPlugin(FilePondPluginImagePreview);--}}
+{{--                                                const pond = FilePond.create($refs.input, {--}}
+{{--                                                    allowFileEncode: true,--}}
+{{--                                                    onprocessfilestart: () => { isUploading = true; },--}}
+{{--                                                    onprocessfile: (error, file) => { isUploading = false; },--}}
+{{--                                                    server: {--}}
+{{--                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                            @this.upload('votersID', file, load, error, progress);--}}
+{{--                                                        },--}}
+{{--                                                        revert: (fileName, load) => {--}}
+{{--                                                            @this.removeUpload('votersID', fileName, load);--}}
+{{--                                                        },--}}
+{{--                                                    },--}}
+{{--                                                });">--}}
+{{--                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="votersID" required>--}}
+{{--                                                @error('votersID')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- 3rd attachment - VALID ID -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Valid ID' }}
-                                                    <span class="text-red-500">*</span>
-                                                </p>
-                                            </div>
+{{--                                        <!-- 3rd attachment - VALID ID -->--}}
+{{--                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">--}}
+{{--                                            <div class="mb-1">--}}
+{{--                                                <p class="uppercase font-bold text-gray-900 text-sm">--}}
+{{--                                                    {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Valid ID' }}--}}
+{{--                                                    <span class="text-red-500">*</span>--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
 
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('validID', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('validID', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="validID" required>
-                                                @error('validID')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                            </div>
-                                        </div>
+{{--                                            <!-- File upload -->--}}
+{{--                                            <div wire:ignore x-data="{ isUploading: false }" x-init="--}}
+{{--                                                FilePond.registerPlugin(FilePondPluginImagePreview);--}}
+{{--                                                const pond = FilePond.create($refs.input, {--}}
+{{--                                                    allowFileEncode: true,--}}
+{{--                                                    onprocessfilestart: () => { isUploading = true; },--}}
+{{--                                                    onprocessfile: (error, file) => { isUploading = false; },--}}
+{{--                                                    server: {--}}
+{{--                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                            @this.upload('validID', file, load, error, progress);--}}
+{{--                                                        },--}}
+{{--                                                        revert: (fileName, load) => {--}}
+{{--                                                            @this.removeUpload('validID', fileName, load);--}}
+{{--                                                        },--}}
+{{--                                                    },--}}
+{{--                                                });">--}}
+{{--                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="validID" required>--}}
+{{--                                                @error('validID')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- 4th attachment - CERTIFICATE OF NO LAND HOLDING -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Certificate of No Land Holding' }}
-                                                    <span class="text-red-500">*</span>
-                                                </p>
-                                            </div>
+{{--                                        <!-- 4th attachment - CERTIFICATE OF NO LAND HOLDING -->--}}
+{{--                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">--}}
+{{--                                            <div class="mb-1">--}}
+{{--                                                <p class="uppercase font-bold text-gray-900 text-sm">--}}
+{{--                                                    {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Certificate of No Land Holding' }}--}}
+{{--                                                    <span class="text-red-500">*</span>--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
 
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('certOfNoLandHolding', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('certOfNoLandHolding', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certOfNoLandHolding" required>
-                                                @error('certOfNoLandHolding')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                            </div>
-                                        </div>
+{{--                                            <!-- File upload -->--}}
+{{--                                            <div wire:ignore x-data="{ isUploading: false }" x-init="--}}
+{{--                                                FilePond.registerPlugin(FilePondPluginImagePreview);--}}
+{{--                                                const pond = FilePond.create($refs.input, {--}}
+{{--                                                    allowFileEncode: true,--}}
+{{--                                                    onprocessfilestart: () => { isUploading = true; },--}}
+{{--                                                    onprocessfile: (error, file) => { isUploading = false; },--}}
+{{--                                                    server: {--}}
+{{--                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                            @this.upload('certOfNoLandHolding', file, load, error, progress);--}}
+{{--                                                        },--}}
+{{--                                                        revert: (fileName, load) => {--}}
+{{--                                                            @this.removeUpload('certOfNoLandHolding', fileName, load);--}}
+{{--                                                        },--}}
+{{--                                                    },--}}
+{{--                                                });">--}}
+{{--                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certOfNoLandHolding" required>--}}
+{{--                                                @error('certOfNoLandHolding')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- 5th attachment - MARRIAGE CERTIFICATE -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 5)->first()->attachment_name ?? 'Marriage Certificate' }}
-                                                </p>
-                                            </div>
+{{--                                        <!-- 5th attachment - MARRIAGE CERTIFICATE -->--}}
+{{--                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">--}}
+{{--                                            <div class="mb-1">--}}
+{{--                                                <p class="uppercase font-bold text-gray-900 text-sm">--}}
+{{--                                                    {{ $attachmentLists->where('id', 5)->first()->attachment_name ?? 'Marriage Certificate' }}--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
 
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('marriageCert', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('marriageCert', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="marriageCert">
-                                                @error('marriageCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                            </div>
-                                        </div>
+{{--                                            <!-- File upload -->--}}
+{{--                                            <div wire:ignore x-data="{ isUploading: false }" x-init="--}}
+{{--                                                FilePond.registerPlugin(FilePondPluginImagePreview);--}}
+{{--                                                const pond = FilePond.create($refs.input, {--}}
+{{--                                                    allowFileEncode: true,--}}
+{{--                                                    onprocessfilestart: () => { isUploading = true; },--}}
+{{--                                                    onprocessfile: (error, file) => { isUploading = false; },--}}
+{{--                                                    server: {--}}
+{{--                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                            @this.upload('marriageCert', file, load, error, progress);--}}
+{{--                                                        },--}}
+{{--                                                        revert: (fileName, load) => {--}}
+{{--                                                            @this.removeUpload('marriageCert', fileName, load);--}}
+{{--                                                        },--}}
+{{--                                                    },--}}
+{{--                                                });">--}}
+{{--                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="marriageCert">--}}
+{{--                                                @error('marriageCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
 
-                                        <!-- 6th attachment - BIRTH CERTIFICATE -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 6)->first()->attachment_name ?? 'Birth Certificate' }}
-                                                    <span class="text-red-500">*</span>
-                                                </p>
-                                            </div>
-                                            {{--                                            @dd($attachmentLists->where('id', 6));--}}
+{{--                                        <!-- 6th attachment - BIRTH CERTIFICATE -->--}}
+{{--                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">--}}
+{{--                                            <div class="mb-1">--}}
+{{--                                                <p class="uppercase font-bold text-gray-900 text-sm">--}}
+{{--                                                    {{ $attachmentLists->where('id', 6)->first()->attachment_name ?? 'Birth Certificate' }}--}}
+{{--                                                    <span class="text-red-500">*</span>--}}
+{{--                                                </p>--}}
+{{--                                            </div>--}}
+{{--                                            --}}{{--                                            @dd($attachmentLists->where('id', 6));--}}
 
 
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('birthCert', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('birthCert', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="birthCert" required>
-                                                @error('birthCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+{{--                                            <!-- File upload -->--}}
+{{--                                            <div wire:ignore x-data="{ isUploading: false }" x-init="--}}
+{{--                                                FilePond.registerPlugin(FilePondPluginImagePreview);--}}
+{{--                                                const pond = FilePond.create($refs.input, {--}}
+{{--                                                    allowFileEncode: true,--}}
+{{--                                                    onprocessfilestart: () => { isUploading = true; },--}}
+{{--                                                    onprocessfile: (error, file) => { isUploading = false; },--}}
+{{--                                                    server: {--}}
+{{--                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {--}}
+{{--                                                            @this.upload('birthCert', file, load, error, progress);--}}
+{{--                                                        },--}}
+{{--                                                        revert: (fileName, load) => {--}}
+{{--                                                            @this.removeUpload('birthCert', fileName, load);--}}
+{{--                                                        },--}}
+{{--                                                    },--}}
+{{--                                                });">--}}
+{{--                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="birthCert" required>--}}
+{{--                                                @error('birthCert')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <!-- Submit Button Section - Fixed at bottom -->
-                                <div class="mt-4">
-                                    <div>
-                                        <div class="alert"
-                                             :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"
-                                             x-data="{ open:false, alert:{} }"
-                                             x-show="open" x-cloak
-                                             x-transition:enter="animate-alert-show"
-                                             x-transition:leave="animate-alert-hide"
-                                             @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">
-                                            <div class="alert-wrapper">
-                                                <strong x-html="alert.title">Title</strong>
-                                                <p x-html="alert.message">Description</p>
-                                            </div>
-                                            <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>
-                                        </div>
-                                        <button type="submit"
-                                                class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                            <span class="text-[12px]">SUBMIT</span>
-                                            <div wire:loading>
-                                                <svg aria-hidden="true"
-                                                     class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                                          fill="currentColor"/>
-                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                                          fill="currentFill"/>
-                                                </svg>
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                                <script>
-                                    document.addEventListener('livewire.initialized', () => {
-                                        let obj = @json(session('alert') ?? []);
-                                        if (Object.keys(obj).length){
-                                            Livewire.dispatch('alert', [obj])
-                                        }
-                                    })
-                                </script>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+{{--                                <!-- Submit Button Section - Fixed at bottom -->--}}
+{{--                                <div class="mt-4">--}}
+{{--                                    <div>--}}
+{{--                                        <div class="alert"--}}
+{{--                                             :class="{primary:'alert-primary', success:'alert-success', danger:'alert-danger', warning:'alert-warning'}[(alert.type ?? 'primary')]"--}}
+{{--                                             x-data="{ open:false, alert:{} }"--}}
+{{--                                             x-show="open" x-cloak--}}
+{{--                                             x-transition:enter="animate-alert-show"--}}
+{{--                                             x-transition:leave="animate-alert-hide"--}}
+{{--                                             @alert.window="open = true; setTimeout( () => open=false, 3000 ); alert=$event.detail[0]">--}}
+{{--                                            <div class="alert-wrapper">--}}
+{{--                                                <strong x-html="alert.title">Title</strong>--}}
+{{--                                                <p x-html="alert.message">Description</p>--}}
+{{--                                            </div>--}}
+{{--                                            <i class="alert-close fa-solid fa-xmark" @click="open=false"></i>--}}
+{{--                                        </div>--}}
+{{--                                        <button type="submit"--}}
+{{--                                                class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">--}}
+{{--                                            <span class="text-[12px]">SUBMIT</span>--}}
+{{--                                            <div wire:loading>--}}
+{{--                                                <svg aria-hidden="true"--}}
+{{--                                                     class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"--}}
+{{--                                                     viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">--}}
+{{--                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"--}}
+{{--                                                          fill="currentColor"/>--}}
+{{--                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"--}}
+{{--                                                          fill="currentFill"/>--}}
+{{--                                                </svg>--}}
+{{--                                                <span class="sr-only">Loading...</span>--}}
+{{--                                            </div>--}}
+{{--                                        </button>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <script>--}}
+{{--                                    document.addEventListener('livewire.initialized', () => {--}}
+{{--                                        let obj = @json(session('alert') ?? []);--}}
+{{--                                        if (Object.keys(obj).length){--}}
+{{--                                            Livewire.dispatch('alert', [obj])--}}
+{{--                                        }--}}
+{{--                                    })--}}
+{{--                                </script>--}}
+{{--                            </form>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
 
                 <!-- Modal for viewing -->
-                <div x-show="$wire.showDocumentModal"
-                     class="fixed inset-0 z-50 overflow-y-auto"
-                     aria-labelledby="modal-title"
-                     role="dialog"
-                     aria-modal="true">
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+{{--                <div x-show="$wire.showDocumentModal"--}}
+{{--                     class="fixed inset-0 z-50 overflow-y-auto"--}}
+{{--                     aria-labelledby="modal-title"--}}
+{{--                     role="dialog"--}}
+{{--                     aria-modal="true">--}}
+{{--                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">--}}
+{{--                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>--}}
 
-                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div class="sm:flex sm:items-start">
-                                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                            Submitted Documents
-                                        </h3>
-                                        <div class="mt-4 grid grid-cols-1 gap-4">
-                                            @foreach($currentDocuments as $document)
-                                                <div class="border rounded-lg p-4 bg-gray-50">
-                                                    <div class="space-y-4">
-                                                        <!-- Document Header -->
-                                                        <div class="flex justify-between items-start">
-                                                            <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
-                                                            @if($editingDocumentId === $document['id'])
-                                                                <button wire:click="cancelEdit"
-                                                                        class="text-gray-400 hover:text-gray-500">
-                                                                    <span class="sr-only">Close</span>
-                                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                    </svg>
-                                                                </button>
-                                                            @else
-                                                                <button wire:click="startEditingDocument({{ $document['id'] }})"
-                                                                        class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                    Edit Photo
-                                                                </button>
-                                                            @endif
-                                                        </div>
+{{--                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">--}}
+{{--                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">--}}
+{{--                                <div class="sm:flex sm:items-start">--}}
+{{--                                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">--}}
+{{--                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">--}}
+{{--                                            Submitted Documents--}}
+{{--                                        </h3>--}}
+{{--                                        <div class="mt-4 grid grid-cols-1 gap-4">--}}
+{{--                                            @foreach($currentDocuments as $document)--}}
+{{--                                                <div class="border rounded-lg p-4 bg-gray-50">--}}
+{{--                                                    <div class="space-y-4">--}}
+{{--                                                        <!-- Document Header -->--}}
+{{--                                                        <div class="flex justify-between items-start">--}}
+{{--                                                            <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>--}}
+{{--                                                            @if($editingDocumentId === $document['id'])--}}
+{{--                                                                <button wire:click="cancelEdit"--}}
+{{--                                                                        class="text-gray-400 hover:text-gray-500">--}}
+{{--                                                                    <span class="sr-only">Close</span>--}}
+{{--                                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">--}}
+{{--                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />--}}
+{{--                                                                    </svg>--}}
+{{--                                                                </button>--}}
+{{--                                                            @else--}}
+{{--                                                                <button wire:click="startEditingDocument({{ $document['id'] }})"--}}
+{{--                                                                        class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">--}}
+{{--                                                                    Edit Photo--}}
+{{--                                                                </button>--}}
+{{--                                                            @endif--}}
+{{--                                                        </div>--}}
 
-                                                        <!-- Current File Info -->
-                                                        <div class="text-sm text-gray-600">
-                                                            Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>
-                                                        </div>
+{{--                                                        <!-- Current File Info -->--}}
+{{--                                                        <div class="text-sm text-gray-600">--}}
+{{--                                                            Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>--}}
+{{--                                                        </div>--}}
 
-                                                        <!-- Image Preview -->
-                                                        <div class="relative">
-                                                            <img src="{{ $document['file_url'] }}"
-                                                                 alt="{{ $document['attachment_name'] }}"
-                                                                 class="rounded-lg shadow-sm max-h-48 object-cover">
-                                                        </div>
+{{--                                                        <!-- Image Preview -->--}}
+{{--                                                        <div class="relative">--}}
+{{--                                                            <img src="{{ $document['file_url'] }}"--}}
+{{--                                                                 alt="{{ $document['attachment_name'] }}"--}}
+{{--                                                                 class="rounded-lg shadow-sm max-h-48 object-cover">--}}
+{{--                                                        </div>--}}
 
-                                                        <!-- Edit Form -->
-                                                        @if($editingDocumentId === $document['id'])
-                                                            <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">
-                                                                <div>
-                                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                                        Upload New Photo
-                                                                    </label>
-                                                                    <input type="file"
-                                                                           wire:model="newDocument"
-                                                                           class="block w-full text-sm text-gray-500
-                                                                  file:mr-4 file:py-2 file:px-4
-                                                                  file:rounded-full file:border-0
-                                                                  file:text-sm file:font-semibold
-                                                                  file:bg-custom-red file:text-white
-                                                                  hover:file:bg-custom-green
-                                                                  cursor-pointer"
-                                                                           accept="image/*">
-                                                                </div>
-                                                                <div class="flex justify-end space-x-2">
-                                                                    <button wire:click="updateDocument"
-                                                                            class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                        Save Changes
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button type="button"
-                                        wire:click="$set('showDocumentModal', false)"
-                                        class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+{{--                                                        <!-- Edit Form -->--}}
+{{--                                                        @if($editingDocumentId === $document['id'])--}}
+{{--                                                            <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">--}}
+{{--                                                                <div>--}}
+{{--                                                                    <label class="block text-sm font-medium text-gray-700 mb-2">--}}
+{{--                                                                        Upload New Photo--}}
+{{--                                                                    </label>--}}
+{{--                                                                    <input type="file"--}}
+{{--                                                                           wire:model="newDocument"--}}
+{{--                                                                           class="block w-full text-sm text-gray-500--}}
+{{--                                                                  file:mr-4 file:py-2 file:px-4--}}
+{{--                                                                  file:rounded-full file:border-0--}}
+{{--                                                                  file:text-sm file:font-semibold--}}
+{{--                                                                  file:bg-custom-red file:text-white--}}
+{{--                                                                  hover:file:bg-custom-green--}}
+{{--                                                                  cursor-pointer"--}}
+{{--                                                                           accept="image/*">--}}
+{{--                                                                </div>--}}
+{{--                                                                <div class="flex justify-end space-x-2">--}}
+{{--                                                                    <button wire:click="updateDocument"--}}
+{{--                                                                            class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">--}}
+{{--                                                                        Save Changes--}}
+{{--                                                                    </button>--}}
+{{--                                                                </div>--}}
+{{--                                                            </div>--}}
+{{--                                                        @endif--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            @endforeach--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">--}}
+{{--                                <button type="button"--}}
+{{--                                        wire:click="$set('showDocumentModal', false)"--}}
+{{--                                        class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">--}}
+{{--                                    Close--}}
+{{--                                </button>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
 
 {{--                <!-- Tagging/Validation Modal -->--}}
 {{--                <div x-show="openModalTag"--}}
