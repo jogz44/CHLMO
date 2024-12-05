@@ -12,7 +12,14 @@ class AwardeeObserver
      */
     public function created(Awardee $awardee): void
     {
-        $awardee->relocationLot->updateFullStatus();
+        // Load the relationship if not already loaded
+        if (!$awardee->relationLoaded('assignedRelocationSite')) {
+            $awardee->load('assignedRelocationSite');
+        }
+
+        if ($awardee->assignedRelocationSite) {
+            $awardee->assignedRelocationSite->updateFullStatus();
+        }
     }
 
     /**
@@ -20,13 +27,41 @@ class AwardeeObserver
      */
     public function updated(Awardee $awardee): void
     {
-        if ($awardee->isDirty('lot_size') || $awardee->isDirty('relocation_lot_id')) {
-            $awardee->relocationLot->updateFullStatus();
 
-            // If relocation site was changed, update old one too
-            if ($awardee->isDirty('relocation_lot_id')) {
-                RelocationSite::find($awardee->getOriginal('relocation_lot_id'))
-                    ?->updateFullStatus();
+        $shouldUpdateStatus = $awardee->isDirty('assigned_relocation_lot_size') ||
+            $awardee->isDirty('assigned_relocation_site_id') ||
+            $awardee->isDirty('actual_relocation_lot_size') ||
+            $awardee->isDirty('actual_relocation_site_id');
+
+        if ($shouldUpdateStatus) {
+            // Update assigned site status
+            if (!$awardee->relationLoaded('assignedRelocationSite')) {
+                $awardee->load('assignedRelocationSite');
+            }
+            if ($awardee->assignedRelocationSite) {
+                $awardee->assignedRelocationSite->updateFullStatus();
+            }
+
+            // Update actual site status
+            if (!$awardee->relationLoaded('actualRelocationSite')) {
+                $awardee->load('actualRelocationSite');
+            }
+            if ($awardee->actualRelocationSite) {
+                $awardee->actualRelocationSite->updateFullStatus();
+            }
+
+            // Update old sites if changed
+            if ($awardee->isDirty('assigned_relocation_site_id')) {
+                $oldSite = RelocationSite::find($awardee->getOriginal('assigned_relocation_site_id'));
+                if ($oldSite) {
+                    $oldSite->updateFullStatus();
+                }
+            }
+            if ($awardee->isDirty('actual_relocation_site_id')) {
+                $oldActualSite = RelocationSite::find($awardee->getOriginal('actual_relocation_site_id'));
+                if ($oldActualSite) {
+                    $oldActualSite->updateFullStatus();
+                }
             }
         }
     }
@@ -36,7 +71,14 @@ class AwardeeObserver
      */
     public function deleted(Awardee $awardee): void
     {
-        $awardee->relocationLot->updateFullStatus();
+        // Load the relationship if not already loaded
+        if (!$awardee->relationLoaded('assignedRelocationSite')) {
+            $awardee->load('assignedRelocationSite');
+        }
+
+        if ($awardee->assignedRelocationSite) {
+            $awardee->assignedRelocationSite->updateFullStatus();
+        }
     }
 
     /**
