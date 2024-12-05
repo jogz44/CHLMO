@@ -38,12 +38,10 @@ return [
         ],
 
         // newly created one
-        'awardee-photo-requirements' => [
+        'awardee-documents' => [
             'driver' => 'local',
-            'root' => storage_path('app/awardee-photo-requirements'),
-            'serve' => true,
-            'throw' => false,
-            'url' => env('APP_URL').'/awardee-photo-requirements',
+            'root' => storage_path('app/public/awardee-documents'),
+            'url' => env('APP_URL').'/storage/awardee-documents',
             'visibility' => 'public',
         ],
         // newly created one
@@ -117,7 +115,6 @@ return [
 
     'links' => [
         public_path('storage') => storage_path('app/public'),
-        public_path('awardee-photo-requirements') => storage_path('app/awardee-photo-requirements'),
         public_path('tagging-house-structure-images') => storage_path('app/public/tagging-house-structure-images'), // Updated path
         public_path('transfer-photo-requirements') => storage_path('app/transfer-photo-requirements'),
         public_path('grantee-photo-requirements') => storage_path('app/grantee-photo-requirements'),
