@@ -77,7 +77,6 @@
                                     <div class="@role('Housing System Tagger') flex items-center gap-1 w-full sm:w-auto @endrole">
                                         <label class="@role('Housing System Tagger') text-center whitespace-nowrap text-sm @else text-center mt-2 mr-1 @endrole" for="start_date">
                                             Date Applied From:
-{{--                                            <span class="text-gray-400 text-xs" title="Today: {{ now()->toDateString() }}">(?)</span>--}}
                                         </label>
                                         <input type="date" id="start_date" wire:model.live="startDate"
                                                class="@role('Housing System Tagger') border text-[13px] border-gray-300 rounded px-2 py-1 w-6 @else border text-[13px] border-gray-300 rounded px-2 py-1 @endrole"
@@ -122,12 +121,6 @@
                                 <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
                             @endforeach
                         </select>
-                        <select wire:model.live="selectedTransactionType_id" class="@role('Housing System Tagger') w-full sm:w-auto bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm @else bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm @endrole">
-                            <option value="">Transaction Type</option>
-                            @foreach($transactionTypesFilter as $transactionTypeFilter)
-                                <option value="{{ $transactionTypeFilter->id }}">{{ $transactionTypeFilter->type_name }}</option>
-                            @endforeach
-                        </select>
                         <select wire:model.live="selectedTaggingStatus" class="@role('Housing System Tagger') w-full sm:w-auto bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm @else bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm @endrole">
                             <option value="">Status</option>
                             @foreach($taggingStatuses as $status)
@@ -157,7 +150,7 @@
                                 </tr>
                                 </thead>
                                 <tbody class="@role('Housing System Tagger') divide-y divide-gray-200 bg-white @endrole">
-                                    @forelse($applicants as $applicant)
+                                    @forelse($applicants->where('transaction_type', 'Walk-in') as $applicant)
                                         <tr>
                                             <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ optional($applicant)->applicant_id }}</td>
                                             <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">{{ optional($applicant->person)->full_name }}</td>
@@ -165,7 +158,7 @@
                                             <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->person)->contact_number }}</td>
                                             <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->address->purok)->name ?? 'N/A' }}</td>
                                             <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->address->barangay)->name ?? 'N/A' }}</td>
-                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->transactionType)->type_name ?? 'N/A' }}</td>
+                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ $applicant->transaction_type ?? 'N/A' }}</td>
                                             <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>
                                             <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2">
                                                 <div class="@role('Housing System Tagger') flex flex-col sm:flex-row gap-2 justify-center @endrole">
@@ -197,6 +190,49 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
+
+
+                                {{--                                <tbody class="@role('Housing System Tagger') divide-y divide-gray-200 bg-white @endrole">--}}
+{{--                                    @forelse($applicants as $applicant)--}}
+{{--                                        <tr>--}}
+{{--                                            <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ optional($applicant)->applicant_id }}</td>--}}
+{{--                                            <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">{{ optional($applicant->person)->full_name }}</td>--}}
+{{--                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->person)->suffix_name }}</td>--}}
+{{--                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->person)->contact_number }}</td>--}}
+{{--                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->address->purok)->name ?? 'N/A' }}</td>--}}
+{{--                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ optional($applicant->address->barangay)->name ?? 'N/A' }}</td>--}}
+{{--                                            <td class="@role('Housing System Tagger') hidden sm:table-cell py-4 px-2 text-center border-b capitalize @else py-4 px-2 text-center border-b capitalize whitespace-normal break-words @endrole">{{ $applicant->transaction_type ?? 'N/A' }}</td>--}}
+{{--                                            <td class="py-4 px-2 text-center border-b whitespace-normal break-words">{{ \Carbon\Carbon::parse($applicant->date_applied)->format('m/d/Y') }}</td>--}}
+{{--                                            <td class="py-4 px-2 text-center border-b whitespace-nowrap space-x-2">--}}
+{{--                                                <div class="@role('Housing System Tagger') flex flex-col sm:flex-row gap-2 justify-center @endrole">--}}
+{{--                                                    @if ($applicant->taggedAndValidated)--}}
+{{--                                                        <button class="@role('Housing System Tagger') bg-gray-400 text-white px-4 sm:px-14 py-1.5 rounded-full cursor-not-allowed @else bg-gray-400 text-white px-14 py-1.5 rounded-full cursor-not-allowed @endrole">--}}
+{{--                                                            Tagged--}}
+{{--                                                        </button>--}}
+{{--                                                    @else--}}
+{{--                                                        @hasanyrole('Super Admin|Housing System Admin')--}}
+{{--                                                        <!-- Edit Button -->--}}
+{{--                                                        <button wire:click="edit({{ $applicant->id }})"--}}
+{{--                                                                @click="openEditModal = true"--}}
+{{--                                                                class="@role('Housing System Tagger') text-custom-red text-bold underline px-4 py-1.5 @else text-custom-red text-bold underline px-4 py-1.5 @endrole">--}}
+{{--                                                            Edit--}}
+{{--                                                        </button>--}}
+{{--                                                        @endhasanyrole--}}
+{{--                                                        <!-- Tag Button -->--}}
+{{--                                                        <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"--}}
+{{--                                                                class="@role('Housing System Tagger') bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 sm:px-8 py-1.5 rounded-full @else bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full @endrole">--}}
+{{--                                                            Tag--}}
+{{--                                                        </button>--}}
+{{--                                                    @endif--}}
+{{--                                                </div>--}}
+{{--                                            </td>--}}
+{{--                                        </tr>--}}
+{{--                                    @empty--}}
+{{--                                        <tr>--}}
+{{--                                            <td colspan="9" class="py-4 px-2 text-center border-b">No applicants found.</td>--}}
+{{--                                        </tr>--}}
+{{--                                    @endforelse--}}
+{{--                                </tbody>--}}
                             </table>
                         </div>
                     </div>
@@ -262,35 +298,34 @@
                             <form wire:submit.prevent="store">
                                 <x-validation-errors class="mb-4" />
                                 <!-- Date Applied Field -->
-                                <div class="grid grid-cols-2 gap-2 mb-4">
-                                    <div class="mb-3">
-                                        <label class="block text-[12px] font-medium mb-2 text-black">
-                                            TRANSACTION TYPE <span class="text-red-500">*</span>
-                                        </label>
-                                        <select wire:model="transaction_type_id" id="transaction_type_id"
-                                                class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800"
-                                                required>
-                                            <option value="">Select Transaction Type</option>
-                                            @foreach($transactionTypes as $transactionType)
-                                                <option value="{{ $transactionType->id }}">{{ $transactionType->type_name }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('transaction_type_id') <span class="error">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="date_applied">
-                                            APPLICATION DATE <span class="text-red-500">*</span>
-                                        </label>
-                                        <input type="date" id="date_applied" wire:model="date_applied" class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none"
-                                               max="{{ now()->toDateString() }}">
-                                        @error('date_applied') <span class="error">{{ $message }}</span> @enderror
-                                    </div>
+{{--                                    <div class="mb-3">--}}
+{{--                                        <label class="block text-[12px] font-medium mb-2 text-black">--}}
+{{--                                            TRANSACTION TYPE <span class="text-red-500">*</span>--}}
+{{--                                        </label>--}}
+{{--                                        <select wire:model="transaction_type_id" id="transaction_type_id"--}}
+{{--                                                class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800"--}}
+{{--                                                required>--}}
+{{--                                            <option value="">Select Transaction Type</option>--}}
+{{--                                            @foreach($transactionTypes as $transactionType)--}}
+{{--                                                <option value="{{ $transactionType->id }}">{{ $transactionType->type_name }}</option>--}}
+{{--                                            @endforeach--}}
+{{--                                        </select>--}}
+{{--                                        @error('transaction_type_id') <span class="error">{{ $message }}</span> @enderror--}}
+{{--                                    </div>--}}
+                                <div>
+                                    <label class="block text-[12px] font-medium mb-2 w-full text-black">
+                                        APPLICATION DATE <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="date" id="date_applied" wire:model="date_applied"
+                                           class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none mb-4"
+                                           max="{{ now()->toDateString() }}">
+                                    @error('date_applied') <span class="error">{{ $message }}</span> @enderror
                                 </div>
                                 <!-- Main Fields -->
                                 <div class="grid grid-cols-2 gap-3 mb-3">
                                     <!-- First Name Field -->
                                     <div>
-                                        <label class="block text-[12px] font-medium mb-2 text-black" for="first_name">
+                                        <label class="block text-[12px] font-medium mb-2 text-black">
                                             FIRST NAME <span class="text-red-500">*</span>
                                         </label>
                                         <input type="text"
@@ -482,16 +517,16 @@
                             </div>
 
                             <form wire:submit.prevent="update">
-                                <div class="grid grid-cols-1 mb-3">
-                                    <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">TRANSACTION TYPE </label>
-                                    <select wire:model.live="edit_transaction_type_id" id="barangay"
-                                            class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>
-                                        <option value="">Select Transaction Type</option>
-                                        @foreach($transactionTypes as $transactionType)
-                                            <option value="{{ $transactionType->id }}">{{ $transactionType->type_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+{{--                                <div class="grid grid-cols-1 mb-3">--}}
+{{--                                    <label class="block text-[12px] font-medium mb-2 text-black" for="barangay">TRANSACTION TYPE </label>--}}
+{{--                                    <select wire:model.live="edit_transaction_type_id" id="barangay"--}}
+{{--                                            class="w-full px-3 py-1 text-[12px] select2-barangay bg-white border border-gray-600 rounded-lg text-gray-800 uppercase" required>--}}
+{{--                                        <option value="">Select Transaction Type</option>--}}
+{{--                                        @foreach($transactionTypes as $transactionType)--}}
+{{--                                            <option value="{{ $transactionType->id }}">{{ $transactionType->type_name }}</option>--}}
+{{--                                        @endforeach--}}
+{{--                                    </select>--}}
+{{--                                </div>--}}
                                 <!-- Main Fields -->
                                 <div class="grid grid-cols-2 gap-3 mb-3">
                                     <!-- First Name Field -->
