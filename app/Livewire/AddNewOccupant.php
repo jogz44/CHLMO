@@ -557,7 +557,7 @@ class AddNewOccupant extends Component
                 'user_id' => auth()->id(),
                 'address_id' => $address->id,
                 'date_applied' => now(),
-                'initially_interviewed_by' => auth()->user()->full_name(),
+                'initially_interviewed_by' => auth()->user()->full_name,
                 'transaction_type' => $this->isTransfer ? 'Transfer' : 'Tagged Applicant',
                 'is_tagged' => true
             ]);
@@ -710,7 +710,7 @@ class AddNewOccupant extends Component
                     'user_id' => auth()->id(),
                     'date_blacklisted' => now(),
                     'blacklist_reason_description' => 'Transfer of Rights - Property transferred to new occupant',
-                    'updated_by' => auth()->user()->full_name()
+                    'updated_by' => auth()->user()->full_name
                 ]);
             }
 

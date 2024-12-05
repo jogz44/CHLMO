@@ -30,6 +30,10 @@ use Illuminate\Support\Facades\Route;
 //    return view('welcome');
 //});
 
+Livewire::setUpdateRoute(function ($handle) {
+    return Route::post('/hlms/livewire/update', $handle);
+});
+
 Route::get('/', function () {
     return view('auth.login');
 });

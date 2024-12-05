@@ -135,98 +135,6 @@
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Previous Awardee</th>
                     </tr>
                     </thead>
-{{--                    <tbody>--}}
-{{--                        @forelse($awardees as $awardee)--}}
-{{--                            <tr class="hover:bg-gray-100">--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    {{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id ?? 'Transfer Case' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-normal break-words cursor-pointer">--}}
-{{--                                    @if($awardee->taggedAndValidatedApplicant && $awardee->taggedAndValidatedApplicant->person)--}}
-{{--                                        {{ $awardee->taggedAndValidatedApplicant->person->full_name }}--}}
-{{--                                        @if($awardee->is_blacklisted)--}}
-{{--                                            <span class="text-xs text-custom-red">(Previous Awardee)</span>--}}
-{{--                                        @elseif($awardee->previous_awardee_id)--}}
-{{--                                            <span class="text-xs text-green-600">(New Occupant)</span>--}}
-{{--                                        @endif--}}
-{{--                                    @else--}}
-{{--                                        N/A--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-normal break-words cursor-pointer">--}}
-{{--                                    {{ $awardee->assignedRelocationSite->relocation_site_name ?? 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-normal cursor-pointer">--}}
-{{--                                    {{ $awardee->assigned_block ?? 'N/A' }},--}}
-{{--                                    {{ $awardee->assigned_lot ?? 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    {{ $awardee->actualRelocationSite->relocation_site_name ?? 'Not Yet Assigned' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->actual_block && $awardee->actual_lot)--}}
-{{--                                        {{ $awardee->actual_block }},--}}
-{{--                                        {{ $awardee->actual_lot }}--}}
-{{--                                    @else--}}
-{{--                                        Not Yet Assigned--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->actual_relocation_lot_size)--}}
-{{--                                        {{ $awardee->actual_relocation_lot_size }} {{ $awardee->unit }}--}}
-{{--                                        <span class="text-xs text-gray-500">(Actual)</span>--}}
-{{--                                    @else--}}
-{{--                                        {{ $awardee->assigned_relocation_lot_size }} {{ $awardee->unit }}--}}
-{{--                                        <span class="text-xs text-gray-500">(Assigned)</span>--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    {{ $awardee->grant_date ? date('M, d, Y', strtotime($awardee->grant_date)) : 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->is_awarded)--}}
-{{--                                        Awarded--}}
-{{--                                        <span class="ml-1">--}}
-{{--                                            <script src="https://cdn.lordicon.com/lordicon.js"></script>--}}
-{{--                                            <lord-icon--}}
-{{--                                                    src="https://cdn.lordicon.com/fkmafinl.json"--}}
-{{--                                                    trigger="loop"--}}
-{{--                                                    delay="2000"--}}
-{{--                                                    style="width: 30px; height: 30px">--}}
-{{--                                            </lord-icon>--}}
-{{--                                        </span>--}}
-{{--                                    @else--}}
-{{--                                        <span class="text-red-500">Pending...</span>--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->is_blacklisted)--}}
-{{--                                        {{ $awardee->newAwardee->taggedAndValidatedApplicant->person->full_name ?? 'N/A' }}--}}
-{{--                                        <span class="text-xs text-green-600">(Current Awardee)</span>--}}
-{{--                                    @elseif($awardee->previous_awardee_id)--}}
-{{--                                        {{ $awardee->previousAwardee->taggedAndValidatedApplicant->person->full_name ?? 'N/A' }}--}}
-{{--                                        <span class="text-xs text-custom-red">(Previous Awardee)</span>--}}
-{{--                                    @else--}}
-{{--                                        <span class="text-xs text-gray-500">No Previous Awardee</span>--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                            </tr>--}}
-{{--                        @empty--}}
-{{--                            <tr>--}}
-{{--                                <td colspan="10" class="py-4 px-2 text-center border-b">No records found.</td>--}}
-{{--                            </tr>--}}
-{{--                        @endforelse--}}
-{{--                    </tbody>--}}
 
                     {{-- awardee-list.blade.php --}}
                     <tbody>
@@ -244,9 +152,6 @@
                                     <div class="flex flex-col">
                                         @if($awardee->taggedAndValidatedApplicant?->applicant?->person)
                                             {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name }}
-{{--                                            @if($awardee->previous_awardee_name)--}}
-{{--                                                <span class="text-xs text-green-600">(New Occupant)</span>--}}
-{{--                                            @endif--}}
                                         @else
                                             N/A
                                         @endif
@@ -327,11 +232,10 @@
 
                                 {{-- Previous Awardee --}}
                                 <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"
-                                        class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">
+                                        class="py-4 px-2 text-center border-b whitespace-normal break-words">
                                     @if($awardee->previous_awardee_name)
                                         <div class="flex flex-col">
                                             <span>{{ $awardee->previous_awardee_name }}</span>
-{{--                                            <span class="text-xs text-red-500">(Previous Awardee)</span>--}}
                                         </div>
                                     @else
                                         <span class="text-xs text-gray-500">No Previous Awardee</span>
@@ -344,78 +248,6 @@
                             </tr>
                         @endforelse
                     </tbody>
-
-{{--                    <tbody>--}}
-{{--                        @forelse($awardees as $awardee)--}}
-{{--                            <tr class="hover:bg-gray-100">--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    {{ $awardee->taggedAndValidatedApplicant->applicant->applicant_id }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                        class="py-4 px-2 text-center border-b whitespace-normal break-words cursor-pointer">--}}
-{{--                                    {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-normal break-words cursor-pointer">--}}
-{{--                                    {{ $awardee->assignedRelocationSite->relocation_site_name ?? 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-normal cursor-pointer">--}}
-{{--                                    {{ $awardee->assigned_block ?? 'N/A' }},--}}
-{{--                                    {{ $awardee->assigned_lot ?? 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    {{ $awardee->actualRelocationSite->relocation_site_name ?? 'Not Yet Assigned' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center text-custom-green border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->actual_block && $awardee->actual_lot)--}}
-{{--                                        {{ $awardee->actual_block }},--}}
-{{--                                        {{ $awardee->actual_lot }}--}}
-{{--                                    @else--}}
-{{--                                        Not Yet Assigned--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->actual_relocation_lot_size)--}}
-{{--                                        {{ $awardee->actual_relocation_lot_size }} {{ $awardee->unit }}--}}
-{{--                                        <span class="text-xs text-gray-500">(Actual)</span>--}}
-{{--                                    @else--}}
-{{--                                        {{ $awardee->assigned_relocation_lot_size }} {{ $awardee->unit }}--}}
-{{--                                        <span class="text-xs text-gray-500">(Assigned)</span>--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    {{ $awardee->grant_date ? date('M, d, Y', strtotime($awardee->grant_date)) : 'N/A' }}--}}
-{{--                                </td>--}}
-{{--                                <td onclick="window.location.href='{{ route('awardee-details', ['applicantId' => $awardee->id]) }}'"--}}
-{{--                                    class="py-4 px-2 text-center border-b whitespace-nowrap cursor-pointer">--}}
-{{--                                    @if($awardee->is_awarded)--}}
-{{--                                        Awarded--}}
-{{--                                        <span class="ml-1">--}}
-{{--                                            <script src="https://cdn.lordicon.com/lordicon.js"></script>--}}
-{{--                                            <lord-icon--}}
-{{--                                                    src="https://cdn.lordicon.com/fkmafinl.json"--}}
-{{--                                                    trigger="loop"--}}
-{{--                                                    delay="2000"--}}
-{{--                                                    style="width: 30px; height: 30px">--}}
-{{--                                            </lord-icon>--}}
-{{--                                        </span>--}}
-{{--                                    @else--}}
-{{--                                        <span class="text-red-500">Pending...</span>--}}
-{{--                                   @endif--}}
-{{--                                </td>--}}
-{{--                            </tr>--}}
-{{--                        @empty--}}
-{{--                            <tr>--}}
-{{--                                <td colspan="11" class="py-4 px-2 text-center border-b">No records found.</td>--}}
-{{--                            </tr>--}}
-{{--                        @endforelse--}}
-{{--                    </tbody>--}}
                 </table>
                 <div class="mt-4">
                     {{ $awardees->links() }}
