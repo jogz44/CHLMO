@@ -40,46 +40,114 @@
                  class="overflow-x-auto">
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
-                    <tr>
-                        <th class="py-2 px-2 border-b text-center font-medium">Transfer Date</th>
-                        <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">Previous Awardee</th>
-                        <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">Transferred To</th>
-                        <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Relationship</th>
-                        <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Lot Details</th>
-                        <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">Reason</th>
-                        <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">Processed By</th>
-                    </tr>
+                        <tr>
+                            <th class="py-2 px-2 border-b text-center font-medium">Transfer Date</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">Previous Awardee</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column suffix-col">New Awardee</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Relationship</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column contact-col">Property Details</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">Reason</th>
+                            <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">Processed By</th>
+                        </tr>
                     </thead>
                     <tbody>
                         @forelse($transfers as $transfer)
                             <tr>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">
                                     {{ $transfer->transfer_date->format('M d, Y') }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">
-                                    {{ $transfer->previousAwardee->taggedAndValidatedApplicant->applicant->person->full_name }}
+                                <td class="py-4 px-2 text-center border-b whitespace-normal">
+                                    @php
+                                        $parts = explode(" from ", $transfer->remarks);
+                                        $previousParts = explode(" to ", $parts[1] ?? '');
+                                        $previousAwardee = $previousParts[0] ?? 'N/A';
+                                    @endphp
+                                    {{ $previousAwardee }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">
-                                    {{ $transfer->remarks }}
+                                <td class="py-4 px-2 text-center border-b whitespace-normal">
+                                    @php
+                                        $newAwardee = $previousParts[1] ?? 'N/A';
+                                    @endphp
+                                    {{ $newAwardee }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">
-                                    {{ $transfer->relationship }}
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal">
+                                    {{ $transfer->relationship ?? 'N/A' }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">
-                                    {{ $transfer->previousAwardee->relocationLot->relocation_site_name }}
+                                <td class="py-4 px-2 text-center border-b whitespace-normal">
+                                    @php
+                                        $awardee = $transfer->previousAwardee;
+                                        $site = $awardee->actualRelocationSite ?? $awardee->assignedRelocationSite;
+                                        $block = $awardee->actual_block ?? $awardee->assigned_block;
+                                        $lot = $awardee->actual_lot ?? $awardee->assigned_lot;
+                                    @endphp
+                                    @if($site)
+                                        {{ $site->relocation_site_name }}<br>
+                                        <span class="text-sm text-gray-600">
+                                            Block {{ $block }}, Lot {{ $lot }}
+                                        </span>
+                                    @else
+                                        N/A
+                                    @endif
                                 </td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">
+                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal">
                                     {{ $transfer->transfer_reason }}
                                 </td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">
-                                    {{ $transfer->processor->first_name }} {{ $transfer->processor->last_name }}
+                                <td class="py-4 px-2 text-center border-b whitespace-normal">
+                                    {{ optional($transfer->processor)->first_name }} {{ optional($transfer->processor)->last_name }}
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="py-4 px-2 text-center border-b">No transfer history found.</td>
+                                <td colspan="7" class="py-4 px-2 text-center border-b">No transfer history found.</td>
                             </tr>
                         @endforelse
+
+{{--                        @forelse($transfers as $transfer)--}}
+{{--                            <tr>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">--}}
+{{--                                    {{ $transfer->transfer_date->format('M d, Y') }}--}}
+{{--                                </td>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap name-col">--}}
+{{--                                    {{ optional(optional(optional(optional($transfer->previousAwardee)->taggedAndValidatedApplicant)->applicant)->person)->full_name ?? 'N/A' }}--}}
+{{--                                </td>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">--}}
+{{--                                    @php--}}
+{{--                                        $parts = explode(" to ", $transfer->remarks);--}}
+{{--                                        $newOccupant = count($parts) > 1 ? trim($parts[1]) : 'N/A';--}}
+{{--                                    @endphp--}}
+{{--                                    {{ $newOccupant }}--}}
+{{--                                </td>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap suffix-col">--}}
+{{--                                    {{ $transfer->relationship ?? 'N/A' }}--}}
+{{--                                </td>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">--}}
+{{--                                    @php--}}
+{{--                                        $awardee = $transfer->previousAwardee;--}}
+{{--                                        $site = $awardee->actualRelocationSite ?? $awardee->assignedRelocationSite;--}}
+{{--                                        $block = $awardee->actual_block ?? $awardee->assigned_block;--}}
+{{--                                        $lot = $awardee->actual_lot ?? $awardee->assigned_lot;--}}
+{{--                                    @endphp--}}
+{{--                                    @if($site)--}}
+{{--                                        {{ $site->relocation_site_name }}<br>--}}
+{{--                                        <span class="text-sm text-gray-600">--}}
+{{--                                            Block {{ $block }}, Lot {{ $lot }}--}}
+{{--                                        </span>--}}
+{{--                                    @else--}}
+{{--                                        N/A--}}
+{{--                                    @endif--}}
+{{--                                </td>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap purok-col">--}}
+{{--                                    {{ $transfer->transfer_reason }}--}}
+{{--                                </td>--}}
+{{--                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap barangay-col">--}}
+{{--                                    {{ optional($transfer->processor)->first_name }} {{ optional($transfer->processor)->last_name }}--}}
+{{--                                </td>--}}
+{{--                            </tr>--}}
+{{--                        @empty--}}
+{{--                            <tr>--}}
+{{--                                <td colspan="7" class="py-4 px-2 text-center border-b">No transfer history found.</td>--}}
+{{--                            </tr>--}}
+{{--                        @endforelse--}}
                     </tbody>
                 </table>
 
