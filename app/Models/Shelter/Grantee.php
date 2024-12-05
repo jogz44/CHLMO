@@ -22,6 +22,7 @@ class Grantee extends Model
         'profiled_tagged_applicant_id',
         'date_of_delivery',
         'date_of_ris',
+        'ar_no',        
     ];
 
     /**
@@ -32,6 +33,7 @@ class Grantee extends Model
     protected $casts = [
         'id' => 'integer',
         'profiled_tagged_applicant_id' => 'integer',
+        'ar_no' => 'integer',
         'date_of_delivery' => 'date',
         'date_of_ris' => 'date',
     ];
