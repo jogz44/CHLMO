@@ -4,7 +4,7 @@
         <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between relative p-3 z-0">
                 <div class="flex items-center">
-                    <h2 class="text-[13px] ml-5 text-gray-700">LOT LIST</h2>
+                    <h2 class="text-[13px] ml-5 text-gray-700">RELOCATION SITES</h2>
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design" class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                 <div class="relative z-0">
@@ -55,13 +55,6 @@
                             <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
                         @endforeach
                     </select>
-                    <select wire:model.live="filterPurok"
-                            class="border text-[13px] bg-white border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm w-full">
-                        <option value="">All Puroks</option>
-                        @foreach($filterPuroks as $purok)
-                            <option value="{{ $purok->id }}">{{ $purok->name }}</option>
-                        @endforeach
-                    </select>
                     <button wire:click="resetFilters"
                             class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 w-full">
                         Reset Filters
@@ -75,11 +68,12 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th class="py-2 px-2  text-center font-medium">Relocation Site Name</th>
-                        <th class="py-2 px-2 border-b text-center  font-medium">Purok</th>
                         <th class="py-2 px-2 border-b text-center font-medium">Barangay</th>
-                        <th class="py-2 px-2 border-b text-center font-medium">Total Lot Size (m&sup2;)</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Total Land Area (hectares)</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Total No. Of Lots (m&sup2;)</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Total Lot No. for Community Facilities/Road Lots/Open Space (m&sup2;)</th>
+                        <th class="py-2 px-2 border-b text-center font-medium">Residential Lots</th>
                         <th class="py-2 px-2 border-b text-center font-medium">No. of Awardees</th>
-                        <th class="py-2 px-2 border-b text-center font-medium">Lot Size Left (m&sup2;)</th>
                         <th class="py-2 px-2 border-b text-center font-medium">Status</th>
                         <th class="py-2 px-2 border-b text-center font-medium">Action</th>
                     </tr>
@@ -87,25 +81,46 @@
                     <tbody>
                         @forelse($relocationSites as $relocationSite)
                             <tr>
-                                <td class="py-2 px-2 text-center border-b">{{ $relocationSite->relocation_site_name }}</td>
-                                <td class="py-2 px-2 text-center border-b">{{ $relocationSite->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-2 px-2 text-center border-b">{{ $relocationSite->address->barangay->name ?? 'N/A' }}</td>
+                                <td class="py-2 px-2 text-center border-b whitespace-normal break-words">{{ $relocationSite->relocation_site_name }}</td>
+                                <td class="py-2 px-2 text-center border-b">{{ $relocationSite->barangay->name ?? 'N/A' }}</td>
                                 <td class="py-2 px-2 text-center border-b">
-                                    {{ $relocationSite->total_lot_size ?? 'N/A' }} m&sup2;
+                                    {{ $relocationSite->total_land_area ?? 'N/A' }} hectares
                                 </td>
-                                <td class="py-2 px-2 text-center border-b">{{ $relocationSite->awardees->count() }}</td>
-                                <td class="py-2 px-2 text-center text-red-500 border-b">
-                                    {{ $this->getRemainingLotSize($relocationSite->id) }} m&sup2;
+                                <td class="py-2 px-2 text-center border-b">
+                                    {{ $relocationSite->total_no_of_lots ?? 'N/A' }} m&sup2;
+                                </td>
+                                <td class="py-2 px-2 text-center border-b">
+                                    {{ $relocationSite->community_facilities_road_lots_open_space ?? 'N/A' }} m&sup2;
+                                </td>
+                                <td class="py-2 px-2 text-center border-b">
+                                    {{ $relocationSite->total_no_of_lots - $relocationSite->community_facilities_road_lots_open_space }}
+                                    <span class="text-sm text-gray-500">
+                                        ({{ $relocationSite->awardees->count() }} awarded)
+                                    </span>
+                                </td>
+                                <td class="py-2 px-2 text-center border-b">
+                                    @php
+                                        $awardeesCounts = $this->getAwardeesCount($relocationSite->id);
+                                    @endphp
+                                    <div class="flex flex-col space-y-1">
+                                        <span class="text-sm">
+                                            Assigned: {{ $awardeesCounts['assigned'] }}
+                                        </span>
+                                                            <span class="text-sm">
+                                            Actual: {{ $awardeesCounts['actual'] }}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="py-2 px-2 text-center border-b">
                                     @php
                                         $remainingSize = $this->getRemainingLotSize($relocationSite->id);
+                                        $totalResidentialSize = $relocationSite->total_no_of_lots - $relocationSite->community_facilities_road_lots_open_space;
                                     @endphp
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $this->getStatusBadgeClass($remainingSize, $relocationSite->total_lot_size) }}">
-                                        {{ $this->getStatusText($remainingSize, $relocationSite->total_lot_size) }}
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $this->getStatusBadgeClass($remainingSize, $totalResidentialSize) }}">
+                                        {{ $this->getStatusText($remainingSize, $totalResidentialSize) }}
                                     </span>
                                 </td>
-                                <td class="py-2 px-2 text-center border-b">
+                                <td class="py-2 px-2 text-center border-b whitespace-nowrap">
                                     <button wire:click="openEditModal({{ $relocationSite->id }})"
                                             class="px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-800 focus:outline-none">
                                         <svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,32 +171,6 @@
                             @error('relocation_site_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Lot Number -->
-                        <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-black">
-                                LOT NAME/NUMBER
-                            </label>
-                            <input wire:model="lot_number"
-                                   type="text"
-                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                   placeholder="Lot name or number..."
-                                   oninput="capitalizeInput(this)">
-                            @error('lot_number') <span class="error">{{ $message }}</span> @enderror
-                        </div>
-
-                        <!-- Block Identifier -->
-                        <div class="mb-4">
-                            <label class="block text-[12px] font-medium mb-2 text-black">
-                                BLOCK IDENTIFIER
-                            </label>
-                            <input wire:model="block_identifier"
-                                   type="text"
-                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                   placeholder="Block identifier..."
-                                   oninput="capitalizeInput(this)">
-                            @error('block_identifier') <span class="error">{{ $message }}</span> @enderror
-                        </div>
-
                         <!-- Barangay Field -->
                         <div class="mb-3">
                             <label class="block text-[12px] font-medium mb-2 text-black">
@@ -198,35 +187,56 @@
                             @error('barangay_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Purok Field -->
-                        <div class="mb-3">
-                            <label class="block text-[12px] font-medium mb-2 text-black">
-                                PUROK <span class="text-red-500">*</span>
-                            </label>
-                            <select id="purok" wire:model.live="purok_id"
-                                    class="w-full px-3 py-1 text-[12px] select2-purok bg-white border border-gray-600 rounded-lg focus:outline-none text-gray-800 uppercase"
-                                    required>
-                                <option value="">Select Purok</option>
-                                @foreach($puroks as $purok)
-                                    <option value="{{ $purok->id }}">{{ $purok->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('purok_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                        </div>
-
+                        <!-- Lot Land Area -->
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-black">
-                                TOTAL LOT SIZE (m&sup2;) <span class="text-red-500">*</span>
+                                TOTAL LAND AREA (hectares)<span class="text-red-500">*</span>
                             </label>
-                            <input wire:model="total_lot_size"
+                            <input wire:model="total_land_area"
                                    type="number"
-                                   id="total_lot_size"
-                                   class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-600 text-[12px]"
-                                   placeholder="1000"
-                                   required
+                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                   placeholder="5"
                                    oninput="validateNumberInput(this)">
-                            @error('total_lot_size') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @error('total_land_area') <span class="error">{{ $message }}</span> @enderror
                         </div>
+
+                        <!-- Total Number of Lots -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black">
+                                TOTAL NUMBER OF LOTS (m&sup2;)<span class="text-red-500">*</span>
+                            </label>
+                            <input wire:model="total_no_of_lots"
+                                   type="number"
+                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                   placeholder="200"
+                                   oninput="validateNumberInput(this)">
+                            @error('total_number_of_lots') <span class="error">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Total Number of Community Facilities/Road Lots/ Open Space -->
+                        <div class="mb-4">
+                            <label class="block text-[12px] font-medium mb-2 text-black">
+                                TOTAL LOT NUMBER OF COMMUNITY FACILITIES/ ROAD LOTS/ OPEN SPACE (m&sup2;)<span class="text-red-500">*</span>
+                            </label>
+                            <input wire:model="total_lot_number_of_community_facilities"
+                                   type="number"
+                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                   placeholder="30"
+                                   oninput="validateNumberInput(this)">
+                            @error('total_lot_number_of_community_facilities') <span class="error">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Residential Lots -->
+{{--                        <div class="mb-4">--}}
+{{--                            <label class="block text-[12px] font-medium mb-2 text-black">--}}
+{{--                                RESIDENTIAL LOTS (m&sup2;)--}}
+{{--                            </label>--}}
+{{--                            <input wire:model="residential_lots"--}}
+{{--                                    type="number"--}}
+{{--                                   disabled--}}
+{{--                                   class="w-full px-3 py-1 bg-gray-200 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"--}}
+{{--                                   placeholder="200">--}}
+{{--                        </div>--}}
 
                         {{-- Modal Footer --}}
                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-6">
@@ -288,10 +298,10 @@
         <!-- resources/views/livewire/edit-relocation-site.blade.php -->
         <x-modal wire:model="showEditModal">
             <div class="p-4">
-                <div class="text-lg font-medium mb-4">Update Total Lot Size</div>
+                <div class="text-lg font-medium mb-4">Update Relocation Site Details</div>
 
                 @if($editingRelocationSite)
-                    <form wire:submit="updateTotalSize">
+                    <form wire:submit="updateRelocationSite">
                         <div class="mb-4">
                             <label class="block text-sm font-medium mb-2">
                                 Relocation Site
@@ -301,39 +311,110 @@
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">
-                                Current Total Size
-                            </label>
-                            <div class="text-gray-700">
-                                {{ $editingRelocationSite->total_lot_size }} m²
+                        <!-- Assigned Lots Section -->
+                        <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-medium mb-3">Assigned Lots Information</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-1">
+                                        Total Assigned Awardees
+                                    </label>
+                                    <div class="text-gray-700 font-medium">
+                                        {{ $editingRelocationSite->awardees()->count() }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-1">
+                                        Total Assigned Space
+                                    </label>
+                                    <div class="text-gray-700 font-medium">
+                                        {{ $editingRelocationSite->awardees()->sum('assigned_relocation_lot_size') }} m²
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-2">
-                                Currently Allocated
-                            </label>
-                            <div class="text-gray-700">
-                                {{ $editingRelocationSite->awardees()->sum('lot_size') }} m²
+                        <!-- Actual Lots Section -->
+                        <div class="mb-6 bg-gray-50 p-4 rounded-lg">
+                            <h3 class="font-medium mb-3">Actual Lots Information</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-1">
+                                        Total Actual Awardees
+                                    </label>
+                                    <div class="text-gray-700 font-medium">
+                                        {{ $editingRelocationSite->actualAwardees()->count() }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-1">
+                                        Total Actual Space
+                                    </label>
+                                    <div class="text-gray-700 font-medium">
+                                        {{ $editingRelocationSite->actualAwardees()->sum('actual_relocation_lot_size') }} m²
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <label for="newTotalLotSize" class="block text-sm font-medium mb-2">
-                                New Total Size (m²) <span class="text-red-500">*</span>
-                            </label>
-                            <input
-                                    type="number"
-                                    id="newTotalLotSize"
-                                    wire:model="newTotalLotSize"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                    step="0.01"
-                                    min="0"
-                            >
-                            @error('newTotalLotSize')
-                            <span class="text-red-500 text-sm">{{ $message }}</span>
-                            @enderror
+                        <!-- Site Configuration -->
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">
+                                    Total Land Area (m²) <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                        type="number"
+                                        wire:model="new_total_land_area"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        step="0.01"
+                                        min="0"
+                                >
+                                @error('new_total_land_area')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">
+                                    Total Number of Lots <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                        type="number"
+                                        wire:model="new_total_no_of_lots"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        step="1"
+                                        min="0"
+                                >
+                                @error('new_total_no_of_lots')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-2">
+                                    Community Facilities/Road Lots/Open Space <span class="text-red-500">*</span>
+                                </label>
+                                <input
+                                        type="number"
+                                        wire:model="new_total_lot_number_of_community_facilities"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        step="1"
+                                        min="0"
+                                >
+                                @error('new_total_lot_number_of_community_facilities')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="bg-blue-50 p-3 rounded-md">
+                                <label class="block text-sm font-medium mb-2">
+                                    Available Residential Lots
+                                </label>
+                                <div class="text-gray-700 font-medium">
+                                    {{ $new_residential_lots ?? ($new_total_no_of_lots - $new_total_lot_number_of_community_facilities) }} lots
+                                </div>
+                            </div>
                         </div>
 
                         <div class="flex justify-end space-x-2">
@@ -359,7 +440,7 @@
                                 <!-- Update Relocation Site -->
                                 <button type="submit"
                                         class="px-4 py-2 text-sm font-medium bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    Update Size
+                                    Update Site
                                     <div wire:loading>
                                         <svg aria-hidden="true"
                                              class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
@@ -395,34 +476,95 @@
                 <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" wire:click="closeAwardeesModal"></div>
 
-                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full">
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
                                 Awardees for {{ $selectedRelocationSite->relocation_site_name }}
                             </h3>
+
+                            <!-- Summary Statistics -->
+                            <div class="grid grid-cols-2 gap-4 mb-6">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-medium text-gray-700 mb-2">Assigned Lots Summary</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div>
+                                            <span class="text-gray-600">Total Awardees:</span>
+                                            <span class="font-medium">{{ $selectedRelocationSite->awardees->count() }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600">Total Space:</span>
+                                            <span class="font-medium">{{ $selectedRelocationSite->awardees->sum('assigned_relocation_lot_size') }} m²</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <h4 class="font-medium text-gray-700 mb-2">Actual Lots Summary</h4>
+                                    <div class="grid grid-cols-2 gap-2 text-sm">
+                                        <div>
+                                            <span class="text-gray-600">Total Actual:</span>
+                                            <span class="font-medium">{{ $selectedRelocationSite->actualAwardees->count() }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600">Total Space:</span>
+                                            <span class="font-medium">{{ $selectedRelocationSite->actualAwardees->sum('actual_relocation_lot_size') }} m²</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             @if($selectedRelocationSite->awardees->count() > 0)
                                 <div class="max-h-96 overflow-y-auto">
                                     <table class="min-w-full bg-white border border-gray-200">
                                         <thead class="bg-gray-100 sticky top-0">
                                         <tr>
-                                            <th class="py-2 px-2 text-center font-medium">Name</th>
-                                            <th class="py-2 px-2 text-center font-medium">Lot Size (m²)</th>
+                                            <th class="py-2 px-2 text-left font-medium">Name</th>
+                                            <th class="py-2 px-2 text-center font-medium">Assigned Block</th>
+                                            <th class="py-2 px-2 text-center font-medium">Assigned Lot</th>
+                                            <th class="py-2 px-2 text-center font-medium">Assigned Size</th>
+                                            <th class="py-2 px-2 text-center font-medium">Actual Block</th>
+                                            <th class="py-2 px-2 text-center font-medium">Actual Lot</th>
+                                            <th class="py-2 px-2 text-center font-medium">Actual Size</th>
+                                            <th class="py-2 px-2 text-center font-medium">Status</th>
                                             <th class="py-2 px-2 text-center font-medium">Date Granted</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         @foreach($selectedRelocationSite->awardees as $awardee)
-                                            <tr>
-                                                <td class="py-2 px-2 text-center border-b">
+                                            <tr class="hover:bg-gray-50">
+                                                <td class="py-2 px-2 text-left border-b">
                                                     {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? 'N/A' }}
                                                 </td>
                                                 <td class="py-2 px-2 text-center border-b">
-                                                    {{ $awardee->lot_size }} m²
+                                                    {{ $awardee->assigned_block }}
                                                 </td>
                                                 <td class="py-2 px-2 text-center border-b">
-                                                    {{ \Carbon\Carbon::parse($awardee->grant_date)->format('m/d/Y') }}
-
+                                                    {{ $awardee->assigned_lot }}
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->assigned_relocation_lot_size }} m²
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->actual_block ?? '-' }}
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->actual_lot ?? '-' }}
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->actual_relocation_lot_size ?? '-' }} {{ $awardee->actual_relocation_lot_size ? 'm²' : '' }}
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    @if($awardee->actual_relocation_lot_size)
+                                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Actual Lot Assigned
+                                                </span>
+                                                    @else
+                                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                                    Temporary Lot
+                                                </span>
+                                                    @endif
+                                                </td>
+                                                <td class="py-2 px-2 text-center border-b">
+                                                    {{ $awardee->grant_date ? \Carbon\Carbon::parse($awardee->grant_date)->format('m/d/Y') : '-' }}
                                                 </td>
                                             </tr>
                                         @endforeach
