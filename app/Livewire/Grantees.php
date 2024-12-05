@@ -47,6 +47,7 @@ class Grantees extends Component
 
     public $selectedPurok_id, $puroksFilter = [], $selectedBarangay_id, $barangaysFilter = [], $barangay_id, $barangays = [], $purok_id, $puroks = [];
     public $governmentProgramsFilter = [];
+    public $isLoading = false;
 
     public function mount()
     {
@@ -70,8 +71,30 @@ class Grantees extends Component
             return Barangay::all();
         });
         $this->governmentProgramsFilter = Cache::remember('governmentPrograms', 60*60, function() {
-            return Barangay::all();
+            return GovernmentProgram::all();
         });
+    }
+    public function updatedBarangayId($barangayId): void
+    {
+        // Fetch the puroks based on the selected barangay
+        $this->puroks = Purok::where('barangay_id', $barangayId)->get();
+        $this->purok_id = null; // Reset selected purok when barangay changes
+        $this->isLoading = false; // Reset loading state
+        logger()->info('Retrieved Puroks', [
+            'barangay_id' => $barangayId,
+            'puroks' => $this->puroks
+        ]);
+    }
+    public function updatedSelectedBarangayId($barangayId)
+    {
+        // Fetch the puroks based on the selected barangay
+        $this->puroksFilter = Purok::where('barangay_id', $barangayId)->get();
+        $this->selectedPurok_id = null; // Reset selected purok when barangay changes
+        $this->isLoading = false; // Reset loading state
+        logger()->info('Retrieved Puroks', [
+            'selectedBarangay_id' => $barangayId,
+            'puroksFilter' => $this->puroksFilter
+        ]);
     }
     // Reset pagination when search changes
     public function updatingSearch(): void
@@ -89,6 +112,8 @@ class Grantees extends Component
  public function resetFilters()
  {
      $this->startGrantingDate = null;
+     $this->selectedPurok_id = null;
+     $this->selectedBarangay_id = null;
      $this->endGrantingDate = null;
      $this->search = '';
      $this->selectedOriginOfRequest = null;
@@ -113,6 +138,9 @@ class Grantees extends Component
                 'request_origin_id' => $this->selectedOriginOfRequest,
             ]);
 
+            // Debug logging
+        Log::info('Export Filters', $filters);
+
             return Excel::download(
                 new GranteesDataExport($filters),
                 'grantees-' . now()->format('Y-m-d') . '.xlsx'
@@ -125,110 +153,6 @@ class Grantees extends Component
                 'type' => 'danger',
             ]);
         }
-    }
-
-    public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
-    {
-        ini_set('default_charset', 'UTF-8');
-
-        // Fetch Applicants based on filters
-        $query = Grantee::with([
-           'profiledTaggedApplicant.shelterApplicant.person',
-            'profiledTaggedApplicant.shelterApplicant.address.purok',
-            'profiledTaggedApplicant.shelterApplicant.address.barangay',
-            'profiledTaggedApplicant.shelterApplicant.originOfRequest',
-            'profiledTaggedApplicant.governmentProgram',
-            'profiledTaggedApplicant.shelterSpouse',
-        ]);
-
-        // Create filters array matching your Excel export
-        $filters = array_filter([
-            'start_date' => $this->startGrantingDate,
-            'end_date' => $this->endGrantingDate,
-            'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
-            'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
-            'request_origin_id' => $this->selectedOriginOfRequest,
-        ]);
-
-        // Fetch Applicants based on filters
-        $query = Grantee::with([
-            'profiledTaggedApplicant.shelterApplicant.person',
-            'profiledTaggedApplicant.shelterApplicant.address.purok',
-            'profiledTaggedApplicant.shelterApplicant.address.barangay',
-            'profiledTaggedApplicant.shelterApplicant.originOfRequest',
-            'profiledTaggedApplicant.governmentProgram',
-            'profiledTaggedApplicant.shelterSpouse',
-        ]);
-
-        
-        // Apply filters
-        if ($this->startGrantingDate && $this->endGrantingDate) {
-            $query->whereBetween('date_of_delivery', [
-                $this->startGrantingDate,
-                $this->endGrantingDate
-            ]);
-        }
-
-        if ($this->selectedBarangay_id) {    // Changed from barangay_id
-            $query->whereHas('address', function($q) {
-                $q->where('barangay_id', $this->selectedBarangay_id);
-            });
-        }
-
-        if ($this->selectedPurok_id) {       // Changed from purok_id
-            $query->whereHas('address', function($q) {
-                $q->where('purok_id', $this->selectedPurok_id);
-            });
-        }
-
-        if ($this->selectedOriginOfRequest) {  // Changed from request_origin_id
-            $query->where('request_origin_id', $this->selectedOriginOfRequest);
-        }
-
-
-        $grantees = $query->get();
-
-        // Build Subtitle from Filters
-        $subtitle = [];
-
-        if ($this->selectedOriginOfRequest) {
-            $originOfRequest = OriginOfRequest::find($this->selectedOriginOfRequest);
-            $subtitle[] = "ORIGIN OF REQUEST: {$originOfRequest->name}";
-        }
-
-        if ($this->selectedBarangay_id) {     // Changed from barangay_id
-            $barangay = Barangay::find($this->selectedBarangay_id);
-            $subtitle[] = "BARANGAY: {$barangay->name}";
-        }
-
-        if ($this->selectedPurok_id) {        // Changed from purok_id
-            $purok = Purok::find($this->selectedPurok_id);
-            $subtitle[] = "PUROK: {$purok->name}";
-        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
-            $subtitle[] = "PUROK: All Purok";
-        }
-
-        if ($this->startGrantingDate && $this->endGrantingDate) {
-            $startGrantingDate = Carbon::parse($this->startGrantingDate)->format('m/d/Y');
-            $endGrantingDate = Carbon::parse($this->endGrantingDate)->format('m/d/Y');
-            $subtitle[] = "Date of Delivery From: {$startGrantingDate} To: {$endGrantingDate}";
-        }
-
-        $subtitleText = implode(' | ', $subtitle);
-
-        $html = view('pdfs.grantees', [
-            'grantees' => $grantees,
-            'subtitle' => $subtitleText,
-        ])->render();
-
-        // Load the PDF with the generated HTML
-        $pdf = Pdf::loadHTML($html);
-        $pdf->setPaper('legal', 'portrait');
-
-        // Stream the PDF for download
-        return response()->streamDownload(function () use ($pdf) {
-            echo $pdf->stream();
-        }, 'grantees.pdf');
     }
 
  public function render()
