@@ -12,20 +12,36 @@ class RelocationSite extends Model
     use HasFactory;
 
     protected $fillable = [
-        'address_id',
-        'lot_number',
-        'block_identifier',
+        'barangay_id',
         'relocation_site_name',
-        'total_lot_size',
+        'total_land_area',
+        'total_no_of_lots',
+        'community_facilities_road_lots_open_space',
         'is_full'
     ];
 
     protected $casts = [
         'id' => 'integer',
         'address_id' => 'integer',
-        'total_lot_size' => 'integer'
+        'total_land_area' => 'integer',
+        'total_no_of_lots' => 'integer',
+        'community_facilities_road_lots_open_space' => 'integer'
     ];
 
+    public function getRemainingLotSize(): float
+    {
+        $totalAvailableLots = $this->total_no_of_lots - $this->community_facilities_road_lots_open_space;
+
+        // Calculate total allocated space based on actual or assigned lot sizes
+        $totalAllocatedSpace = $this->awardees()
+            ->get()
+            ->sum(function ($awardee) {
+                // Use actual Lot size if available, otherwise use assigned lot size
+                return $awardee->actual_relocation_lot_size ?? $awardee->assigned_relocation_lot_size;
+            });
+
+        return $totalAvailableLots - $totalAllocatedSpace;
+    }
     public function updateFullStatus(): void
     {
         $remainingSize = $this->getRemainingLotSize();
@@ -33,20 +49,16 @@ class RelocationSite extends Model
             'is_full' => $remainingSize <= 0
         ]);
     }
-    public function getRemainingLotSize(): float
+    public function actualAwardees(): HasMany
     {
-        return $this->total_lot_size - $this->awardees()->sum('lot_size');
-    }
-    public function taggedAndValidatedApplicants(): HasMany
-    {
-        return $this->hasMany(TaggedAndValidatedApplicant::class, 'relocation_lot_id', 'id');
+        return $this->hasMany(Awardee::class, 'actual_relocation_site_id', 'id');
     }
     public function awardees(): HasMany
     {
-        return $this->hasMany(Awardee::class, 'relocation_lot_id', 'id');
+        return $this->hasMany(Awardee::class, 'assigned_relocation_site_id', 'id');
     }
-    public function address(): BelongsTo
+    public function barangay(): BelongsTo
     {
-        return $this->belongsTo(Address::class);
+        return $this->belongsTo(Barangay::class);
     }
 }

@@ -11,14 +11,18 @@ class Blacklist extends Model
     use HasFactory;
 
     protected $fillable = [
-        'awardee_id','user_id','date_blacklisted','blacklist_reason_description','updated_by',
+        'awardee_id',
+        'user_id',
+        'date_blacklisted',
+        'blacklist_reason_description',
+        'updated_by',
     ];
 
     protected $casts = [
         'id' => 'integer',
         'awardee_id' => 'integer',
         'user_id' => 'integer',
-        'date_blacklisted' => 'date',
+        'date_blacklisted' => 'datetime',
     ];
 
     public function awardee(): BelongsTo

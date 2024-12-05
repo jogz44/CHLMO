@@ -16,7 +16,7 @@ class Applicant extends Model
         'applicant_id',
         'person_id',
         'user_id',
-        'transaction_type_id',
+        'transaction_type',
         'address_id',
         'date_applied',
         'initially_interviewed_by',
@@ -27,7 +27,6 @@ class Applicant extends Model
         'id' => 'integer',
         'person_id' => 'integer',
         'user_id' => 'integer',
-        'transaction_type_id' => 'integer',
         'date_applied' => 'date',
     ];
 
@@ -60,12 +59,6 @@ class Applicant extends Model
     {
         return $this->belongsTo(People::class, 'person_id', 'id');
     }
-
-    public function transactionType(): BelongsTo
-    {
-        return $this->belongsTo(TransactionType::class);
-    }
-
     public function spouse(): BelongsTo
     {
         return $this->belongsTo(Spouse::class);
@@ -74,12 +67,10 @@ class Applicant extends Model
     {
         return $this->belongsTo(Dependent::class);
     }
-
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
-
     public function taggedAndValidated(): HasOne
     {
         return $this->hasOne(TaggedAndValidatedApplicant::class, 'applicant_id', 'id');

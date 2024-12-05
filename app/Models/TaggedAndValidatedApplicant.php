@@ -14,7 +14,7 @@ class TaggedAndValidatedApplicant extends Model
 
     protected $fillable = [
         'applicant_id', 'civil_status_id', 'tribe', 'religion', 'living_situation_id', 'case_specification_id',
-        'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id',
+        'living_situation_case_specification', 'non_informal_settler_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id',
         'wall_type_id', 'structure_status_id', 'full_address', 'sex', 'date_of_birth', 'occupation',
         'monthly_income', 'tagging_date', 'room_rent_fee', 'room_landlord', 'house_rent_fee', 'house_landlord',
         'lot_rent_fee', 'lot_landlord', 'house_owner', 'relationship_to_house_owner', 'tagger_name',
@@ -32,11 +32,19 @@ class TaggedAndValidatedApplicant extends Model
     // Relationship with Applicant
     public function applicant(): BelongsTo
     {
-        return $this->belongsTo(Applicant::class);
+        return $this->belongsTo(Applicant::class, 'applicant_id');
     }
-    public function documents(): HasMany
+    public function person(): BelongsTo
     {
-        return $this->hasMany(AwardeeDocumentsSubmission::class, 'tagged_applicant_id');
+        return $this->belongsTo(People::class, 'person_id', 'id');
+    }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function address(): BelongsTo
+    {
+        return $this->belongsTo(Address::class);
     }
     public function awardees(): HasMany
     {
@@ -45,10 +53,6 @@ class TaggedAndValidatedApplicant extends Model
     public function civilStatus(): BelongsTo
     {
         return $this->belongsTo(CivilStatus::class, 'civil_status_id');
-    }
-    public function address(): BelongsTo
-    {
-        return $this->belongsTo(Address::class);
     }
     public function spouse(): HasOne
     {

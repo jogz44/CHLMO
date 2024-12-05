@@ -11,8 +11,8 @@ class AwardeeDocumentsSubmission extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tagged_applicant_id',
-        'attachment_id',
+        'awardee_id',
+        'document_name',
         'file_path',
         'file_name',
         'file_type',
@@ -21,16 +21,10 @@ class AwardeeDocumentsSubmission extends Model
 
     protected $casts = [
         'id' => 'integer',
-        'tagged_applicant_id' => 'integer',
-        'awardee_attachments_list_id' => 'integer'
+        'awardee_id' => 'integer',
     ];
-    public function taggedAndValidatedApplicant(): BelongsTo
+    public function awardee(): BelongsTo
     {
-        return $this->belongsTo(TaggedAndValidatedApplicant::class, 'tagged_applicant_id');
-    }
-
-    public function attachmentType(): BelongsTo
-    {
-        return $this->belongsTo(AwardeeAttachmentsList::class, 'awardee_attachments_list_id');
+        return $this->belongsTo(Awardee::class, 'awardee_id');
     }
 }

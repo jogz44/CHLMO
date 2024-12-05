@@ -15,10 +15,16 @@ class Awardee extends Model
     protected $fillable = [
         'tagged_and_validated_applicant_id',
         'assigned_relocation_site_id',
+        'assigned_lot',
+        'assigned_block',
+        'assigned_relocation_lot_size',
         'actual_relocation_site_id',
-        'lot_size',
+        'actual_lot',
+        'actual_block',
+        'actual_relocation_lot_size',
         'unit',
         'grant_date',
+        'previous_awardee_name',
         'has_assigned_relocation_site',
         'documents_submitted',
         'is_awarded',
@@ -28,7 +34,6 @@ class Awardee extends Model
     protected $casts = [
         'id' => 'integer',
         'tagged_and_validated_applicant_id' => 'integer',
-        'relocation_lot_id' => 'integer',
         'grant_date' => 'datetime',
         'has_assigned_relocation_site' => 'boolean',
         'documents_submitted' => 'boolean',
@@ -60,12 +65,23 @@ class Awardee extends Model
     {
         return $this->hasOne(Blacklist::class);
     }
-    public function transfersAsOriginal(): HasMany
+    // Get the previous awardee for a transfer case
+    public function previousAwardee(): BelongsTo
+    {
+        return $this->belongsTo(Awardee::class, 'previous_awardee_id');
+    }
+    // Get the new awardee that replaced this one
+    public function newAwardee(): HasOne
+    {
+        return $this->hasOne(Awardee::class, 'previous_awardee_id', 'id');
+    }
+    // Get the transfer history records where this awardee was the previous awardee
+    public function transferHistories(): HasMany
     {
         return $this->hasMany(AwardeeTransferHistory::class, 'previous_awardee_id');
     }
-    public function transfersAsNew(): HasMany
+    public function documents(): HasMany
     {
-        return $this->hasMany(AwardeeTransferHistory::class, 'new_awardee_id');
+        return $this->hasMany(AwardeeDocumentsSubmission::class, 'awardee_id');
     }
 }
