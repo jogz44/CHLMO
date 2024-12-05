@@ -43,7 +43,7 @@ class ShelterProfiledTaggedApplicants extends Component
     public $materialUnits = [];
     public $purchaseOrders = [];
     public $materialUnitId, $material_id, $purchaseOrderId;
-    public $quantity, $available_quantity, $date_of_delivery, $date_of_ris;
+    public $quantity, $available_quantity, $date_of_delivery, $date_of_ris, $ar_no;
     public $grantee_quantity = [];
     public $images = [];
 
@@ -186,6 +186,7 @@ class ShelterProfiledTaggedApplicants extends Component
         return [
             'date_of_delivery' => 'required|date',
             'date_of_ris' => 'required|date',
+            'ar_no' => 'required|numeric',
             'materials.*.material_id' => 'required|exists:materials,id',
             'grantee_quantity.*' => 'required|numeric|min:1',
             'materials.*.material_unit_id' => 'required|exists:material_units,id',
@@ -213,16 +214,23 @@ class ShelterProfiledTaggedApplicants extends Component
     {
         $this->isFilePondUploadComplete = true;
         $this->validate([
-            'requestLetterAddressToCityMayor' => 'required|file|max:10240',
-            'certificateOfIndigency' => 'required|file|max:10240',
+            'requestLetterAddressToCityMayor' => 'nullable|file|max:10240',
+            'certificateOfIndigency' => 'nullable|file|max:10240',
             'consentLetterIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
             'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
-            'profilingForm' => 'required|file|max:10240',
+            'profilingForm' => 'nullable|file|max:10240',
         ]);
     }
 
     public function submit(): void
     {
+        $submittedAttachments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $this->profiledTaggedApplicantId)->count();
+
+        if ($submittedAttachments === 0) {
+            $this->handleError('No documents have been submitted.');
+            return;
+        }
+
         DB::beginTransaction();
         try {
             // Check if granteeId is set
@@ -241,11 +249,11 @@ class ShelterProfiledTaggedApplicants extends Component
 
             // Validate inputs
             $validatedData = $this->validate([
-                'requestLetterAddressToCityMayor' => 'required|file|max:10240',
-                'certificateOfIndigency' => 'required|file|max:10240',
+                'requestLetterAddressToCityMayor' => 'nullable|file|max:10240',
+                'certificateOfIndigency' => 'nullable|file|max:10240',
                 'consentLetterIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
                 'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
-                'profilingForm' => 'required|file|max:10240',
+                'profilingForm' => 'nullable|file|max:10240',
             ]);
 
             logger()->info('Validation passed', $validatedData);
@@ -258,7 +266,7 @@ class ShelterProfiledTaggedApplicants extends Component
 
             DB::commit();
 
-             // Log the activity
+            // Log the activity
             $logger = new ActivityLogs();
             $user = Auth::user();
             $logger->logActivity('Submitted Applicants Requirements', $user);
@@ -303,15 +311,6 @@ class ShelterProfiledTaggedApplicants extends Component
                 'file_size' => $file->getSize(),
             ]);
 
-            // logger()->info('Searching for grantee with ID', ['id' => $this->granteeId]);
-
-            // $grantee = Grantee::findOrFail($this->granteeId);
-
-            // logger()->info('Found grantee', [
-            //     'grantee_id' => $grantee->id,
-            //     'profiled_tagged_applicant_id' => $grantee->profiled_tagged_applicant_id
-            // ]);
-
             // Update the applicant's status
             ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
                 'is_awarding_on_going' => true
@@ -338,18 +337,19 @@ class ShelterProfiledTaggedApplicants extends Component
 
     private function resetUpload(): void
     {
-        $this->reset([
-            'requestLetterAddressToCityMayor',
-            'certificateOfIndigency',
-            'consentLetterIfTheLandIsNotTheirs',
-            'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs',
-            'profilingForm',
-            'attachment_id',
-        ]);
-
         $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
         $this->show = false;  // Close the modal or hide any UI related to uploads if needed
     }
+
+    public function isRequirementsComplete($profiledTaggedApplicantId): bool
+    {
+        $submittedAttachments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $profiledTaggedApplicantId)->count();
+
+        // Check for at least one document if all are optional
+        return $submittedAttachments > 0;
+    }
+
+
     public function grantApplicant()
     {
         $this->validate();
@@ -357,10 +357,12 @@ class ShelterProfiledTaggedApplicants extends Component
 
         try {
             // Create the grantee entry first
-            $grantee = Grantee::create([
+            $grantee = Grantee::updateOrCreate([
                 'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
                 'date_of_delivery' => $this->date_of_delivery,
                 'date_of_ris' => $this->date_of_ris,
+                'ar_no' => $this->ar_no,
+                'is_granted' => true,
             ]);
 
             // Now loop over the materials to create DeliveredMaterial entries for this grantee
@@ -403,10 +405,10 @@ class ShelterProfiledTaggedApplicants extends Component
             ]);
             // $grantee->update(['is_granted' => true]);
 
-             // Log the activity
-             $logger = new ActivityLogs();
-             $user = Auth::user();
-             $logger->logActivity('Granted Shelter Applicant', $user);
+            // Log the activity
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Granted Shelter Applicant', $user);
 
             DB::commit();
             $this->resetForm();
@@ -456,6 +458,7 @@ class ShelterProfiledTaggedApplicants extends Component
             'purchaseOrderId',
             'date_of_delivery',
             'date_of_ris',
+            'ar_no',
             'grantee_quantity',
             'images',
         ]);
@@ -533,7 +536,6 @@ class ShelterProfiledTaggedApplicants extends Component
                 'message' => 'Document has been successfully updated!',
                 'type' => 'success'
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->handleError('Failed to update document', $e);
@@ -546,45 +548,58 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->newDocument = null;
     }
 
+    public function searchMaterials($query)
+    {
+        if (empty($query)) {
+            return [];
+        }
+
+        return Material::where('item_description', 'like', '%' . $query . '%')
+            ->take(10) // Limit results for performance
+            ->get(['id', 'item_description'])
+            ->toArray();
+    }
+
+
     public function render()
     {
         // Fetch applicants with their related data
         $query = ProfiledTaggedApplicant::with(['originOfRequest', 'shelterApplicant.person'])
-            ->where(function($query) {
+            ->where(function ($query) {
                 // Search within shelterApplicant's person relationship
-                $query->whereHas('shelterApplicant.person', function($q) {
-                    $q->where('first_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('last_name', 'like', '%'.$this->search.'%');
+                $query->whereHas('shelterApplicant.person', function ($q) {
+                    $q->where('first_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('middle_name', 'like', '%' . $this->search . '%')
+                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
                 })
-                // Search within shelterApplicant's own fields
-                ->orWhereHas('shelterApplicant', function($q) {
-                    $q->where('request_origin_id', 'like', '%'.$this->search.'%')
-                        ->orWhere('profile_no', 'like', '%'.$this->search.'%');
-                });
+                    // Search within shelterApplicant's own fields
+                    ->orWhereHas('shelterApplicant', function ($q) {
+                        $q->where('request_origin_id', 'like', '%' . $this->search . '%')
+                            ->orWhere('profile_no', 'like', '%' . $this->search . '%');
+                    });
             });
-    
+
         // Apply date range filter (if both dates are present)
         if ($this->startTaggingDate && $this->endTaggingDate) {
             $query->whereBetween('date_tagged', [$this->startTaggingDate, $this->endTaggingDate]);
         }
-    
+
         // Filter by selected origin of request
         if ($this->selectedOriginOfRequest) {
             $query->whereHas('shelterApplicant.originOfRequest', function ($q) {
                 $q->where('id', $this->selectedOriginOfRequest);
             });
         }
-    
+
         // Fetch all origin of requests for filter dropdown
         $OriginOfRequests = OriginOfRequest::all();
-    
+
         // Fetch and paginate the results
         $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate(5);
-    
+
         return view('livewire.shelter-profiled-tagged-applicants', [
             'profiledTaggedApplicants' => $profiledTaggedApplicants,
             'OriginOfRequests' => $OriginOfRequests,
         ]);
     }
-}    
+}

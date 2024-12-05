@@ -13,6 +13,38 @@
                 </div>
                 <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                     class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+                <div class="relative" x-data="{ open: false }">
+                    <!-- Button to toggle dropdown -->
+                    <button
+                        @click="open = !open"
+                        class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded w-full text-left flex items-center justify-between">
+                        EXPORT RIS
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 transform transition-transform duration-300"
+                            :class="{ 'rotate-180': open }"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div
+                        x-show="open"
+                        @click.outside="open = false"
+                        class="absolute bg-white shadow-lg rounded mt-1 w-full z-10"
+                        x-cloak>
+                        @foreach ($poNumbers as $poNumber)
+                        <button
+                            wire:click="export('{{ $poNumber }}')"
+                            class="block text-black text-left px-4 py-2 w-full hover:bg-gray-100">
+                            {{ $poNumber }}
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
             </div>
 
 

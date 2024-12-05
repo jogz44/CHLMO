@@ -38,32 +38,20 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
     private $selectedPoNumber;
     private $startRisDate;
     private $endRisDate;
+    private $selectedPrId;
+    private $selectedPoId;
 
 
     const DANGER_ZONE_ID = 8;
 
     private function getTitle(): string
     {
-        return 'DISTRIBUTION LIST';
+        return 'SHELTER ASSISTANCE PROGRAM';
     }
 
-    private function getSubtitle(): array
+    private function getSubtitle(): string
     {
-        $subtitle = [];
-
-        if (!empty($this->selectedPrNumber)) {
-            $this->poNumbers = PurchaseOrder::where('purchase_requisition_id', $this->selectedPrNumber)->pluck('po_number', 'id')->toArray();
-            $subtitle[] = "PO AND PR: {poNumbers}";
-        }
-
-        // Add Date Range
-        if (!empty($this->filters['startRisDate']) && !empty($this->filters['endRisDate'])) {
-            $startRisDate = Carbon::parse($this->filters['startRisDate'])->format('m/d/Y');
-            $endRisDate = Carbon::parse($this->filters['endRisDate'])->format('m/d/Y');
-            $subtitle[] = "FOR THE PERIOD OF: {$startRisDate} TO: {$endRisDate}";
-        }
-
-        return $subtitle;
+        return 'DISTRIBUTION LIST';
     }
 
     public function __construct(array $filters = [])
@@ -83,7 +71,7 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
             'profiledTaggedApplicant.shelterApplicant.person',
             'deliveredMaterials.material',
             'deliveredMaterials.material.purchaseOrder',
-            'deliveredMaterials.material.materialUnit'
+            'deliveredMaterials.material.materialUnit',
         ]);
 
         // Apply date range filter
@@ -107,6 +95,13 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
 
         $grantees = $query->get();
 
+        // Calculate totals 
+        $totals = [
+            'total_delivered' => $grantees->sum(function ($grantee) {
+                return $grantee->deliveredMaterials->sum('grantee_quantity');
+            }),
+        ];
+
         // Dynamic material filtering based on grantees and filters
         $materialIds = $grantees->pluck('deliveredMaterials.*.material_id')->flatten()->unique();
         $allMaterials = Material::whereIn('id', $materialIds)
@@ -120,41 +115,37 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
                     $q->where('id', $this->selectedPrNumber);
                 });
             })
-            ->with('materialUnit')
+            ->with(
+                'materialUnit',
+            )
             ->get();
 
-        // Prep subtitle to show applied filters
-        $subtitles = [];
-        if ($this->startRisDate && $this->endRisDate) {
-            $subtitles[] = "Date Range: " .
-                Carbon::parse($this->startRisDate)->format('m/d/Y') .
-                " to " .
-                Carbon::parse($this->endRisDate)->format('m/d/Y');
-        }
-
-        if ($this->selectedPrNumber) {
-            $prNumber = PurchaseRequisition::find($this->selectedPrNumber)->pr_number ?? 'N/A';
-            $subtitles[] = "PR Number: {$prNumber}";
-        }
-
-        if ($this->selectedPoNumber) {
-            $poNumber = PurchaseOrder::find($this->selectedPoNumber)->po_number ?? 'N/A';
-            $subtitles[] = "PO Number: {$poNumber}";
-        }
+        $selectedPrNumber = $this->getPrNumber(); // Fetch PR number from the related model or attribute
+        $selectedPoNumber = $this->getPoNumber(); // Fetch PO number from the related model or attribute
 
         return view('exports.distribution-lists', [
             'grantees' => $grantees,
             'allMaterials' => $allMaterials,
-            'title' => 'DISTRIBUTION LIST',
-            'subtitle' => $subtitles,
-            'poNumbers' => $this->poNumbers,
-            'prNumbers' => $this->prNumbers,
+            'title' => 'SHELTER ASSISTANCE PROGRAM',
+            'subtitle' => 'DISTRIBUTION LIST',
+            'totals' => $totals,
             'selectedPoNumber' => $this->selectedPoNumber,
             'selectedPrNumber' => $this->selectedPrNumber,
             'startRisDate' => $this->startRisDate,
             'endRisDate' => $this->endRisDate,
         ]);
     }
+
+    private function getPrNumber()
+    {
+        return PurchaseRequisition::find($this->selectedPrId)?->pr_number ?? null; // Assuming you store the PR ID in $this->selectedPrId
+    }
+
+    private function getPoNumber()
+    {
+        return PurchaseOrder::find($this->selectedPoId)?->po_number ?? null; // Assuming you store the PO ID in $this->selectedPoId
+    }
+
 
     public function updatedSelectedPrNumber($value)
     {
@@ -193,7 +184,7 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
         $sheet->getColumnDimension('A')->setWidth(15); // ID
         $sheet->getColumnDimension('B')->setWidth(30); // date ris
         $sheet->getColumnDimension('C')->setWidth(10); // name
-        $sheet->getColumnDimension('D')->setWidth(15); // contact
+        $sheet->getColumnDimension('D')->setWidth(15); // ar no
         $sheet->getColumnDimension('E')->setWidth(15); // material
 
         // Set print area
@@ -209,18 +200,34 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
     /**
      * @throws Exception
      */
-    public function drawings(): Drawing
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/logo.png'));
-        $drawing->setHeight(100); // Adjust height as needed
-        $drawing->setCoordinates('B1'); // Stay in column B
-        $drawing->setOffsetX(100); // Adjust this value to push it toward the end of column B
-        $drawing->setOffsetY(2);
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(100); // Adjust height as needed
+        $leftDrawing->setCoordinates('B2'); // Starting cell
+        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
+        $rightDrawing->setHeight(100); // Adjust height as needed
+        $rightDrawing->setCoordinates('F2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
 
     public function startCell(): string
@@ -256,6 +263,41 @@ class DistributionListDataExport implements FromView, ShouldAutoSize, WithChunkR
                 $worksheet->getColumnDimension('C')->setWidth(6.89);
                 $worksheet->getColumnDimension('D')->setWidth(15.11);
                 $worksheet->getColumnDimension('E')->setWidth(19.56);
+
+                $highestRow = $event->sheet->getDelegate()->getHighestRow(); // Last data row
+                $highestColumn = $event->sheet->getDelegate()->getHighestColumn(); // Last column
+
+                $styleBottomThick = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+
+                $styleBottomMedium = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+
+                $styleBottomThin = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+
+                // Apply different border styles
+                $event->sheet->getStyle('A9:H9')->applyFromArray($styleBottomMedium); // Thick border
+                $event->sheet->getStyle('A13:H13')->applyFromArray($styleBottomMedium); // Medium border
+                $event->sheet->getStyle('A15:H15')->applyFromArray($styleBottomThin); // Thin border
             },
         ];
     }
