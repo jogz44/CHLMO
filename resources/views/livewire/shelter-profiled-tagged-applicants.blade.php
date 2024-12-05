@@ -102,48 +102,47 @@
                         @forelse($profiledTaggedApplicants as $shelterApplicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->shelterApplicant->profile_no }}</td>
-                            <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->person->last_name }}, {{ $shelterApplicant->shelterApplicant->person->first_name }} {{ $shelterApplicant->shelterApplicant->person->middle_name }}</td>
+                            <td class="py-4 px-2 text-center capitalize border-b underline cursor-pointer hover:text-green-500"
+                                @click="window.location.href = '{{ route('profiled-tagged-applicant-details', ['profileNo' => $shelterApplicant->id]) }}'">
+                                {{ $shelterApplicant->shelterApplicant->person->last_name }}, {{ $shelterApplicant->shelterApplicant->person->first_name }} {{ $shelterApplicant->shelterApplicant->person->middle_name }}
+                            </td>
                             <td class="py-4 px-2 text-center capitalize border-b">{{ $shelterApplicant->shelterApplicant->originOfRequest->name ?? 'N/A' }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b"> {{ $shelterApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ optional($shelterApplicant->date_tagged)->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                @if (!$shelterApplicant->is_awarding_on_going)
-                                <!-- Submit Requirements and Details Buttons -->
-                                <button @click="window.location.href = '{{ route('profiled-tagged-applicant-details', ['profileNo' => $shelterApplicant->id]) }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">
-                                    Details
+                                @php
+                                $isComplete = $shelterApplicant->granteeDocumentsSubmission->count() >= 3; // Assuming 3 required documents
+                                @endphp
+
+                                @if ($isComplete)
+                                <button
+                                    @click="showDocumentModal({{ $shelterApplicant->id }})"
+                                    class="bg-amber-500 text-white px-4 py-1.5 rounded-full">
+                                    Submitted
                                 </button>
-                                <button @click="openModalDocumentsChecklist = true; $wire.set('profiledTaggedApplicantId', {{ $shelterApplicant->id }})"
-                                    class="bg-amber-500 text-white px-4 py-1.5 rounded-full ">
+                                @else
+                                <button
+                                    @click="openModalDocumentsChecklist = true; $wire.set('profiledTaggedApplicantId', {{ $shelterApplicant->id }})"
+                                    class="bg-amber-500 text-white px-4 py-1.5 rounded-full hover:from-orange-500 hover:to-orange-500">
                                     Submit Requirements
                                 </button>
-                                @elseif($shelterApplicant->grantees->isEmpty())
-                                <!-- Grant Button if no grantee exists yet -->
-                                <div class="relative flex items-center space-x-2 ml-16">
-                                    <button @click="window.location.href = '{{ route('profiled-tagged-applicant-details', ['profileNo' => $shelterApplicant->id]) }}'"
-                                        class="text-custom-red text-bold underline px-4 py-1.5">
-                                        Details
-                                    </button>
-                                    <button wire:click="viewSubmittedDocuments({{ $shelterApplicant->id }})" 
-                                        class="bg-amber-500 text-white px-4 py-1.5 rounded-full">
-                                        Submitted
-                                    </button>
-                                    <button @click="openModalGrant = true; $wire.set('profiledTaggedApplicantId', {{ $shelterApplicant->id }})"
-                                        class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-6 py-1.5 rounded-full">
-                                        Grant
-                                    </button>
-                                </div>
-                                @elseif($shelterApplicant->grantees->isNotEmpty() && !$shelterApplicant->grantees->first()?->is_granted)
-                                <!-- Granted Button when is_granted is true -->
-                                <button @click="window.location.href = '{{ route('profiled-tagged-applicant-details', ['profileNo' => $shelterApplicant->id]) }}'"
-                                    class="text-custom-red text-bold underline px-4 py-1.5">
-                                    Details
+                                @endif
+
+                                @if($shelterApplicant->grantees->isEmpty())
+                                <button
+                                     @click="window.location.href = '{{ route('grant-applicant', ['profiledTaggedApplicantId' => $shelterApplicant->id]) }}'"
+                                    class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-6 py-1.5 rounded-full">
+                                    Grant
                                 </button>
-                                <button class="bg-gray-400 text-white px-12 py-1.5 rounded-full cursor-not-allowed">
+                                @else
+                                <button
+                                    class="bg-gray-500 text-white px-6 py-1.5 rounded-full" disabled>
                                     Granted
                                 </button>
                                 @endif
                             </td>
+
+
                         </tr>
                         @empty
                         <tr>
@@ -163,33 +162,40 @@
                 <div x-show="openModalGrant"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg "
                     x-cloak style="font-family: 'Poppins', sans-serif;">
-                    <div class="bg-white text-white w-[530px] h-[590px] rounded-lg shadow-lg px-6 p-2 relative overflow-y-auto">
+                    <div class="bg-white text-white w-[680px] h-[590px] rounded-lg shadow-lg px-6 p-2 relative overflow-y-auto">
                         <!-- Modal Header -->
-                        <div class="flex justify-between items-center mb-4 bg-white sticky top-0 z-10 py-6">
+                        <div class="flex justify-between items-center mb-2 bg-white sticky top-0 z-10 py-6">
                             <h3 class="text-lg font-semibold text-black">GRANT APPLICANT</h3>
                             <button @click="openModalGrant = false" class="text-gray-400 hover:text-gray-200">
                                 &times;
-                            </button>   
+                            </button>
                         </div>
 
                         <!-- Form -->
                         <form wire:submit.prevent="grantApplicant">
                             <div class="flex flex-wrap -mx-2">
                                 <!-- Tagging and Validation Date Field -->
-                                <div class="w-full md:w-1/2 px-2 mb-4">
+                                <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="irs-date">DATE OF RIS</label>
                                     <input type="date" id="irs-date" wire:model="date_of_ris" max="{{ now()->toDateString() }}" required
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
                                     @error('date_of_ris') <span class="error">{{ $message }}</span> @enderror
                                 </div>
-                                <div class="w-full md:w-1/2 px-2 mb-4">
+                                <div class="w-full md:w-1/3 px-2 mb-4">
                                     <label class="block text-[12px] font-medium mb-2 text-black"
                                         for="delivery-date">DATE OF DELIVERY</label>
                                     <input type="date" id="delivery-date" wire:model="date_of_delivery" required
                                         class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]"
                                         max="{{ now()->toDateString() }}">
                                     @error('date_of_delivery') <span class="error">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="w-full md:w-1/3 px-2 mb-4">
+                                    <label class="block text-[12px] font-medium mb-2 text-black"
+                                        for="ar_no">AR N0.</label>
+                                    <input type="number" id="ar_no" wire:model="ar_no"
+                                        class="w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-[12px]">
+                                    @error('ar_no') <span class="error">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                             <label class="block text-[13px] font-medium text-gray-700 mb-4">MATERIALS DELIVERED</label>
@@ -215,15 +221,29 @@
                                 @foreach ($materials as $index => $material)
                                 <div class="flex flex-wrap -mx-2">
                                     <!-- Material Select -->
-                                    <div class="w-full md:w-4/12 px-2 mb-2">
-                                        <select wire:model="materials.{{ $index }}.material_id" wire:change="updateMaterialInfo({{ $index }})" required class="uppercase w-full px-1 py-1.5 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
-                                            <option value="">Select Material</option>
-                                            @foreach($materialLists as $materialItem)
-                                            <option value="{{ $materialItem->id }}">{{ $materialItem->item_description }}</option>
-                                            @endforeach
-                                        </select>
-                                        @error('materials.' . $index . '.material_id') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
+                                    <div class="w-full md:w-4/12 px-2 mb-2" x-data="{ query: '', suggestions: [], showSuggestions: false }" @click.away="showSuggestions = false">
+                                        <input
+                                            type="text"
+                                            x-model="query"
+                                            @input.debounce.300ms="$wire.searchMaterials(query).then(data => { suggestions = data; showSuggestions = true; })"
+                                            placeholder="Type to search materials..."
+                                            class="uppercase w-full px-1 py-1.5 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]" />
+
+                                        <ul x-show="showSuggestions && suggestions.length" class="bg-white border text-black border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto uppercase">
+                                            <template x-for="(item, index) in suggestions" :key="index">
+                                                <li
+                                                    @click="$wire.selectMaterial({{ $index }}, item.id); query = item.item_description; showSuggestions = false;"
+                                                    class="px-3 py-2 cursor-pointer hover:bg-gray-100">
+                                                    <span x-text="item.item_description"></span>
+                                                </li>
+                                            </template>
+                                        </ul>
+
+                                        @error('materials.' . $index . '.material_id')
+                                        <span class="text-red-400 text-sm">{{ $message }}</span>
+                                        @enderror
                                     </div>
+
                                     <!-- Available quantity -->
                                     <div class="w-full md:w-2/12 px-2 mb-2">
                                         <input type="text" wire:model="materials.{{ $index }}.available_quantity" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="available">
@@ -255,6 +275,7 @@
 
                                 <!-- House Situation Upload -->
                                 <h2 class="block text-[12px] font-medium mb-2 text-black mt-4">UPLOAD PHOTO</h2>
+                                <p class="text-gray-500 text-xs">Upload here the photo after delivery.</p>
 
                                 <!-- Drag and Drop Area -->
                                 <div x-data="fileUpload()">
@@ -262,8 +283,6 @@
                                         <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
                                         </svg>
-                                        <p class="text-gray-500 text-xs">DRAG AND DROP FILES</p>
-                                        <p class="text-gray-500 text-xs">or</p>
                                         <button type="button" class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
                                             @click="$refs.fileInput.click()">BROWSE FILES
                                         </button>
@@ -412,7 +431,6 @@
                                         <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
                                             <p class="uppercase font-bold text-gray-900 text-sm">
                                                 {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Request Letter Address to City Mayor' }}
-                                                <span class="text-red-500">*</span>
                                             </p>
 
                                             <!-- File upload -->
@@ -431,7 +449,7 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="requestLetterAddressToCityMayor" required>
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="requestLetterAddressToCityMayor">
                                                 @error('requestLetterAddressToCityMayor')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                             </div>
                                         </div>
@@ -441,7 +459,7 @@
                                             <div class="mb-1">
                                                 <p class="uppercase font-bold text-gray-900 text-sm">
                                                     {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Certificate of Indigency' }}
-                                                    <span class="text-red-500">*</span>
+
                                                 </p>
                                             </div>
 
@@ -461,7 +479,7 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certificateOfIndigency" required>
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certificateOfIndigency">
                                                 @error('certificateOfIndigency')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                             </div>
                                         </div>
@@ -471,7 +489,7 @@
                                             <div class="mb-1">
                                                 <p class="uppercase font-bold text-gray-900 text-sm">
                                                     {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Consent Letter (if the land is not theirs)' }}
-                                                    
+
                                                 </p>
                                             </div>
 
@@ -530,7 +548,7 @@
                                             <div class="mb-1">
                                                 <p class="uppercase font-bold text-gray-900 text-sm">
                                                     {{ $attachmentLists->where('id', 5)->first()->attachment_name ?? 'Profiling Form ' }}
-                                                    <span class="text-red-500">*</span>
+
                                                 </p>
                                             </div>
 
@@ -550,7 +568,7 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="profilingForm" required>
+                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="profilingForm">
                                                 @error('profilingForm')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
                                             </div>
                                         </div>
@@ -583,10 +601,10 @@
 
                 <!-- Modal for viewing -->
                 <div x-show="$wire.showDocumentModal"
-                     class="fixed inset-0 z-50 overflow-y-auto"
-                     aria-labelledby="modal-title"
-                     role="dialog"
-                     aria-modal="true">
+                    class="fixed inset-0 z-50 overflow-y-auto"
+                    aria-labelledby="modal-title"
+                    role="dialog"
+                    aria-modal="true" x-cloack>
                     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
@@ -599,67 +617,67 @@
                                         </h3>
                                         <div class="mt-4 grid grid-cols-1 gap-4">
                                             @foreach($currentDocuments as $document)
-                                                <div class="border rounded-lg p-4 bg-gray-50">
-                                                    <div class="space-y-4">
-                                                        <!-- Document Header -->
-                                                        <div class="flex justify-between items-start">
-                                                            <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
-                                                            @if($editingDocumentId === $document['id'])
-                                                                <button wire:click="cancelEdit"
-                                                                        class="text-gray-400 hover:text-gray-500">
-                                                                    <span class="sr-only">Close</span>
-                                                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                                    </svg>
-                                                                </button>
-                                                            @else
-                                                                <button wire:click="startEditingDocument({{ $document['id'] }})"
-                                                                        class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                    Edit Photo
-                                                                </button>
-                                                            @endif
-                                                        </div>
-
-                                                        <!-- Current File Info -->
-                                                        <div class="text-sm text-gray-600">
-                                                            Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>
-                                                        </div>
-
-                                                        <!-- Image Preview -->
-                                                        <div class="relative">
-                                                            <img src="{{ $document['file_url'] }}"
-                                                                 alt="{{ $document['attachment_name'] }}"
-                                                                 class="rounded-lg shadow-sm max-h-48 object-cover">
-                                                        </div>
-
-                                                        <!-- Edit Form -->
+                                            <div class="border rounded-lg p-4 bg-gray-50">
+                                                <div class="space-y-4">
+                                                    <!-- Document Header -->
+                                                    <div class="flex justify-between items-start">
+                                                        <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
                                                         @if($editingDocumentId === $document['id'])
-                                                            <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">
-                                                                <div>
-                                                                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                                        Upload New Photo
-                                                                    </label>
-                                                                    <input type="file"
-                                                                           wire:model="newDocument"
-                                                                           class="block w-full text-sm text-gray-500
+                                                        <button wire:click="cancelEdit"
+                                                            class="text-gray-400 hover:text-gray-500">
+                                                            <span class="sr-only">Close</span>
+                                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                        @else
+                                                        <button wire:click="startEditingDocument({{ $document['id'] }})"
+                                                            class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
+                                                            Edit Photo
+                                                        </button>
+                                                        @endif
+                                                    </div>
+
+                                                    <!-- Current File Info -->
+                                                    <div class="text-sm text-gray-600">
+                                                        Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>
+                                                    </div>
+
+                                                    <!-- Image Preview -->
+                                                    <div class="relative">
+                                                        <img src="{{ $document['file_url'] }}"
+                                                            alt="{{ $document['attachment_name'] }}"
+                                                            class="rounded-lg shadow-sm max-h-48 object-cover">
+                                                    </div>
+
+                                                    <!-- Edit Form -->
+                                                    @if($editingDocumentId === $document['id'])
+                                                    <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                                                Upload New Photo
+                                                            </label>
+                                                            <input type="file"
+                                                                wire:model="newDocument"
+                                                                class="block w-full text-sm text-gray-500
                                                                   file:mr-4 file:py-2 file:px-4
                                                                   file:rounded-full file:border-0
                                                                   file:text-sm file:font-semibold
                                                                   file:bg-custom-red file:text-white
                                                                   hover:file:bg-custom-green
                                                                   cursor-pointer"
-                                                                           accept="image/*">
-                                                                </div>
-                                                                <div class="flex justify-end space-x-2">
-                                                                    <button wire:click="updateDocument"
-                                                                            class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                        Save Changes
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        @endif
+                                                                accept="image/*">
+                                                        </div>
+                                                        <div class="flex justify-end space-x-2">
+                                                            <button wire:click="updateDocument"
+                                                                class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
+                                                                Save Changes
+                                                            </button>
+                                                        </div>
                                                     </div>
+                                                    @endif
                                                 </div>
+                                            </div>
                                             @endforeach
                                         </div>
                                     </div>
@@ -667,8 +685,8 @@
                             </div>
                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                 <button type="button"
-                                        wire:click="$set('showDocumentModal', false)"
-                                        class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
+                                    wire:click="$set('showDocumentModal', false)"
+                                    class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
                                     Close
                                 </button>
                             </div>
