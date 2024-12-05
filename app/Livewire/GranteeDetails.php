@@ -22,6 +22,8 @@ use App\Models\Shelter\DeliveredMaterial;
 use App\Models\Shelter\PurchaseOrder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\RisDataExport;
 
 class GranteeDetails extends Component
 {
@@ -29,6 +31,8 @@ class GranteeDetails extends Component
     public $grantee;
     public $shelterApplicant;
     public $profiledTagged;
+    public $selectedPO;
+    public $poNumbers = [];
 
     public $first_name;
     public $middle_name;
@@ -115,7 +119,7 @@ class GranteeDetails extends Component
             return [
                 'material_id' => $deliveredMaterial->material_id,  // material ID from deliveredMaterial
                 'grantee_quantity' => $deliveredMaterial->grantee_quantity,  // Quantity given to the grantee
-                'purchase_order_id' => $deliveredMaterial->purchase_order_id,  // Purchase order ID from deliveredMaterial
+                'purchase_order_id' => $deliveredMaterial->material->purchaseOrder->po_number,  // Purchase order ID from deliveredMaterial
                 'material_unit_id' => $deliveredMaterial->material->material_unit_id,  // material_unit_id from Material model
             ];
         })->toArray();
@@ -161,7 +165,13 @@ class GranteeDetails extends Component
                     })->filter();
             })
             : collect();
+
+        $this->poNumbers = $this->grantee->deliveredMaterials
+            ->pluck('material.purchaseOrder.po_number')
+            ->unique()
+            ->toArray();
     }
+
     // For Awarding pictures
     public function viewAttachment($fileName): void
     {
@@ -196,6 +206,24 @@ class GranteeDetails extends Component
         }
         $this->isLoading = false;
     }
+
+    public function updatedSelectedPO($value)
+    {
+        Log::info('Updated selectedPO: ' . $value); // Add this for debugging
+        if ($value) {
+            $this->export($value);
+        }
+    }
+    public function export($poNumber)
+    {
+        Log::info('Exporting PO: ' . $poNumber);
+
+        return Excel::download(
+            new RisDataExport($this->grantee, $poNumber),
+            "Acknowledgement_Receipt_{$poNumber}.xlsx"
+        );
+    }
+
     public function render()
     {
         $materialsList = Material::all(); // Fetch all materials for the dropdown
@@ -204,6 +232,7 @@ class GranteeDetails extends Component
             'grantee' => $this->grantee,
             'OriginOfRequests' => $OriginOfRequests,
             'barangays' => Barangay::all(),
+            'poNumbers' => $this->poNumbers,
             'materialsList' => $materialsList, // Add materials list for the dropdown
         ])
             ->layout('layouts.adminshelter');
