@@ -33,17 +33,7 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
 
     private function getTitle(): string
     {
-        $title = 'SUMMARY OF IDENTIFIED INFORMAL SETTLERS';
-
-        // Add Transaction Type to title
-        if (!empty($this->filters['transaction_type_id'])) {
-            $transactionType = TransactionType::find($this->filters['transaction_type_id']);
-            $title .= 'APPLICANTS VIA ' . strtoupper($transactionType->type_name);
-        } else {
-            $title .= ' HOUSING APPLICANTS';
-        }
-
-        return $title;
+        return 'SUMMARY OF IDENTIFIED INFORMAL SETTLERS - APPLICANTS VIA WALK-IN HOUSING APPLICANTS';
     }
 
     private function getSubtitle(): array
@@ -77,7 +67,6 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
             'person',
             'address.barangay',
             'address.purok',
-            'transactionType'
         ]);
 
         // Apply filters
@@ -98,10 +87,6 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
             $query->whereHas('address', function($q) {
                 $q->where('purok_id', $this->filters['purok_id']);
             });
-        }
-
-        if (!empty($this->filters['transaction_type_id'])) {
-            $query->where('transaction_type_id', $this->filters['transaction_type_id']);
         }
 
         if (isset($this->filters['tagging_status'])) {
