@@ -15,6 +15,7 @@ use App\Exports\GranteesDataExport;
 
 use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
+use App\Livewire\GrantApplicant;
 use App\Livewire\GranteeDetails;
 use App\Livewire\PermissionsManager;
 use App\Livewire\ShelterApplicantDetails;
@@ -168,6 +169,7 @@ Route::middleware([
 
     Route::get('/grantee-details/{profileNo}', GranteeDetails::class)->name('grantee-details');
     Route::get('/profiled-tagged-applicant-details/{profileNo}', ProfiledTaggedApplicantDetails::class)->name('profiled-tagged-applicant-details');
+    Route::get('/grant-applicant/{profiledTaggedApplicantId}', GrantApplicant::class)->name('grant-applicant');
 
     Route::get('/shelter-grantees', function () {
         return view('shelter-grantees');
