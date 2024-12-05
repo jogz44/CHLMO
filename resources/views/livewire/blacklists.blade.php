@@ -67,26 +67,100 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2  text-center font-medium">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Property Details</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Date Awarded</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Date Blacklisted</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Reason</th>
+                            <th class="py-2 px-2 border-b text-center font-medium">Current Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                    @forelse($blacklisted as $blacklistedApplicant)
-                        <tr>
-                            <td class="py-4 px-2 text-center border-b">
-                                {{ $blacklistedApplicant->awardee->taggedAndValidatedApplicant->applicant->person->full_name ?? '--' }}
-                            </td>
-                            <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->awardee->grant_date ? date('M d, Y', strtotime($blacklistedApplicant->awardee->grant_date)) : 'N/A' }}</td>
-                            <td class="py-4 px-2 text-center border-b">{{ $blacklistedApplicant->date_blacklisted ? date('M d, Y', strtotime($blacklistedApplicant->date_blacklisted)) : 'N/A' }}</td>
-                            <td class="py-2 px-2 text-center border-b">{{ $blacklistedApplicant->blacklist_reason_description ?? '--' }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="14" class="py-4 px-2 text-center border-b">No applicants found.</td>
-                        </tr>
-                    @endforelse
+                        @forelse($blacklisted as $blacklistedApplicant)
+                            <tr>
+                                <td class="py-4 px-2 text-center border-b">
+                                    @php
+                                        $person = optional(optional(optional(optional($blacklistedApplicant->awardee)
+                                            ->taggedAndValidatedApplicant)
+                                            ->applicant)
+                                            ->person);
+                                    @endphp
+                                    <div class="flex flex-col">
+                                        <span class="font-medium">
+                                            {{ $person->full_name ?? 'N/A' }}
+                                        </span>
+                                                    <span class="text-xs text-gray-500">
+                                            {{ $person->contact_number ?? 'No contact' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-2 text-center border-b">
+                                    @php
+                                        $awardee = $blacklistedApplicant->awardee;
+                                        $site = $awardee->actualRelocationSite ?? $awardee->assignedRelocationSite;
+                                    @endphp
+                                    @if($site)
+                                        <div class="flex flex-col">
+                                            <span class="font-medium">{{ $site->relocation_site_name }}</span>
+                                            <span class="text-sm text-gray-600">
+                                                Block {{ $awardee->actual_block ?? $awardee->assigned_block }},
+                                                Lot {{ $awardee->actual_lot ?? $awardee->assigned_lot }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-500">No property details</span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-2 text-center border-b">
+                                    @if($blacklistedApplicant->awardee->grant_date)
+                                        <div class="flex flex-col">
+                                            <span>{{ $blacklistedApplicant->awardee->grant_date->format('M d, Y') }}</span>
+                                            <span class="text-xs text-gray-500">
+                                                {{ $blacklistedApplicant->awardee->grant_date->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-500">N/A</span>
+                                    @endif
+                                </td>
+                                <td class="py-2 px-2 text-center border-b">
+                                    @if($blacklistedApplicant->date_blacklisted)
+                                        <div class="flex flex-col">
+                                            <span>{{ $blacklistedApplicant->date_blacklisted->format('M d, Y') }}</span>
+                                            <span class="text-xs text-gray-500">
+                                                {{ $blacklistedApplicant->date_blacklisted->diffForHumans() }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-500">N/A</span>
+                                    @endif
+                                </td>
+                                <td class="py-4 px-2 text-center border-b">
+                                    <div class="max-w-xs mx-auto">
+                                        <p class="text-sm">
+                                            {{ $blacklistedApplicant->blacklist_reason_description }}
+                                        </p>
+                                        <span class="text-xs text-gray-500">
+                                            By: {{ $blacklistedApplicant->updated_by }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-2 text-center border-b">
+                                    @if($awardee->newAwardee)
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                            Transferred
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                            Blacklisted
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-4 px-2 text-center border-b">No records found.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
