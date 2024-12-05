@@ -43,13 +43,13 @@ class ApplicantDetails extends Component
     use WithFileUploads;
     public $applicantId, $applicant, $taggedApplicant;
     public $applicantForSpouse;
-    public $transaction_type_id, $transaction_type_name;
+    public $transaction_type;
     public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay, $purok;
 
     // New fields
     public $full_address, $civil_status_id, $civil_statuses, $religion, $tribe;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications,
-        $living_situation_case_specification, $government_program_id, $governmentPrograms, $living_status_id,
+        $living_situation_case_specification, $non_informal_settler_case_specification, $government_program_id, $governmentPrograms, $living_status_id,
         $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes, $structure_status_id, $structureStatuses,
         $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $room_rent_fee, $room_landlord,
         $house_rent_fee, $house_landlord, $lot_rent_fee, $lot_landlord, $house_owner, $relationship_to_house_owner,
@@ -107,13 +107,6 @@ class ApplicantDetails extends Component
             })->toArray();
         }
 
-        // Set the default transaction type to 'Walk-in'
-        $walkIn = TransactionType::where('type_name', 'Walk-in')->first();
-        if ($walkIn) {
-            $this->transaction_type_id = $walkIn->id; // This can still be used internally for further logic if needed
-            $this->transaction_type_name = $walkIn->type_name; // Set the name to display
-        }
-
         $this->civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
@@ -165,11 +158,13 @@ class ApplicantDetails extends Component
         $this->barangay = $this->applicant->address->barangay->name ?? '';
         $this->purok = $this->applicant->address->purok->name ?? '';
 
+        $this->transaction_type = $this->applicant->transaction_type ?? '';
+
         // Set today's date as the default value for tagged_date
         $this->tagging_date = now()->toDateString(); // YYYY-MM-DD format
 
         // Set interviewer
-        $this->tagger_name = Auth::user()->full_name();
+        $this->tagger_name = Auth::user()->full_name;
 
         $this->houseStructureImages = [];
         $this->isFilePondUploadComplete = false;
@@ -212,7 +207,7 @@ class ApplicantDetails extends Component
             'living_situation_id' => 'required|exists:living_situations,id',
             'living_situation_case_specification' => [
                 'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,1,2,3,4,5,6,7,9',
+                'required_if:living_situation_id,1,2,3,4,5,6,7',
                 'string',
                 'max:255'
             ],
@@ -220,6 +215,12 @@ class ApplicantDetails extends Component
                 'nullable', // Allow it to be null if not required
                 'required_if:living_situation_id,8', // Only required if living_situation_id is 8
                 'exists:case_specifications,id'
+            ],
+            'non_informal_settler_case_specification' => [
+                'nullable', // Allow it to be null if not required
+                'required_if:living_situation_id,9',
+                'string',
+                'max:255'
             ],
             'government_program_id' => 'required|exists:government_programs,id',
             'living_status_id' => 'required|exists:living_statuses,id',
@@ -442,6 +443,7 @@ class ApplicantDetails extends Component
             'living_situation_id' => $this->living_situation_id,
             'living_situation_case_specification' => $this->living_situation_case_specification,
             'case_specification_id' => $this->case_specification_id,
+            'non_informal_settler_case_specification' => $this->non_informal_settler_case_specification,
             'government_program_id' => $this->government_program_id,
             'living_status_id' => $this->living_status_id,
             'room_rent_fee' => $this->room_rent_fee,
@@ -496,7 +498,7 @@ class ApplicantDetails extends Component
         try {
             $taggedApplicant = TaggedAndValidatedApplicant::create([
                 'applicant_id' => $this->applicantId,
-                'transaction_type_id' => $this->transaction_type_id,
+                'transaction_type' => $this->applicant->transaction_type,
                 'full_address' => $this->full_address ?: null,
                 'civil_status_id' => $this->civil_status_id,
                 'tribe' => $this->tribe,
@@ -507,8 +509,9 @@ class ApplicantDetails extends Component
                 'monthly_income' => $this->monthly_income,
                 'tagging_date' => $this->tagging_date,
                 'living_situation_id' => $this->living_situation_id,
-                'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
+                'living_situation_case_specification' => $this->living_situation_id != 8 && $this->living_situation_id != 9 ? $this->living_situation_case_specification : null, // Store only for 1-7
                 'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
+                'non_informal_settler_case_specification' => $this->living_situation_id == 9 ? $this->non_informal_settler_case_specification : null, // Only for 9
                 'government_program_id' => $this->government_program_id,
                 'living_status_id' => $this->living_status_id,
                 'room_rent_fee' => $this->living_status_id == 1 ? $this->room_rent_fee : null, // Store rent fee only if living_status_id is 1,

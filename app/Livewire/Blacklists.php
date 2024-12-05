@@ -57,15 +57,15 @@ class Blacklists extends Component
     {
         $query = Blacklist::with([
             'awardee.taggedAndValidatedApplicant.applicant.person',
+            'awardee.assignedRelocationSite',
+            'awardee.actualRelocationSite',
             'user'
         ]);
 
-        // Apply search filter
+        // Enhanced search filter
         if ($this->search) {
             $query->whereHas('awardee.taggedAndValidatedApplicant.applicant.person', function ($q) {
-                $q->where('first_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('middle_name', 'like', '%' . $this->search . '%');
+                $q->where(DB::raw("CONCAT(first_name, ' ', COALESCE(middle_name, ''), ' ', last_name)"), 'like', '%' . $this->search . '%');
             })->orWhere('blacklist_reason_description', 'like', '%' . $this->search . '%');
         }
 

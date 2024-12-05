@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Livewire\Logs\ActivityLogs;
 use App\Models\Applicant;
+use App\Models\Awardee;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\Dependent;
@@ -13,6 +14,7 @@ use App\Models\LivingSituation;
 use App\Models\LivingStatus;
 use App\Models\Purok;
 use App\Models\Religion;
+use App\Models\RelocationSite;
 use App\Models\RoofType;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TaggedDocumentsSubmission;
@@ -37,7 +39,7 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $isEditing = false, $isLoading = false, $originalData = []; // Add new properties for edit mode
 
     public $applicantForSpouse;
-    public $transaction_type_id, $transactionTypes, $transaction_type_name;
+    public $transaction_type;
     public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays, $purok_id, $puroks,
             $date_applied;
 
@@ -115,13 +117,30 @@ class TaggedAndValidatedApplicantDetails extends Component
         'transaction_type' => '',
         'remarks' => '',
     ];
-    public function mount($applicantId): void
+
+    // For assigning relocation site
+    public $applicantId, $tagged_and_validated_applicant_id, $relocationSites = [];
+    public $showAssignSiteModal = false;
+    public $selected_relocation_site_id = '';
+    public $assigned_lot, $assigned_block;
+    public $lot_size_allocation = '';
+    public $allocationUnit = 'square meters'; // Default unit
+
+    // For updating relocation site - Actual Relocation Site -->
+    public $showActualSiteModal = false;
+    public $actual_relocation_site_id = '';
+    public $actual_lot = '';
+    public $actual_block = '';
+    public $actual_lot_size = '';
+
+    public function mount()
     {
+        $this->applicantId = request()->route('applicantId');
+
         $this->taggedAndValidatedApplicant = TaggedAndValidatedApplicant::with([
             'applicant.person',
             'applicant.address.purok',
             'applicant.address.barangay',
-            'applicant.transactionType',
             'livingSituation',
             'caseSpecification',
             'governmentProgram',
@@ -132,8 +151,9 @@ class TaggedAndValidatedApplicantDetails extends Component
             'roofType',
             'wallType',
             'taggedDocuments'
-        ])->findOrFail($applicantId);
+        ])->findOrFail($this->applicantId);
 
+        $this->tagged_and_validated_applicant_id = $this->taggedAndValidatedApplicant->id;
         $this->taggedDocuments = $this->taggedAndValidatedApplicant->taggedDocuments;
 
         // Add this debug
@@ -189,12 +209,11 @@ class TaggedAndValidatedApplicantDetails extends Component
 
         // Applicant basic information
         $this->first_name = $this->taggedAndValidatedApplicant->applicant->person->first_name ?? null;
-        $this->transactionTypes = TransactionType::all();
         $this->middle_name = $this->taggedAndValidatedApplicant->applicant->person->middle_name ?? null;
         $this->last_name = $this->taggedAndValidatedApplicant->applicant->person->last_name ?? null;
         $this->suffix_name = $this->taggedAndValidatedApplicant->applicant->person->suffix_name ?? null;
         $this->contact_number = $this->taggedAndValidatedApplicant->applicant->person->contact_number ?? null;
-        $this->transaction_type_id = $this->taggedAndValidatedApplicant?->applicant->transactionType?->transaction_type_id ?? null;
+        $this->transaction_type = $this->taggedAndValidatedApplicant?->applicant->transaction_type ?? null;
         $this->date_applied = optional($this->taggedAndValidatedApplicant->applicant->date_applied)
             ->format('F d, Y') ?? null;
         // Load Address Information - Store IDs instead of names
@@ -454,7 +473,7 @@ class TaggedAndValidatedApplicantDetails extends Component
             $this->dispatch('alert', [
                 'title' => 'Error!',
                 'message' => 'Failed to update information. Please try again.',
-                'type' => 'error'
+                'type' => 'danger'
             ]);
         }
     }
@@ -612,7 +631,7 @@ class TaggedAndValidatedApplicantDetails extends Component
             $this->dispatch('alert', [
                 'title' => 'Error!',
                 'message' => 'Failed to update dependents. Please try again.',
-                'type' => 'error'
+                'type' => 'danger'
             ]);
         }
     }
@@ -882,7 +901,7 @@ class TaggedAndValidatedApplicantDetails extends Component
             $this->dispatch('alert', [
                 'title' => 'Error!',
                 'message' => 'Failed to update living situation. Please try again.',
-                'type' => 'error'
+                'type' => 'danger'
             ]);
         }
     }
@@ -932,7 +951,7 @@ class TaggedAndValidatedApplicantDetails extends Component
             $this->dispatch('alert', [
                 'title' => 'Error!',
                 'message' => 'Failed to remove photo. Please try again.',
-                'type' => 'error'
+                'type' => 'danger'
             ]);
         }
     }
@@ -1002,7 +1021,7 @@ class TaggedAndValidatedApplicantDetails extends Component
             $this->dispatch('alert', [
                 'title' => 'Error!',
                 'message' => 'Failed to update photos. Please try again.',
-                'type' => 'error'
+                'type' => 'danger'
             ]);
         }
     }
@@ -1028,6 +1047,216 @@ class TaggedAndValidatedApplicantDetails extends Component
             } catch (\Exception $e) {
                 logger()->error('Error cleaning up old upload: ' . $e->getMessage());
             }
+        }
+    }
+
+    // Assigning Relocation Site
+    public function openAssignSiteModal(): void
+    {
+        // Get only relocation sites that aren't full
+        $this->relocationSites = RelocationSite::where('is_full', false)
+            ->with('awardees') // Eager load awardees to prevent N+1 queries
+            ->get()
+            ->map(function ($site) {
+                $availableSpace = $site->total_no_of_lots
+                    - $site->community_facilities_road_lots_open_space
+                    - $site->awardees()->sum('assigned_relocation_lot_size');
+
+                return [
+                    'id' => $site->id,
+                    'name' => $site->relocation_site_name,
+                    'available_space' => $availableSpace
+                ];
+            })
+            ->filter(function ($site) {
+                return $site['available_space'] > 0;
+            })
+            ->values() // Re-index the array after filtering
+            ->toArray(); // Convert to array explicitly
+
+        $this->selected_relocation_site_id = ''; // Reset selection
+        $this->assigned_lot = '';
+        $this->assigned_block = '';
+        $this->lot_size_allocation = '';
+        $this->allocationUnit = 'square meters'; // Reset to default unit
+
+        $this->showAssignSiteModal = true;
+    }
+
+    // Method for assigning the relocation site and create awardee record
+    public function assignRelocationSite()
+    {
+        $this->validate([
+            'selected_relocation_site_id' => 'required|exists:relocation_sites,id',
+            'assigned_lot' => 'required|string|max:100',
+            'assigned_block' => 'required|string|max:100',
+            'lot_size_allocation' => 'required|numeric|min:1'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Fetch the relocation site and calculate available space
+            $relocationSite = RelocationSite::findOrFail($this->selected_relocation_site_id);
+
+            // Check available space
+            $availableSpace = $relocationSite->getRemainingLotSize();
+
+            if ($this->lot_size_allocation > $availableSpace) {
+                $this->addError('lot_size_allocation', 'Requested lot size exceeds available space');
+                return;
+            }
+
+            // Create new awardee record
+            Awardee::create([
+                'tagged_and_validated_applicant_id' => $this->tagged_and_validated_applicant_id,
+                'assigned_relocation_site_id' => $this->selected_relocation_site_id,
+                'assigned_lot' => $this->assigned_lot,
+                'assigned_block' => $this->assigned_block,
+                'assigned_relocation_lot_size' => $this->lot_size_allocation,
+                'unit' => $this->allocationUnit,
+                'has_assigned_relocation_site' => true,
+                'documents_submitted' => false,
+                'is_awarded' => false,
+                'is_blacklisted' => false
+            ]);
+
+            // Update relocation site status
+            $relocationSite->refresh(); // Refresh the model to get latest data
+            $relocationSite->updateFullStatus();
+
+            DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Assigned relocation site to tagged and validated applicant ID: ' . $this->tagged_and_validated_applicant_id,
+                Auth::user()
+            );
+
+            $this->showAssignSiteModal = false;
+            $this->reset(['selected_relocation_site_id', 'lot_size_allocation', 'assigned_lot', 'assigned_block']);
+
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Relocation site assigned successfully',
+                'type' => 'success'
+            ]);
+
+            // Redirect back to the same page to refresh it
+            return redirect()->route('tagged-and-validated-applicant-details', ['applicantId' => $this->tagged_and_validated_applicant_id]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error assigning relocation site: ' . $e->getMessage());
+
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to assign relocation site. Please try again.',
+                'type' => 'danger'
+            ]);
+        }
+    }
+
+    // Method to get available space for selected site
+    public function getAvailableSpace()
+    {
+        if (!$this->selected_relocation_site_id) {
+            return 0;
+        }
+
+        $site = RelocationSite::find($this->selected_relocation_site_id);
+        if (!$site) {
+            return 0;
+        }
+
+        return ($site->total_no_of_lots - $site->community_facilities_road_lots_open_space) -
+            $site->awardees()->sum('assigned_relocation_lot_size');
+    }
+
+    // For updating relocation site - Actual Relocation Site
+    public function openActualSiteModal(): void
+    {
+        $awardee = $this->taggedAndValidatedApplicant->awardees->first();
+
+        // Load relocation sites
+        $this->relocationSites = RelocationSite::select('id', 'relocation_site_name')
+            ->get()
+            ->map(function ($site) {
+                return [
+                    'id' => $site->id,
+                    'name' => $site->relocation_site_name
+                ];
+            })
+            ->toArray();
+
+        // Initialize with current values if they exist
+        $this->actual_relocation_site_id = $awardee->actual_relocation_site_id ?? '';
+        $this->actual_lot_size = $awardee->actual_relocation_lot_size ?? '';
+        $this->actual_lot = $awardee->actual_lot ?? '';
+        $this->actual_block = $awardee->actual_block ?? '';
+
+        $this->showActualSiteModal = true;
+    }
+
+    public function updateActualSite()
+    {
+        $this->validate([
+            'actual_relocation_site_id' => 'required|exists:relocation_sites,id',
+            'actual_lot' => 'required|string|max:100',
+            'actual_block' => 'required|string|max:100',
+            'actual_lot_size' => 'required|numeric|min:1'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Get the awardee record
+            $awardee = $this->taggedAndValidatedApplicant->awardees->first();
+
+            // Update the awardee with actual site information
+            $awardee->update([
+                'actual_relocation_site_id' => $this->actual_relocation_site_id,
+                'actual_lot' => $this->actual_lot,
+                'actual_block' => $this->actual_block,
+                'actual_relocation_lot_size' => $this->actual_lot_size,
+            ]);
+
+            // Update status for both assigned and actual relocation sites
+            $awardee->assignedRelocationSite->updateFullStatus();
+            if ($awardee->actualRelocationSite) {
+                $awardee->actualRelocationSite->updateFullStatus();
+            }
+
+            DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Assigned actual relocation site to awardee ID: ' . $awardee->id,
+                Auth::user()
+            );
+
+            $this->showActualSiteModal = false;
+            $this->reset(['actual_relocation_site_id', 'actual_lot_size', 'actual_lot', 'actual_block']);
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Actual relocation site updated successfully',
+                'type' => 'success'
+            ]);
+
+            // Redirect back to the same page to refresh it
+            return redirect()->route('tagged-and-validated-applicant-details', ['applicantId' => $this->tagged_and_validated_applicant_id]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error updating actual relocation site: ' . $e->getMessage());
+
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to update actual relocation site. Please try again.',
+                'type' => 'danger'
+            ]);
         }
     }
 

@@ -28,18 +28,16 @@ class Applicants extends Component
     public $paginationTheme = 'tailwind', $search = '';
 
     public $isModalOpen = false, $isLoading = false;
-    public $date_applied, $transaction_type_id;
-    public $transactionTypes = [];
-    public $person_id, $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
+    public $date_applied, $transaction_type,
+        $person_id, $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay_id, $barangays = [],
         $purok_id, $puroks = [], $interviewer;
 
     // Filter properties:
     public $applicantId, $startDate, $endDate, $selectedTaggingStatus, $selectedPurok_id, $puroksFilter = [],
-        $selectedBarangay_id, $barangaysFilter = [], $selectedTransactionType_id, $transactionTypesFilter = [],
-        $taggingStatuses;
+        $selectedBarangay_id, $barangaysFilter = [], $taggingStatuses;
 
     public $selectedApplicantId, $edit_person_id, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
-        $edit_transaction_type_id, $edit_contact_number, $edit_barangay_id, $edit_purok_id;
+            $edit_contact_number, $edit_barangay_id, $edit_purok_id;
 
     // For checking duplicate applicants
     public $showHousingDuplicateWarning = false, $housingDuplicateData = null, $proceedWithDuplicate = false;
@@ -59,7 +57,6 @@ class Applicants extends Component
         $this->endDate = null;
         $this->selectedPurok_id = null;
         $this->selectedBarangay_id = null;
-        $this->selectedTransactionType_id = null;
         $this->selectedTaggingStatus = null;
 
         // Reset pagination and any search terms
@@ -75,13 +72,12 @@ class Applicants extends Component
         // Set today's date as the default value for date_applied
         $this->date_applied = now()->toDateString(); // YYYY-MM-DD format
 
-        $this->startDate = now()->toDateString();
-        $this->endDate = now()->toDateString();
+//        $this->startDate = now()->toDateString();
+//        $this->endDate = now()->toDateString();
 
         // Initialize dropdowns
         $this->barangays = Barangay::all();
         $this->puroks = Purok::all();
-        $this->transactionTypes = TransactionType::all();
 
         // Set interviewer
         $this->interviewer = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
@@ -92,9 +88,6 @@ class Applicants extends Component
         });
         $this->barangaysFilter = Cache::remember('barangays', 60*60, function() {
             return Barangay::all();
-        });
-        $this->transactionTypesFilter = Cache::remember('transactionTypes', 60*60, function() {
-            return TransactionType::all();
         });
         $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
     }
@@ -134,7 +127,6 @@ class Applicants extends Component
             ],
             'barangay_id' => 'required|exists:barangays,id',
             'purok_id' => 'required|exists:puroks,id',
-            'transaction_type_id' => 'required|exists:transaction_types,id',
         ];
     }
     // Add this method to check for duplicates when name fields change
@@ -233,9 +225,9 @@ class Applicants extends Component
                 'person_id' => $people->id,
                 'user_id' => Auth::id(),
                 'date_applied' => $this->date_applied,
-                'transaction_type_id' => $this->transaction_type_id,
                 'initially_interviewed_by' => $this->interviewer,
                 'address_id' => $address->id,
+                'transaction_type' => 'Walk-in'  // Explicitly set for new applicants
             ]);
             
              // Log the activity using ActivityLogs
@@ -271,7 +263,7 @@ class Applicants extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'date_applied', 'transaction_type_id', 'person_id', 'first_name', 'middle_name', 'last_name',
+            'date_applied', 'person_id', 'first_name', 'middle_name', 'last_name',
             'suffix_name', 'barangay_id', 'purok_id', 'contact_number',
         ]);
     }
@@ -289,7 +281,6 @@ class Applicants extends Component
         $this->edit_barangay_id = $applicant->address->barangay_id ?? null;
         $this->edit_purok_id = $applicant->address->purok_id ?? null;
         $this->edit_date_applied = $applicant->date_applied->format('Y-m-d');
-        $this->edit_transaction_type_id = $applicant->transaction_type_id;
     }
     public function update(): void
     {
@@ -302,7 +293,6 @@ class Applicants extends Component
             'edit_barangay_id' => 'required|integer',
             'edit_purok_id' => 'required|integer',
             'edit_date_applied' => 'required|date',
-            'edit_transaction_type_id' => 'required|integer',
         ]);
 
         $applicant = Applicant::findOrFail($this->selectedApplicantId);
@@ -317,7 +307,6 @@ class Applicants extends Component
         $person->save();
 
         $applicant->date_applied = $this->edit_date_applied;
-        $applicant->transaction_type_id = $this->edit_transaction_type_id;
         $applicant->save();
 
         // Update address
@@ -356,7 +345,6 @@ class Applicants extends Component
                 'end_date' => $this->endDate,
                 'barangay_id' => $this->selectedBarangay_id,
                 'purok_id' => $this->selectedPurok_id,
-                'transaction_type_id' => $this->selectedTransactionType_id,
                 'is_tagged' => $this->selectedTaggingStatus
             ]);
 
@@ -384,7 +372,6 @@ class Applicants extends Component
             'person',
             'address.barangay',
             'address.purok',
-            'transactionType'
         ]);
 
         // Create filters array matching your Excel export
@@ -393,7 +380,6 @@ class Applicants extends Component
             'end_date' => $this->endDate,
             'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
             'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
-            'transaction_type_id' => $this->selectedTransactionType_id,  // Changed from transaction_type_id
             'is_tagged' => $this->selectedTaggingStatus  // Added to match Excel export
         ]);
 
@@ -402,7 +388,6 @@ class Applicants extends Component
             'person',
             'address.barangay',
             'address.purok',
-            'transactionType'
         ]);
 
         // Apply filters
@@ -423,10 +408,6 @@ class Applicants extends Component
             $query->whereHas('address', function($q) {
                 $q->where('purok_id', $this->selectedPurok_id);
             });
-        }
-
-        if ($this->selectedTransactionType_id) {  // Changed from transaction_type_id
-            $query->where('transaction_type_id', $this->selectedTransactionType_id);
         }
 
         if ($this->selectedTaggingStatus) {   // Added to match Excel export
@@ -475,7 +456,7 @@ class Applicants extends Component
 
     public function render()
     {
-        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'transactionType', 'person'])
+        $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'person'])
             ->where(function($query) {
                 $query->whereHas('person', function($q) {
                     $q->where('first_name', 'like', '%'.$this->search.'%')
@@ -490,9 +471,6 @@ class Applicants extends Component
                     })
                     ->orWhereHas('address.barangay', function ($query) {
                         $query->where('name', 'like', '%'.$this->search.'%');
-                    })
-                    ->orWhereHas('transactionType', function ($query) {
-                        $query->where('type_name', 'like', '%' . $this->search . '%');
                     });
             });
 
@@ -517,13 +495,6 @@ class Applicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        if ($this->selectedTransactionType_id) {
-            $query->whereHas('transactionType', function ($q) {
-                $q->where('transaction_type_id', $this->selectedTransactionType_id);
-            });
-        }
-
-//        $applicants = $query->paginate(5); // Apply pagination after filtering
         $applicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
         // Pass data to the view

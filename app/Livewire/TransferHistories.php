@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\AwardeeTransferHistory;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class TransferHistories extends Component
@@ -11,9 +12,22 @@ class TransferHistories extends Component
     {
         $transfers = AwardeeTransferHistory::with([
             'previousAwardee.taggedAndValidatedApplicant.applicant.person',
-            'previousAwardee.relocationLot',
+            'previousAwardee.assignedRelocationSite',
+            'previousAwardee.actualRelocationSite',
             'processor'
-        ])->latest()->paginate(5);
+        ])
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        // Add debug logging
+        foreach ($transfers as $transfer) {
+            Log::info('Transfer details', [
+                'id' => $transfer->id,
+                'previous_awardee_id' => $transfer->previous_awardee_id,
+                'remarks' => $transfer->remarks,
+                'relationship' => $transfer->relationship
+            ]);
+        }
 
         return view('livewire.transfer-histories', [
             'transfers' => $transfers

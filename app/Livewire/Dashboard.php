@@ -28,26 +28,20 @@ class Dashboard extends Component
         // Generate monthly labels
         $labels = array_map(fn($month) => date('M', mktime(0, 0, 0, $month, 1)), range(1, 12));
 
-        $applicants = Applicant::where('transaction_type_id', 1)->count();
+        $applicants = Applicant::where('transaction_type', 'Walk-in')->count();
 
         return [
             'labels' => $labels,
             'applicants' => $this->getApplicantsMonthlyData(
-                Applicant::where('transaction_type_id', 1)
+                Applicant::where('transaction_type', 'Walk-in')
                     ->whereNotNull('date_applied')
                     ->select('date_applied')
                     ->get(),
                 $labels
-            ),
-            'applicantsViaRequest' => $this->getApplicantsMonthlyData(
-                Applicant::where('transaction_type_id', 2)
-                    ->whereNotNull('date_applied')
-                    ->select('date_applied')
-                    ->get(),
-                $labels
-            ),
+            )
         ];
     }
+
     public function getInformalSettlersData(): array
     {
         // Generate monthly labels

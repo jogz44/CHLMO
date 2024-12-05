@@ -2,27 +2,16 @@
 
 namespace App\Livewire;
 
-use App\Models\Address;
 use App\Models\Awardee;
-use App\Models\AwardeeAttachmentsList;
-use App\Models\AwardeeDocumentsSubmission;
 use App\Models\Barangay;
 use App\Models\CaseSpecification;
 use App\Models\LivingSituation;
-use App\Models\LotList;
-use App\Models\LotSizeUnit;
 use App\Models\Purok;
 use App\Models\RelocationSite;
 use App\Models\TaggedAndValidatedApplicant;
-use App\Models\TemporaryImageForHousing;
-use App\Models\TransactionType;
-use Barryvdh\DomPDF\Facade\Pdf;
-use http\Env\Request;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -38,7 +27,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     public $search = '';
     public $isLoading = false;
-    public $tagging_date, $transaction_type_id, $transaction_type_name;
+    public $tagging_date, $transaction_type;
 
     // Filter properties:
     public $applicantId;
@@ -49,7 +38,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
     // Tagged and validated applicant details
     public $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $living_situation, $contact_number,
-        $occupation, $monthly_income, $transaction_type;
+        $occupation, $monthly_income;
 
     // For assigning relocation site
     public $assigned_relocation_site_id,
@@ -63,19 +52,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $lot_size,
         $unit = 'm²';
 
-    // For uploading of files
-    public $isFilePondUploadComplete = false, $isFilePonduploading = false, $letterOfIntent, $votersID, $validID,
-        $certOfNoLandHolding, $marriageCert, $birthCert, $selectedAwardee, $files,
-        $awardeeToPreview, $isUploading = false, $attachment_id, $attachmentLists = [], $awardeeId, $documents = [],
-        $newFileImages = [];
-
     public $taggedAndValidatedApplicant;
-
-    // For viewing the submitted requirements:
-    public $showDocumentModal = false;
-    public $currentDocuments = [];
-    public $editingDocumentId = null; // Changed from editingDocument to editingDocumentId
-    public $newDocument = null;
 
     public function updatingSearch(): void
     {
@@ -129,11 +106,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         // Initialize dropdowns
         $this->assignedRelocationSites = RelocationSite::all(); // Fetch all relocation sites
         $this->actualRelocationSites = RelocationSite::all(); // Fetch all relocation sites
-
-        // Fetch attachment types for the dropdown
-        $this->attachmentLists = AwardeeAttachmentsList::all(); // Fetch all attachment lists
-
-        $this->isFilePondUploadComplete = false;
     }
     public function updatingBarangay(): void
     {
@@ -240,105 +212,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'actual_relocation_site_id', 'lot_size', 'grant_date',
         ]);
     }
-    public function removeUpload($property, $fileName, $load): void
-    {
-        $filePath = storage_path('livewire-tmp/'.$fileName);
-        if (file_exists($filePath)){
-            unlink($filePath);
-        }
-        $load('');
-    }
-    protected function schedule(Schedule $schedule): void
-    {
-        $schedule->call(function () {
-            $tmpPath = storage_path('livewire-tmp');
-            // Delete files older than 24 hours
-            foreach (glob("$tmpPath/*") as $file) {
-                if (time() - filemtime($file) > 24 * 3600) {
-                    unlink($file);
-                }
-            }
-        })->daily();
-    }
-    public function updatedAwardeeUpload(): void
-    {
-        $this->isFilePondUploadComplete = true;
-        $this->validate([
-            'letterOfIntent' => 'required|file|max:10240',
-            'votersID' => 'required|file|max:10240',
-            'validID' => 'required|file|max:10240',
-            'certOfNoLandHolding' => 'required|file|max:10240',
-            'marriageCert' => 'nullable|file|max:10240',
-            'birthCert' => 'required|file|max:10240',
-        ]);
-    }
-    public function submit(): void
-    {
-        DB::beginTransaction();
-        try {
-            logger()->info('Starting document submission for applicant', [
-                'applicant_id' => $this->taggedAndValidatedApplicantId,
-            ]);
-
-            $this->isFilePonduploading = false;
-
-            // Validate and store documents
-            $this->validate([
-                'letterOfIntent' => 'required|file|max:10240',
-                'votersID' => 'required|file|max:10240',
-                'validID' => 'required|file|max:10240',
-                'certOfNoLandHolding' => 'required|file|max:10240',
-                'marriageCert' => 'nullable|file|max:10240',
-                'birthCert' => 'required|file|max:10240',
-            ]);
-
-            // Store each document
-            $this->storeAttachment('letterOfIntent', 1);
-            $this->storeAttachment('votersID', 2);
-            $this->storeAttachment('validID', 3);
-            $this->storeAttachment('certOfNoLandHolding', 4);
-            $this->storeAttachment('marriageCert', 5);
-            $this->storeAttachment('birthCert', 6);
-
-            DB::commit();
-
-            // Log the activity
-            $logger = new ActivityLogs();
-            $user = Auth::user();
-            $logger->logActivity('Submitted Applicants Requirements', $user);
-
-            $this->dispatch('alert', [
-                'title' => 'Requirements Submitted Successfully!',
-                'message' => 'Documents have been submitted successfully! <br><small>'. now()->calendar() .'</small>',
-                'type' => 'success'
-            ]);
-
-            $this->redirect('transaction-request');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->handleError('Document submission failed', $e);
-        }
-    }
-    /**
-     * Store individual attachment
-     */
-    private function storeAttachment($fileInput, $attachmentId): void
-    {
-        $file = $this->$fileInput;
-        if ($file) {
-            $fileName = $file->getClientOriginalName();
-            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
-
-            AwardeeDocumentsSubmission::create([
-                'tagged_applicant_id' => $this->taggedAndValidatedApplicantId,
-                'attachment_id' => $attachmentId,
-                'file_path' => $filePath,
-                'file_name' => $fileName,
-                'file_type' => $file->extension(),
-                'file_size' => $file->getSize(),
-            ]);
-        }
-    }
 
     private function handleError(string $message, \Exception $e = null): void
     {
@@ -356,106 +229,10 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         ]);
     }
 
-    private function resetUpload(): void
-    {
-        $this->reset([
-            'letterOfIntent',
-            'votersID',
-            'validID',
-            'certOfNoLandHolding',
-            'marriageCert',
-            'birthCert',
-            'attachment_id',
-        ]);
-
-        $this->isFilePondUploadComplete = false;  // Reset FilePond upload status if applicable
-        $this->show = false;  // Close the modal or hide any UI related to uploads if needed
-    }
     public function viewApplicantDetails($applicantId): RedirectResponse
     {
         return redirect()->route('tagged-and-validated-applicant-details', ['applicantId' => $applicantId]);
     }
-
-    // Update the viewSubmittedDocuments method to include the attachment name
-    public function viewSubmittedDocuments($applicantId): void
-    {
-        $this->taggedAndValidatedApplicantId = $applicantId;
-        $attachmentsList = AwardeeAttachmentsList::all()->pluck('attachment_name', 'id');
-
-        $this->currentDocuments = AwardeeDocumentsSubmission::where('tagged_applicant_id', $applicantId)
-            ->with('attachmentType')
-            ->get()
-            ->map(function ($doc) use ($attachmentsList) {
-                return [
-                    'id' => $doc->id,
-                    'attachment_name' => $attachmentsList[$doc->attachment_id] ?? 'Unknown Attachment',
-                    'file_name' => $doc->file_name,
-                    'file_path' => $doc->file_path,
-                    'attachment_id' => $doc->attachment_id,
-                    // Updated to use the correct path structure based on your filesystem config
-                    'file_url' => asset('awardee-photo-requirements/' . $doc->file_path)
-                ];
-            });
-        $this->showDocumentModal = true;
-    }
-
-    public function startEditingDocument($documentId): void
-    {
-        $this->editingDocumentId = $documentId;
-    }
-
-    public function updateDocument()
-    {
-        $this->validate([
-            'newDocument' => 'required|file|max:10240|mimes:jpeg,png,jpg,gif'
-        ]);
-
-        DB::beginTransaction();
-        try {
-            $document = AwardeeDocumentsSubmission::find($this->editingDocumentId); // Updated property name
-
-            // Store the new file
-            $file = $this->newDocument;
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $filePath = $file->storeAs('documents', $fileName, 'awardee-photo-requirements');
-
-            // Delete old file if it exists
-            if ($document->file_path) {
-                Storage::disk('awardee-photo-requirements')->delete($document->file_path);
-            }
-
-            // Update document record
-            $document->update([
-                'file_path' => $filePath,
-                'file_name' => $fileName,
-                'file_type' => $file->extension(),
-                'file_size' => $file->getSize(),
-            ]);
-
-            DB::commit();
-
-            $this->editingDocumentId = null; // Updated property name
-            $this->newDocument = null;
-            $this->viewSubmittedDocuments($this->taggedAndValidatedApplicantId); // Refresh documents
-
-            $this->dispatch('alert', [
-                'title' => 'Document Updated',
-                'message' => 'Document has been successfully updated!',
-                'type' => 'success'
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            $this->handleError('Failed to update document', $e);
-        }
-    }
-
-    public function cancelEdit(): void
-    {
-        $this->editingDocumentId = null; // Updated property name
-        $this->newDocument = null;
-    }
-
 
     public function render()
     {
@@ -463,9 +240,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'applicant.person',
             'applicant.address.purok',
             'applicant.address.barangay',
-            'applicant.transactionType',
             'livingSituation',
             'caseSpecification',
+            'awardees'
         ]);
 
         // Apply search filter

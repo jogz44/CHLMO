@@ -22,318 +22,203 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use App\Livewire\Logs\ActivityLogs;
+use Livewire\WithFileUploads;
 
 class AwardeeDetails extends Component
 {
-    public $isEditing = false, $isLoading = false;
+    use WithFileUploads;
 
-    public $awardee, $taggedApplicant, $applicant;
-    // Applicant information
-    public $transaction_type_id, $transactionTypes, $first_name, $middle_name, $last_name, $suffix_name, $barangay_id, $purok_id, $full_address, $contact_number;
-    public $puroks = [], $tribe, $sex, $date_of_birth, $religion, $occupation, $monthly_income, $family_income,
-            $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income,
-            $partner_first_name, $partner_middle_name, $partner_last_name, $partner_occupation, $partner_monthly_income;
+    public Awardee $awardee;
+    public $selectedDocument = null;
+    public $showEditDocumentsModal = false;
+    public $newDocuments = [];
+    public $newDocumentNames = [];
+    public $existingDocuments = [];
+    public $existingDocumentNames = [];
+    public $isBlacklistModalOpen = false;
+    public $blacklistForm = [
+        'date_blacklisted' => '',
+        'reason' => '',
+        'confirmation_password' => ''
+    ];
 
-    // Tagged applicant details
-    public $civil_status_id, $civilStatuses, $date_applied, $tagging_date, $grant_date,
-            $living_situation_id, $livingSituations, $living_status_id, $livingStatuses, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
-            $government_program_id, $governmentPrograms, $rent_fee, $landlord, $house_owner, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes,
-            $remarks;
-    // Dependent's details
-    public $dependents = [];
-    public $images = [], $imagesForAwarding = [];
-    public $dependent_relationship_id, $dependentRelationships;
-    public $selectedImage = null; // This is for the tagging image
-    public $selectedAttachment = null; // this is for the awarding attachment
+    protected $rules = [
+        'newDocuments.*' => 'required|file|max:2048',
+        'newDocumentNames.*' => 'required|string|max:255',
+        'existingDocumentNames.*' => 'required|string|max:255'
+    ];
 
-    // For blacklisting
-    public $openModalBlacklist = false, $showBlacklistConfirmationModal = false, $awardeeToBlacklist, $confirmationPassword = '', $blacklistError = '';
-    // Track deleted dependents
-    public $deletedDependentIds = [];
-
-    // Blacklisting
-    public $date_blacklisted, $blacklist_reason_description, $updated_by;
+    protected $messages = [
+        'newDocumentNames.*.required' => 'Document name is required.',
+        'existingDocumentNames.*.required' => 'Document name is required.'
+    ];
 
     public function mount($applicantId): void
     {
         $this->awardee = Awardee::with([
             'taggedAndValidatedApplicant.applicant.person',
-            'taggedAndValidatedApplicant.applicant.transactionType',
-            'taggedAndValidatedApplicant.civilStatus',
-            'taggedAndValidatedApplicant.livingSituation',
-            'taggedAndValidatedApplicant.caseSpecification',
-            'taggedAndValidatedApplicant.governmentProgram',
-            'taggedAndValidatedApplicant.livingStatus',
-            'taggedAndValidatedApplicant.roofType',
-            'taggedAndValidatedApplicant.wallType',
-            'taggedAndValidatedApplicant.spouse',
-            'taggedAndValidatedApplicant.liveInPartner',
-            'taggedAndValidatedApplicant.dependents.dependentRelationship',
-            'address.purok',
-            'address.barangay',
-            'relocationLot',
-            'lotSizeUnit',
-            'blacklist'
+            'documents',
+            'blacklist',
         ])->findOrFail($applicantId);
 
-        $this->taggedApplicant = $this->awardee->taggedAndValidatedApplicant;
-        $this->applicant = $this->taggedApplicant->applicant;
-        // Blacklisting
-        $this->date_blacklisted = now()->toDateString();
-        $this->updated_by = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
-        $this->loadFormData();
+        $this->blacklistForm['date_blacklisted'] = now()->format('Y-m-d');
+
+        $this->loadExistingDocuments();
     }
-    public function loadFormData(): void
+
+    public function loadExistingDocuments(): void
     {
-        // Load Applicant Information
-        $this->transaction_type_id = $this->applicant?->transactionType?->transaction_type_id ?? '--';
-        $this->transactionTypes = TransactionType::all();
-        $this->first_name = $this->applicant->person->first_name ?? '--';
-        $this->middle_name = $this->applicant->person->middle_name ?? '--';
-        $this->last_name = $this->applicant->person->last_name ?? '--';
-        $this->suffix_name = $this->applicant->person->suffix_name ?? '--';
-        $this->contact_number = $this->applicant?->person->contact_number ?? '--';
-        $this->date_applied = optional($this->applicant?->date_applied)
-            ->format('F d, Y') ?? '--';
+        $documents = $this->awardee->documents()
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        // Load Tagged and Validated Applicant Information
-        $this->civil_status_id = $this->taggedApplicant?->civil_status_id ?? '--';
-        $this->tribe = $this->taggedApplicant?->tribe ?? '--';
-        $this->sex = $this->taggedApplicant?->sex ?? '--';
-        $this->date_of_birth = optional($this->taggedApplicant?->date_of_birth)
-            ->format('F d, Y') ?? '--';
-        $this->religion = $this->taggedApplicant?->religion ?? '--';
-        $this->occupation = $this->taggedApplicant?->occupation ?? '--';
-        $this->monthly_income = $this->taggedApplicant?->monthly_income ?? '--';
-        $this->family_income = $this->taggedApplicant?->family_income ?? '--';
-        $this->tagging_date = optional($this->taggedApplicant?->tagging_date)
-            ->format('F d, Y') ?? '--';
-
-        // Load live-in partner information
-        $this->partner_first_name = $this->taggedApplicant?->liveInPartner?->partner_first_name ?? '--';
-        $this->partner_middle_name = $this->taggedApplicant?->liveInPartner?->partner_middle_name ?? '--';
-        $this->partner_last_name = $this->taggedApplicant?->liveInPartner?->partner_last_name ?? '--';
-        $this->partner_occupation = $this->taggedApplicant?->liveInPartner?->partner_occupation ?? '--';
-        $this->partner_monthly_income = $this->taggedApplicant?->liveInPartner?->partner_monthly_income ?? '--';
-
-        // Load spouse information
-        $this->spouse_first_name = $this->taggedApplicant?->spouse?->spouse_first_name ?? '--';
-        $this->spouse_middle_name = $this->taggedApplicant?->spouse?->spouse_middle_name ?? '--';
-        $this->spouse_last_name = $this->taggedApplicant?->spouse?->spouse_last_name ?? '--';
-        $this->spouse_occupation = $this->taggedApplicant?->spouse?->spouse_occupation ?? '--';
-        $this->spouse_monthly_income = $this->taggedApplicant?->spouse?->spouse_monthly_income ?? '--';
-
-        $this->grant_date = optional($this->awardee->grant_date)->format('F d, Y') ?? '--';
-
-        // Convert the collection to an array when loading
-        $this->dependents = $this->taggedApplicant->dependents->map(function($dependent) {
-            return [
-                'id' => $dependent->id,  // Make sure this is included
-                'dependent_first_name' => $dependent->dependent_first_name,
-                'dependent_middle_name' => $dependent->dependent_middle_name,
-                'dependent_last_name' => $dependent->dependent_last_name,
-                'dependent_sex' => $dependent->dependent_sex,
-                'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
-                'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
-                'dependent_relationship_id' => $dependent->dependent_relationship_id,
-                'dependent_occupation' => $dependent->dependent_occupation,
-                'dependent_monthly_income' => $dependent->dependent_monthly_income,
-            ];
-        })->toArray();
-        // Load civil statuses here
-        $this->civilStatuses = CivilStatus::all();
-        // Load civil statuses here
-        $this->dependentRelationships = DependentsRelationship::all();
-        // Load living situation
-        $this->living_situation_id = $this->taggedApplicant?->living_situation_id ?? null;
-        $this->livingSituations = LivingSituation::all();
-
-        // Load case specification data
-        if ($this->taggedApplicant?->living_situation_id == 8) {
-            $this->case_specification_id = $this->taggedApplicant?->case_specification_id ?? null;
-        } else {
-            $this->living_situation_case_specification = $this->taggedApplicant?->living_situation_case_specification ?? '';
-        }
-        $this->caseSpecifications = CaseSpecification::all();
-
-        // government programs
-        $this->government_program_id = $this->taggedApplicant?->government_program_id ?? '--';
-        $this->governmentPrograms = GovernmentProgram::all();
-
-        $this->living_status_id = $this->taggedApplicant?->living_status_id ?? '--';
-        $this->livingStatuses = LivingStatus::all();
-
-        $this->roof_type_id = $this->taggedApplicant?->roof_type_id ?? '--';
-        $this->roofTypes = RoofType::all();
-
-        $this->wall_type_id = $this->taggedApplicant?->wall_type_id ?? '--';
-        $this->wallTypes = WallType::all();
-
-        $this->remarks = $this->taggedApplicant?->remarks ?? '--';
-
-        if ($this->living_status_id == 1){
-            // Renting
-            $this->rent_fee = $this->taggedApplicant?->rent_fee ?? '--';
-            $this->landlord = $this->taggedApplicant?->landlord ?? '--';
-        } elseif ($this->living_status_id == 5){
-            // Just staying in someone's house
-            $this->house_owner = $this->taggedApplicant?->house_owner ?? '--';
-        }
-
-        // Load Address Information - Store IDs instead of names
-        $this->barangay_id = $this->awardee->relocationLot?->address?->barangay?->name;
-        $this->purok_id = $this->awardee->relocationLot?->address?->purok?->name;
-        $this->full_address = $this->awardeerelocationLot?->address?->full_address ?? '--';
-        // Load initial puroks if barangay is selected
-        if ($this->barangay_id) {
-            $this->puroks = Purok::where('barangay_id', $this->barangay_id)->get();
-        }
-
-        $this->images = $this->applicant->taggedAndValidated?->images ?? [];
-
-        $this->imagesForAwarding = $this->applicant->taggedAndValidated?->awardees?->flatMap(function ($awardee) {
-            return $awardee->taggedAndValidatedApplicant->documents()
-                ->with('attachmentType') // Eager load the relationship
-                ->get()
-                ->map(function ($submission) {
-//                    return $submission->file_name;
-                    return [
-//                        'file_name' => $submission->file_name,
-                        'attachment_name' => $submission->attachmentType->attachment_name ?? $submission->file_name
-                    ];
-                })->filter();
-        }) ?? collect();
+        $this->existingDocuments = $documents->toArray();
+        $this->existingDocumentNames = $documents->pluck('document_name', 'id')->toArray();
     }
-    // For Awarding pictures
-    public function viewAttachment($fileName): void
-    {
-        $this->selectedAttachment = $fileName;
-    }
-    public function closeAttachment(): void
-    {
-        $this->selectedAttachment = null;
-    }
-    public function updatedBarangayId($barangayId): void
-    {
-        $this->isLoading = true;
 
-        try {
-            if ($barangayId){
-                $this->puroks = Purok::where('barangay_id', $barangayId)->get();
-            } else{
-                $this->puroks = [];
+    public function updatedNewDocuments(): void
+    {
+        foreach ($this->newDocuments as $index => $document) {
+            if (!isset($this->newDocumentNames[$index])) {
+                // Set default name from file name but allow editing
+                $this->newDocumentNames[$index] = pathinfo($document->getClientOriginalName(), PATHINFO_FILENAME);
             }
-            $this->purok_id = null; // Reset selected puroks when barangay changes
-        } catch (\Exception $e){
-            logger()->error('Error fetching puroks', [
-                'barangay_id' => $barangayId,
-                'error' => $e->getMessage()
-            ]);
-        }
-        $this->isLoading = false;
-    }
-    public function toggleEdit(): void
-    {
-        $this->isEditing = !$this->isEditing;
-        if (!$this->isEditing) {
-            $this->loadFormData(); // Reset form data if canceling edit
         }
     }
-    public function proceedToConfirmation(): void
-    {
-        // Validate the first form
-        $this->validate([
-            'date_blacklisted' => 'required|date',
-            'blacklist_reason_description' => 'required|string|max:255',
-        ]);
 
-        $this->openModalBlacklist = false;
-        $this->showBlacklistConfirmationModal = true;
-    }
-    protected function rules()
+    public function removeNewDocument($index): void
     {
-        return [
-            'date_blacklisted' => 'required|date',
-            'blacklist_reason_description' => 'required|string|max:255',
-            'confirmationPassword' => 'required',
-        ];
+        array_splice($this->newDocuments, $index, 1);
+        array_splice($this->newDocumentNames, $index, 1);
+        // Re-index arrays to maintain consistency
+        $this->newDocuments = array_values($this->newDocuments);
+        $this->newDocumentNames = array_values($this->newDocumentNames);
     }
-    public function store()
+
+    public function updateDocuments(): void
     {
-        // Validate the input data
         $this->validate();
 
-        // Verify password first
-        if (!Hash::check($this->confirmationPassword, Auth::user()->password)) {
-            $this->blacklistError = 'Incorrect password. Please try again.';
+        try {
+            // Update existing document names
+            foreach ($this->existingDocumentNames as $id => $newName) {
+                $this->awardee->documents()
+                    ->where('id', $id)
+                    ->update(['document_name' => $newName]);
+            }
+
+            // Add new documents
+            foreach ($this->newDocuments as $index => $document) {
+                $path = $document->store('awardee-documents', 'public');
+
+                $this->awardee->documents()->create([
+                    'document_name' => $this->newDocumentNames[$index],
+                    'file_path' => $path,
+                    'file_name' => $document->getClientOriginalName(),
+                    'file_type' => $document->getMimeType(),
+                    'file_size' => $document->getSize()
+                ]);
+            }
+
+            $this->showEditDocumentsModal = false;
+            $this->reset(['newDocuments', 'newDocumentNames']);
+            $this->loadExistingDocuments();
+
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Documents updated successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Error updating documents: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function removeDocument($documentId): void
+    {
+        try {
+            $document = $this->awardee->documents()->findOrFail($documentId);
+
+            // Delete the file from storage
+            Storage::delete($document->file_path);
+
+            // Delete the database record
+            $document->delete();
+
+            // Remove from local arrays
+            unset($this->existingDocuments[$documentId]);
+            unset($this->existingDocumentNames[$documentId]);
+
+            // Refresh the documents list
+            $this->loadExistingDocuments();
+
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Document removed successfully'
+            ]);
+        } catch (\Exception $e) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Error removing document: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function viewDocument($documentId): void
+    {
+        $this->selectedDocument = $this->awardee->documents()->findOrFail($documentId);
+    }
+
+    public function closeDocumentViewer(): void
+    {
+        $this->selectedDocument = null;
+    }
+
+    public function confirmBlacklist(): void
+    {
+        $this->validate([
+            'blacklistForm.date_blacklisted' => 'required|date',
+            'blacklistForm.reason' => 'required|string|max:255',
+            'blacklistForm.confirmation_password' => 'required'
+        ]);
+
+        if (!Hash::check($this->blacklistForm['confirmation_password'], Auth::user()->password)) {
+            $this->addError('blacklistForm.confirmation_password', 'Incorrect password');
             return;
         }
 
-        // Create the new applicant record and get the ID of the newly created applicant
-        $blacklist = Blacklist::create([
-            'awardee_id' => $this->awardee->id,
+        $this->awardee->blacklist()->create([
             'user_id' => Auth::id(),
-            'date_blacklisted' => $this->date_blacklisted,
-            'blacklist_reason_description' => $this->blacklist_reason_description,
-            'updated_by' => $this->updated_by,
+            'date_blacklisted' => $this->blacklistForm['date_blacklisted'],
+            'blacklist_reason_description' => $this->blacklistForm['reason'],
+            'updated_by' => Auth::user()->full_name
         ]);
 
-        $this->awardee->update([
-            'is_blacklisted' => true
-        ]);
+        $this->awardee->update(['is_blacklisted' => true]);
 
         $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Blacklisted an Awardee', $user);
+        $logger->logActivity('Blacklisted an Awardee', Auth::user());
 
-        $this->resetForm();
-        $this->openModalBlacklist = false;
-        $this->showBlacklistConfirmationModal = false;
-
-        // Trigger the alert message
+        $this->isBlacklistModalOpen = false;
         $this->dispatch('alert', [
-            'title' => 'Awardee is now Blacklisted!',
-            'message' => '<br><small>'. now()->calendar() .'</small>',
-            'type' => 'success'
+            'type' => 'success',
+            'title' => 'Awardee Blacklisted',
+            'message' => 'The awardee has been successfully blacklisted.'
         ]);
 
         $this->redirect(route('awardee-details', ['applicantId' => $this->awardee->id]));
     }
-    public function resetForm(): void
-    {
-        $this->reset([
-            'date_blacklisted',
-            'blacklist_reason_description',
-            'updated_by',
-            'confirmationPassword',
-            'blacklistError',
-            'openModalBlacklist',
-            'showBlacklistConfirmationModal'
-        ]);
-    }
-    public function confirmBlacklisting($awardeeId): void
-    {
-        $this->awardeeToBlacklist = $awardeeId;
-        $this->confirmationPassword = '';
-        $this->blacklistError = '';
-        $this->showBlacklistConfirmationModal = true;
-    }
-    public function cancelBlacklisting(): void
-    {
-        $this->openModalBlacklist = false;
-        $this->showBlacklistConfirmationModal = false;
-        $this->awardeeToBlacklist = null;
-        $this->confirmationPassword = '';
-        $this->blacklistError = '';
-    }
+
     public function render()
     {
-        return view('livewire.awardee-details',[
-            'barangays' => Barangay::all(),
-            'tribes' => Tribe::all(),
-            'religions' => Religion::all(),
-            'showRentDetails' => $this->living_status_id == 1,
-            'showHouseOwnerDetails' => $this->living_status_id == 5,
+        return view('livewire.awardee-details', [
+            'documents' => $this->awardee->documents()
+                ->orderBy('created_at', 'desc')
+                ->get(),
+            'applicant' => $this->awardee->taggedAndValidatedApplicant->applicant
         ])->layout('layouts.app');
     }
 }

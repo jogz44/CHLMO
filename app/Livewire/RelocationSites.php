@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Barangay;
 use App\Models\Purok;
 use App\Models\RelocationSite;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -19,81 +20,76 @@ class RelocationSites extends Component
     protected $paginationTheme = 'tailwind';
 
     public $selectedSiteId, $password = '', $newStatus = '', $showPasswordModal = false;
-    public  $lot_number, $block_identifier, $relocation_site_name = '';
-    public $barangay_id, $barangays = [], $purok_id, $puroks = [];
-    public $total_lot_size;
-    public $isModalOpen = false, $isLoading = false;
-    // To edit relocation site
-    public $showEditModal = false, $editingRelocationSite, $currentId, $newTotalLotSize;
-    public $isAwardeesModalVisible = false; // Changed property name
-    public $selectedRelocationSite = null;
+    public $relocation_site_name = '';
+    public $barangay_id;
+    public $total_land_area = ''; // in hectares
+    public $total_no_of_lots = ''; // in square meters
+    public $total_lot_number_of_community_facilities = ''; // in square meters
+    public $residential_lots = ''; // Computed fields
 
+    // Edit mode fields
+    public $editingRelocationSite;
+    public $new_total_land_area;
+    public $new_total_no_of_lots;
+    public $new_total_lot_number_of_community_facilities;
+    public $new_residential_lots;
+
+    // UI state
+    public $isModalOpen = false;
+    public $showEditModal = false;
+    public $isAwardeesModalVisible = false;
+    public $selectedRelocationSite = null;
+    public $barangays = [];
+
+    // Search and filter
     public $search = '';
     public $filterBarangay = '';
-    public $filterPurok = '';
-    public $barangaysForFilter; // For the filter dropdown
-    public $filterPuroks = []; // For the dynamic purok filter dropdown
+    public $barangaysForFilter;
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'filterBarangay' => ['except' => ''],
-        'filterPurok' => ['except' => '']
+        'filterBarangay' => ['except' => '']
     ];
 
     protected $rules = [
-        'lot_number' => 'nullable|string|max:255',
-        'block_identifier' => 'nullable|string|max:255',
         'relocation_site_name' => 'required|string|max:255|unique:relocation_sites,relocation_site_name',
         'barangay_id' => 'required|exists:barangays,id',
-        'purok_id' => 'required|exists:puroks,id',
-        'total_lot_size' => 'required|numeric|min:0',
+        'total_land_area' => 'required|numeric|min:0',
+        'total_no_of_lots' => 'required|numeric|min:0',
+        'total_lot_number_of_community_facilities' => 'required|numeric|min:0|lte:total_no_of_lots'
     ];
+
     protected $messages = [
         'relocation_site_name.required' => 'Relocation site name is required.',
         'relocation_site_name.unique' => 'This relocation site name already exists.',
+        'total_land_area.required' => 'Total land area is required.',
+        'total_no_of_lots.required' => 'Total number of lots is required.',
+        'total_lot_number_of_community_facilities.required' => 'Total lot number of community facilities is required.',
+        'total_lot_number_of_community_facilities.lte' => 'Community facilities cannot exceed total number of lots.'
     ];
-    public function openModal()
-    {
-        $this->isModalOpen = true;
-        $this->resetForm();
-    }
-    public function closeModal()
-    {
-        $this->isModalOpen = false;
-        $this->resetForm();
-    }
-    public function resetForm()
-    {
-        $this->reset(['lot_number', 'block_identifier', 'relocation_site_name', 'barangay_id', 'purok_id', 'total_lot_size']);
-        $this->resetValidation();
-    }
-    public function mount()
+
+    public function mount(): void
     {
         $this->barangays = Barangay::all();
-        $this->puroks = Purok::all();
         $this->barangaysForFilter = Barangay::orderBy('name')->get();
     }
 
-    public function updatedBarangayId($barangayId): void
+    // Computed property for residential lots
+    public function updatedTotalNumberOfLots(): void
     {
-        // Fetch the puroks based on the selected barangay
-        $this->puroks = Purok::where('barangay_id', $barangayId)->get();
-        $this->purok_id = null; // Reset selected purok when barangay changes
-        $this->isLoading = false; // Reset loading state
-        logger()->info('Retrieved Puroks', [
-            'barangay_id' => $barangayId,
-            'puroks' => $this->puroks
-        ]);
+        $this->calculateResidentialLots();
     }
 
-    // Update puroks when barangay filter changes
-    public function updatedFilterBarangay($value): void
+    public function updatedTotalLotNumberOfCommunityFacilities(): void
     {
-        $this->filterPurok = ''; // Reset purok filter
-        $this->filterPuroks = $value ?
-            Purok::where('barangay_id', $value)->orderBy('name')->get() :
-            [];
-        $this->resetPage();
+        $this->calculateResidentialLots();
+    }
+
+    private function calculateResidentialLots(): void
+    {
+        if ($this->total_no_of_lots && $this->total_lot_number_of_community_facilities) {
+            $this->residential_lots = $this->total_no_of_lots - $this->total_lot_number_of_community_facilities;
+        }
     }
 
     // Reset page on search update
@@ -102,38 +98,20 @@ class RelocationSites extends Component
         $this->resetPage();
     }
 
-    public function resetFilters(): void
-    {
-        $this->reset(['search', 'filterBarangay', 'filterPurok']);
-        $this->filterPuroks = [];
-        $this->resetPage();
-    }
-
-    public function getRemainingLotSize($relocationSiteId)
-    {
-        $relocationSite = RelocationSite::with('awardees')->find($relocationSiteId);
-
-        if (!$relocationSite) {
-            return 'N/A';
-        }
-
-        // Sum up the lot sizes of all awarded applicants for this relocation site
-        $allocatedLotSize = $relocationSite->awardees->sum('lot_size');
-
-        // Calculate the remaining lot size
-        return $relocationSite->total_lot_size - $allocatedLotSize;
-    }
     public function getStatusBadgeClass($remainingSize, $totalSize): string
     {
-        $percentage = ($remainingSize / $totalSize) * 100;
-
         if ($remainingSize <= 0) {
             return 'bg-red-100 text-red-800';
-        } elseif ($percentage <= 20) {
+        }
+
+        $percentage = ($remainingSize / $totalSize) * 100;
+        if ($percentage <= 20) {
             return 'bg-orange-100 text-orange-800';
         }
+
         return 'bg-green-100 text-green-800';
     }
+
     public function getStatusText($remainingSize, $totalSize): string
     {
         $percentage = ($remainingSize / $totalSize) * 100;
@@ -147,15 +125,16 @@ class RelocationSites extends Component
     }
     public function createRelocationSite(): void
     {
+        $this->validate();
+
         try {
             Log::info('Starting relocation site creation', [
                 'form_data' => [
                     'barangay_id' => $this->barangay_id,
-                    'purok_id' => $this->purok_id,
-                    'lot_number' => $this->lot_number,
-                    'block_identifier' => $this->block_identifier,
                     'relocation_site_name' => $this->relocation_site_name,
-                    'total_lot_size' => $this->total_lot_size,
+                    'total_land_area' => $this->total_land_area,
+                    'total_no_of_lots' => $this->total_no_of_lots,
+                    'total_lot_number_of_community_facilities' => $this->total_lot_number_of_community_facilities,
                 ]
             ]);
 
@@ -171,30 +150,15 @@ class RelocationSites extends Component
                 throw $e;
             }
 
-            // Create the address entry first
-            try {
-                $address = Address::create([
-                    'barangay_id' => $this->barangay_id,
-                    'purok_id' => $this->purok_id,
-                ]);
-                Log::info('Address created successfully', ['address' => $address->toArray()]);
-            } catch (\Exception $e) {
-                Log::error('Failed to create address', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                throw $e;
-            }
-
             // Create the relocation site
             try {
                 $relocationSite = RelocationSite::create([
-                    'lot_number' => $this->lot_number,
-                    'block_identifier' => $this->block_identifier,
                     'relocation_site_name' => $this->relocation_site_name,
-                    'address_id' => $address->id,
-                    'total_lot_size' => $this->total_lot_size,
-                    'is_full' => false,
+                    'barangay_id' => $this->barangay_id,
+                    'total_land_area' => $this->total_land_area,
+                    'total_no_of_lots' => $this->total_no_of_lots,
+                    'community_facilities_road_lots_open_space' => $this->total_lot_number_of_community_facilities,
+                    'is_full' => false
                 ]);
                 Log::info('Relocation site created successfully', ['site' => $relocationSite->toArray()]);
 
@@ -208,15 +172,14 @@ class RelocationSites extends Component
 
             // Show success message
             $this->dispatch('alert', [
-                'title' => 'Relocation site added successfully!',
-                'message' => '<br><small>'. now()->calendar() .'</small>',
+                'title' => 'Success!',
+                'message' => 'Relocation site created successfully.<br><small>' . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
 
             // Log the activity
             $logger = new ActivityLogs();
-            $user = Auth::user();
-            $logger->logActivity('Created New Relocation Site', $user);            
+            $logger->logActivity('Created New Relocation Site', Auth::user());
 
             Log::info('Relocation site creation completed successfully');
 
@@ -234,67 +197,128 @@ class RelocationSites extends Component
             ]);
 
             $this->dispatch('alert', [
-                'title' => 'Error creating relocation site.',
-                'message' => '<br><small>'. now()->calendar() .'</small>',
+                'title' => 'Error!',
+                'message' => 'Failed to create relocation site.<br><small>' . now()->calendar() . '</small>',
                 'type' => 'danger'
             ]);
         }
     }
-    public function openEditModal($relocationSiteId)
+    public function openEditModal($relocationSiteId): void
     {
-        $this->editingRelocationSite = RelocationSite::find($relocationSiteId);
-        $this->newTotalLotSize = $this->editingRelocationSite->total_lot_size;
+        $this->editingRelocationSite = RelocationSite::with(['awardees', 'actualAwardees'])->find($relocationSiteId);
+
+        // Initialize form fields with current values
+        $this->new_total_land_area = $this->editingRelocationSite->total_land_area;
+        $this->new_total_no_of_lots = $this->editingRelocationSite->total_no_of_lots;
+        $this->new_total_lot_number_of_community_facilities = $this->editingRelocationSite->community_facilities_road_lots_open_space;
+
+        $this->calculateNewResidentialLots();
         $this->showEditModal = true;
     }
-    public function closeEditModal()
+
+    private function calculateNewResidentialLots(): void
     {
-        $this->showEditModal = false;
-        $this->reset('editingRelocationSite', 'newTotalLotSize');
+        if ($this->new_total_no_of_lots && $this->new_total_lot_number_of_community_facilities) {
+            $this->new_residential_lots = $this->new_total_no_of_lots - $this->new_total_lot_number_of_community_facilities;
+        }
     }
-    public function updateTotalSize()
+
+    public function updateRelocationSite(): void
     {
         $this->validate([
-            'newTotalLotSize' => 'required|numeric|min:0'
+            'new_total_land_area' => 'required|numeric|min:0',
+            'new_total_no_of_lots' => 'required|numeric|min:0',
+            'new_total_lot_number_of_community_facilities' => [
+                'required',
+                'numeric',
+                'min:0',
+                'lte:new_total_no_of_lots',
+                function ($attribute, $value, $fail) {
+                    $residentialLots = $this->new_total_no_of_lots - $value;
+                    $totalAllocatedSpace = $this->editingRelocationSite->awardees
+                        ->sum(function ($awardee) {
+                            return $awardee->actual_relocation_lot_size ?? $awardee->assigned_relocation_lot_size;
+                        });
+
+                    if ($residentialLots < $totalAllocatedSpace) {
+                        $fail('New configuration would result in insufficient space for existing awardees.');
+                    }
+                },
+            ]
         ]);
 
         try {
-            // Check if new size is less than currently allocated
-            $totalAllocated = $this->editingRelocationSite->awardees()->sum('lot_size');
-            if ($this->newTotalLotSize < $totalAllocated) {
-                $this->addError('newTotalLotSize', "New size cannot be less than currently allocated size ($totalAllocated m²)");
-                return;
-            }
+            DB::beginTransaction();
 
             $this->editingRelocationSite->update([
-                'total_lot_size' => $this->newTotalLotSize,
-                'is_full' => ($this->newTotalLotSize - $totalAllocated) <= 0
+                'total_land_area' => $this->new_total_land_area,
+                'total_no_of_lots' => $this->new_total_no_of_lots,
+                'community_facilities_road_lots_open_space' => $this->new_total_lot_number_of_community_facilities
             ]);
+
+            // Update the status
+            $this->editingRelocationSite->updateFullStatus();
+
+            DB::commit();
 
             $this->dispatch('alert', [
                 'title' => 'Success!',
-                'message' => 'Total lot size updated successfully.<br><small>' . now()->calendar() . '</small>',
+                'message' => 'Relocation site updated successfully.<br><small>' . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
 
-               // Log the activity
-               $logger = new ActivityLogs();
-               $user = Auth::user();
-               $logger->logActivity('Updated Relocation Site', $user);
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity('Updated Relocation Site', Auth::user());
 
             $this->closeEditModal();
 
         } catch (\Exception $e) {
             $this->dispatch('alert', [
                 'title' => 'Error!',
-                'message' => 'Failed to update total lot size.<br><small>' . now()->calendar() . '</small>',
+                'message' => 'Failed to update relocation site.<br><small>' . now()->calendar() . '</small>',
                 'type' => 'danger'
             ]);
         }
     }
-    public function openAwardeesModal($relocationSiteId): void // Changed method name
+
+    public function getAwardeesCount($relocationSiteId): array
     {
-        $this->selectedRelocationSite = RelocationSite::with('awardees.taggedAndValidatedApplicant')->findOrFail($relocationSiteId);
-        $this->isAwardeesModalVisible = true; // Updated property name
+        $relocationSite = RelocationSite::find($relocationSiteId);
+
+        return [
+            'assigned' => $relocationSite->awardees()->count(),
+            'actual' => $relocationSite->actualAwardees()->count()
+        ];
+    }
+
+    public function getRemainingLotSize($relocationSiteId): float
+    {
+        $relocationSite = RelocationSite::with(['awardees', 'actualAwardees'])->find($relocationSiteId);
+
+        if (!$relocationSite) {
+            return 0;
+        }
+
+        $totalAvailableLots = $relocationSite->total_no_of_lots - $relocationSite->community_facilities_road_lots_open_space;
+
+        // Calculate total allocated space based on actual or assigned lot sizes
+        $totalAllocatedSpace = $relocationSite->awardees
+            ->sum(function ($awardee) {
+                // Use actual lot size if available, otherwise use assigned lot size
+                return $awardee->actual_relocation_lot_size ?? $awardee->assigned_relocation_lot_size;
+            });
+
+        return $totalAvailableLots - $totalAllocatedSpace;
+    }
+
+    public function openAwardeesModal($relocationSiteId): void
+    {
+        $this->selectedRelocationSite = RelocationSite::with([
+            'awardees.taggedAndValidatedApplicant.applicant.person',
+            'actualAwardees'
+        ])->findOrFail($relocationSiteId);
+        $this->isAwardeesModalVisible = true;
     }
 
     public function closeAwardeesModal(): void
@@ -302,31 +326,17 @@ class RelocationSites extends Component
         $this->isAwardeesModalVisible = false; // Updated property name
         $this->selectedRelocationSite = null;
     }
+
     public function render()
     {
-        $query = RelocationSite::with(['address.barangay', 'address.purok']);
+        $query = RelocationSite::with(['barangay']);
 
-        // Apply search filter
         if ($this->search) {
-            $query->where(function($q) {
-                $q->where('relocation_site_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('lot_number', 'like', '%' . $this->search . '%')
-                    ->orWhere('block_identifier', 'like', '%' . $this->search . '%');
-            });
+            $query->where('relocation_site_name', 'like', '%' . $this->search . '%');
         }
 
-        // Apply barangay filter
         if ($this->filterBarangay) {
-            $query->whereHas('address.barangay', function($q) {
-                $q->where('id', $this->filterBarangay);
-            });
-        }
-
-        // Apply purok filter
-        if ($this->filterPurok) {
-            $query->whereHas('address.purok', function($q) {
-                $q->where('id', $this->filterPurok);
-            });
+            $query->where('barangay_id', $this->filterBarangay);
         }
 
         $relocationSites = $query->orderBy('relocation_site_name', 'asc')
@@ -335,5 +345,35 @@ class RelocationSites extends Component
         return view('livewire.relocation-sites', [
             'relocationSites' => $relocationSites
         ]);
+    }
+
+    public function openModal(): void
+    {
+        $this->isModalOpen = true;
+        $this->resetForm();
+    }
+
+    public function closeModal(): void
+    {
+        $this->isModalOpen = false;
+        $this->resetForm();
+    }
+
+    public function closeEditModal(): void
+    {
+        $this->showEditModal = false;
+        $this->reset(['editingRelocationSite', 'new_total_land_area', 'new_total_no_of_lots', 'new_total_lot_number_of_community_facilities']);
+    }
+
+    public function resetForm() {
+        $this->reset([
+            'relocation_site_name',
+            'barangay_id',
+            'total_land_area',
+            'total_no_of_lots',
+            'total_lot_number_of_community_facilities',
+            'residential_lots'
+        ]);
+        $this->resetValidation();
     }
 }

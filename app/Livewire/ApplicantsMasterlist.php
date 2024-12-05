@@ -14,6 +14,7 @@ class ApplicantsMasterlist extends Component
     protected $paginationTheme = 'tailwind';
     // Search and filter properties
     public $search = '';
+    public $statusFilter = '';
     public $filterApplicationType = ''; // 'housing', 'shelter', or empty for all
     // applicant details
     public $first_name, $middle_name, $last_name, $suffix_name, $barangay, $purok, $living_situation, $contact_number,
@@ -21,13 +22,13 @@ class ApplicantsMasterlist extends Component
 
     public function render()
     {
-        $peopleQuery = People::query()
+        // Initialize the query builder at the start
+        $query = People::query()
             ->with([
                 'applicants' => function ($query) {
                     $query->with([
                         'address.purok',
                         'address.barangay',
-                        'transactionType',
                         'taggedAndValidated.awardees',
                         'taggedAndValidated.livingSituation',
                     ]);
@@ -39,19 +40,40 @@ class ApplicantsMasterlist extends Component
                 }
             ]);
 
-        // Add debugging to check values
-        \Log::info('Checking applicant statuses:');
-        $peopleQuery->get()->each(function($person) {
-            if ($person->applicants->first()) {
-                \Log::info("Person {$person->id} - Applicant {$person->applicants->first()->id}: is_tagged = " .
-                    ($person->applicants->first()->is_tagged ? 'true' : 'false'));
-            }
-        });
-
+        // Apply filters
+        if ($this->statusFilter) {
+            $query->whereHas('applicants', function($query) {
+                switch($this->statusFilter) {
+                    case 'pending_tagging':
+                        $query->where('is_tagged', false);
+                        break;
+                    case 'tagged':
+                        $query->where('is_tagged', true)
+                            ->whereDoesntHave('taggedAndValidated.awardees');
+                        break;
+                    case 'pending_awarding':
+                        $query->whereHas('taggedAndValidated.awardees', function($q) {
+                            $q->where('has_assigned_relocation_site', true)
+                                ->where('is_awarded', false);
+                        });
+                        break;
+                    case 'awarded':
+                        $query->whereHas('taggedAndValidated.awardees', function($q) {
+                            $q->where('is_awarded', true);
+                        });
+                        break;
+                    case 'blacklisted':
+                        $query->whereHas('taggedAndValidated.awardees', function($q) {
+                            $q->where('is_blacklisted', true);
+                        });
+                        break;
+                }
+            });
+        }
 
         // Apply search if provided
         if ($this->search) {
-            $peopleQuery->where(function ($query) {
+            $query->where(function ($query) {
                 $query->where('first_name', 'LIKE', '%' . $this->search . '%')
                     ->orWhere('middle_name', 'LIKE', '%' . $this->search . '%')
                     ->orWhere('last_name', 'LIKE', '%' . $this->search . '%')
@@ -68,12 +90,11 @@ class ApplicantsMasterlist extends Component
 
         // Apply application type filter if selected
         if ($this->filterApplicationType) {
-            $peopleQuery->where('application_type', $this->filterApplicationType);
+            $query->where('application_type', $this->filterApplicationType);
         }
 
-        $people = $peopleQuery
-            ->orderBy('last_name', 'asc')
-            ->paginate(5);
+        // Get paginated results
+        $people = $query->orderBy('last_name', 'asc')->paginate(5);
 
         return view('livewire.applicants-masterlist', [
             'people' => $people
