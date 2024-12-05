@@ -118,23 +118,50 @@
                     </thead>
                     <tbody>
                         @forelse($taggedAndValidatedApplicants as $applicant)
-                            <tr>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap">{{ $applicant->applicant->applicant_id}}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words name-col">{{ $applicant->applicant->person->full_name }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words purok-col">{{ $applicant->applicant->address->purok->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words barangay-col">{{ $applicant->applicant->address->barangay->name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words living-situation-col">{{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-col">{{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words case-specification-description-col">{{ $applicant->living_situation_case_specification ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap contact-col">{{ $applicant->applicant->person->contact_number ?? 'N/A' }}</td>
-                                <td class="py-4 px-2 text-center border-b capitalize whitespace-nowrap transaction-type-col">{{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}</td>
-                                <td class="py-4 px-2 text-center border-b whitespace-nowrap actions-col">
+                            <tr class="hover:bg-gray-50 cursor-pointer">
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-nowrap cursor-pointer">
+                                    {{ $applicant->applicant->applicant_id}}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words cursor-pointer">
+                                    {{ $applicant->applicant->person->full_name }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words cursor-pointer">
+                                    {{ $applicant->applicant->address->purok->name ?? 'N/A' }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words cursor-pointer">
+                                    {{ $applicant->applicant->address->barangay->name ?? 'N/A' }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words cursor-pointer">
+                                    {{ $applicant->livingSituation->living_situation_description ?? 'N/A' }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words cursor-pointer">
+                                    {{ $applicant->caseSpecification->case_specification_name ?? 'N/A' }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words cursor-pointer">
+                                    {{ $applicant->living_situation_case_specification ?? 'N/A' }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-nowrap cursor-pointer">
+                                    {{ $applicant->applicant->person->contact_number ?? 'N/A' }}
+                                </td>
+                                <td onclick="window.location.href='{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
+                                    class="py-4 px-2 text-center border-b capitalize whitespace-nowrap cursor-pointer">
+                                    {{ \Carbon\Carbon::parse($applicant->tagging_date)->format('m/d/Y') }}
+                                </td>
+                                <td class="py-4 px-2 text-center border-b whitespace-nowrap">
                                     @if(!$applicant->documents->count() && !$applicant->is_awarding_on_going)
                                         <!-- Initial state: Show Details and Submit Requirements -->
-                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"
-                                                class="text-custom-red text-bold underline px-4 py-1.5 mr-2">
-                                            Details
-                                        </button>
+{{--                                        <button @click="window.location.href = '{{ route('tagged-and-validated-applicant-details', ['applicantId' => $applicant->id]) }}'"--}}
+{{--                                                class="text-custom-red text-bold underline px-4 py-1.5 mr-2">--}}
+{{--                                            Details--}}
+{{--                                        </button>--}}
                                         <button @click="openModalDocumentsChecklist = true; $wire.set('taggedAndValidatedApplicantId', {{ $applicant->id }})"
                                                 class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
                                             Submit Requirements
@@ -208,7 +235,7 @@
                                     <select wire:model.live="relocation_lot_id" id="lot_name" name="lot_name" :disabled="!isEditable" required
                                             class="uppercase w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]">
                                         <option value="">Select Relocation Site </option>
-                                        @forelse($relocationSites as $relocationSite)
+                                        @forelse($actualRelocationSites as $relocationSite)
                                             <option value="{{ $relocationSite->id }}">{{ $relocationSite->relocation_site_name }}</option>
                                         @empty
                                             <option disabled>There's no record available yet.</option>

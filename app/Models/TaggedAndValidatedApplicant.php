@@ -15,7 +15,7 @@ class TaggedAndValidatedApplicant extends Model
     protected $fillable = [
         'applicant_id', 'civil_status_id', 'tribe', 'religion', 'living_situation_id', 'case_specification_id',
         'living_situation_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id',
-        'wall_type_id', 'structure_status_id', 'relocation_lot_id', 'full_address', 'sex', 'date_of_birth', 'occupation',
+        'wall_type_id', 'structure_status_id', 'full_address', 'sex', 'date_of_birth', 'occupation',
         'monthly_income', 'tagging_date', 'room_rent_fee', 'room_landlord', 'house_rent_fee', 'house_landlord',
         'lot_rent_fee', 'lot_landlord', 'house_owner', 'relationship_to_house_owner', 'tagger_name',
         'years_of_residency', 'voters_id_number', 'remarks', 'is_tagged', 'is_awarding_on_going',
@@ -103,16 +103,8 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(StructureStatusType::class);
     }
-//    public function images()
-//    {
-//        return $this->hasMany(ImagesForHousing::class, 'tagged_and_validated_applicant_id');
-//    }
     public function taggedDocuments(): HasMany
     {
         return $this->hasMany(TaggedDocumentsSubmission::class, 'tagged_applicant_id');
-    }
-    public function relocationSite(): BelongsTo
-    {
-        return $this->belongsTo(RelocationSite::class, 'relocation_lot_id', 'id');
     }
 }

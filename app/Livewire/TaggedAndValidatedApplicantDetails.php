@@ -2,10 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Logs\ActivityLogs;
 use App\Models\Applicant;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\Dependent;
+use App\Models\DependentsRelationship;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\LivingStatus;
@@ -13,19 +15,26 @@ use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\TaggedAndValidatedApplicant;
+use App\Models\TaggedDocumentsSubmission;
 use App\Models\TransactionType;
 use App\Models\Tribe;
 use App\Models\WallType;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class TaggedAndValidatedApplicantDetails extends Component
 {
+    use WithFileUploads;
+
     public $applicant;
     public $taggedAndValidatedApplicant;
-    public $isEditing = false, $isLoading = false;
+    public $isEditing = false, $isLoading = false, $originalData = []; // Add new properties for edit mode
 
     public $applicantForSpouse;
     public $transaction_type_id, $transactionTypes, $transaction_type_name;
@@ -46,7 +55,8 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $spouse_first_name, $spouse_middle_name, $spouse_last_name, $spouse_occupation, $spouse_monthly_income;
 
     // Dependent's details
-    public $dependents = [], $dependent_civil_status_id, $dependent_civilStatuses, $renamedFileName = [];
+    public $dependents = [], $dependent_civil_status_id, $dependent_civilStatuses, $dependent_relationship_id,
+        $dependentRelationships, $renamedFileName = [];
     public $showDeleteConfirmationModal = false, $dependentToDelete, $confirmationPassword = '', $deleteError = '';
     public $images = [], $imagesForTagging = [];
     public $selectedImage = null; // This is for the tagging image
@@ -55,6 +65,56 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $taggedDocuments = [];
     public $selectedDocument = null;
 
+    // Modal states for each group
+    public $showPrimaryInfoModal = false, $showDependentsModal = false, $showLivingSituationModal = false,
+        $showPhotosModal = false, $newPhotos = [], $photosToDelete = [];
+    public $editDependents = [], $editPhotos = [];
+    public $confirmingDependentRemoval = false, $dependentIndexToRemove = null, $passwordConfirmation = '';
+    // Edit temporary data
+    public $editPrimaryInfo = [
+        'full_address' => '',
+        'civil_status_id' => '',
+        'tribe' => '',
+        'sex' => '',
+        'date_of_birth' => '',
+        'religion' => '',
+        'occupation' => '',
+        'monthly_income' => '',
+        'length_of_residency' => '',
+        'voters_id_number' => '',
+        // Partner fields
+        'partner_first_name' => '',
+        'partner_middle_name' => '',
+        'partner_last_name' => '',
+        'partner_occupation' => '',
+        'partner_monthly_income' => '',
+        // Spouse fields
+        'spouse_first_name' => '',
+        'spouse_middle_name' => '',
+        'spouse_last_name' => '',
+        'spouse_occupation' => '',
+        'spouse_monthly_income' => '',
+    ];
+    public $editLivingSituation = [
+        'date_tagged' => '',
+        'living_situation_id' => '',
+        'case_specification_id' => '',
+        'living_situation_case_specification' => '',
+        'social_welfare_sector' => '',
+        'living_status' => '',
+        'room_rent_fee' => '',
+        'room_landlord' => '',
+        'house_rent_fee' => '',
+        'house_landlord' => '',
+        'lot_rent_fee' => '',
+        'lot_landlord' => '',
+        'house_owner' => '',
+        'relationship_to_house_owner' => '',
+        'roof_type' => '',
+        'wall_type' => '',
+        'transaction_type' => '',
+        'remarks' => '',
+    ];
     public function mount($applicantId): void
     {
         $this->taggedAndValidatedApplicant = TaggedAndValidatedApplicant::with([
@@ -85,6 +145,16 @@ class TaggedAndValidatedApplicantDetails extends Component
         }
 
         $this->loadFormData();
+        $this->resetPrimaryInfoForm();
+        $this->resetDependentsForm();
+        $this->resetLivingSituationForm();
+        $this->resetPhotosData();
+    }
+    public function getFormattedDateOfBirthProperty(): string
+    {
+        return $this->date_of_birth
+            ? Carbon::parse($this->date_of_birth)->format('F d, Y')
+            : 'N/A';
     }
     public function loadFormData(): void
     {
@@ -94,6 +164,9 @@ class TaggedAndValidatedApplicantDetails extends Component
         // For Dependents
         $this->dependent_civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
+        });
+        $this->dependentRelationships = Cache::remember('dependentsRelationships', 60*60, function () {
+            return DependentsRelationship::all(); // Cache for 1 hour
         });
         $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
             return LivingSituation::all();  // Cache for 1 hour
@@ -130,6 +203,8 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->full_address = $this->taggedAndValidatedApplicant->full_address ?? null;
         $this->occupation = $this->taggedAndValidatedApplicant->occupation ?? null;
         $this->tribe = $this->taggedAndValidatedApplicant->tribe ?? null;
+        $this->sex = $this->taggedAndValidatedApplicant->sex;
+        $this->date_of_birth = $this->taggedAndValidatedApplicant->date_of_birth;
         $this->religion = $this->taggedAndValidatedApplicant->religion ?? null;
         $this->monthly_income = $this->taggedAndValidatedApplicant->monthly_income ?? null;
         $this->years_of_residency = $this->taggedAndValidatedApplicant->years_of_residency ?? null;
@@ -211,6 +286,751 @@ class TaggedAndValidatedApplicantDetails extends Component
     {
         $this->selectedDocument = null;
     }
+
+    // Methods for handling Primary information editing
+    public function openPrimaryInfoModal(): void
+    {
+        $this->editPrimaryInfo = [
+            'full_address' => $this->taggedAndValidatedApplicant->full_address,
+            'civil_status_id' => $this->taggedAndValidatedApplicant->civil_status_id,
+            'tribe' => $this->taggedAndValidatedApplicant->tribe,
+            'sex' => $this->taggedAndValidatedApplicant->sex,
+            'date_of_birth' => $this->taggedAndValidatedApplicant->date_of_birth,
+            'religion' => $this->taggedAndValidatedApplicant->religion,
+            'occupation' => $this->taggedAndValidatedApplicant->occupation,
+            'monthly_income' => $this->taggedAndValidatedApplicant->monthly_income,
+            'length_of_residency' => $this->taggedAndValidatedApplicant->years_of_residency,
+            'voters_id_number' => $this->taggedAndValidatedApplicant->voters_id_number,
+            // Partner fields
+            'partner_first_name' => $this->taggedAndValidatedApplicant->liveInPartner->partner_first_name ?? '',
+            'partner_middle_name' => $this->taggedAndValidatedApplicant->liveInPartner->partner_middle_name ?? '',
+            'partner_last_name' => $this->taggedAndValidatedApplicant->liveInPartner->partner_last_name ?? '',
+            'partner_occupation' => $this->taggedAndValidatedApplicant->liveInPartner->partner_occupation ?? '',
+            'partner_monthly_income' => $this->taggedAndValidatedApplicant->liveInPartner->partner_monthly_income ?? '',
+            // Spouse fields
+            'spouse_first_name' => $this->taggedAndValidatedApplicant->spouse->spouse_first_name ?? '',
+            'spouse_middle_name' => $this->taggedAndValidatedApplicant->spouse->spouse_middle_name ?? '',
+            'spouse_last_name' => $this->taggedAndValidatedApplicant->spouse->spouse_last_name ?? '',
+            'spouse_occupation' => $this->taggedAndValidatedApplicant->spouse->spouse_occupation ?? '',
+            'spouse_monthly_income' => $this->taggedAndValidatedApplicant->spouse->spouse_monthly_income ?? '',
+        ];
+
+        $this->showPrimaryInfoModal = true;
+    }
+
+    protected function primaryInfoValidationRules()
+    {
+        return [
+            'editPrimaryInfo.full_address' => 'nullable|string|max:255',
+            'editPrimaryInfo.civil_status_id' => 'required|exists:civil_statuses,id',
+            'editPrimaryInfo.tribe' => 'required|string|max:255',
+            'editPrimaryInfo.sex' => 'required|in:Male,Female',
+            'editPrimaryInfo.date_of_birth' => 'required|date',
+            'editPrimaryInfo.religion' => 'required|string|max:255',
+            'editPrimaryInfo.occupation' => 'required|string|max:255',
+            'editPrimaryInfo.monthly_income' => 'required|numeric|min:0',
+            'editPrimaryInfo.length_of_residency' => 'required|integer|min:0',
+            'editPrimaryInfo.voters_id_number' => 'nullable|string|max:255',
+
+            // Conditional validation for partner details
+            'editPrimaryInfo.partner_first_name' => 'required_if:editPrimaryInfo.civil_status_id,2|string|max:255|nullable',
+            'editPrimaryInfo.partner_middle_name' => 'nullable|string|max:255',
+            'editPrimaryInfo.partner_last_name' => 'required_if:editPrimaryInfo.civil_status_id,2|string|max:255|nullable',
+            'editPrimaryInfo.partner_occupation' => 'required_if:editPrimaryInfo.civil_status_id,2|string|max:255|nullable',
+            'editPrimaryInfo.partner_monthly_income' => 'required_if:editPrimaryInfo.civil_status_id,2|numeric|min:0|nullable',
+
+            // Conditional validation for spouse details
+            'editPrimaryInfo.spouse_first_name' => 'required_if:editPrimaryInfo.civil_status_id,3|string|max:255|nullable',
+            'editPrimaryInfo.spouse_middle_name' => 'nullable|string|max:255',
+            'editPrimaryInfo.spouse_last_name' => 'required_if:editPrimaryInfo.civil_status_id,3|string|max:255|nullable',
+            'editPrimaryInfo.spouse_occupation' => 'required_if:editPrimaryInfo.civil_status_id,3|string|max:255|nullable',
+            'editPrimaryInfo.spouse_monthly_income' => 'required_if:editPrimaryInfo.civil_status_id,3|numeric|min:0|nullable',
+        ];
+    }
+
+    protected $messages = [
+        'editPrimaryInfo.civil_status_id.required' => 'The civil status field is required.',
+        'editPrimaryInfo.tribe.required' => 'The tribe/ethnicity field is required.',
+        'editPrimaryInfo.sex.required' => 'The sex field is required.',
+        'editPrimaryInfo.date_of_birth.required' => 'The date of birth field is required.',
+        'editPrimaryInfo.religion.required' => 'The religion field is required.',
+        'editPrimaryInfo.occupation.required' => 'The occupation field is required.',
+        'editPrimaryInfo.monthly_income.required' => 'The monthly income field is required.',
+        'editPrimaryInfo.length_of_residency.required' => 'The length of residency field is required.',
+
+        // Partner validation messages
+        'editPrimaryInfo.partner_first_name.required_if' => 'Partner\'s first name is required.',
+        'editPrimaryInfo.partner_last_name.required_if' => 'Partner\'s last name is required.',
+        'editPrimaryInfo.partner_occupation.required_if' => 'Partner\'s occupation is required.',
+        'editPrimaryInfo.partner_monthly_income.required_if' => 'Partner\'s monthly income is required.',
+
+        // Spouse validation messages
+        'editPrimaryInfo.spouse_first_name.required_if' => 'Spouse\'s first name is required.',
+        'editPrimaryInfo.spouse_last_name.required_if' => 'Spouse\'s last name is required.',
+        'editPrimaryInfo.spouse_occupation.required_if' => 'Spouse\'s occupation is required.',
+        'editPrimaryInfo.spouse_monthly_income.required_if' => 'Spouse\'s monthly income is required.',
+    ];
+
+    public function updatePrimaryInfo(): void
+    {
+        $this->validate($this->primaryInfoValidationRules());
+
+        try {
+            DB::beginTransaction();
+
+            // Update primary information
+            $this->taggedAndValidatedApplicant->update([
+                'full_address' => $this->editPrimaryInfo['full_address'],
+                'civil_status_id' => $this->editPrimaryInfo['civil_status_id'],
+                'tribe' => $this->editPrimaryInfo['tribe'],
+                'sex' => $this->editPrimaryInfo['sex'],
+                'date_of_birth' => $this->editPrimaryInfo['date_of_birth'],
+                'religion' => $this->editPrimaryInfo['religion'],
+                'occupation' => $this->editPrimaryInfo['occupation'],
+                'monthly_income' => $this->editPrimaryInfo['monthly_income'],
+                'years_of_residency' => $this->editPrimaryInfo['length_of_residency'],
+                'voters_id_number' => $this->editPrimaryInfo['voters_id_number'],
+            ]);
+
+            // Handle live-in partner information
+            if ($this->editPrimaryInfo['civil_status_id'] == 2) {
+                $this->taggedAndValidatedApplicant->liveInPartner()->updateOrCreate(
+                    ['tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicant->id],
+                    [
+                        'partner_first_name' => $this->editPrimaryInfo['partner_first_name'],
+                        'partner_middle_name' => $this->editPrimaryInfo['partner_middle_name'],
+                        'partner_last_name' => $this->editPrimaryInfo['partner_last_name'],
+                        'partner_occupation' => $this->editPrimaryInfo['partner_occupation'],
+                        'partner_monthly_income' => $this->editPrimaryInfo['partner_monthly_income'],
+                    ]
+                );
+            } else {
+                // Delete partner information if civil status is not live-in
+                $this->taggedAndValidatedApplicant->liveInPartner()->delete();
+            }
+
+            // Handle spouse information
+            if ($this->editPrimaryInfo['civil_status_id'] == 3) {
+                $this->taggedAndValidatedApplicant->spouse()->updateOrCreate(
+                    ['tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicant->id],
+                    [
+                        'spouse_first_name' => $this->editPrimaryInfo['spouse_first_name'],
+                        'spouse_middle_name' => $this->editPrimaryInfo['spouse_middle_name'],
+                        'spouse_last_name' => $this->editPrimaryInfo['spouse_last_name'],
+                        'spouse_occupation' => $this->editPrimaryInfo['spouse_occupation'],
+                        'spouse_monthly_income' => $this->editPrimaryInfo['spouse_monthly_income'],
+                    ]
+                );
+            } else {
+                // Delete spouse information if civil status is not married
+                $this->taggedAndValidatedApplicant->spouse()->delete();
+            }
+
+            DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Updated primary information for applicant: ' . $this->taggedAndValidatedApplicant->applicant->applicant_id,
+                Auth::user()
+            );
+
+            // Reset the modal and show success message
+            $this->showPrimaryInfoModal = false;
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Primary information updated successfully',
+                'type' => 'success'
+            ]);
+
+            // Refresh the applicant data
+            $this->taggedAndValidatedApplicant = $this->taggedAndValidatedApplicant->fresh();
+            $this->loadFormData();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error updating primary information: ' . $e->getMessage());
+
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to update information. Please try again.',
+                'type' => 'error'
+            ]);
+        }
+    }
+
+    public function updatedEditPrimaryInfoCivilStatusId($value): void
+    {
+        if ($value == 1) { // Single
+            $this->resetSpouseAndPartnerFields();
+        }
+    }
+
+    private function resetSpouseAndPartnerFields(): void
+    {
+        $fields = [
+            'partner_first_name', 'partner_middle_name', 'partner_last_name',
+            'partner_occupation', 'partner_monthly_income',
+            'spouse_first_name', 'spouse_middle_name', 'spouse_last_name',
+            'spouse_occupation', 'spouse_monthly_income'
+        ];
+
+        foreach ($fields as $field) {
+            $this->editPrimaryInfo[$field] = '';
+        }
+    }
+
+    // Method to handle civil status changes
+    public function updatedEditPrimaryCivilStatusId($value): void
+    {
+        // If changing to single, reset spouse/partner fields
+        if ($value == 1) { // Assuming 1 is single
+            $this->spouse_first_name = null;
+            $this->spouse_middle_name = null;
+            $this->spouse_last_name = null;
+            $this->spouse_occupation = null;
+            $this->spouse_monthly_income = null;
+
+            $this->partner_first_name = null;
+            $this->partner_middle_name = null;
+            $this->partner_last_name = null;
+            $this->partner_occupation = null;
+            $this->partner_monthly_income = null;
+        }
+    }
+    // method to reset form
+    public function resetPrimaryInfoForm(): void
+    {
+        $this->reset('editPrimaryInfo');
+        $this->resetValidation();
+    }
+
+    // Methods for handling Dependents editing
+    public function openDependentsModal(): void
+    {
+        // Load current dependents into edit array
+        $this->editDependents = $this->taggedAndValidatedApplicant->dependents->map(function($dependent) {
+            return [
+                'id' => $dependent->id,
+                'dependent_first_name' => $dependent->dependent_first_name,
+                'dependent_middle_name' => $dependent->dependent_middle_name,
+                'dependent_last_name' => $dependent->dependent_last_name,
+                'dependent_sex' => $dependent->dependent_sex,
+                'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
+                'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
+                'dependent_occupation' => $dependent->dependent_occupation,
+                'dependent_monthly_income' => $dependent->dependent_monthly_income,
+                'dependent_relationship_id' => $dependent->dependent_relationship_id,
+            ];
+        })->toArray();
+
+        $this->showDependentsModal = true;
+    }
+    public function addDependentRow(): void
+    {
+        $this->editDependents[] = [
+            'id' => null, // Important for distinguishing new records
+            'dependent_first_name' => '',
+            'dependent_middle_name' => '',
+            'dependent_last_name' => '',
+            'dependent_sex' => '',
+            'dependent_civil_status_id' => '',
+            'dependent_date_of_birth' => '',
+            'dependent_relationship_id' => '',
+            'dependent_occupation' => '',
+            'dependent_monthly_income' => '',
+            'tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicant->id
+        ];
+    }
+    public function updateDependents(): void
+    {
+        $this->validate([
+            'editDependents.*.dependent_first_name' => 'required|string|max:255',
+            'editDependents.*.dependent_middle_name' => 'nullable|string|max:255',
+            'editDependents.*.dependent_last_name' => 'required|string|max:255',
+            'editDependents.*.dependent_sex' => 'required|in:Male,Female',
+            'editDependents.*.dependent_civil_status_id' => 'required|exists:civil_statuses,id',
+            'editDependents.*.dependent_date_of_birth' => 'required|date',
+            'editDependents.*.dependent_occupation' => 'required|string|max:255',
+            'editDependents.*.dependent_monthly_income' => 'required|numeric|min:0',
+            'editDependents.*.dependent_relationship_id' => 'required|exists:dependents_relationships,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Get current dependent IDs
+            $currentDependentIds = collect($this->editDependents)
+                ->pluck('id')
+                ->filter()
+                ->toArray();
+
+            // Delete dependents that are no longer in the list
+            $this->taggedAndValidatedApplicant->dependents()
+                ->whereNotIn('id', $currentDependentIds)
+                ->delete();
+
+            // Update or create dependents
+            foreach ($this->editDependents as $dependentData) {
+                $id = $dependentData['id'] ?? null;
+                $dependentData['tagged_and_validated_applicant_id'] = $this->taggedAndValidatedApplicant->id;
+
+                if ($id) {
+                    // Update existing dependent
+                    Dependent::where('id', $id)->update($dependentData);
+                } else {
+                    // Create new dependent
+                    unset($dependentData['id']); // Remove null id if it exists
+                    Dependent::create($dependentData);
+                }
+            }
+
+            DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Updated dependents for applicant: ' . $this->taggedAndValidatedApplicant->applicant->applicant_id,
+                Auth::user()
+            );
+
+            $this->showDependentsModal = false;
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Dependents updated successfully',
+                'type' => 'success'
+            ]);
+
+            // Refresh the data
+            $this->taggedAndValidatedApplicant = $this->taggedAndValidatedApplicant->fresh(['dependents']);
+            $this->loadFormData();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error updating dependents: ' . $e->getMessage());
+
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to update dependents. Please try again.',
+                'type' => 'error'
+            ]);
+        }
+    }
+    public function confirmDependentRemoval($index): void
+    {
+        $this->dependentIndexToRemove = $index;
+        $this->confirmingDependentRemoval = true;
+        $this->passwordConfirmation = '';
+    }
+    public function removeDependentRow(): void
+    {
+        // Validate password
+        $this->validate([
+            'passwordConfirmation' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (!Hash::check($value, Auth::user()->password)) {
+                        $fail('The password is incorrect.');
+                    }
+                },
+            ],
+        ]);
+
+        if (is_null($this->dependentIndexToRemove)) {
+            return;
+        }
+
+        // If password is valid, proceed with removal
+        unset($this->editDependents[$this->dependentIndexToRemove]);
+        $this->editDependents = array_values($this->editDependents);
+
+        // Reset confirmation state
+        $this->confirmingDependentRemoval = false;
+        $this->dependentIndexToRemove = null;
+        $this->passwordConfirmation = '';
+
+        // Show success message
+        $this->dispatch('alert', [
+            'title' => 'Success!',
+            'message' => 'Dependent removed successfully',
+            'type' => 'success'
+        ]);
+    }
+    // Add this method to handle cancellation
+    public function cancelDependentRemoval(): void
+    {
+        $this->confirmingDependentRemoval = false;
+        $this->dependentIndexToRemove = null;
+        $this->passwordConfirmation = '';
+    }
+    public function resetDependentsForm(): void
+    {
+        $this->reset('editDependents');
+        $this->resetValidation();
+    }
+    protected $dependentMessages = [
+        'editDependents.*.dependent_first_name.required' => 'The first name field is required.',
+        'editDependents.*.dependent_last_name.required' => 'The last name field is required.',
+        'editDependents.*.dependent_sex.required' => 'The sex field is required.',
+        'editDependents.*.dependent_civil_status_id.required' => 'The civil status field is required.',
+        'editDependents.*.dependent_date_of_birth.required' => 'The date of birth field is required.',
+        'editDependents.*.dependent_occupation.required' => 'The occupation field is required.',
+        'editDependents.*.dependent_monthly_income.required' => 'The monthly income field is required.',
+        'editDependents.*.dependent_relationship_id.required' => 'The relationship field is required.',
+    ];
+
+
+    // Methods for handling living situation editing
+    // Add validation rules for living situation
+    protected function getLivingSituationRules(): array
+    {
+        $rules = [
+            'editLivingSituation.living_situation_id' => 'required|exists:living_situations,id',
+            'editLivingSituation.social_welfare_sector' => 'required|exists:government_programs,id',
+            'editLivingSituation.living_status' => 'required|exists:living_statuses,id',
+            'editLivingSituation.roof_type' => 'required|exists:roof_types,id',
+            'editLivingSituation.wall_type' => 'required|exists:wall_types,id',
+            'editLivingSituation.remarks' => 'nullable|string|max:255',
+        ];
+
+        // Add conditional validation rules based on living status
+        switch ($this->editLivingSituation['living_status']) {
+            case '1': // Room Rent
+                $rules['editLivingSituation.room_rent_fee'] = 'required|numeric|min:0';
+                $rules['editLivingSituation.room_landlord'] = 'required|string|max:255';
+                break;
+            case '2': // House Rent
+                $rules['editLivingSituation.house_rent_fee'] = 'required|numeric|min:0';
+                $rules['editLivingSituation.house_landlord'] = 'required|string|max:255';
+                break;
+            case '3': // Lot Rent
+                $rules['editLivingSituation.lot_rent_fee'] = 'required|numeric|min:0';
+                $rules['editLivingSituation.lot_landlord'] = 'required|string|max:255';
+                break;
+            case '8': // Living with Others
+                $rules['editLivingSituation.house_owner'] = 'required|string|max:255';
+                $rules['editLivingSituation.relationship_to_house_owner'] = 'required|string|max:255';
+                break;
+        }
+
+        // Living Situation specific rules
+        if ($this->editLivingSituation['living_situation_id'] == 8) {
+            $rules['editLivingSituation.case_specification_id'] = 'required|exists:case_specifications,id';
+        } else {
+            $rules['editLivingSituation.living_situation_case_specification'] = 'required|string|max:255';
+        }
+
+        return $rules;
+    }
+
+    // Add custom messages for living situation validation
+    protected $livingSituationMessages = [
+        'editLivingSituation.living_situation_id.required' => 'The living situation field is required.',
+        'editLivingSituation.case_specification_id.required' => 'The case specification field is required.',
+        'editLivingSituation.living_situation_case_specification.required' => 'The case specification field is required.',
+        'editLivingSituation.social_welfare_sector.required' => 'The social welfare sector field is required.',
+        'editLivingSituation.living_status.required' => 'The living status field is required.',
+        'editLivingSituation.roof_type.required' => 'The roof type field is required.',
+        'editLivingSituation.wall_type.required' => 'The wall type field is required.',
+    ];
+
+    public function openLivingSituationModal(): void
+    {
+        $this->editLivingSituation = [
+            'date_tagged' => $this->taggedAndValidatedApplicant->tagging_date,
+            'living_situation_id' => $this->taggedAndValidatedApplicant->living_situation_id,
+            'case_specification_id' => $this->taggedAndValidatedApplicant->case_specification_id,
+            'living_situation_case_specification' => $this->taggedAndValidatedApplicant->living_situation_case_specification,
+            'social_welfare_sector' => $this->taggedAndValidatedApplicant->government_program_id,
+            'living_status' => $this->taggedAndValidatedApplicant->living_status_id,
+            'roof_type' => $this->taggedAndValidatedApplicant->roof_type_id,
+            'wall_type' => $this->taggedAndValidatedApplicant->wall_type_id,
+            'remarks' => $this->taggedAndValidatedApplicant->remarks,
+            // Add all status-specific fields
+            'room_rent_fee' => $this->taggedAndValidatedApplicant->room_rent_fee,
+            'room_landlord' => $this->taggedAndValidatedApplicant->room_landlord,
+            'house_rent_fee' => $this->taggedAndValidatedApplicant->house_rent_fee,
+            'house_landlord' => $this->taggedAndValidatedApplicant->house_landlord,
+            'lot_rent_fee' => $this->taggedAndValidatedApplicant->lot_rent_fee,
+            'lot_landlord' => $this->taggedAndValidatedApplicant->lot_landlord,
+            'house_owner' => $this->taggedAndValidatedApplicant->house_owner,
+            'relationship_to_house_owner' => $this->taggedAndValidatedApplicant->relationship_to_house_owner,
+        ];
+
+        $this->showLivingSituationModal = true;
+    }
+
+    public function updatedEditLivingSituationLivingSituationId($value): void
+    {
+        // Instead of resetting all fields, only reset fields that don't correspond to the current status
+        switch ($value) {
+            case '1': // Room Rent
+                // Keep room fields, reset others
+                $this->editLivingSituation['house_rent_fee'] = null;
+                $this->editLivingSituation['house_landlord'] = null;
+                $this->editLivingSituation['lot_rent_fee'] = null;
+                $this->editLivingSituation['lot_landlord'] = null;
+                $this->editLivingSituation['house_owner'] = null;
+                $this->editLivingSituation['relationship_to_house_owner'] = null;
+                break;
+            case '2': // House Rent
+                $this->editLivingSituation['room_rent_fee'] = null;
+                $this->editLivingSituation['room_landlord'] = null;
+                $this->editLivingSituation['lot_rent_fee'] = null;
+                $this->editLivingSituation['lot_landlord'] = null;
+                $this->editLivingSituation['house_owner'] = null;
+                $this->editLivingSituation['relationship_to_house_owner'] = null;
+                break;
+            case '3': // Lot Rent
+                $this->editLivingSituation['room_rent_fee'] = null;
+                $this->editLivingSituation['room_landlord'] = null;
+                $this->editLivingSituation['house_rent_fee'] = null;
+                $this->editLivingSituation['house_landlord'] = null;
+                $this->editLivingSituation['house_owner'] = null;
+                $this->editLivingSituation['relationship_to_house_owner'] = null;
+                break;
+            case '8': // Living with Others
+                $this->editLivingSituation['room_rent_fee'] = null;
+                $this->editLivingSituation['room_landlord'] = null;
+                $this->editLivingSituation['house_rent_fee'] = null;
+                $this->editLivingSituation['house_landlord'] = null;
+                $this->editLivingSituation['lot_rent_fee'] = null;
+                $this->editLivingSituation['lot_landlord'] = null;
+                break;
+        }
+    }
+
+    public function updateLivingSituation(): void
+    {
+        $this->validate($this->getLivingSituationRules(), $this->livingSituationMessages);
+
+        try {
+            DB::beginTransaction();
+
+            $updateData = [
+                'living_situation_id' => $this->editLivingSituation['living_situation_id'],
+                'government_program_id' => $this->editLivingSituation['social_welfare_sector'],
+                'living_status_id' => $this->editLivingSituation['living_status'],
+                'roof_type_id' => $this->editLivingSituation['roof_type'],
+                'wall_type_id' => $this->editLivingSituation['wall_type'],
+                'remarks' => $this->editLivingSituation['remarks'],
+            ];
+
+            // Handle living situation specific fields
+            if ($this->editLivingSituation['living_situation_id'] == 8) {
+                $updateData['case_specification_id'] = $this->editLivingSituation['case_specification_id'];
+                $updateData['living_situation_case_specification'] = null;
+            } else {
+                $updateData['case_specification_id'] = null;
+                $updateData['living_situation_case_specification'] = $this->editLivingSituation['living_situation_case_specification'];
+            }
+
+            // Handle living status specific fields
+            switch ($this->editLivingSituation['living_status']) {
+                case '1':
+                    $updateData += [
+                        'room_rent_fee' => $this->editLivingSituation['room_rent_fee'],
+                        'room_landlord' => $this->editLivingSituation['room_landlord'],
+                    ];
+                    break;
+                case '2':
+                    $updateData += [
+                        'house_rent_fee' => $this->editLivingSituation['house_rent_fee'],
+                        'house_landlord' => $this->editLivingSituation['house_landlord'],
+                    ];
+                    break;
+                case '3':
+                    $updateData += [
+                        'lot_rent_fee' => $this->editLivingSituation['lot_rent_fee'],
+                        'lot_landlord' => $this->editLivingSituation['lot_landlord'],
+                    ];
+                    break;
+                case '8':
+                    $updateData += [
+                        'house_owner' => $this->editLivingSituation['house_owner'],
+                        'relationship_to_house_owner' => $this->editLivingSituation['relationship_to_house_owner'],
+                    ];
+                    break;
+            }
+
+            $this->taggedAndValidatedApplicant->update($updateData);
+
+            DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Updated living situation for applicant: ' . $this->taggedAndValidatedApplicant->applicant->applicant_id,
+                Auth::user()
+            );
+
+            $this->showLivingSituationModal = false;
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Living situation updated successfully',
+                'type' => 'success'
+            ]);
+
+            // Refresh the data
+            $this->taggedAndValidatedApplicant = $this->taggedAndValidatedApplicant->fresh();
+            $this->loadFormData();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error updating living situation: ' . $e->getMessage());
+
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to update living situation. Please try again.',
+                'type' => 'error'
+            ]);
+        }
+    }
+
+    public function resetLivingSituationForm(): void
+    {
+        $this->reset('editLivingSituation');
+        $this->resetValidation();
+    }
+
+    // Methods for handling Photos editing
+    protected function rules()
+    {
+        return [
+            'newPhotos.*' => 'image|max:2048' // 2MB Max
+        ];
+    }
+
+    protected $photosValidationMessages = [
+        'newPhotos.*.image' => 'File :index must be an image.',
+        'newPhotos.*.max' => 'File :index must not be larger than 2MB.',
+    ];
+
+    public function openPhotosModal(): void
+    {
+        $this->resetPhotosData();
+        $this->showPhotosModal = true;
+    }
+
+    public function removePhoto($documentId): void
+    {
+        try {
+            $document = TaggedDocumentsSubmission::findOrFail($documentId);
+
+            // Add to photos to delete array
+            $this->photosToDelete[] = [
+                'id' => $document->id,
+                'file_path' => $document->file_path
+            ];
+
+            // Remove from current documents array
+            $this->taggedDocuments = $this->taggedDocuments->filter(function($doc) use ($documentId) {
+                return $doc->id !== $documentId;
+            });
+
+        } catch (\Exception $e) {
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to remove photo. Please try again.',
+                'type' => 'error'
+            ]);
+        }
+    }
+
+    public function removeNewPhoto($index): void
+    {
+        unset($this->newPhotos[$index]);
+        $this->newPhotos = array_values($this->newPhotos);
+    }
+
+    public function updatePhotos(): void
+    {
+        $this->validate();
+
+        try {
+            DB::beginTransaction();
+
+            // Delete marked photos
+            foreach ($this->photosToDelete as $photo) {
+                $document = TaggedDocumentsSubmission::find($photo['id']);
+                if ($document) {
+                    // Delete file from storage
+                    Storage::disk('tagging-house-structure-images')->delete($photo['file_path']);
+                    // Delete record
+                    $document->delete();
+                }
+            }
+
+            // Store new photos
+            foreach ($this->newPhotos as $photo) {
+                $fileName = time() . '_' . $photo->getClientOriginalName();
+                $filePath = $photo->storeAs('documents', $fileName, 'tagging-house-structure-images');
+
+                TaggedDocumentsSubmission::create([
+                    'tagged_applicant_id' => $this->taggedAndValidatedApplicant->id,
+                    'file_path' => $filePath,
+                    'file_name' => $fileName,
+                    'file_type' => $photo->getClientOriginalExtension(),
+                    'file_size' => $photo->getSize(),
+                ]);
+            }
+
+            DB::commit();
+
+            // Log the activity
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Updated photos for applicant: ' . $this->taggedAndValidatedApplicant->applicant->applicant_id,
+                Auth::user()
+            );
+
+            $this->showPhotosModal = false;
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Photos updated successfully',
+                'type' => 'success'
+            ]);
+
+            // Refresh the data
+            $this->taggedAndValidatedApplicant = $this->taggedAndValidatedApplicant->fresh(['taggedDocuments']);
+            $this->loadFormData();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error('Error updating photos: ' . $e->getMessage());
+
+            $this->dispatch('alert', [
+                'title' => 'Error!',
+                'message' => 'Failed to update photos. Please try again.',
+                'type' => 'error'
+            ]);
+        }
+    }
+
+    private function resetPhotosData(): void
+    {
+        $this->reset(['newPhotos', 'photosToDelete']);
+        $this->resetValidation();
+    }
+
+    // Add to handle temporary file cleanup
+    public function cleanupOldUploads(): void
+    {
+        $storage = Storage::disk('livewire-tmp');
+
+        // Delete files older than 24 hours
+        foreach ($storage->allFiles() as $filePathname) {
+            // Get the last modified time of the file
+            try {
+                if (now()->diffInHours($storage->lastModified($filePathname)) > 24) {
+                    $storage->delete($filePathname);
+                }
+            } catch (\Exception $e) {
+                logger()->error('Error cleaning up old upload: ' . $e->getMessage());
+            }
+        }
+    }
+
     public function render()
     {
         return view('livewire.tagged-and-validated-applicant-details', [
