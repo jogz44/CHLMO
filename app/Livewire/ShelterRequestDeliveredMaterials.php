@@ -7,10 +7,22 @@ use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use App\Models\Barangay;
 
 class ShelterRequestDeliveredMaterials extends Component
 {
     public $governmentProgram = ''; // Holds selected government program ID
+    public $barangaysFilter = []; // Holds selected barangay IDs
+    public $selectedBarangay_id = '';
+
+
+    public function mount()
+    {
+        $this->barangaysFilter = Cache::remember('barangays', 60 * 60, function () {
+            return Barangay::all();
+        });
+    }
 
     public function getStatistics()
     {
@@ -27,6 +39,12 @@ class ShelterRequestDeliveredMaterials extends Component
             ->leftJoin('profiled_tagged_applicants as pta', 'pta.profile_no', '=', 'sa.id')
             ->leftJoin('grantees as g', 'g.profiled_tagged_applicant_id', '=', 'pta.id');
 
+
+        // Apply Barangay filter
+        if (!empty($this->selectedBarangay_id)) {
+            $query->where('b.id', $this->selectedBarangay_id);
+        }
+
         // Filter by government program
         if (!empty($this->governmentProgram)) {
             $query->where('pta.government_program_id', $this->governmentProgram);
@@ -39,10 +57,10 @@ class ShelterRequestDeliveredMaterials extends Component
             ->get();
     }
 
-
     public function clearFilter()
     {
         $this->governmentProgram = ''; // Reset the filter
+        $this->selectedBarangay_id = ''; // Reset the filter
     }
 
     public function export()
@@ -53,6 +71,7 @@ class ShelterRequestDeliveredMaterials extends Component
                 'startDate' => $this->filters['startDate'] ?? null,
                 'endDate' => $this->filters['endDate'] ?? null,
                 'government_program_id' => $this->governmentProgram,
+                'barangay_id' => $this->selectedBarangay_id,
             ];
 
             // Pass the filters to the export class
