@@ -13,6 +13,7 @@ use App\Http\Controllers\ApplicantsController;
 use App\Http\Controllers\PurokController;
 use App\Exports\GranteesDataExport;
 
+use App\Livewire\AddNewOccupant;
 use App\Livewire\ApplicantDetails;
 use App\Livewire\AwardeeDetails;
 use App\Livewire\GranteeDetails;
@@ -68,6 +69,8 @@ Route::middleware([
 
     Route::get('/awardee-details/{applicantId}', AwardeeDetails::class)
         ->name('awardee-details');
+
+    Route::get('/add-new-occupant', AddNewOccupant::class)->name('add-new-occupant');
 
     Route::get('/awardee-list', function () {
         return view('awardee-list');
