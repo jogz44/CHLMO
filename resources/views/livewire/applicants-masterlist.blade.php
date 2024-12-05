@@ -43,11 +43,14 @@
                                 <option value="Housing Applicant">Housing Applicants</option>
                                 <option value="Shelter Applicant">Shelter Applicants</option>
                             </select>
-                            <select class="border text-[13px] border-white text-gray-600 rounded px-2 py-1 shadow-sm">
-                                <option value="">Status</option>
-                                <option value="status1">Status 1</option>
-                                <option value="status2">Status 2</option>
-                                <option value="status3">Status 3</option>
+                            <select wire:model.live="statusFilter"
+                                    class="border text-[13px] border-white text-gray-600 rounded px-2 py-1 shadow-sm">
+                                <option value="">All Statuses</option>
+                                <option value="pending_tagging">Pending Tagging</option>
+                                <option value="tagged">Tagged</option>
+                                <option value="pending_awarding">Pending Awarding</option>
+                                <option value="awarded">Awarded</option>
+                                <option value="blacklisted">Blacklisted</option>
                             </select>
                         </div>
                     </div>
@@ -109,12 +112,6 @@
                                         @endif
                                     </td>
                                     <td class="py-4 px-2 text-center border-b capitalize whitespace-normal break-words">
-{{--                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full--}}
-{{--                                                {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'bg-green-100 text-green-800' :--}}
-{{--                                                   ($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first()?->is_tagged ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">--}}
-{{--                                                {{ $person->application_type === 'Housing Applicant' && $person->applicants->first()?->is_tagged ? 'Tagged' :--}}
-{{--                                                   ($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first()?->is_tagged ? 'Tagged' : 'Pending') }}--}}
-{{--                                            </span>--}}
                                         <!-- Status -->
                                         @if($person->application_type === 'Housing Applicant' && $person->applicants->first())
                                             @php
@@ -122,21 +119,22 @@
                                                 $taggedApplicant = $applicant->taggedAndValidated;
                                                 $awardee = $taggedApplicant ? $taggedApplicant->awardees->first() : null;
 
-                                                $isTagged = (bool)$applicant->is_tagged;  // Explicit casting to boolean
-
-                                                $statusClass = match(true) {
-                                                    $awardee?->is_awarded => 'bg-green-100 text-green-800',
-                                                    $awardee?->has_assigned_relocation_site => 'bg-yellow-100 text-yellow-800',
-                                                    $isTagged => 'bg-blue-100 text-blue-800',
-                                                    default => 'bg-gray-100 text-gray-800'
-                                                };
-
-                                                $status = match(true) {
-                                                    $awardee?->is_awarded => 'Awarded',
-                                                    $awardee?->has_assigned_relocation_site => 'Pending Awarding',
-                                                    $isTagged => 'Tagged',
-                                                    default => 'Pending Tagging'
-                                                };
+                                                if ($awardee && $awardee->is_blacklisted) {
+                                                    $statusClass = 'bg-red-100 text-red-800';
+                                                    $status = 'Blacklisted';
+                                                } elseif ($awardee && $awardee->is_awarded) {
+                                                    $statusClass = 'bg-green-100 text-green-800';
+                                                    $status = 'Awarded';
+                                                } elseif ($awardee && $awardee->has_assigned_relocation_site) {
+                                                    $statusClass = 'bg-yellow-100 text-yellow-800';
+                                                    $status = 'Has Assigned Site';
+                                                } elseif ($applicant->is_tagged) {
+                                                    $statusClass = 'bg-blue-100 text-blue-800';
+                                                    $status = 'Tagged';
+                                                } else {
+                                                    $statusClass = 'bg-gray-100 text-gray-800';
+                                                    $status = 'Pending Tagging';
+                                                }
                                             @endphp
                                         @elseif($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first())
                                             @php
@@ -151,17 +149,25 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-2 text-center text-red-600 border-b whitespace-normal break-words">
+                                        @php
+                                            $days = $person->applicants->first()?->date_applied->diffInDays(now());
+                                            $agingClass = match(true) {
+                                                $days >= 90 => 'text-red-600',
+                                                $days >= 60 => 'text-orange-600',
+                                                $days >= 30 => 'text-yellow-600',
+                                                default => 'text-green-600'
+                                            };
+                                        @endphp
                                         <div class="flex items-center justify-center w-full">
-                                            @if($person->application_type === 'Housing Applicant' && $person->applicants->first())
-                                                {{ $person->applicants->first()->date_applied->shortAbsoluteDiffForHumans() }}
-                                            @elseif($person->application_type === 'Shelter Applicant' && $person->shelterApplicants->first())
-                                                {{ $person->shelterApplicants->first()->date_request->shortAbsoluteDiffForHumans() }}
-                                            @else
-                                                N/A
-                                            @endif
-                                            <span class="ml-1">
-                                                <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                                <lord-icon src="https://cdn.lordicon.com/lzgqzxrq.json" trigger="loop" delay="3000" style="width: 20px; height: 20px"></lord-icon>
+                                            <span class="{{ $agingClass }}">
+                                                {{ $person->applicants->first()?->date_applied->shortAbsoluteDiffForHumans() }}
+                                            </span>
+                                                                                <span class="ml-1">
+                                                <lord-icon src="https://cdn.lordicon.com/lzgqzxrq.json"
+                                                           trigger="loop"
+                                                           delay="3000"
+                                                           style="width: 20px; height: 20px">
+                                                </lord-icon>
                                             </span>
                                         </div>
                                     </td>
