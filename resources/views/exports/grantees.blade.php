@@ -1,32 +1,46 @@
 <table>
-    <!-- Header Section -->
     <!-- Spacing -->
     <tr>
-        <td colspan="13" height="81.6"></td>
+        <td colspan="13" height="20"></td>
     </tr>
     <tr>
-        <td colspan="13" style="text-align: center; margin-top: 40px; font-size: 16px; font-weight: bold;">
+        <td colspan="13" style="text-align: center; margin-top: 40px; font-size: 11px; font-weight: bold;">
             Republic of the Philippines
         </td>
     </tr>
     <tr>
-        <td colspan="13" style="text-align: center; font-size: 16px; font-weight: bold;">
+        <td colspan="13" style="text-align: center; font-size: 11px; font-weight: bold;">
             Province of Davao del Norte
         </td>
     </tr>
     <tr>
-        <td colspan="13" style="text-align: center; font-size: 16px; font-weight: bold;">
-            City of Tagum
+        <td colspan="13" style="text-align: center; font-size: 11px; font-weight: bold;">
+            CITY OF TAGUM
         </td>
     </tr>
     <tr>
-        <td colspan="13" style="text-align: center; font-size: 20px; font-weight: bold;">
-            CITY HOUSING AND LAND MANAGEMENT OFFICE
+        <td colspan="13"></td>
+    </tr>
+    <tr>
+        <td colspan="13" style="text-align: center; font-size: 9px; font-weight: bold;">
+            OFFICE OF THE CITY HOUSING AND LAND MANAGEMENT OFFICER
         </td>
     </tr>
+    <tr>
+        <td colspan="13" style="text-align: center; font-size: 9px; font-weight: regular;">
+            2/F Annex Building, City Government, J.V. Ayala Ave., Barangay Apokon, Tagum City
+        </td>
+    </tr>
+    <tr>
+        <td colspan="13" style="text-align: center; font-size: 9px; font-weight: regular;">
+            Telephone No. (9) 216 - 9367 Local 141
+        </td>
 
-    <!-- Spacing -->
-    <tr>
+        <!-- Spacing -->
+    <tr style="border-bottom: 4px solid #000;">
+        <td colspan="13" height="10"></td>
+    </tr>
+    <tr style="border-bottom: 4px solid #000;">
         <td colspan="13" height="20"></td>
     </tr>
 

@@ -80,6 +80,18 @@
                             <option value="{{ $origin->id }}">{{ $origin->name }}</option>
                             @endforeach
                         </select>
+                        <select wire:model.live="selectedBarangay_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">Barangay</option>
+                            @foreach($barangaysFilter as $barangayFilter)
+                            <option value="{{ $barangayFilter->id }}">{{ $barangayFilter->name }}</option>
+                            @endforeach
+                        </select>
+                        <select wire:model.live="selectedPurok_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                            <option value="">Purok</option>
+                            @foreach($puroksFilter as $purokFilter)
+                            <option value="{{ $purokFilter->id }}">{{ $purokFilter->name }}</option>
+                            @endforeach
+                        </select>
                         <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
                             Reset Filter
                         </button>

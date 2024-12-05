@@ -31,6 +31,13 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
 {
     use Exportable;
     private $filters;
+    private $selectedPurok_id;
+    private $selectedBarangay_id;
+    private $puroksFilter;
+    private $puroks;
+    private $purok_id;
+    private $barangay_id;
+
     public function __construct($filters = null)
     {
         $this->filters = $filters;
@@ -73,10 +80,32 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
             'profiledTaggedApplicant.shelterSpouse',
         ]);
 
+        // Apply date range filter
+        if (!empty($this->filters['start_date']) && !empty($this->filters['end_date'])) {
+            $query->whereBetween('date_of_delivery', [
+                $this->filters['start_date'],
+                $this->filters['end_date']
+            ]);
+        }
+
         // Apply filters
         if (!empty($this->filters['request_origin_id'])) {
             $query->whereHas('profiledTaggedApplicant.shelterApplicant', function ($q) {
                 $q->where('request_origin_id', $this->filters['request_origin_id']);
+            });
+        }
+
+        // Apply Barangay filter
+        if (!empty($this->filters['barangay_id'])) {
+            $query->whereHas('profiledTaggedApplicant.shelterApplicant.address.barangay', function ($q) {
+                $q->where('id', $this->filters['barangay_id']);
+            });
+        }
+
+        // Apply Purok filter
+        if (!empty($this->filters['purok_id'])) {
+            $query->whereHas('profiledTaggedApplicant.shelterApplicant.address.purok', function ($q) {
+                $q->where('id', $this->filters['purok_id']);
             });
         }
 
@@ -86,6 +115,27 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
             'grantees' => $grantees,
             'title' => $this->getTitle(),
             'subtitle' => $this->getSubtitle()
+        ]);
+    }
+
+    public function updatedBarangayId($barangayId): void
+    {
+        // Fetch the puroks based on the selected barangay
+        $this->puroks = Purok::where('barangay_id', $barangayId)->get();
+        $this->purok_id = null; // Reset selected purok when barangay changes
+        logger()->info('Retrieved Puroks', [
+            'barangay_id' => $barangayId,
+            'puroks' => $this->puroks
+        ]);
+    }
+    public function updatedSelectedBarangayId($barangayId)
+    {
+        // Fetch the puroks based on the selected barangay
+        $this->puroksFilter = Purok::where('barangay_id', $barangayId)->get();
+        $this->selectedPurok_id = null; // Reset selected purok when barangay changes
+        logger()->info('Retrieved Puroks', [
+            'selectedBarangay_id' => $barangayId,
+            'puroksFilter' => $this->puroksFilter
         ]);
     }
 
@@ -100,16 +150,34 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
         ];
     }
 
-    public function drawings()
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/logo.png'));
-        $drawing->setHeight(90);
-        $drawing->setCoordinates('A1');
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(100); // Adjust height as needed
+        $leftDrawing->setCoordinates('C2'); // Starting cell
+        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
+        $rightDrawing->setHeight(100); // Adjust height as needed
+        $rightDrawing->setCoordinates('K2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
 
     public function startCell(): string
@@ -153,6 +221,17 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
                 $worksheet->getColumnDimension('K')->setWidth(15); // date profiled tagged
                 $worksheet->getColumnDimension('L')->setWidth(15); // Date of Delivery
                 $worksheet->getColumnDimension('M')->setWidth(15); // Remarks
+
+                $styleBottomMedium = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+                // Apply different border styles
+                $event->sheet->getStyle('A9:M9')->applyFromArray($styleBottomMedium); // Thick border
             },
         ];
     }

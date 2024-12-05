@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('profiled_tagged_applicant_id')->constrained('profiled_tagged_applicants')->onDelete('cascade');
             $table->dateTime('date_of_delivery');
             $table->dateTime('date_of_ris');
+            $table->integer('ar_no');
             $table->boolean('is_granted')->default(false);
             $table->timestamps();
         });

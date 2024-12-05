@@ -156,19 +156,36 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
     /**
      * @throws Exception
      */
-    public function drawings(): Drawing
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/logo.png'));
-        $drawing->setHeight(100); // Adjust height as needed
-        $drawing->setCoordinates('B1'); // Stay in column B
-        $drawing->setOffsetX(100); // Adjust this value to push it toward the end of column B
-        $drawing->setOffsetY(2);
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(100); // Adjust height as needed
+        $leftDrawing->setCoordinates('B2'); // Starting cell
+        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
+        $rightDrawing->setHeight(100); // Adjust height as needed
+        $rightDrawing->setCoordinates('F2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
+
 
     public function startCell(): string
     {
@@ -204,6 +221,39 @@ class ShelterApplicantDataExport implements FromView, ShouldAutoSize, WithChunkR
                 $worksheet->getColumnDimension('D')->setWidth(15.11);
                 $worksheet->getColumnDimension('E')->setWidth(19.56);
                 $worksheet->getColumnDimension('F')->setWidth(24);
+
+                $highestRow = $event->sheet->getDelegate()->getHighestRow(); // Last data row
+                $highestColumn = $event->sheet->getDelegate()->getHighestColumn(); // Last column
+
+                $styleBottomThick = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+
+                $styleBottomMedium = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+
+                $styleBottomThin = [
+                    'borders' => [
+                        'bottom' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'], // Black color
+                        ],
+                    ],
+                ];
+
+                // Apply different border styles
+                $event->sheet->getStyle('A9:F9')->applyFromArray($styleBottomMedium); // Thick border
             },
         ];
     }

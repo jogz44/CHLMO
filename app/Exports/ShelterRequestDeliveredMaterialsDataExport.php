@@ -29,6 +29,7 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
     use Exportable;
     private $filters;
     private $governmentProgram;
+    private $barangay_id;
     const DANGER_ZONE_ID = 8;
     public function __construct(array $filters = [])
     {
@@ -58,6 +59,7 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
     {
         $statistics = $this->getStatistics(); // Fetch statistics data
         $totals = $this->getTotals($statistics); // Calculate totals
+
 
         $data = [
             'title' => $this->getTitle(),
@@ -92,6 +94,11 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
                 Carbon::parse($this->filters['startDate'])->startOfDay(),
                 Carbon::parse($this->filters['endDate'])->endOfDay(),
             ]);
+        }
+
+        // Filter by government program
+        if (!empty($this->filters['barangay_id'])) {
+            $query->where('b.id', $this->filters['barangay_id']);
         }
 
         // Filter by government program
@@ -143,18 +150,36 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
     /**
      * @throws Exception
      */
-    public function drawings(): Drawing
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/logo.png'));
-        $drawing->setHeight(100);
-        $drawing->setCoordinates('D1');
-        $drawing->setOffsetY(2);
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(100); // Adjust height as needed
+        $leftDrawing->setCoordinates('A2'); // Starting cell
+        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
+        $rightDrawing->setHeight(100); // Adjust height as needed
+        $rightDrawing->setCoordinates('E2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
+
     public function startCell(): string
     {
         return 'A2'; // Start the text content from row 2
@@ -188,13 +213,9 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
                 $lastRow = $worksheet->getHighestRow();
                 $lastColumn = 'E';
 
-                // Style the header rows
-                $worksheet->getStyle('A1:E5')->getFont()->setSize(9);
-                $worksheet->getStyle('A6')->getFont()->setSize(14);
 
                 // Style the table headers
-                $worksheet->getStyle("A8:{$lastColumn}8")->applyFromArray([
-                    'font' => ['bold' => true],
+                $worksheet->getStyle("A14:{$lastColumn}14")->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['rgb' => 'F3F4F6']
@@ -202,6 +223,7 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
                 ]);
 
                 $worksheet->getStyle('A:E')->getAlignment()->setWrapText(true);
+                
             }
         ];
     }

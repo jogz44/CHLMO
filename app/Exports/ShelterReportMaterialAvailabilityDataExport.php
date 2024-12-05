@@ -109,18 +109,35 @@ class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAut
         ];
     }
 
-    public function drawings(): Drawing
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/logo.png')); // Adjust the path if needed
-        $drawing->setHeight(80);
-        $drawing->setCoordinates('A1');
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(100); // Adjust height as needed
+        $leftDrawing->setCoordinates('A2'); // Starting cell
+        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
+        $rightDrawing->setHeight(100); // Adjust height as needed
+        $rightDrawing->setCoordinates('G2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
-
     public function registerEvents(): array
     {
         return [
