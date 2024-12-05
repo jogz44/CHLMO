@@ -107,7 +107,7 @@
     <div class="grid grid-cols-2 gap-6">
         <div class="bg-white shadow rounded-lg p-6">
             <h4 class="text-[13px] mb-2 font-semibold text-center">
-                Applicants per Transaction Type
+                Walk-in Applicants
             </h4>
             <div>
                 <canvas wire:ignore id="relocationLotChart"></canvas>
@@ -138,14 +138,14 @@
                             backgroundColor: 'rgba(255, 145, 0, 100)',
                             borderColor: 'rgba(255, 145, 0, 100)',
                             borderWidth: 2
-                        },
-                        {
-                            label: 'Applicants via Request',
-                            data: @js($relocationLotData['applicantsViaRequest']),
-                            backgroundColor: 'rgba(0, 113, 45, 100)',
-                            borderColor: 'rgba(0, 113, 45, 100)',
-                            borderWidth: 2
                         }]
+                        {{--{--}}
+                        {{--    label: 'Applicants via Request',--}}
+                        {{--    data: @js($relocationLotData['applicantsViaRequest']),--}}
+                        {{--    backgroundColor: 'rgba(0, 113, 45, 100)',--}}
+                        {{--    borderColor: 'rgba(0, 113, 45, 100)',--}}
+                        {{--    borderWidth: 2--}}
+                        {{--}]--}}
                     },
                     options: {
                         responsive: true,
