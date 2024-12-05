@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('relocation_sites', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
-            $table->string('lot_number', 255)->nullable();
-            $table->string('block_identifier', 255)->nullable();
+            $table->foreignId('barangay_id')->constrained('barangays')->onDelete('cascade');
             $table->string('relocation_site_name', 255);
-            $table->integer('total_lot_size');
+            $table->integer('total_land_area');
+            $table->integer('total_no_of_lots');
+            $table->integer('community_facilities_road_lots_open_space');
             $table->boolean('is_full')->default(false);
             $table->timestamps();
         });

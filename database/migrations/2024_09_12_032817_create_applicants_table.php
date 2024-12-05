@@ -13,8 +13,8 @@ return new class extends Migration
             $table->string('applicant_id')->unique()->nullable();
             $table->foreignId('person_id')->constrained('people')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('transaction_type_id')->constrained('transaction_types')->onDelete('cascade');
             $table->foreignId('address_id')->constrained('addresses')->onDelete('cascade');
+            $table->string('transaction_type')->default('Walk-in');
             $table->date('date_applied');
             $table->string('initially_interviewed_by', 100);
             $table->boolean('is_tagged')->default(false);

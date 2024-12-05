@@ -29,7 +29,7 @@ return new class extends Migration
             ['living_situation_description' => 'Private Construction Projects'],
             ['living_situation_description' => 'Alienable and Disposable Land'],
             ['living_situation_description' => 'Danger Zone'],
-            ['living_situation_description' => 'Other cases'],
+            ['living_situation_description' => 'Non-Informal Settler'],
         ]);
 
         Schema::enableForeignKeyConstraints();

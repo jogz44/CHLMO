@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('tagged_and_validated_applicants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('applicant_id')->constrained('applicants')->onDelete('cascade');
+            $table->foreignId('applicant_id')->nullable()->constrained('applicants')->onDelete('cascade');
             $table->foreignId('civil_status_id')->constrained('civil_statuses')->onDelete('cascade');
             $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
             $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
             $table->text('living_situation_case_specification')->nullable();
+            $table->text('non_informal_settler_case_specification')->nullable();
             $table->foreignId('government_program_id')->constrained('government_programs')->onDelete('cascade');
             $table->foreignId('living_status_id')->constrained('living_statuses')->onDelete('cascade');
             $table->foreignId('roof_type_id')->constrained('roof_types')->onDelete('cascade');
