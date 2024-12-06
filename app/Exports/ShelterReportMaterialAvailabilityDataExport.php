@@ -25,7 +25,6 @@ class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAut
     private $selectedPrPo = null; // Track selected PR-PO combination
     private $isFiltered = false; // Flag to track if a filter is applied
     private $groupedMaterials = [];
-    
 
     public function __construct($filters = null)
     {
@@ -41,64 +40,65 @@ class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAut
 
 
     public function view(): View
-{
-    $query = DB::table('materials')
-        ->join('material_units', 'materials.material_unit_id', '=', 'material_units.id')
-        ->leftJoin('purchase_orders', 'materials.purchase_order_id', '=', 'purchase_orders.id')
-        ->leftJoin('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
-        ->leftJoin('delivered_materials', 'materials.id', '=', 'delivered_materials.material_id')
-        ->select(
-            'materials.id as material_id',
-            'materials.item_description as item_description',
-            'material_units.unit as unit',
-            DB::raw('SUM(materials.quantity) as total_quantity'),
-            DB::raw('SUM(delivered_materials.grantee_quantity) as delivered_quantity'),
-            DB::raw('SUM(materials.quantity - COALESCE(delivered_materials.grantee_quantity, 0)) as available_quantity'),
-            'purchase_requisitions.pr_number',
-            'purchase_orders.po_number'
-        )
-        ->groupBy(
-            'materials.id',
-            'materials.item_description',
-            'material_units.unit',
-            'purchase_requisitions.pr_number',
-            'purchase_orders.po_number'
-        );
+    {
 
-    // Apply filters if needed
-    if (!empty($this->filters['po_number']) && !empty($this->filters['pr_number'])) {
-        $query->where('purchase_requisitions.pr_number', $this->filters['pr_number'])
-              ->where('purchase_orders.po_number', $this->filters['po_number']);
-        $this->isFiltered = true;
-    } else {
-        $this->isFiltered = false;
+        $materials = $this->fetchMaterials();
+
+        return view('exports.shelter-report-availability-materials', [
+            'materials' => $materials,
+            'title' => $this->getTitle(),
+            'isFiltered' => $this->isFiltered,
+            'prPoHeaders' => $this->prPoHeaders,
+        ]);
     }
 
-    // Get the data as a flat array
-    $this->materials = $query->get();
-
-    $this->fetchPrPoHeaders();
-
-    return view('exports.shelter-report-availability-materials', [
-        'materials' => $this->materials, // Flat array of materials
-        'title' => $this->getTitle(),
-        'isFiltered' => $this->isFiltered, // Pass filter flag
-        'prPoHeaders' => $this->prPoHeaders, // Pass PR-PO headers
-    ]);
-}
-
-    
-
-    public function fetchPrPoHeaders()
+    public function fetchMaterials()
     {
-        $this->prPoHeaders = DB::table('purchase_orders')
-            ->join('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
+        $query = DB::table('materials')
+            ->join('material_units', 'materials.material_unit_id', '=', 'material_units.id')
+            ->leftJoin('purchase_orders', 'materials.purchase_order_id', '=', 'purchase_orders.id')
+            ->leftJoin('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
+            ->leftJoin('delivered_materials', 'materials.id', '=', 'delivered_materials.material_id')
             ->select(
+                'materials.id as material_id',
+                'materials.item_description as description',
+                'material_units.unit as unit',
+                DB::raw('SUM(materials.quantity) as total_quantity'),
+                DB::raw('SUM(delivered_materials.grantee_quantity) as delivered_quantity'),
+                DB::raw('SUM(materials.quantity - COALESCE(delivered_materials.grantee_quantity, 0)) as available_quantity'),
                 'purchase_requisitions.pr_number',
                 'purchase_orders.po_number'
             )
-            ->distinct()
-            ->get();
+            ->groupBy(
+                'materials.id',
+                'materials.item_description',
+                'material_units.unit',
+                'purchase_requisitions.pr_number',
+                'purchase_orders.po_number'
+            );
+
+        // Correctly parse and apply filtering
+        if ($this->selectedPrPo) {
+            // Remove the 'PR-' and 'PO-' prefixes
+            $prPo = str_replace(['PR-', 'PO-'], '', $this->selectedPrPo);
+            $parts = explode('-', $prPo);
+
+            if (count($parts) == 2) {
+                $prNumber = 'PR-' . $parts[0];
+                $poNumber = 'PO-' . $parts[1];
+
+                $query->where('purchase_requisitions.pr_number', $prNumber)
+                    ->where('purchase_orders.po_number', $poNumber);
+
+                $this->isFiltered = true;
+            } else {
+                $this->isFiltered = false;
+            }
+        } else {
+            $this->isFiltered = false;
+        }
+
+        $this->materials = $query->get()->groupBy('material_id');
     }
 
     public function styles(Worksheet $sheet): array
