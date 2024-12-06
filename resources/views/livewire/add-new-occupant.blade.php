@@ -1,7 +1,8 @@
 <div class="p-10 h-screen ml-[17%] mt-[60px]">
     <div class="flex bg-gray-100 text-[12px]">
         <div class="flex-1 p-6 overflow-auto">
-            <form wire:submit.prevent="store">
+            <form wire:submit.prevent="store"
+                  x-on:submit="console.log('Form submitted')">
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-0">
                     <div class="flex items-center">
                         <a href="javascript:void(0)" onclick="window.history.length > 1 ? history.back() : window.location.href='/transaction-request'">
@@ -15,14 +16,24 @@
                     <img src="{{ asset('storage/images/design.png') }}" alt="Design"
                          class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
                     <div x-data="{ saved: false }" class="flex space-x-2 z-10">
-                        <button type="submit" @click="saved = true"
+                        <button type="submit"
+                                wire:loading.attr="disabled"
                                 class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white text-xs font-medium px-6 py-2 rounded">
-                            SUBMIT
+                            <span wire:loading.remove>
+                                {{ $isTransfer ? 'SUBMIT TRANSFER' : 'SUBMIT NEW OCCUPANT' }}
+                            </span>
+                            <span wire:loading class="flex items-center">
+                                <svg class="animate-spin h-4 w-4 text-white mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                Processing...
+                            </span>
                         </button>
                     </div>
                 </div>
 
-                @if($isTransfer ?? false)
+                @if($isTransfer && $previousAwardeeData)
                     <div class="flex flex-col p-3 rounded bg-gray-200 mt-16">
                         <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PREVIOUS AWARDEE INFORMATION</h2>
                         <p class="text-[12px] ml-2 items-center text-gray-700">
@@ -43,7 +54,6 @@
                     <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PERSONAL INFORMATION</h2>
                     <p class="text-[12px] ml-2 items-center text-gray-700">Encode here the personal information of the new occupant.</p>
                 </div>
-
 
                 <div class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
@@ -89,26 +99,56 @@
                                    placeholder="Suffix name..."
                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4 {{ !$isTransfer ? 'hidden' : '' }}">
-                            <label for="last-name" class="block text-[13px] font-medium text-gray-700 mb-1">
-                                RELATIONSHIP TO THE AWARDEE <span class="text-red-500">*</span>
-                            </label>
-                            <input wire:model="relationship"
-                                   type="text"
-                                   required
-                                   placeholder="Relationship"
-                                   class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
-                        <div class="w-full md:w-1/4 px-2 mb-4 {{ !$isTransfer ? 'hidden' : '' }}">
-                            <label for="reason_for_transfer" class="block text-[13px] font-medium text-gray-700 mb-1">
-                                REASON FOR TRANSFER <span class="text-red-500">*</span>
-                            </label>
-                            <input wire:model="reason_for_transfer"
-                                   type="text"
-                                   required
-                                   placeholder="Reason for transfer"
-                                   class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
-                        </div>
+{{--                        <div class="w-full md:w-1/4 px-2 mb-4 {{ !$isTransfer ? 'hidden' : '' }}">--}}
+{{--                            <label for="last-name" class="block text-[13px] font-medium text-gray-700 mb-1">--}}
+{{--                                RELATIONSHIP TO THE AWARDEE <span class="text-red-500">*</span>--}}
+{{--                            </label>--}}
+{{--                            <input wire:model="relationship"--}}
+{{--                                   type="text"--}}
+{{--                                   required--}}
+{{--                                   placeholder="Relationship"--}}
+{{--                                   class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">--}}
+{{--                        </div>--}}
+{{--                        <div class="w-full md:w-1/4 px-2 mb-4 {{ !$isTransfer ? 'hidden' : '' }}">--}}
+{{--                            <label for="reason_for_transfer" class="block text-[13px] font-medium text-gray-700 mb-1">--}}
+{{--                                REASON FOR TRANSFER <span class="text-red-500">*</span>--}}
+{{--                            </label>--}}
+{{--                            <input wire:model="reason_for_transfer"--}}
+{{--                                   type="text"--}}
+{{--                                   required--}}
+{{--                                   placeholder="Reason for transfer"--}}
+{{--                                   class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">--}}
+{{--                        </div>--}}
+                        <!-- Transfer-specific fields -->
+                        @if($isTransfer)
+                            <div class="flex flex-wrap -mx-2">
+                                <!-- Relationship field -->
+                                <div class="w-full md:w-1/4 px-2 mb-4">
+                                    <label for="relationship" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                        RELATIONSHIP TO THE AWARDEE
+                                    </label>
+                                    <input wire:model="relationship"
+                                           id="relationship"
+                                           type="text"
+                                           required
+                                           placeholder="Relationship"
+                                           class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                </div>
+
+                                <!-- Reason for transfer field -->
+                                <div class="w-full md:w-1/4 px-2 mb-4">
+                                    <label for="reason_for_transfer" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                        REASON FOR TRANSFER
+                                    </label>
+                                    <input wire:model="reason_for_transfer"
+                                           id="reason_for_transfer"
+                                           type="text"
+                                           required
+                                           placeholder="Reason for transfer"
+                                           class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     <div x-data="{ civilStatus: '' }">

@@ -278,7 +278,12 @@ class ApplicantDetails extends Component
             ],
             'voters_id_number' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
-            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
+            'houseStructureImages.*' => [
+                'required',
+                'image',
+                'mimes:jpeg,png',
+                'max:10240'
+            ],
 
             // Live-in partner details
             'partner_first_name' => [
@@ -362,6 +367,111 @@ class ApplicantDetails extends Component
             'dependents.*.dependent_relationship_id' => 'required|exists:dependents_relationships,id',
         ];
     }
+
+    protected function messages(): array
+    {
+        return [
+            'full_address.max' => 'The address cannot exceed 255 characters.',
+            'civil_status_id.exists' => 'Please select a valid civil status.',
+            'tribe.required' => 'Please specify your tribe.',
+            'tribe.max' => 'Tribe name cannot exceed 255 characters.',
+            'sex.required' => 'Please select your sex.',
+            'sex.in' => 'Sex must be either Male or Female.',
+            'date_of_birth.required' => 'Date of birth is required.',
+            'date_of_birth.date' => 'Please enter a valid date.',
+            'religion.required' => 'Please specify your religion.',
+            'religion.max' => 'Religion cannot exceed 255 characters.',
+            'occupation.required' => 'Please specify your occupation.',
+            'occupation.max' => 'Occupation cannot exceed 255 characters.',
+            'monthly_income.required' => 'Monthly income is required.',
+            'monthly_income.integer' => 'Monthly income must be a whole number.',
+            'tagging_date.required' => 'Tagging date is required.',
+            'tagging_date.date' => 'Please enter a valid date.',
+            'living_situation_id.required' => 'Please select your living situation.',
+            'living_situation_id.exists' => 'Please select a valid living situation.',
+
+            'living_situation_case_specification.required_if' => 'Please specify your living situation case.',
+            'living_situation_case_specification.max' => 'Case specification cannot exceed 255 characters.',
+
+            'case_specification_id.required_if' => 'Please select a case specification.',
+            'case_specification_id.exists' => 'Please select a valid case specification.',
+
+            'non_informal_settler_case_specification.required_if' => 'Please specify your non-informal settler case.',
+            'non_informal_settler_case_specification.max' => 'Specification cannot exceed 255 characters.',
+
+            'government_program_id.required' => 'Please select a government program.',
+            'government_program_id.exists' => 'Please select a valid government program.',
+
+            'living_status_id.required' => 'Please select your living status.',
+            'living_status_id.exists' => 'Please select a valid living status.',
+
+            'room_rent_fee.required_if' => 'Room rent fee is required for room renters.',
+            'room_rent_fee.integer' => 'Room rent fee must be a whole number.',
+            'room_landlord.required_if' => 'Landlord name is required for room renters.',
+
+            'house_rent_fee.required_if' => 'House rent fee is required for house renters.',
+            'house_rent_fee.integer' => 'House rent fee must be a whole number.',
+            'house_landlord.required_if' => 'Landlord name is required for house renters.',
+
+            'lot_rent_fee.required_if' => 'Lot rent fee is required for lot renters.',
+            'lot_rent_fee.integer' => 'Lot rent fee must be a whole number.',
+            'lot_landlord.required_if' => 'Landlord name is required for lot renters.',
+
+            'house_owner.required_if' => 'House owner name is required.',
+            'relationship_to_house_owner.required_if' => 'Relationship to house owner is required.',
+
+            'roof_type_id.required' => 'Please select a roof type.',
+            'roof_type_id.exists' => 'Please select a valid roof type.',
+
+            'wall_type_id.required' => 'Please select a wall type.',
+            'wall_type_id.exists' => 'Please select a valid wall type.',
+
+            'structure_status_id.required' => 'Please select a structure status.',
+            'structure_status_id.exists' => 'Please select a valid structure status.',
+
+            'years_of_residency.required' => 'Years of residency is required.',
+            'years_of_residency.integer' => 'Years of residency must be a whole number.',
+
+            'voters_id_number.max' => 'Voter\'s ID number cannot exceed 255 characters.',
+            'remarks.max' => 'Remarks cannot exceed 255 characters.',
+
+            'houseStructureImages.required' => 'House structure images are required.',
+            'houseStructureImages.*.image' => 'File must be an image.',
+            'houseStructureImages.*.mimes' => 'Only JPG and PNG images are allowed.',
+            'houseStructureImages.*.max' => 'Image size must not exceed 10MB.',
+
+            // Live-in Partner Messages
+            'partner_first_name.required_if' => 'Partner\'s first name is required.',
+            'partner_last_name.required_if' => 'Partner\'s last name is required.',
+            'partner_occupation.required_if' => 'Partner\'s occupation is required.',
+            'partner_monthly_income.required_if' => 'Partner\'s monthly income is required.',
+            'partner_monthly_income.numeric' => 'Partner\'s monthly income must be a number.',
+
+            // Spouse Messages
+            'spouse_first_name.required_if' => 'Spouse\'s first name is required.',
+            'spouse_last_name.required_if' => 'Spouse\'s last name is required.',
+            'spouse_occupation.required_if' => 'Spouse\'s occupation is required.',
+            'spouse_monthly_income.required_if' => 'Spouse\'s monthly income is required.',
+            'spouse_monthly_income.numeric' => 'Spouse\'s monthly income must be a number.',
+
+            // Dependent Messages
+            'dependents.*.dependent_civil_status_id.required' => 'Civil status is required for all dependents.',
+            'dependents.*.dependent_civil_status_id.exists' => 'Please select a valid civil status for dependent.',
+            'dependents.*.dependent_first_name.required' => 'First name is required for all dependents.',
+            'dependents.*.dependent_last_name.required' => 'Last name is required for all dependents.',
+            'dependents.*.dependent_sex.required' => 'Sex is required for all dependents.',
+            'dependents.*.dependent_sex.in' => 'Sex must be either Male or Female for dependents.',
+            'dependents.*.dependent_date_of_birth.required' => 'Date of birth is required for all dependents.',
+            'dependents.*.dependent_date_of_birth.date' => 'Please enter a valid date for dependent.',
+            'dependents.*.dependent_occupation.required' => 'Occupation is required for all dependents.',
+            'dependents.*.dependent_monthly_income.required' => 'Monthly income is required for all dependents.',
+            'dependents.*.dependent_monthly_income.integer' => 'Monthly income must be a whole number for dependents.',
+            'dependents.*.dependent_monthly_income.min' => 'Monthly income cannot be negative for dependents.',
+            'dependents.*.dependent_relationship_id.required' => 'Relationship is required for all dependents.',
+            'dependents.*.dependent_relationship_id.exists' => 'Please select a valid relationship for dependent.',
+        ];
+    }
+
     public function updatedHouseStructureImages(): void
     {
         if (!is_array($this->houseStructureImages)) {
@@ -379,7 +489,12 @@ class ApplicantDetails extends Component
             ]);
 
             $this->validate([
-                'houseStructureImages.*' => 'image|max:2048'
+                'houseStructureImages.*' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,png',
+                    'max:10240'
+                ],
             ]);
 
             $this->isFilePondUploadComplete = true;
@@ -424,7 +539,12 @@ class ApplicantDetails extends Component
     {
         $this->isFilePondUploadComplete = true;
         $this->validate([
-            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
+            'houseStructureImages.*' => [
+                'required',
+                'image',
+                'mimes:jpeg,png',
+                'max:10240'
+            ],
         ]);
     }
     protected function getValidationData(): array
@@ -585,7 +705,12 @@ class ApplicantDetails extends Component
 
             // Validate and store files
             $this->validate([
-                'houseStructureImages.*' => 'required|image|max:2048',
+                'houseStructureImages.*' => [
+                    'required',
+                    'image',
+                    'mimes:jpeg,png',
+                    'max:10240'
+                ],
             ]);
 
             // Ensure files are an array and filter out any non-file entries

@@ -44,15 +44,6 @@ return [
             'url' => env('APP_URL').'/storage/awardee-documents',
             'visibility' => 'public',
         ],
-        // newly created one
-//        'tagging-house-structure-images' => [
-//            'driver' => 'local',
-//            'root' => storage_path('app/tagging-house-structure-images'),
-//            'serve' => true,
-//            'throw' => false,
-//            'url' => env('APP_URL').'/tagging-house-structure-images',
-//            'visibility' => 'public',
-//        ],
         'livewire-tmp' => [
             'driver' => 'local',
             'root' => storage_path('app/livewire-tmp'),

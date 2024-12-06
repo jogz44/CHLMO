@@ -77,19 +77,17 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
                 'barangays.name as barangay',
                 'puroks.name as purok',
                 'living_situations.living_situation_description as living_situation',
-                DB::raw('CASE
+                DB::raw('CASE 
                     WHEN tagged_and_validated_applicants.living_situation_id = ' . self::DANGER_ZONE_ID . '
-                    THEN case_specifications.case_specification_name
-                    ELSE tagged_and_validated_applicants.living_situation_case_specification
+                    THEN case_specifications.case_specification_name 
+                    ELSE tagged_and_validated_applicants.living_situation_case_specification 
                 END as case_specification'),
-                'relocation_sites.relocation_site_name as assigned_relocation_site',
-                'awardees.relocation_lot_id as actual_relocation_site_id',
+                'assigned_relocation_sites.relocation_site_name as assigned_relocation_site',
                 DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as occupants_count'),
                 DB::raw('COUNT(DISTINCT awardees.id) as awarded_count'),
-                DB::raw('GROUP_CONCAT(DISTINCT relocation_lots.relocation_site_name SEPARATOR ", ") as actual_relocation_sites'),
-                DB::raw('MIN(tagged_and_validated_applicants.id) as min_id'),
+                DB::raw('GROUP_CONCAT(DISTINCT actual_relocation_sites.relocation_site_name SEPARATOR ", ") as actual_relocation_sites'),
+                DB::raw('MIN(tagged_and_validated_applicants.id) as min_id')
             ])
-            // [Previous joins remain the same]
             ->join('applicants', 'tagged_and_validated_applicants.applicant_id', '=', 'applicants.id')
             ->join('addresses', 'applicants.address_id', '=', 'addresses.id')
             ->join('barangays', 'addresses.barangay_id', '=', 'barangays.id')
@@ -99,9 +97,9 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
                 $join->on('tagged_and_validated_applicants.case_specification_id', '=', 'case_specifications.id')
                     ->where('tagged_and_validated_applicants.living_situation_id', '=', self::DANGER_ZONE_ID);
             })
-            ->leftJoin('relocation_sites', 'tagged_and_validated_applicants.relocation_lot_id', '=', 'relocation_sites.id')
             ->leftJoin('awardees', 'tagged_and_validated_applicants.id', '=', 'awardees.tagged_and_validated_applicant_id')
-            ->leftJoin('relocation_sites as relocation_lots', 'awardees.relocation_lot_id', '=', 'relocation_lots.id');
+            ->leftJoin('relocation_sites as assigned_relocation_sites', 'awardees.assigned_relocation_site_id', '=', 'assigned_relocation_sites.id')
+            ->leftJoin('relocation_sites as actual_relocation_sites', 'awardees.actual_relocation_site_id', '=', 'actual_relocation_sites.id');
 
         // Apply filters [Previous filter logic remains the same]
         if (!empty($this->filters['filterBarangay'])) {
@@ -128,7 +126,6 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
             });
         }
 
-        // Date Range Filter
         if (!empty($this->filters['startDate'])) {
             $query->where('tagged_and_validated_applicants.tagging_date', '>=', $this->filters['startDate']);
         }
@@ -137,16 +134,17 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
             $query->where('tagged_and_validated_applicants.tagging_date', '<=', $this->filters['endDate']);
         }
 
-        // Assigned Relocation Site Filter
         if (!empty($this->filters['filterAssignedRelocationSite'])) {
-            $query->where('relocation_sites.relocation_site_name', $this->filters['filterAssignedRelocationSite']);
+            $query->where('assigned_relocation_sites.relocation_site_name', $this->filters['filterAssignedRelocationSite']);
         }
 
-        // Assigned Relocation Site Filter
         if (!empty($this->filters['filterActualRelocationSite'])) {
-            $query->where(function($q) {
-                $q->where('relocation_lots.relocation_site_name', $this->filters['filterActualRelocationSite'])
-                    ->orWhereNull('relocation_lots.relocation_site_name'); // Handle cases where the actual relocation site may be null
+            $query->whereExists(function ($subquery) {
+                $subquery->select(DB::raw(1))
+                    ->from('awardees as a')
+                    ->join('relocation_sites as rs', 'a.actual_relocation_site_id', '=', 'rs.id')
+                    ->whereColumn('a.tagged_and_validated_applicant_id', 'tagged_and_validated_applicants.id')
+                    ->where('rs.relocation_site_name', $this->filters['filterActualRelocationSite']);
             });
         }
 
@@ -180,19 +178,28 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
             ])
             ->first();
 
+        // Create a copy of the base query before grouping for totals calculation
+        $totalsQuery = (clone $query);
+        $grandTotals = (clone $totalsQuery)
+            ->select([
+                DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as total_occupants'),
+                DB::raw('COUNT(DISTINCT awardees.id) as total_awarded'),
+                DB::raw('COUNT(DISTINCT CASE WHEN awardees.id IS NULL THEN tagged_and_validated_applicants.id END) as total_pending')
+            ])
+            ->first();
+
         // Group by and order by
         $query->groupBy([
             'tagged_and_validated_applicants.tagging_date',
             'barangays.name',
             'puroks.name',
             'living_situations.living_situation_description',
-            DB::raw('CASE
+            DB::raw('CASE 
                 WHEN tagged_and_validated_applicants.living_situation_id = ' . self::DANGER_ZONE_ID . '
-                THEN case_specifications.case_specification_name
-                ELSE tagged_and_validated_applicants.living_situation_case_specification
+                THEN case_specifications.case_specification_name 
+                ELSE tagged_and_validated_applicants.living_situation_case_specification 
             END'),
-            'relocation_sites.relocation_site_name',
-            'awardees.relocation_lot_id'
+            'assigned_relocation_sites.relocation_site_name'
         ])->orderBy('min_id');
 
         return $query;

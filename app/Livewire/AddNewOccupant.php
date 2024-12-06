@@ -134,6 +134,23 @@ class AddNewOccupant extends Component
             return StructureStatusType::all();
         });
 
+        // Clear any existing transfer session data when accessing directly
+        if (!request()->has('transfer')) {
+            session()->forget('transfer_data');
+            $this->isTransfer = false;
+            $this->previousAwardeeData = null;
+        } else {
+            // Only load transfer data if specifically accessing via transfer
+            $this->previousAwardeeData = session('transfer_data');
+            $this->isTransfer = !empty($this->previousAwardeeData);
+        }
+
+        // Reset transfer-specific fields
+        if (!$this->isTransfer) {
+            $this->relationship = null;
+            $this->reason_for_transfer = null;
+        }
+
         // Set default values
         $this->tagger_name = Auth::user()->full_name;
         $this->houseStructureImages = [];
@@ -521,15 +538,18 @@ class AddNewOccupant extends Component
 
     public function store()
     {
-        Log::info('Starting store method', [
+        Log::info('Store method triggered', [
             'is_transfer' => $this->isTransfer,
-            'previous_awardee_data' => $this->previousAwardeeData,
+            'form_data' => $this->getValidationData()  // Log all form data
         ]);
+
 
         try {
             $validatedData = $this->validate($this->rules());
+            Log::info('Validation passed');
 
             DB::beginTransaction();
+            Log::info('Transaction started');
 
             // 1. Create person record
             $person = People::create([
@@ -715,6 +735,7 @@ class AddNewOccupant extends Component
             }
 
             DB::commit();
+            Log::info('Transaction committed');
 
             // Success message and redirect
             $this->dispatch('alert', [
@@ -725,10 +746,14 @@ class AddNewOccupant extends Component
                 'type' => 'success'
             ]);
 
-            return redirect()->route($this->isTransfer ? 'awardee-list' : 'applicants');
+            return redirect()->route($this->isTransfer ? 'awardee-list' : 'transaction-request');
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error in store method', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             $this->handleError($e);
         }
     }

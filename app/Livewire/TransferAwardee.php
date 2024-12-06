@@ -41,7 +41,7 @@ class TransferAwardee extends Component
             ]
         ]);
 
-        return redirect()->route('add-new-occupant');
+        return redirect()->route('add-new-occupant', ['transfer' => true]);
     }
 
     public function render()

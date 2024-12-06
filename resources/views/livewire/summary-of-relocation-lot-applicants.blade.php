@@ -48,65 +48,64 @@
                 </div>
 
                 <!-- Table with transaction requests -->
-                <div class="overflow-x-auto max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="overflow-x-auto w-full mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
                     <table class="min-w-full bg-white border border-gray-200">
-                        <thead class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white p-4">
+                        <thead class="bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white">
                             <tr>
-                                <th class="p-4 px-32 text-xl font-semibold text-center">
-                                    <h3 class="text-xl font-bold text-center">RELOCATION LOT APPLICANTS</h3>
+                                <th class="p-4 px-2 text-lg font-semibold text-center">
+                                    <h3 class="text-lg font-bold text-center">RELOCATION LOT APPLICANTS</h3>
+                                </th>
+                                <th class="p-4 px-2 text-lg font-semibold text-center">
+                                    <h3 class="text-lg font-bold text-center">NO. OF APPLICANTS</h3>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800">
+                                <td class="row-span-3 text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800 whitespace-normal break-words">
                                     WALK-IN APPLICANTS
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-[16px] py-2 px-2 border-b text-gray-700 text-center font-medium">
-                                    {{ $walkInApplicants }}
+                                <td class="text-lg mb-4 py-2 px-2 text-center border-b text-gray-800">
+                                    <span class="text-xs">Total: <span class="font-semibold text-lg">{{ $walkInApplicants }}</span></span>
+                                    <br>
+                                    <span class="text-xs">Tagged: <span class="font-semibold text-lg">{{ $taggedWalkInApplicants }}</span></span>
+                                    <br>
+                                    <span class="text-xs">Untagged: <span class="font-semibold text-lg">{{ $untaggedWalkInApplicants }}</span></span>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800">
-                                    TAGGED AND VALIDATED
+                                <td class="row-span-3 text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800 whitespace-normal break-words">
+                                    TAGGED AND VALIDATED APPLICANTS
+                                </td>
+                                <td class="text-lg mb-4 py-2 px-2 text-center border-b text-gray-800">
+                                    <span class="text-xs">Total: <span class="font-semibold text-lg">{{ $totalTaggedValidated }}</span></span>
+                                    <br>
+                                    <span class="text-xs">Informal Settlers: <span class="font-semibold text-lg">{{ $informalSettlers }}</span></span>
+                                    <br>
+                                    <span class="text-xs">Non-informal Settlers: <span class="font-semibold text-lg">{{ $nonInformalSettlers }}</span></span>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="text-[16px] py-2 px-2 border-b text-gray-700 text-center font-medium">
-                                    {{ $taggedAndValidated }}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800">
+                                <td class="row-span-3 text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800 whitespace-normal break-words">
                                     IDENTIFIED INFORMAL SETTLERS
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="text-[16px] py-2 px-2 border-b text-gray-700 text-center font-medium">
-                                    {{ $identifiedInformalSettlers }}
+                                <td class="text-lg mb-4 py-2 px-2 text-center border-b text-gray-800">
+                                    <span class="text-xs">Total: <span class="font-semibold text-lg">{{ $totalInformalSettlers }}</span></span>
+                                    <br>
+                                    <span class="text-xs">Awarded: <span class="font-semibold text-lg">{{ $awardedInformalSettlers }}</span></span>
+                                    <br>
+                                    <span class="text-xs">Non-awarded: <span class="font-semibold text-lg">{{ $nonAwardedInformalSettlers }}</span></span>
                                 </td>
                             </tr>
                             <tr>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td class="text-lg font-semibold mb-4 py-2 px-2 text-center border-b text-gray-800">
-                                    TOTAL NUMBER RELOCATION LOT APPLICANTS
+                                <td class="row-span-3 text-lg font-bold mb-4 py-2 px-2 text-center border-b text-gray-800 whitespace-normal break-words">
+                                    TOTAL NUMBER OF RELOCATION LOT APPLICANTS
+                                </td>
+                                <td class="text-lg mb-4 py-2 px-2 text-center border-b text-gray-800">
+                                    {{ $totalRelocationApplicants }}
                                 </td>
                             </tr>
-                            <tr>
-                                <td class="text-lg py-2 px-2 border-b text-gray-700 text-center font-medium">
-                                    {{ $totalRelocationLotApplicants }}
-                                </td>
-                            </tr>
+
                         </tbody>
                     </table>
                 </div>
