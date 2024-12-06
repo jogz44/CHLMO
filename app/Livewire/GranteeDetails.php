@@ -9,9 +9,9 @@ use App\Models\Shelter\Grantee;
 use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\Barangay;
-use App\Models\LivingSituation;
 use App\Models\GovernmentProgram;
 use App\Models\Shelter\OriginOfRequest;
+use App\Models\Shelter\ShelterLivingSituation;
 use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Shelter\ShelterSpouse;
 use App\Models\Shelter\Material;
@@ -48,7 +48,7 @@ class GranteeDetails extends Component
 
     public $date_request;
     public $civil_status_id, $civilStatuses, $date_tagged,
-        $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
+        $shelter_living_situation_id, $shelterLivingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $remarks;
 
     public $materialUnitId, $material_id, $purchaseOrderId, $materialUnits = [], $purchaseOrders = [];
@@ -128,11 +128,11 @@ class GranteeDetails extends Component
         // Load civil statuses here
         $this->civilStatuses = CivilStatus::all();
         // Load living situation
-        $this->living_situation_id = $this->profiledTagged?->living_situation_id ?? null;
-        $this->livingSituations = LivingSituation::all();
+        $this->shelter_living_situation_id = $this->profiledTagged?->shelter_living_situation_id ?? null;
+        $this->shelterLivingSituations = ShelterLivingSituation::all();
 
         // Load case specification data
-        if ($this->profiledTagged?->living_situation_id == 8) {
+        if ($this->profiledTagged?->shelter_living_situation_id == 8) {
             $this->case_specification_id = $this->profiledTagged?->case_specification_id ?? null;
         } else {
             $this->living_situation_case_specification = $this->profiledTagged?->living_situation_case_specification ?? '';
