@@ -17,7 +17,7 @@
                     <div class="flex space-x-2  z-[60]">
                         <div x-data="{ showModal: false }"
                             x-on:keydown.escape.window="showModal = false">
-                            <div >
+                            <div>
                                 <div class="alert mt-14"
                                     :class="{primary:'alter-primary', success:'alert-success', danger:'alert-danger', warning:'alter-warning'}[(alert.type ?? 'primary')]"
                                     x-data="{ open:false, alert:{} }"
@@ -355,15 +355,15 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap -mx-2">  
+                    <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="barangay" class="block text-[13px] font-medium text-gray-700 mb-1">
                                 BARANGAY <span class="text-red-500">*</span>
                             </label>
                             <input wire:model="barangay_name"
-                                       id="barangay"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
-                                @error('barangay_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                id="barangay"
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                            @error('barangay_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="w-full md:w-1/3 px-2 mb-4">
@@ -371,9 +371,9 @@
                                 PUROK <span class="text-red-500">*</span>
                             </label>
                             <input wire:model="purok_name"
-                                       id="purok"
-                                       class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
-                                @error('purok') <span class="text-red-600 error">{{ $message }}</span> @enderror
+                                id="purok"
+                                class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
+                            @error('purok') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="w-full md:w-1/3 px-2 mb-4">
@@ -384,7 +384,7 @@
                         </div>
                     </div>
                     <div x-data="{
-                    livingSituation: @entangle('living_situation_id')" class="flex flex-wrap -mx-2">
+                    shelterLivingSituations: @entangle('shelter_living_situation_id')" class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="structure_status_id"
                                 class="block text-[13px] font-semibold text-gray-700 mb-1">
@@ -403,29 +403,42 @@
 
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION (CASE) <span class="text-red-500">*</span></label>
-                            <select x-model.number="livingSituation" wire:model.live="living_situation_id" id="living_situation" name="living_situation"
-                                required class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
+                            <label for="shelter_living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                LIVING SITUATION (CASE) <span class="text-red-500">*</span>
+                            </label>
+                            <select x-model.number="shelterLivingSituations" wire:model.live="shelter_living_situation_id" id="shelter_living_situation"
+                                name="shelter_living_situation" required
+                                class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select situation</option>
-                                @foreach($livingSituations as $livingSituation)
+                                @foreach($shelterLivingSituations as $livingSituation)
                                 <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
                                 @endforeach
                             </select>
-                            @error('living_situation') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            @error('living_situation')
+                            <span class="error text-red-600">{{ $message }}</span>
+                            @enderror
                         </div>
-                        <template x-if="livingSituation >= '1' && livingSituation <= '7'  || livingSituation === 9">
+                        <template x-if="shelterLivingSituations >= 1 && shelterLivingSituations <= 7 || shelterLivingSituations === 9">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span></label>
-                                <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification" name="living_situation_case_specification" placeholder="Enter case details"
-                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" required oninput="capitalizeInput(this)">
+                                <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span>
+                                </label>
+                                <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification"
+                                    name="living_situation_case_specification" placeholder="Enter case details"
+                                    class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                    required>
                                 </textarea>
-                                @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                @error('living_situation_case_specification')
+                                <span class="error text-red-600">{{ $message }}</span>
+                                @enderror
                             </div>
                         </template>
-                        <!-- add also template here for uploading a photo for letter of consent from the owner of the house if nag select na nakipuyo lang sila sa yuta -->
-                        <template x-if="livingSituation == '8'">
+
+                        <template x-if="shelterLivingSituations == 8">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">CASE SPECIFICATION <span class="text-red-500">*</span></label>
+                                <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                    CASE SPECIFICATION <span class="text-red-500">*</span>
+                                </label>
                                 <select wire:model.live="case_specification_id" id="case_specification" name="case_specification"
                                     class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase" required>
                                     <option value="">Select specification</option>
@@ -433,7 +446,9 @@
                                     <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
                                     @endforeach
                                 </select>
-                                @error('case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                @error('case_specification')
+                                <span class="error text-red-600">{{ $message }}</span>
+                                @enderror
                             </div>
                         </template>
                     </div>
