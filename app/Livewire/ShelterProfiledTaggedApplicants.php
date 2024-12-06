@@ -53,7 +53,7 @@ class ShelterProfiledTaggedApplicants extends Component
         $granteeToPreview, $isUploading = false;
 
     public $attachment_id, $attachmentLists = [];
-    public $description, $granteeId, $documents = [], $newFileImages = [];
+    public $description, $granteeId, $newFileImages = [];
     public $show = false;
 
     public $materialLists = [];
@@ -67,6 +67,13 @@ class ShelterProfiledTaggedApplicants extends Component
     public $currentDocuments = [];
     public $editingDocumentId = null;
     public $newDocument = null;
+    public $documents = [
+        1 => null,
+        2 => null,
+        3 => null,
+        4 => null,
+        5 => null
+    ];
 
 
     // Reset pagination when search changes
@@ -102,7 +109,7 @@ class ShelterProfiledTaggedApplicants extends Component
     public function mount()
     {
 
-        $this->shelterLivingStatusesFilter = Cache::remember('living_situations', 60 * 60, function () {
+        $this->shelterLivingStatusesFilter = Cache::remember('shelter_living_situations', 60 * 60, function () {
             return LivingStatus::all();
         });
         $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here        
@@ -120,7 +127,30 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->attachmentLists = GranteeAttachmentList::all(); // Fetch all attachment lists
 
         $this->isFilePondUploadComplete = false;
+        $this->documents = [
+            1 => null,
+            2 => null,
+            3 => null,
+            4 => null,
+            5 => null
+        ];
+    
+        $this->loadExistingDocuments();
     }
+    public function checkDocuments()
+{
+    Log::info('Current documents array:', $this->documents);
+    
+    $existingDocuments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $this->profiledTaggedApplicantId)
+        ->get();
+    
+    foreach ($existingDocuments as $document) {
+        Log::info('Existing document:', [
+            'attachment_id' => $document->attachment_id,
+            'file_path' => $document->file_path
+        ]);
+    }
+}
 
     public function findMaterialInfo($material_id)
     {
@@ -202,14 +232,30 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->validateOnly('images');
     }
 
-    public  function removeUpload($property, $fileName, $load): void
+    public function removeUpload($attachmentId): void
     {
-        $filePath = storage_path('livewire-tmp/' . $fileName);
-        if (file_exists($filePath)) {
-            unlink($filePath);
+        $existingDocument = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $this->profiledTaggedApplicantId)
+            ->where('attachment_id', $attachmentId)
+            ->first();
+
+        if ($existingDocument) {
+            // Delete file from storage
+            Storage::disk('grantee-photo-requirements')->delete($existingDocument->file_path);
+
+            // Delete the record from the database
+            $existingDocument->delete();
+
+            // Update the displayed file data
+            $this->documents[$attachmentId] = null;
+
+            $this->dispatch('alert', [
+                'title' => 'File Removed Successfully!',
+                'message' => 'The document has been removed.',
+                'type' => 'success'
+            ]);
         }
-        $load('');
     }
+
     public function updatedGranteeUpload(): void
     {
         $this->isFilePondUploadComplete = true;
@@ -222,74 +268,55 @@ class ShelterProfiledTaggedApplicants extends Component
         ]);
     }
 
+
     public function submit(): void
     {
-        $submittedAttachments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $this->profiledTaggedApplicantId)->count();
-
-        if ($submittedAttachments === 0) {
-            $this->handleError('No documents have been submitted.');
-            return;
-        }
-
         DB::beginTransaction();
         try {
-            // Check if granteeId is set
-            if (is_null($this->profiledTaggedApplicantId)) {
-                $this->handleError('Grantee ID is missing. Please make sure the grantee is created first.');
-                return;
-            }
-
-            // Log the current IDs we're working with
-            logger()->info('Starting submission with IDs', [
-                'profiled_tagged_applicant_id' => $this->profiledTaggedApplicantId,
-                // 'attachment_id' => $this->attachment_id,
-            ]);
-
-            $this->isFilePonduploading = false;
-
-            // Validate inputs
+            // Validate before storing documents
             $validatedData = $this->validate([
-                'requestLetterAddressToCityMayor' => 'nullable|file|max:10240',
                 'certificateOfIndigency' => 'nullable|file|max:10240',
-                'consentLetterIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
-                'photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs' => 'nullable|file|max:10240',
-                'profilingForm' => 'nullable|file|max:10240',
+                'requestLetterAddressToCityMayor' => 'nullable|file|max:10240',
+                // other document validations
             ]);
 
-            logger()->info('Validation passed', $validatedData);
-
-            $this->storeAttachment('requestLetterAddressToCityMayor', 1);
+            // Store each document if uploaded
             $this->storeAttachment('certificateOfIndigency', 2);
-            $this->storeAttachment('consentLetterIfTheLandIsNotTheirs', 3);
-            $this->storeAttachment('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', 4);
-            $this->storeAttachment('profilingForm', 5);
+            $this->storeAttachment('requestLetterAddressToCityMayor', 1);
+            // Store other documents similarly
 
             DB::commit();
 
-            // Log the activity
-            $logger = new ActivityLogs();
-            $user = Auth::user();
-            $logger->logActivity('Submitted Applicants Requirements', $user);
-
             $this->dispatch('alert', [
                 'title' => 'Requirements Submitted Successfully!',
-                'message' => 'Applicant is now ready for granting! <br><small>' . now()->calendar() . '</small>',
-                'type' => 'warning'
+                'message' => 'Documents have been uploaded successfully!',
+                'type' => 'success'
             ]);
 
             $this->redirect('shelter-profiled-tagged-applicants');
         } catch (\Exception $e) {
             DB::rollBack();
-            logger()->error('Submission failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            $this->dispatch('alert', [
-                'title' => 'Failed!',
-                'message' => 'Submission of requirements failed. Please try again. <br><small>' . now()->calendar() . '</small>',
-                'type' => 'danger'
-            ]);
+            $this->handleError('Document submission failed. Please try again.');
         }
+    }
+    public function loadExistingDocuments(): void
+    {
+        $existingDocuments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $this->profiledTaggedApplicantId)
+            ->get();
+    
+        Log::info('Existing documents count: ' . $existingDocuments->count());
+    
+        foreach ($existingDocuments as $document) {
+            Log::info('Processing document:', [
+                'attachment_id' => $document->attachment_id,
+                'file_path' => $document->file_path
+            ]);
+    
+            // Explicitly set the document for the specific attachment ID
+            $this->documents[$document->attachment_id] = $document->file_path;
+        }
+    
+        Log::info('Documents array after loading:', $this->documents);
     }
 
     /**
@@ -298,7 +325,20 @@ class ShelterProfiledTaggedApplicants extends Component
     private function storeAttachment($fileInput, $attachmentId): void
     {
         $file = $this->$fileInput;
+
         if ($file) {
+            // Check if the document already exists, and delete if necessary
+            $existingDocument = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $this->profiledTaggedApplicantId)
+                ->where('attachment_id', $attachmentId)
+                ->first();
+
+            if ($existingDocument) {
+                // Remove the existing file from storage
+                Storage::disk('grantee-photo-requirements')->delete($existingDocument->file_path);
+                $existingDocument->delete();
+            }
+
+            // Store new file
             $fileName = $file->getClientOriginalName();
             $filePath = $file->storeAs('documents', $fileName, 'grantee-photo-requirements');
 
@@ -315,7 +355,6 @@ class ShelterProfiledTaggedApplicants extends Component
             ProfiledTaggedApplicant::where('id', $this->profiledTaggedApplicantId)->update([
                 'is_awarding_on_going' => true
             ]);
-            logger()->info('The applicant submitted its requirements', ['id' => $this->profiledTaggedApplicantId]);
         }
     }
     private function handleError(string $message, \Exception $e = null): void
@@ -341,13 +380,13 @@ class ShelterProfiledTaggedApplicants extends Component
         $this->show = false;  // Close the modal or hide any UI related to uploads if needed
     }
 
-    public function isRequirementsComplete($profiledTaggedApplicantId): bool
-    {
-        $submittedAttachments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $profiledTaggedApplicantId)->count();
+    // public function isRequirementsComplete($profiledTaggedApplicantId): bool
+    // {
+    //     $submittedAttachments = GranteeDocumentsSubmission::where('profiled_tagged_applicant_id', $profiledTaggedApplicantId)->count();
 
-        // Check for at least one document if all are optional
-        return $submittedAttachments > 0;
-    }
+    //     // Check for at least one document if all are optional
+    //     return $submittedAttachments > 0;
+    // }
 
 
     public function grantApplicant()
@@ -593,6 +632,7 @@ class ShelterProfiledTaggedApplicants extends Component
 
         // Fetch all origin of requests for filter dropdown
         $OriginOfRequests = OriginOfRequest::all();
+        $this->checkDocuments();
 
         // Fetch and paginate the results
         $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate(5);
