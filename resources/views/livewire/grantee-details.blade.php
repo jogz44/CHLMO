@@ -447,26 +447,26 @@
 
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                            <label for="shelter_living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 LIVING SITUATION (CASE)
                             </label>
                             @if($isEditing)
-                            <select wire:model="living_situation_id"
-                                x-model="livingSituation"
-                                id="living_situation_id"
+                            <select wire:model="shelter_living_situation_id"
+                                x-model="shelterLivingSituation"
+                                id="shelter_living_situation_id"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Living Situation</option>
-                                @foreach($livingSituations as $livingSituation)
+                                @foreach($shelterLivingSituations as $livingSituation)
                                 <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
                                 @endforeach
                             </select>
-                            @error('living_situation_id')
+                            @error('shelter_living_situation_id')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                             @else
                             <textarea rows="2"
                                 disabled
-                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->livingSituation)->living_situation_description ?? '--' }}
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->shelterLivingSituation)->living_situation_description ?? '--' }}
                             </textarea>
                             @endif
                         </div>
@@ -475,7 +475,7 @@
                                 CASE SPECIFICATION
                             </label>
                             @if($isEditing)
-                            <div x-show="living_situation_id != 8">
+                            <div x-show="shelter_living_situation_id != 8">
                                 <textarea
                                     wire:model="living_situation_case_specification"
                                     placeholder="Enter case details"
@@ -487,7 +487,7 @@
                                 <span class="error text-red-600">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div x-show="living_situation_id == 8">
+                            <div x-show="shelter_living_situation_id == 8">
                                 <select
                                     wire:model="case_specification_id"
                                     class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase"
@@ -502,7 +502,7 @@
                                 @enderror
                             </div>
                             @else
-                            @if($profiledTagged->living_situation_id == 8)
+                            @if($profiledTagged->shelter_living_situation_id == 8)
                             <textarea rows="2"
                                 disabled
                                 class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->caseSpecification)->case_specification_name ?? '--' }}
