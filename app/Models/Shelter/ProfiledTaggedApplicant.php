@@ -37,7 +37,7 @@ class ProfiledTaggedApplicant extends Model
         // 'address_id',
         'government_program_id',
         'tribe',
-        'living_situation_id',
+        'shelter_living_situation_id',
         'case_specification_id',
         'living_situation_case_specification',
         'sex',
@@ -97,9 +97,9 @@ class ProfiledTaggedApplicant extends Model
     //     return $this->belongsTo(Purok::class, 'purok_id');
     // }
     // Relationship with LivingSituation
-    public function livingSituation(): BelongsTo
+    public function shelterLivingSituation(): BelongsTo
     {
-        return $this->belongsTo(LivingSituation::class, 'living_situation_id');
+        return $this->belongsTo(ShelterLivingSituation::class, 'shelter_living_situation_id');
     }
 
     // Relationship with CaseSpecification

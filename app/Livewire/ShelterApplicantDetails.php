@@ -60,7 +60,8 @@ class ShelterApplicantDetails extends Component
     public $full_address, $barangay_name, $purok_name;
     public $government_program_id; // Store selected Government Program ID
     public $governmentPrograms; // For populating the government programs dropdown
-    public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification;
+    public $shelter_living_situation_id, $case_specification_id, $caseSpecifications, $living_situation_case_specification;
+    public $shelterLivingSituations = [];
     public $date_tagged;
     public $remarks;
     public $applicantForSpouse;
@@ -83,7 +84,7 @@ class ShelterApplicantDetails extends Component
         });
 
 
-        $this->livingSituations = Cache::remember('livingSituations', 60 * 60, function () {
+        $this->shelterLivingSituations = Cache::remember('shelterLivingSituations', 60 * 60, function () {
             return LivingSituation::all();  // Cache for 1 hour
         });
 
@@ -171,22 +172,22 @@ class ShelterApplicantDetails extends Component
                 'required',
                 'regex:/^09\d{9}$/'
             ],
-            'living_situation_id' => 'required|exists:living_situations,id',
+            'shelter_living_situation_id' => 'required|exists:shelter_living_situations,id',
             'living_situation_case_specification' => [
                 'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,1,2,3,4,5,6,7,9',
+                'required_if:shelter_living_situation_id,1,2,3,4,5,6,7,9',
                 'string',
                 'max:255'
             ],
             'case_specification_id' => [
                 'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,8', // Only required if living_situation_id is 8
+                'required_if:shelter_living_situation_id,8', // Only required if living_situation_id is 8
                 'exists:case_specifications,id'
             ],
             'date_tagged' => 'required|date',
             'government_program_id' => 'required|exists:government_programs,id',
             'remarks' => 'nullable|string|max:255',
-            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
+            'houseStructureImages.*' => 'required|mimes:jpeg,png,jpg|max:10240', // Validate each image
             'full_address' => 'nullable|string|max:255',
 
             // Live-in partner details
@@ -290,7 +291,7 @@ class ShelterApplicantDetails extends Component
     {
         $this->isFilePondUploadComplete = true;
         $this->validate([
-            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
+            'houseStructureImages.*' => 'required|mimes:jpeg,png,jpg|max:10240', // Validate each image
         ]);
     }
 
@@ -315,9 +316,9 @@ class ShelterApplicantDetails extends Component
                 'contact_number' => $this->contact_number ?: null,
                 'full_address' => $this->full_address ?: null,
                 'date_tagged' => now(),
-                'living_situation_id' => $this->living_situation_id,
-                'living_situation_case_specification' => $this->living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
-                'case_specification_id' => $this->living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
+                'shelter_living_situation_id' => $this->shelter_living_situation_id,
+                'living_situation_case_specification' => $this->shelter_living_situation_id != 8 ? $this->living_situation_case_specification : null, // Store only for 1-7, 9
+                'case_specification_id' => $this->shelter_living_situation_id == 8 ? $this->case_specification_id : null, // Only for 8
                 'structure_status_id' => $this->structure_status_id,
                 'date_tagged' => $this->date_tagged,
                 'government_program_id' => $this->government_program_id,

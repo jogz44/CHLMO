@@ -14,6 +14,7 @@ use App\Models\GovernmentProgram;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\ShelterLiveInPartner;
 use App\Models\Shelter\ShelterSpouse;
+use App\Models\Shelter\ShelterLivingSituation;
 use App\Models\Purok;
 use App\Models\Religion;
 use App\Models\StructureStatusType;
@@ -44,7 +45,7 @@ class ProfiledTaggedApplicantDetails extends Component
 
     public $date_request;
     public $civil_status_id, $civilStatuses, $date_tagged, $structure_status_id, $structureStatuses,
-        $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
+        $shelter_living_situation_id, $shelterLivingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $remarks;
 
     public $materialUnitId, $material_id, $purchaseOrderId;
@@ -63,7 +64,7 @@ class ProfiledTaggedApplicantDetails extends Component
             'shelterApplicant.person',
             'shelterApplicant.originOfRequest',
             'shelterApplicant.address.barangay',
-            'livingSituation',
+            'shelterLivingSituation',
             'caseSpecification',
             'governmentProgram',
             'civilStatus',
@@ -83,8 +84,8 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
         });
-        $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
-            return LivingSituation::all();  // Cache for 1 hour
+        $this->shelterLivingSituations = Cache::remember('shelterLivingSituations', 60*60, function() {
+            return ShelterLivingSituation::all();  // Cache for 1 hour
         });
         $this->caseSpecifications = Cache::remember('caseSpecifications', 60*60, function() {
             return CaseSpecification::all();  // Cache for 1 hour
@@ -131,10 +132,10 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->date_tagged = optional($this->profiledTaggedApplicant->date_tagged)
             ->format('F d, Y') ?? null;
        
-        $this->living_situation_id = $this->profiledTaggedApplicant?->livingSituation?->living_situation_id ?? null;
-        $this->livingSituations = LivingSituation::all();
+        $this->shelter_living_situation_id = $this->profiledTaggedApplicant?->shelterLivingSituation?->shelter_living_situation_id ?? null;
+        $this->shelterLivingSituations = ShelterLivingSituation::all();
         // Load case specification data
-        if ($this->profiledTaggedApplicant?->livingSituation?->living_situation_id == 8) {
+        if ($this->profiledTaggedApplicant?->shelterLivingSituation?->shelter_living_situation_id == 8) {
             $this->case_specification_id = $this->profiledTaggedApplicant?->caseSpecification?->case_specification_id ?? null;
         } else {
             $this->living_situation_case_specification = $this->profiledTaggedApplicant?->living_situation_case_specification ?? '';
@@ -186,16 +187,16 @@ class ProfiledTaggedApplicantDetails extends Component
             'monthly_income' => 'required|integer',
             'family_income' => 'required|integer',
             'date_tagged' => 'required|date',
-            'living_situation_id' => 'required|integer',
+            'shelter_living_situation_id' => 'required|integer',
             'living_situation_case_specification' => [
                 'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,1,2,3,4,5,6,7,9',
+                'required_if:shelter_living_situation_id,1,2,3,4,5,6,7,9',
                 'string',
                 'max:255'
             ],
             'case_specification_id' => [
                 'nullable', // Allow it to be null if not required
-                'required_if:living_situation_id,8', // Only required if living_situation_id is 8
+                'required_if:shelter_living_situation_id,8', // Only required if shelter_living_situation_id is 8
                 'exists:case_specifications,id'
             ],
             'government_program_id' => 'required|integer',
@@ -280,7 +281,7 @@ class ProfiledTaggedApplicantDetails extends Component
         $this->profiledTaggedApplicant->spouse->spouse_last_name = $this->spouse_last_name;
 
         $this->profiledTaggedApplicant->date_tagged = $this->date_tagged;
-        $this->profiledTaggedApplicant->livingSituation->living_situation_id = $this->living_situation_id;
+        $this->profiledTaggedApplicant->shelterLivingSituation->shelter_living_situation_id = $this->shelter_living_situation_id;
         $this->profiledTaggedApplicant->living_situation_case_specification = $this->living_situation_case_specification;
         $this->profiledTaggedApplicant->caseSpecification->case_specification_id = $this->case_specification_id;
         $this->profiledTaggedApplicant->governmentProgram->government_program_id = $this->government_program_id;

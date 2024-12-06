@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('civil_status_id')->constrained('civil_statuses')->onDelete('cascade');
             $table->foreignId('government_program_id')->constrained('government_programs')->onDelete('cascade');
             $table->foreignId('structure_status_id')->nullable()->constrained('structure_status_types')->onDelete('cascade');
-            $table->foreignId('living_situation_id')->constrained('living_situations')->onDelete('cascade');
+            $table->foreignId('shelter_living_situation_id')->constrained('shelter_living_situations')->onDelete('cascade');
             $table->foreignId('case_specification_id')->nullable()->constrained('case_specifications')->onDelete('cascade');
             $table->text('living_situation_case_specification')->nullable();
             $table->text('full_address')->nullable();
