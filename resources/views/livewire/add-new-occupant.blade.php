@@ -121,7 +121,7 @@
 {{--                        </div>--}}
                         <!-- Transfer-specific fields -->
                         @if($isTransfer)
-                            <div class="flex flex-wrap -mx-2">
+                            <div class="w-full flex flex-wrap -mx-2">
                                 <!-- Relationship field -->
                                 <div class="w-full md:w-1/4 px-2 mb-4">
                                     <label for="relationship" class="block text-[13px] font-medium text-gray-700 mb-1">
@@ -616,7 +616,7 @@
                             </select>
                             @error('living_situation') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
-                        <template x-if="livingSituation >= '1' && livingSituation <= '7'  || livingSituation === '9'">
+                        <template x-if="livingSituation >= '1' && livingSituation <= '7'">
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="living_situation_case_specification"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
@@ -648,6 +648,23 @@
                                     @endforeach
                                 </select>
                                 @error('case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                            </div>
+                        </template>
+                        <template x-if="livingSituation == '9'">
+                            <div class="w-full md:w-1/3 px-2 mb-4">
+                                <label for="non_informal_settler_case_specification"
+                                       class="block text-[13px] font-semibold text-gray-700 mb-1">
+                                    NON-INFORMAL SETTLER CASE SPECIFICATION <span class="text-red-500">*</span>
+                                </label>
+                                <select wire:model="non_informal_settler_case_specification"
+                                        id="non_informal_settler_case_specification"
+                                        class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase" required>
+                                    <option value="">Select specification</option>
+                                    @foreach($caseSpecifications as $caseSpecification)
+                                        <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('non_informal_settler_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </template>
                     </div>
