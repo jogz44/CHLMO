@@ -74,7 +74,7 @@
                     </div>
                 </div>
 
-                <div x-show="openFilters" class="flex space-x-2 mb-1 mt-5">
+                <div x-show="openFilters" class="grid grid-cols-4 gap-2 mb-1 mt-5">
                     <select wire:model.live="selectedBarangay_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Barangay</option>
                         @foreach($barangaysFilter as $barangayFilter)
@@ -91,6 +91,12 @@
                         <option value="">CASE</option>
                         @foreach($livingSituationsFilter as $livingSituationFilter)
                             <option value="{{ $livingSituationFilter->id }}">{{ $livingSituationFilter->living_situation_description }}</option>
+                        @endforeach
+                    </select>
+                    <select wire:model.live="selectedCaseSpecification_id" class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Case Specification</option>
+                        @foreach($caseSpecifications as $caseSpecification)
+                            <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
                         @endforeach
                     </select>
                     <select wire:model.live="selectedTaggingStatus"

@@ -41,24 +41,24 @@
     </main>
 
     <!-- Toastr script for livewire -->
-    <script>
-        $(document).ready(function (){
-            toastr.options = {
-                "progressBar": true,
-                "positionClass": "toast-top-right"
-            }
-        });
+{{--    <script>--}}
+{{--        $(document).ready(function (){--}}
+{{--            toastr.options = {--}}
+{{--                "progressBar": true,--}}
+{{--                "positionClass": "toast-top-right"--}}
+{{--            }--}}
+{{--        });--}}
 
-        window.addEventListener('success', event => {
-            toastr.success(event.details.message);
-        });
-        window.addEventListener('warning', event => {
-            toastr.warning(event.details.message);
-        });
-        window.addEventListener('error', event => {
-            toastr.error(event.details.message);
-        });
-    </script>
+{{--        window.addEventListener('success', event => {--}}
+{{--            toastr.success(event.details.message);--}}
+{{--        });--}}
+{{--        window.addEventListener('warning', event => {--}}
+{{--            toastr.warning(event.details.message);--}}
+{{--        });--}}
+{{--        window.addEventListener('error', event => {--}}
+{{--            toastr.error(event.details.message);--}}
+{{--        });--}}
+{{--    </script>--}}
 
     @yield('scripts')
     @stack('modals')

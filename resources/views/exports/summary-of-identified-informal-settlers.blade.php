@@ -1,3 +1,17 @@
+<!-- Before table - Add totals calculation -->
+@php
+    $totalOccupants = 0;
+    $totalAwarded = 0;
+    $totalPending = 0;
+
+    // Calculate totals
+    foreach($taggedAndValidatedApplicants as $applicant) {
+        $totalOccupants += $applicant->occupants_count;
+        $totalAwarded += $applicant->awarded_count;
+    }
+    $totalPending = $totalOccupants - $totalAwarded;
+@endphp
+
 <table>
     <colgroup>
         <col style="width: 5.11%; word-wrap: break-word; white-space: normal;">
@@ -104,7 +118,7 @@
     </tr>
 
     <!-- Table Body -->
-    @foreach($taggedAndValidatedApplicants as $taggedAndValidatedApplicant)
+    @forelse($taggedAndValidatedApplicants as $taggedAndValidatedApplicant)
         <tr>
             <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
                 {{ $taggedAndValidatedApplicant->row_num }}
@@ -140,7 +154,32 @@
                 {{ $taggedAndValidatedApplicant->remarks ?? 'N/A' }}
             </td>
         </tr>
-    @endforeach
+    @empty
+        <tr>
+            <td colspan="11" style="border: 1px solid #000000; text-align: center; padding: 8px;">
+                No records found.
+            </td>
+        </tr>
+    @endforelse
+
+    <!-- Add Grand Totals Row -->
+    <tr style="background-color: #f3f4f6; font-weight: bold;">
+        <td colspan="6" style="border: 1px solid #000000; text-align: left; padding: 8px;">
+            GRAND TOTAL:
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ number_format($totalOccupants) }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            <!-- Empty cell for Assigned Relocation Site -->
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ number_format($totalAwarded) }}
+        </td>
+        <td colspan="2" style="border: 1px solid #000000; text-align: right; padding: 8px;">
+            Pending: {{ number_format($totalPending) }}
+        </td>
+    </tr>
 
     <!-- Spacing -->
     <tr>

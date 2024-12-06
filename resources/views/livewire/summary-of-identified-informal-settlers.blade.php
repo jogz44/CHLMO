@@ -148,7 +148,7 @@
                     <select wire:model.live="filterActualRelocationSite"
                             class="bg-gray-50 border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
                         <option value="">Select Actual Relocation Site</option>
-                        @foreach($relocationSites as $site)
+                        @foreach($actualRelocationSites as $site)
                             <option value="{{ $site->relocation_site_name }}">{{ $site->relocation_site_name }}</option>
                         @endforeach
                     </select>
@@ -221,6 +221,25 @@
                                 </td>
                             </tr>
                         @endforelse
+
+                        <!-- Grand Totals Row -->
+                        <tr class="bg-gray-100 font-semibold">
+                            <td colspan="5" class="py-3 px-2 text-left border-b capitalize">
+                                GRAND TOTAL:
+                            </td>
+                            <td class="py-3 px-2 text-center border-b capitalize">
+                                {{ number_format($grandTotals->total_occupants) }}
+                            </td>
+                            <td class="py-3 px-2 text-center border-b capitalize">
+                                <!-- Empty cell for Assigned Relocation Site -->
+                            </td>
+                            <td class="py-3 px-2 text-center border-b capitalize">
+                                {{ number_format($grandTotals->total_awarded) }}
+                            </td>
+                            <td colspan="2" class="py-3 px-2 text-right border-b capitalize">
+                                Pending: {{ number_format($grandTotals->total_pending) }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

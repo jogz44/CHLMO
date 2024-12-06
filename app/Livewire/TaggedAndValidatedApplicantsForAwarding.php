@@ -294,8 +294,10 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         }
 
         if ($this->selectedCaseSpecification_id) {
-            $query->whereHas('caseSpecification', function ($q) {
-                $q->where('case_specification_id', $this->selectedCaseSpecification_id);
+            $query->where(function($q) {
+                $q->where('case_specification_id', $this->selectedCaseSpecification_id)
+                    ->orWhere('living_situation_case_specification', $this->selectedCaseSpecification_id)
+                    ->orWhere('non_informal_settler_case_specification', $this->selectedCaseSpecification_id);
             });
         }
 
@@ -311,6 +313,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'puroks' => $this->puroksFilter,
             'barangays' => $this->barangaysFilter,
             'livingSituations' => $this->livingSituationsFilter,
+            'caseSpecifications' => $this->caseSpecificationsFilter,  // Add this
             'taggingStatuses' => $this->taggingStatuses,
         ]);
     }

@@ -100,11 +100,16 @@ class RelocationSites extends Component
 
     public function getStatusBadgeClass($remainingSize, $totalSize): string
     {
+        // If totalSize is 0 or null, treat as unavailable
+        if ($totalSize <= 0) {
+            return 'bg-gray-100 text-gray-800';
+        }
+
         if ($remainingSize <= 0) {
             return 'bg-red-100 text-red-800';
         }
 
-        $percentage = ($remainingSize / $totalSize) * 100;
+        $percentage = ($remainingSize / max(1, $totalSize)) * 100; // Use max to prevent division by zero
         if ($percentage <= 20) {
             return 'bg-orange-100 text-orange-800';
         }
@@ -114,11 +119,18 @@ class RelocationSites extends Component
 
     public function getStatusText($remainingSize, $totalSize): string
     {
-        $percentage = ($remainingSize / $totalSize) * 100;
+        // If totalSize is 0 or null, return unavailable
+        if ($totalSize <= 0) {
+            return 'UNAVAILABLE';
+        }
 
         if ($remainingSize <= 0) {
             return 'FULL';
-        } elseif ($percentage <= 20) {
+        }
+
+        $percentage = ($remainingSize / max(1, $totalSize)) * 100; // Use max to prevent division by zero
+
+        if ($percentage <= 20) {
             return 'ALMOST FULL';
         }
         return 'AVAILABLE';

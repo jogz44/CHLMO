@@ -10,37 +10,71 @@ use Livewire\Component;
 class SummaryOfRelocationLotApplicants extends Component
 {
     // For counting
-    public $walkInApplicants = 0, $taggedAndValidated = 0, $identifiedInformalSettlers = 0, $totalRelocationLotApplicants = 0;
+    public $walkInApplicants = 0,
+        $taggedWalkInApplicants = 0,
+        $untaggedWalkInApplicants = 0,
+
+        $totalTaggedValidated = 0,
+        $informalSettlers = 0,
+        $nonInformalSettlers = 0,
+
+        $totalInformalSettlers = 0,
+        $awardedInformalSettlers = 0,
+        $nonAwardedInformalSettlers = 0,
+
+        $totalRelocationApplicants = 0;
     public function mount()
     {
-        // Count Walk-in Applicants (transaction_type_id = 1)
-        $this->walkInApplicants = Applicant::whereHas('transactionType', function ($query) {
-            $query->where('id', 1);
-        })->count();
+        // Count total walk-in applicants
+        $this->walkInApplicants = Applicant::where('transaction_type', 'Walk-in')->count();
 
-        // Count ALL Tagged and Validated Applicants
-        $this->taggedAndValidated = TaggedAndValidatedApplicant::where('is_tagged', true)->count();
-
-        // Count Identified Informal Settlers
-        // Specific living situation IDs: 1, 2, 3, 4, 5, 6, 7, 8, 9
-        $this->identifiedInformalSettlers = TaggedAndValidatedApplicant::where('is_tagged', true)
-            ->whereBetween('living_situation_id', [1, 9])
+        // Count tagged walk-in applicants
+        $this->taggedWalkInApplicants = Applicant::where('transaction_type', 'Walk-in')
+            ->where('is_tagged', true)
             ->count();
-        // Add this debug code
-//        $settlers = TaggedAndValidatedApplicant::where('is_tagged', true)
-//            ->whereBetween('living_situation_id', [1, 9])
-//            ->get();
-//        dd([
-//            'total_records' => $settlers->count(),
-//            'living_situation_ids' => $settlers->pluck('living_situation_id')->toArray()
-//        ]);
 
-        // Calculate Total Relocation Lot Applicants
-//        $this->totalRelocationLotApplicants = $this->walkInApplicants + $this->taggedAndValidated + $this->identifiedInformalSettlers;
+        // Count untagged walk-in applicants
+        $this->untaggedWalkInApplicants = Applicant::where('transaction_type', 'Walk-in')
+            ->where('is_tagged', false)
+            ->count();
 
-        // Modified total calculation - only add walk-in and tagged/validated
-        // since informal settlers are already included in tagged/validated
-        $this->totalRelocationLotApplicants = $this->walkInApplicants + $this->taggedAndValidated;
+        // Count total tagged and validated applicants
+        $this->totalTaggedValidated = TaggedAndValidatedApplicant::count();
+
+        // Count informal settlers (living_situation_id 1-7)
+        $this->informalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])->count();
+
+        // Count non-informal settlers (living_situation_id 8 and 9)
+        $this->nonInformalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [8, 9])->count();
+
+        // Count all informal settlers (living_situation_id 1-7)
+        $this->totalInformalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])->count();
+
+        // Count awarded informal settlers
+        $this->awardedInformalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])
+            ->whereHas('awardees', function($query) {
+                $query->where('is_awarded', true);
+            })->count();
+
+        // Count non-awarded informal settlers
+        $this->nonAwardedInformalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])
+            ->whereHas('awardees', function($query) {
+                $query->where('is_awarded', false);
+            })->count();
+
+        // OVERALL TOTALS
+
+        // Total Walk-in Applicants
+        $walkInTotal = Applicant::where('transaction_type', 'Walk-in')->count();
+
+        // Non-Informal Settlers from Tagged and Validated
+        $nonInformalTotal = TaggedAndValidatedApplicant::whereIn('living_situation_id', [8, 9])->count();
+
+        // Informal Settlers
+        $informalTotal = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])->count();
+
+        // Grand Total
+        $this->totalRelocationApplicants = $walkInTotal + $nonInformalTotal + $informalTotal;
     }
 
     public function exportPDF(): \Symfony\Component\HttpFoundation\StreamedResponse
@@ -83,9 +117,16 @@ class SummaryOfRelocationLotApplicants extends Component
     {
         return view('livewire.summary-of-relocation-lot-applicants', [
             'walkInApplicants' => $this->walkInApplicants,
-            'taggedAndValidated' => $this->taggedAndValidated,
-            'identifiedInformalSettlers' => $this->identifiedInformalSettlers,
-            'totalRelocationLotApplicants' => $this->totalRelocationLotApplicants
+            'taggedWalkInApplicants' => $this->taggedWalkInApplicants,
+            'untaggedWalkInApplicants' => $this->untaggedWalkInApplicants,
+
+            'totalTaggedValidated' => $this->totalTaggedValidated,
+            'informalSettlers' => $this->informalSettlers,
+            'nonInformalSettlers' => $this->nonInformalSettlers,
+
+            'totalInformalSettlers' => $this->totalInformalSettlers,
+            'awardedInformalSettlers' => $this->awardedInformalSettlers,
+            'nonAwardedInformalSettlers' => $this->nonAwardedInformalSettlers
         ]);
     }
 }

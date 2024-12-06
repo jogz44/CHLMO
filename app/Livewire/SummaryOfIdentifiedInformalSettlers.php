@@ -189,14 +189,15 @@ class SummaryOfIdentifiedInformalSettlers extends Component
     public function export()
     {
         try {
-            $filters =  array_filter([
+            $filters = array_filter([
                 'startDate' => $this->startDate,
                 'endDate' => $this->endDate,
                 'filterBarangay' => $this->filterBarangay,
                 'filterPurok' => $this->filterPurok,
                 'filterLivingSituation' => $this->filterLivingSituation,
                 'filterCaseSpecification' => $this->filterCaseSpecification,
-                'filterAssignedRelocationSite' => $this->filterAssignedRelocationSite
+                'filterAssignedRelocationSite' => $this->filterAssignedRelocationSite,
+                'filterActualRelocationSite' => $this->filterActualRelocationSite // Add this new filter
             ]);
 
             return Excel::download(
@@ -227,11 +228,10 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                     THEN case_specifications.case_specification_name 
                     ELSE tagged_and_validated_applicants.living_situation_case_specification 
                 END as case_specification'),
-                'relocation_sites.relocation_site_name as assigned_relocation_site',
-                'awardees.relocation_lot_id as actual_relocation_site_id',
+                'assigned_relocation_sites.relocation_site_name as assigned_relocation_site',
                 DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as occupants_count'),
                 DB::raw('COUNT(DISTINCT awardees.id) as awarded_count'),
-                DB::raw('GROUP_CONCAT(DISTINCT relocation_lots.relocation_site_name SEPARATOR ", ") as actual_relocation_sites')
+                DB::raw('GROUP_CONCAT(DISTINCT actual_relocation_sites.relocation_site_name SEPARATOR ", ") as actual_relocation_sites')
             ])
             ->join('applicants', 'tagged_and_validated_applicants.applicant_id', '=', 'applicants.id')
             ->join('addresses', 'applicants.address_id', '=', 'addresses.id')
@@ -242,9 +242,9 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                 $join->on('tagged_and_validated_applicants.case_specification_id', '=', 'case_specifications.id')
                     ->where('tagged_and_validated_applicants.living_situation_id', '=', self::DANGER_ZONE_ID);
             })
-            ->leftJoin('relocation_sites', 'tagged_and_validated_applicants.relocation_lot_id', '=', 'relocation_sites.id')
             ->leftJoin('awardees', 'tagged_and_validated_applicants.id', '=', 'awardees.tagged_and_validated_applicant_id')
-            ->leftJoin('relocation_sites as relocation_lots', 'awardees.relocation_lot_id', '=', 'relocation_lots.id');
+            ->leftJoin('relocation_sites as assigned_relocation_sites', 'awardees.assigned_relocation_site_id', '=', 'assigned_relocation_sites.id')
+            ->leftJoin('relocation_sites as actual_relocation_sites', 'awardees.actual_relocation_site_id', '=', 'actual_relocation_sites.id');
 
         // Apply filters
         if ($this->filterBarangay) {
@@ -279,17 +279,28 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             $query->where('tagged_and_validated_applicants.tagging_date', '<=', $this->endDate);
         }
 
+        // Get all relocation sites for Assigned dropdown
+        $relocationSites = RelocationSite::all();
+
+        // Get distinct actual relocation sites that are actually used
+        $actualRelocationSites = RelocationSite::whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('awardees')
+                ->whereColumn('awardees.actual_relocation_site_id', 'relocation_sites.id')
+                ->whereNotNull('actual_relocation_site_id');
+        })->get();
+
         // Assigned Relocation Site Filter
         if ($this->filterAssignedRelocationSite) {
-            $query->where('relocation_sites.relocation_site_name', $this->filterAssignedRelocationSite);
+            $query->where('assigned_relocation_sites.relocation_site_name', $this->filterAssignedRelocationSite);
         }
 
-        // Modified Actual Relocation Site Filter
+        // Actual Relocation Site Filter
         if ($this->filterActualRelocationSite) {
             $query->whereExists(function ($subquery) {
                 $subquery->select(DB::raw(1))
                     ->from('awardees as a')
-                    ->join('relocation_sites as rs', 'a.relocation_lot_id', '=', 'rs.id')
+                    ->join('relocation_sites as rs', 'a.actual_relocation_site_id', '=', 'rs.id')
                     ->whereColumn('a.tagged_and_validated_applicant_id', 'tagged_and_validated_applicants.id')
                     ->where('rs.relocation_site_name', $this->filterActualRelocationSite);
             });
@@ -325,6 +336,16 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             ])
             ->first();
 
+        // Create a copy of the base query before grouping for totals calculation
+        $totalsQuery = (clone $query);
+        $grandTotals = (clone $totalsQuery)
+            ->select([
+                DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as total_occupants'),
+                DB::raw('COUNT(DISTINCT awardees.id) as total_awarded'),
+                DB::raw('COUNT(DISTINCT CASE WHEN awardees.id IS NULL THEN tagged_and_validated_applicants.id END) as total_pending')
+            ])
+            ->first();
+
         // Group by all relevant fields
         $query->groupBy([
             'tagged_and_validated_applicants.tagging_date',
@@ -336,8 +357,7 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                 THEN case_specifications.case_specification_name 
                 ELSE tagged_and_validated_applicants.living_situation_case_specification 
             END'),
-            'relocation_sites.relocation_site_name',
-            'awardees.relocation_lot_id'
+            'assigned_relocation_sites.relocation_site_name'
         ]);
 
         // Apply sorting
@@ -347,14 +367,19 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             $query->orderBy($this->sortField, $this->sortDirection);
         }
 
+        // Your existing grouping and pagination code...
+        $groupedApplicants = $query->paginate(5);
+
         return view('livewire.summary-of-identified-informal-settlers', [
-            'groupedApplicants' => $query->paginate(5),
+            'groupedApplicants' => $groupedApplicants,
             'totals' => $totals,
+            'grandTotals' => $grandTotals,
             'barangays' => $this->filterOptions['barangays'],
             'puroks' => $this->availablePuroks, // Use dynamic puroks instead of all puroks
             'livingSituations' => $this->filterOptions['livingSituations'],
             'caseSpecifications' => $this->filterOptions['caseSpecifications'],
-            'relocationSites' => $this->filterOptions['relocationSites'],
+            'relocationSites' => $relocationSites, // For assigned sites
+            'actualRelocationSites' => $actualRelocationSites, // For actual sites
         ]);
     }
 }
