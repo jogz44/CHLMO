@@ -110,27 +110,17 @@
                             <td class="py-4 px-2 text-center capitalize border-b"> {{ $shelterApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ optional($shelterApplicant->date_tagged)->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-                                @php
-                                $isComplete = $shelterApplicant->granteeDocumentsSubmission->count() >= 3; // Assuming 3 required documents
-                                @endphp
 
-                                @if ($isComplete)
-                                <button
-                                    @click="showDocumentModal({{ $shelterApplicant->id }})"
-                                    class="bg-amber-500 text-white px-4 py-1.5 rounded-full">
-                                    Submitted
-                                </button>
-                                @else
                                 <button
                                     @click="openModalDocumentsChecklist = true; $wire.set('profiledTaggedApplicantId', {{ $shelterApplicant->id }})"
                                     class="bg-amber-500 text-white px-4 py-1.5 rounded-full hover:from-orange-500 hover:to-orange-500">
                                     Submit Requirements
                                 </button>
-                                @endif
+
 
                                 @if($shelterApplicant->grantees->isEmpty())
                                 <button
-                                     @click="window.location.href = '{{ route('grant-applicant', ['profiledTaggedApplicantId' => $shelterApplicant->id]) }}'"
+                                    @click="window.location.href = '{{ route('grant-applicant', ['profiledTaggedApplicantId' => $shelterApplicant->id]) }}'"
                                     class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-6 py-1.5 rounded-full">
                                     Grant
                                 </button>
@@ -415,7 +405,7 @@
                     <div class="bg-white w-full max-w-7xl mx-4 rounded-xl shadow-2xl relative max-h-[90vh] flex flex-col">
                         <!-- Modal Header -->
                         <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
-                            <h3 class="text-lg font-bold text-gray-900">DOCUMENTS/REQUIREMENTS CHECKLIST</h3>
+                            <h3 class="text-lg font-bold text-gray-900">SUBMIT DOCUMENT REQUIREMENTS</h3>
                             <button @click="openModalDocumentsChecklist = false" class="text-gray-500 hover:text-gray-700 text-2xl font-bold">
                                 &times;
                             </button>
@@ -449,8 +439,16 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="requestLetterAddressToCityMayor">
-                                                @error('requestLetterAddressToCityMayor')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                
+                                                @if (isset($documents[1])) <!-- Check if Certificate of Indigency is uploaded -->
+                                                <div>
+                                                  okayy
+                                                </div>
+                                                @else
+                                                <div>
+                                                    <input x-ref="input" type="file" wire:model="requestLetterAddressToCityMayor" accept="image/jpeg,image/png,image/jpg">
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -479,8 +477,18 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="certificateOfIndigency">
-                                                @error('certificateOfIndigency')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                @if (isset($documents[2])) <!-- Check if Certificate of Indigency is uploaded -->
+                                                <div>
+                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[2]) }}" target="_blank">
+                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[2]) }}" alt="Certificate of Indigency" class="img-fluid">
+                                                    </a>
+                                                    <button wire:click="removeUpload(2)" class="btn btn-danger">Remove</button>
+                                                </div>
+                                                @else
+                                                <div>
+                                                    <input x-ref="input" type="file" wire:model="certificateOfIndigency" accept="image/jpeg,image/png,image/jpg">
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -509,8 +517,19 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="consentLetterIfTheLandIsNotTheirs">
-                                                @error('consentLetterIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                               
+                                                @if (isset($documents[3])) <!-- Check if Certificate of Indigency is uploaded -->
+                                                <div>
+                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[3]) }}" target="_blank">
+                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[3]) }}" alt="consentLetterIfTheLandIsNotTheirs" class="img-fluid">
+                                                    </a>
+                                                    <button wire:click="removeUpload(3)" class="btn btn-danger">Remove</button>
+                                                </div>
+                                                @else
+                                                <div>
+                                                    <input x-ref="input" type="file" wire:model="consentLetterIfTheLandIsNotTheirs" accept="image/jpeg,image/png,image/jpg">
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -538,8 +557,19 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs">
-                                                @error('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                               
+                                                @if (isset($documents[4])) <!-- Check if Certificate of Indigency is uploaded -->
+                                                <div>
+                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[4]) }}" target="_blank">
+                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[4]) }}" alt="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" class="img-fluid">
+                                                    </a>
+                                                    <button wire:click="removeUpload(4)" class="btn btn-danger">Remove</button>
+                                                </div>
+                                                @else
+                                                <div>
+                                                    <input x-ref="input" type="file" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" accept="image/jpeg,image/png,image/jpg">
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -568,8 +598,18 @@
                                                         },
                                                     },
                                                 });">
-                                                <input x-ref="input" type="file" accept="image/*,application/pdf" wire:model="profilingForm">
-                                                @error('profilingForm')<div class="text-red-400 text-sm">{{ $message }}</div>@enderror
+                                                @if (isset($documents[6])) <!-- Check if Certificate of Indigency is uploaded -->
+                                                <div>
+                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[5]) }}" target="_blank">
+                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[5]) }}" alt="profilingForm" class="img-fluid">
+                                                    </a>
+                                                    <button wire:click="removeUpload(5)" class="btn btn-danger">Remove</button>
+                                                </div>
+                                                @else
+                                                <div>
+                                                    <input x-ref="input" type="file" wire:model="profilingForm" accept="image/jpeg,image/png,image/jpg">
+                                                </div>
+                                                @endif
                                             </div>
                                         </div>
 
