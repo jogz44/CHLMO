@@ -13,8 +13,6 @@ use Maatwebsite\Excel\Facades\Excel; // Correct Excel import
 use App\Exports\ShelterReportMaterialAvailabilityDataExport;
 
 
-
-
 class ShelterReportAvailabilityMaterials extends Component
 {
     use WithPagination;
@@ -66,7 +64,6 @@ class ShelterReportAvailabilityMaterials extends Component
                 'purchase_requisitions.pr_number',
                 'purchase_orders.po_number'
             )
-
             ->groupBy(
                 'materials.id',
                 'materials.item_description',
@@ -74,59 +71,76 @@ class ShelterReportAvailabilityMaterials extends Component
                 'purchase_requisitions.pr_number',
                 'purchase_orders.po_number'
             );
+    
+        // Correctly parse and apply filtering
         if ($this->selectedPrPo) {
-            $prPo = explode('-', $this->selectedPrPo);
-            Log::info('Filtering materials with PR: ' . $prPo[0] . ' and PO: ' . $prPo[1]);
-
-            $query->where('purchase_requisitions.pr_number', $prPo[0])
-                ->where('purchase_orders.po_number', $prPo[1]);
-            $this->isFiltered = true;
+            // Remove the 'PR-' and 'PO-' prefixes
+            $prPo = str_replace(['PR-', 'PO-'], '', $this->selectedPrPo);
+            $parts = explode('-', $prPo);
+            
+            if (count($parts) == 2) {
+                $prNumber = 'PR-' . $parts[0];
+                $poNumber = 'PO-' . $parts[1];
+    
+                Log::info('Filtering with PR: ' . $prNumber . ' and PO: ' . $poNumber);
+    
+                $query->where('purchase_requisitions.pr_number', $prNumber)
+                      ->where('purchase_orders.po_number', $poNumber);
+                
+                $this->isFiltered = true;
+            } else {
+                Log::error('Invalid PR-PO format: ' . $this->selectedPrPo);
+                $this->isFiltered = false;
+            }
+        } else {
+            $this->isFiltered = false;
         }
+    
         $this->materials = $query->get()->groupBy('material_id');
-        Log::info($query->toSql()); // Outputs the SQL query
-        Log::info($query->get()->toArray()); // Outputs fetched data
+    
     }
 
     public function updatedSelectedPrPo()
     {
         $this->fetchMaterials();
+
+        Log::info('Selected PR-PO: ' . $this->selectedPrPo);
+        Log::info('Materials after filtering: ' . json_encode($this->materials));
+        Log::info('Is Filtered: ' . ($this->isFiltered ? 'Yes' : 'No'));
     }
+
     public function clearFilter()
     {
         $this->selectedPrPo = null;
-        $this->fetchMaterials();
+        $this->isFiltered = false;
+        $this->fetchMaterials(); // Re-fetch materials when filter is cleared
+
     }
 
 
     public function export()
-    {
-        try {
-            $filters = array_filter([
-                'po_number' => $this->poNumber,        // PO Number filter
-                'pr_number' => $this->prNumber,        // PR Number filter
-                'item_description' => $this->itemsDescription,  // Filter for item description
-                'availability_status' => $this->available_quantity > 0 ? 1 : 0,  // Filter for availability
-            ]);
+{
+    try {
+        $filters = array_filter([
+            'po_number' => $this->poNumber,        // PO Number filter
+            'pr_number' => $this->prNumber,        // PR Number filter
+            'item_description' => $this->itemsDescription,  // Filter for item description
+            'availability_status' => $this->available_quantity > 0 ? 1 : 0,  // Filter for availability
+        ]);
 
-            return Excel::download(
-                new ShelterReportMaterialAvailabilityDataExport($filters),
-                'shelter-' . now()->format('Y-m-d') . '.xlsx'
-            );
-        } catch (\Exception $e) {
-            Log::error('Export error: ' . $e->getMessage());
-            $this->dispatch('alert', [
-                'title' => 'Export failed:',
-                'message' => $e->getMessage(),
-                'type' => 'danger',
-            ]);
-        }
-        // Dispatch a browser event in case of an error
+        return Excel::download(
+            new ShelterReportMaterialAvailabilityDataExport($filters),
+            'shelter-' . now()->format('Y-m-d') . '.xlsx'
+        );
+    } catch (\Exception $e) {
+        Log::error('Export error: ' . $e->getMessage());
         $this->dispatch('alert', [
             'title' => 'Export failed:',
             'message' => $e->getMessage(),
             'type' => 'danger',
         ]);
     }
+}
 
 
     public function render()
