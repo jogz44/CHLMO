@@ -656,14 +656,14 @@
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
                                     NON-INFORMAL SETTLER CASE SPECIFICATION <span class="text-red-500">*</span>
                                 </label>
-                                <select wire:model="non_informal_settler_case_specification"
-                                        id="non_informal_settler_case_specification"
-                                        class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase" required>
-                                    <option value="">Select specification</option>
-                                    @foreach($caseSpecifications as $caseSpecification)
-                                        <option value="{{ $caseSpecification->id }}">{{ $caseSpecification->case_specification_name }}</option>
-                                    @endforeach
-                                </select>
+                                <textarea wire:model="non_informal_settler_case_specification"
+                                          type="text"
+                                          id="non_informal_settler_case_specification"
+                                          placeholder="Non Dwelling"
+                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                          required
+                                          oninput="capitalizeInput(this)">
+                                </textarea>
                                 @error('non_informal_settler_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </template>
