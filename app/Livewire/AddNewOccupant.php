@@ -71,6 +71,10 @@ class AddNewOccupant extends Component
     public $houseStructureImages = [];
     protected $listeners = ['fileUploadFinished' => 'handleFileUploadFinished'];
 
+    public $previousSpecifications = [];
+    public $previousNonInformalSpecifications = [];
+    public $showSuggestions = false;
+
     public function handleFileUploadFinished(): void
     {
         $this->isFilePondUploadComplete = true;
@@ -184,6 +188,17 @@ class AddNewOccupant extends Component
                 })->toArray();
             }
         }
+
+        // Get unique case specifications from the database
+        $this->previousSpecifications = TaggedAndValidatedApplicant::whereNotNull('living_situation_case_specification')
+            ->distinct()
+            ->pluck('living_situation_case_specification')
+            ->toArray();
+
+        $this->previousNonInformalSpecifications = TaggedAndValidatedApplicant::whereNotNull('non_informal_settler_case_specification')
+            ->distinct()
+            ->pluck('non_informal_settler_case_specification')
+            ->toArray();
     }
 
     // Add row for another dependent

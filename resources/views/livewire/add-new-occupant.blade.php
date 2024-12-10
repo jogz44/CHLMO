@@ -617,20 +617,71 @@
                             @error('living_situation') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
                         <template x-if="livingSituation >= '1' && livingSituation <= '7'">
-                            <div class="w-full md:w-1/3 px-2 mb-4">
+                            <div class="w-full md:w-1/3 px-2 mb-4"
+                                 x-data="{
+                                        search: @entangle('living_situation_case_specification'),
+                                        suggestions: [],
+                                        showSuggestions: false,
+                                        selectedIndex: -1,
+                                        previousSpecs: @entangle('previousSpecifications'),
+                                        init() {
+                                            this.$watch('search', value => {
+                                                if (value) {
+                                                    this.suggestions = this.previousSpecs.filter(spec =>
+                                                        spec.toLowerCase().includes(value.toLowerCase())
+                                                    );
+                                                    this.showSuggestions = this.suggestions.length > 0;
+                                                    this.selectedIndex = -1;
+                                                } else {
+                                                    this.suggestions = [];
+                                                    this.showSuggestions = false;
+                                                }
+                                            })
+                                        }
+                                     }"
+                                 @click.away="showSuggestions = false">
                                 <label for="living_situation_case_specification"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
                                     LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span>
                                 </label>
-                                <textarea wire:model="living_situation_case_specification"
-                                          type="text"
-                                          id="living_situation_case_specification"
-                                          placeholder="Enter case details"
-                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                          required
-                                          oninput="capitalizeInput(this)">
-                                </textarea>
-                                @error('living_situation_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                <div class="relative">
+                                    <textarea
+                                            wire:model="living_situation_case_specification"
+                                            type="text"
+                                            id="living_situation_case_specification"
+                                            placeholder="Enter case details"
+                                            x-ref="textarea"
+                                            @keydown.prevent.arrow-down="selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1)"
+                                            @keydown.prevent.arrow-up="selectedIndex = Math.max(selectedIndex - 1, 0)"
+                                            @keydown.prevent.enter="
+                                            if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+                                                search = suggestions[selectedIndex];
+                                                showSuggestions = false;
+                                            }"
+                                            @keydown.escape="showSuggestions = false"
+                                            x-on:input="$el.value = $el.value.toUpperCase()"
+                                            class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                            required>
+                                    </textarea>
+
+                                    <!-- Suggestions Dropdown -->
+                                    <div x-show="showSuggestions"
+                                         x-cloak
+                                         class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                        <template x-for="(suggestion, index) in suggestions" :key="index">
+                                            <div @click="search = suggestion; showSuggestions = false"
+                                                 x-text="suggestion"
+                                                 :class="{
+                                                     'px-4 py-2 cursor-pointer text-[13px] hover:bg-gray-100': true,
+                                                     'bg-yellow-100': index === selectedIndex
+                                                 }">
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                @error('living_situation_case_specification')
+                                <span class="error text-red-600">{{ $message }}</span>
+                                @enderror
                             </div>
                         </template>
                         <template x-if="livingSituation == '8'">
@@ -650,21 +701,72 @@
                                 @error('case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </template>
-                        <template x-if="livingSituation == '9'">
-                            <div class="w-full md:w-1/3 px-2 mb-4">
+                        <template x-if="livingSituation === '9'">
+                            <div class="w-full md:w-1/3 px-2 mb-4"
+                                 x-data="{
+                                    search: @entangle('non_informal_settler_case_specification'),
+                                    suggestions: [],
+                                    showSuggestions: false,
+                                    selectedIndex: -1,
+                                    previousSpecs: @entangle('previousNonInformalSpecifications'),
+                                    init() {
+                                        this.$watch('search', value => {
+                                            if (value) {
+                                                this.suggestions = this.previousSpecs.filter(spec =>
+                                                    spec.toLowerCase().includes(value.toLowerCase())
+                                                );
+                                                this.showSuggestions = this.suggestions.length > 0;
+                                                this.selectedIndex = -1;
+                                            } else {
+                                                this.suggestions = [];
+                                                this.showSuggestions = false;
+                                            }
+                                        })
+                                    }
+                                 }"
+                                 @click.away="showSuggestions = false">
                                 <label for="non_informal_settler_case_specification"
                                        class="block text-[13px] font-semibold text-gray-700 mb-1">
                                     NON-INFORMAL SETTLER CASE SPECIFICATION <span class="text-red-500">*</span>
                                 </label>
-                                <textarea wire:model="non_informal_settler_case_specification"
-                                          type="text"
-                                          id="non_informal_settler_case_specification"
-                                          placeholder="Non Dwelling"
-                                          class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
-                                          required
-                                          oninput="capitalizeInput(this)">
-                                </textarea>
-                                @error('non_informal_settler_case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
+                                <div class="relative">
+                                    <textarea
+                                            wire:model="non_informal_settler_case_specification"
+                                            type="text"
+                                            id="non_informal_settler_case_specification"
+                                            placeholder="Non-Dwelling"
+                                            x-ref="textarea"
+                                            @keydown.prevent.arrow-down="selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1)"
+                                            @keydown.prevent.arrow-up="selectedIndex = Math.max(selectedIndex - 1, 0)"
+                                            @keydown.prevent.enter="
+                                                if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+                                                    search = suggestions[selectedIndex];
+                                                    showSuggestions = false;
+                                                }"
+                                            @keydown.escape="showSuggestions = false"
+                                            x-on:input="$el.value = $el.value.toUpperCase()"
+                                            class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
+                                            required>
+                                    </textarea>
+
+                                    <!-- Suggestions Dropdown -->
+                                    <div x-show="showSuggestions"
+                                         x-cloak
+                                         class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                        <template x-for="(suggestion, index) in suggestions" :key="index">
+                                            <div @click="search = suggestion; showSuggestions = false"
+                                                 x-text="suggestion"
+                                                 :class="{
+                                                     'px-4 py-2 cursor-pointer text-[13px] hover:bg-gray-100': true,
+                                                     'bg-yellow-100': index === selectedIndex
+                                                 }">
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                                @error('non_informal_settler_case_specification')
+                                <span class="error text-red-600">{{ $message }}</span>
+                                @enderror
                             </div>
                         </template>
                     </div>
