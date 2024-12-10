@@ -29,7 +29,7 @@
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -51,7 +51,7 @@
                     <p class="text-[13px] text-gray-500">Total Profiled/Tagged</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -73,7 +73,7 @@
                     <p class="text-[13px] text-gray-500">Total Grantees</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
