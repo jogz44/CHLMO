@@ -66,7 +66,7 @@
 
     <!-- Table Body -->
     @foreach($applicants as $applicant)
-        <tr>
+        <tr style="background-color: {{ $applicant->is_tagged ? '#E8F5E9' : '#FFEBEE' }}">
             <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $applicant->applicant_id }}</td>
             <td style="border: 1px solid #000000; padding: 8px;">{{ optional($applicant->person)->full_name }}</td>
             <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ optional($applicant->person)->suffix_name }}</td>
@@ -80,32 +80,35 @@
 
     <!-- Spacing -->
     <tr>
-        <td colspan="8" height="30"></td>
+        <td colspan="8" height="20"></td>
     </tr>
 
-    <!-- Footer/Signatures -->
+    <!-- Totals Summary -->
     <tr>
-        <td colspan="4" style="padding-top: 30px;">
-            Prepared by:
-        </td>
-        <td colspan="4" style="padding-top: 30px;">
-            Noted by:
+        <td colspan="8" style="padding: 8px; text-align: right; font-weight: bold;">
+            Total Walk-in: {{ $applicants->count() }} |
+            Tagged: {{ $applicants->where('is_tagged', true)->count() }} |
+            Untagged: {{ $applicants->where('is_tagged', false)->count() }}
         </td>
     </tr>
-    <tr>
-        <td colspan="4" style="padding-top: 20px; font-weight: bold;">
-            {{ auth()->user()->first_name }} {{ auth()->user()->middle_name }} {{ auth()->user()->last_name }}
-        </td>
-        <td colspan="4" style="padding-top: 20px; font-weight: bold;">
-            ____________________
-        </td>
-    </tr>
-    <tr>
-        <td colspan="4" style="padding-top: 5px;">
-            {{ auth()->user()->position ?? 'Staff' }}
-        </td>
-        <td colspan="4" style="padding-top: 5px;">
-            Department Head
-        </td>
-    </tr>
+
+    <!-- Color Legend -->
+{{--    <tr>--}}
+{{--        <td colspan="8" height="20"></td>--}}
+{{--    </tr>--}}
+{{--    <tr>--}}
+{{--        <td colspan="8" style="padding: 8px; font-weight: bold;">Color Legend:</td>--}}
+{{--    </tr>--}}
+{{--    <tr style="background-color: #E8F5E9">--}}
+{{--        <td colspan="8" style="padding: 8px;">Tagged Applicants</td>--}}
+{{--    </tr>--}}
+{{--    <tr style="background-color: #FFEBEE">--}}
+{{--        <td colspan="8" style="padding: 8px;">Untagged Applicants</td>--}}
+{{--    </tr>--}}
+
+    <!-- Spacing -->
+{{--    <tr>--}}
+{{--        <td colspan="8" height="30"></td>--}}
+{{--    </tr>--}}
+
 </table>

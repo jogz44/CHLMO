@@ -345,7 +345,7 @@ class Applicants extends Component
                 'end_date' => $this->endDate,
                 'barangay_id' => $this->selectedBarangay_id,
                 'purok_id' => $this->selectedPurok_id,
-                'is_tagged' => $this->selectedTaggingStatus
+                'tagging_status' => $this->selectedTaggingStatus
             ]);
 
             return Excel::download(
@@ -367,20 +367,13 @@ class Applicants extends Component
     {
         ini_set('default_charset', 'UTF-8');
 
-        // Fetch Applicants based on filters
-        $query = Applicant::with([
-            'person',
-            'address.barangay',
-            'address.purok',
-        ]);
-
         // Create filters array matching your Excel export
         $filters = array_filter([
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
             'barangay_id' => $this->selectedBarangay_id,      // Changed from barangay_id
             'purok_id' => $this->selectedPurok_id,            // Changed from purok_id
-            'is_tagged' => $this->selectedTaggingStatus  // Added to match Excel export
+            'tagging_status' => $this->selectedTaggingStatus  // Added to match Excel export
         ]);
 
         // Fetch Applicants based on filters
@@ -388,7 +381,7 @@ class Applicants extends Component
             'person',
             'address.barangay',
             'address.purok',
-        ]);
+        ])->where('transaction_type', 'Walk-in');
 
         // Apply filters
         if ($this->startDate && $this->endDate) {
@@ -410,8 +403,10 @@ class Applicants extends Component
             });
         }
 
-        if ($this->selectedTaggingStatus) {   // Added to match Excel export
-            $query->where('is_tagged', $this->selectedTaggingStatus);
+        if ($this->selectedTaggingStatus === 'Tagged') {
+            $query->where('is_tagged', true);
+        } elseif ($this->selectedTaggingStatus === 'Untagged') {
+            $query->where('is_tagged', false);
         }
 
         $applicants = $query->get();
@@ -419,15 +414,15 @@ class Applicants extends Component
         // Build Subtitle from Filters
         $subtitle = [];
 
-        if ($this->selectedBarangay_id) {     // Changed from barangay_id
+        if ($this->selectedBarangay_id) {
             $barangay = Barangay::find($this->selectedBarangay_id);
             $subtitle[] = "BARANGAY: {$barangay->name}";
         }
 
-        if ($this->selectedPurok_id) {        // Changed from purok_id
+        if ($this->selectedPurok_id) {
             $purok = Purok::find($this->selectedPurok_id);
             $subtitle[] = "PUROK: {$purok->name}";
-        } else if ($this->selectedBarangay_id) {   // Changed from barangay_id
+        } else if ($this->selectedBarangay_id) {
             $subtitle[] = "PUROK: All Purok";
         }
 
@@ -437,11 +432,18 @@ class Applicants extends Component
             $subtitle[] = "Date From: {$startDate} To: {$endDate}";
         }
 
+        if ($this->selectedTaggingStatus) {
+            $subtitle[] = "Status: {$this->selectedTaggingStatus}";
+        }
+
         $subtitleText = implode(' | ', $subtitle);
+
+        $title = 'WALK-IN APPLICANTS';
 
         $html = view('pdfs.applicants', [
             'applicants' => $applicants,
             'subtitle' => $subtitleText,
+            'title' => $title,
         ])->render();
 
         // Load the PDF with the generated HTML

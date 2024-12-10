@@ -5,7 +5,6 @@ namespace App\Exports;
 use App\Models\Applicant;
 use App\Models\Barangay;
 use App\Models\Purok;
-use App\Models\TransactionType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -24,7 +23,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading, WithStyles, WithDrawings, WithEvents
 {
     use Exportable;
-    protected $transactionType;
     private $filters;
     public function __construct($filters = null)
     {
@@ -33,7 +31,7 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
 
     private function getTitle(): string
     {
-        return 'SUMMARY OF IDENTIFIED INFORMAL SETTLERS - APPLICANTS VIA WALK-IN HOUSING APPLICANTS';
+        return 'WALK-IN APPLICANTS';
     }
 
     private function getSubtitle(): array
@@ -58,6 +56,12 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
             $endDate = Carbon::parse($this->filters['end_date'])->format('m/d/Y');
             $subtitle[] = "Date From: {$startDate} To: {$endDate}";
         }
+
+        // Add Tagging Status
+        if (!empty($this->filters['tagging_status'])) {
+            $subtitle[] = "Status: {$this->filters['tagging_status']}";
+        }
+
         return $subtitle;
     }
 
@@ -67,7 +71,7 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
             'person',
             'address.barangay',
             'address.purok',
-        ]);
+        ])->where('transaction_type', 'Walk-in');
 
         // Apply filters
         if (!empty($this->filters['start_date']) && !empty($this->filters['end_date'])) {
@@ -89,11 +93,20 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
             });
         }
 
-        if (isset($this->filters['tagging_status'])) {
-            $query->where('is_tagged', $this->filters['tagging_status'] === 'Tagged');
+        // Modified tagging status filter
+        if (!empty($this->filters['tagging_status'])) {
+            $isTagged = $this->filters['tagging_status'] === 'Tagged';
+            $query->where('is_tagged', $isTagged);
         }
 
         $applicants = $query->get();
+
+        // Calculate totals
+        $totals = [
+            'total' => $applicants->count(),
+            'tagged' => $applicants->where('is_tagged', true)->count(),
+            'untagged' => $applicants->where('is_tagged', false)->count()
+        ];
 
         // Get the dynamic title and subtitle
         $title = $this->getTitle();
@@ -103,7 +116,8 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
         return view('exports.applicants', [
             'applicants' => $applicants,
             'title' => $title,
-            'subtitle' => $subtitle
+            'subtitle' => $subtitle,
+            'totals' => $totals
         ]);
     }
 
@@ -114,6 +128,63 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
 
     public function styles(Worksheet $sheet): array
     {
+        $lastRow = $sheet->getHighestRow();
+
+        $dataStartRow = 11; // Adjust based on your header rows
+        $dataEndRow = $lastRow - 8; // Adjust based on your footer rows
+
+        // Default styles
+        $styles = [
+            // Style for the title and header sections
+            1 => ['font' => ['bold' => true, 'size' => 16]],
+            2 => ['font' => ['bold' => true, 'size' => 16]],
+            3 => ['font' => ['bold' => true, 'size' => 16]],
+            4 => ['font' => ['bold' => true, 'size' => 20]],
+
+            // Table header style
+            11 => [
+                'font' => ['bold' => true],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => 'F3F4F6']
+                ]
+            ]
+        ];
+
+        // Apply color coding to data rows
+        foreach($this->view()->getData()['applicants'] as $index => $applicant) {
+            $rowIndex = $dataStartRow + $index;
+            $styles[$rowIndex] = [
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => [
+                        'rgb' => $applicant->is_tagged ? 'E8F5E9' : 'FFEBEE'
+                    ]
+                ]
+            ];
+        }
+
+        // Add legend at the bottom
+        $legendRow = $lastRow + 2;
+        $sheet->setCellValue("A{$legendRow}", "Color Legend:");
+        $sheet->setCellValue("A" . ($legendRow + 1), "Tagged Applicants");
+        $sheet->setCellValue("A" . ($legendRow + 2), "Untagged Applicants");
+
+        // Style the legend
+        $styles[$legendRow] = ['font' => ['bold' => true]];
+        $styles[$legendRow + 1] = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E8F5E9']
+            ]
+        ];
+        $styles[$legendRow + 2] = [
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'FFEBEE']
+            ]
+        ];
+
         // Set paper orientation to landscape
         $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
 
@@ -127,12 +198,14 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
         $sheet->getColumnDimension('G')->setWidth(20); // Transaction Type
         $sheet->getColumnDimension('H')->setWidth(15); // Date
 
-        // Set print area
-        $sheet->getPageSetup()->setPrintArea('A1:H' . ($sheet->getHighestRow()));
+        // Set page setup
+        $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
+        $sheet->getPageSetup()->setFitToPage(true);
+        $sheet->getPageSetup()->setFitToWidth(1);
+        $sheet->getPageSetup()->setFitToHeight(0);
 
-        return [
-            1 => ['font' => ['bold' => true, 'size' => 16]], // Header row
-        ];
+        return $styles;
     }
 
     /**
