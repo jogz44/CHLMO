@@ -17,10 +17,7 @@ return new class extends Migration
                 ->constrained('profiled_tagged_applicants')
                 ->onDelete('cascade')
                 ->name('fk_tagged_applicant'); // Shorter name for the foreign key constraint
-            $table->foreignId('attachment_id')
-                ->constrained('grantee_attachment_lists')
-                ->onDelete('cascade')
-                ->name('fk_attachment'); // Shorter name for the foreign key constraint
+            $table->string('document_name');
             $table->string('file_path');
             $table->string('file_name');
             $table->string('file_type');
