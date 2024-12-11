@@ -414,7 +414,7 @@
                                 <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
                                 @endforeach
                             </select>
-                            @error('living_situation')
+                            @error('shelter_living_situation')
                             <span class="error text-red-600">{{ $message }}</span>
                             @enderror
                         </div>
