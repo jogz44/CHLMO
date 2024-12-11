@@ -99,7 +99,8 @@
                         </tr>
                     </thead>
                     <tbody x-data>
-                        @forelse($profiledTaggedApplicants as $shelterApplicant)
+                        @if($profiledTaggedApplicants->isNotEmpty())
+                        @foreach($profiledTaggedApplicants as $shelterApplicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->shelterApplicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b underline cursor-pointer hover:text-green-500"
@@ -110,13 +111,19 @@
                             <td class="py-4 px-2 text-center capitalize border-b"> {{ $shelterApplicant->shelterApplicant->date_request->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b">{{ optional($shelterApplicant->date_tagged)->format('Y-m-d') }}</td>
                             <td class="py-4 px-2 text-center border-b space-x-2">
-
+                                @if($shelterApplicant->documents_submitted)
+                                <button
+                                    @click="openModalDocumentsChecklist = true; $wire.set('profiledTaggedApplicantId', {{ $shelterApplicant->id }})"
+                                    class="bg-gray-500 hover:bg-gray-700 text-white px-4 py-1.5 rounded-full">
+                                    Requirements Completed
+                                </button>
+                                @else
                                 <button
                                     @click="openModalDocumentsChecklist = true; $wire.set('profiledTaggedApplicantId', {{ $shelterApplicant->id }})"
                                     class="bg-amber-500 text-white px-4 py-1.5 rounded-full hover:from-orange-500 hover:to-orange-500">
                                     Submit Requirements
                                 </button>
-
+                                @endif
 
                                 @if($shelterApplicant->grantees->isEmpty())
                                 <button
@@ -131,21 +138,19 @@
                                 </button>
                                 @endif
                             </td>
-
-
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-4">No applicants found.</td>
-                        </tr>
-                        @endforelse
+                        @endforeach
+                        @else
+                        <p>No applicants found.</p>
+                        @endif
                     </tbody>
+
 
                 </table>
 
                 <!-- Pagination Links -->
                 <div class="py-4 px-3">
-                    {{ $profiledTaggedApplicants->links() }}
+
                 </div>
 
                 <!-- GRANT Modal -->
@@ -399,6 +404,8 @@
                 <!-- Modal Relocate - Checklist for uploading documents -->
                 <div x-show="openModalDocumentsChecklist"
                     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+                    x-data
+                    @requirements-completed.window="openModalDocumentsChecklist = false"
                     x-cloak
                     style="font-family: 'Poppins', sans-serif;">
                     <!-- Modal -->
@@ -410,325 +417,260 @@
                                 &times;
                             </button>
                         </div>
+                        <div class="flex-none flex justify-between items-center p-4 border-b border-gray-200">
+                            <button wire:click="$set('showEditDocumentsModal', true)" class="bg-custom-red text-white px-4 py-2 rounded-md text-sm flex items-end">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit
+                            </button>
+
+                            <button
+                                wire:click="markRequirementsComplete"
+                                class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-2 rounded-md text-sm flex items-end">
+                                Requirements Complete
+                            </button>
+                        </div>
 
                         <!-- Modal Content - Scrollable Area -->
                         <div class="flex-1 p-8 overflow-y-auto">
-                            <form wire:submit.prevent="submit">
-                                <!-- Horizontal Scrollable Container -->
-                                <div class="w-full overflow-x-auto pb-4">
-                                    <div class="flex flex-nowrap gap-4 min-w-full">
-                                        <!-- 1st Attachment - Request Letter Address to City Mayor-->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <p class="uppercase font-bold text-gray-900 text-sm">
-                                                {{ $attachmentLists->where('id', 1)->first()->attachment_name ?? 'Request Letter Address to City Mayor' }}
-                                            </p>
-
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('requestLetterAddressToCityMayor', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('requestLetterAddressToCityMayor', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                
-                                                @if (isset($documents[1])) <!-- Check if Certificate of Indigency is uploaded -->
-                                                <div>
-                                                  okayy
-                                                </div>
-                                                @else
-                                                <div>
-                                                    <input x-ref="input" type="file" wire:model="requestLetterAddressToCityMayor" accept="image/jpeg,image/png,image/jpg">
-                                                </div>
-                                                @endif
-                                            </div>
+                            <!-- Image Grid -->
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+                                @forelse($documents as $document)
+                                <div class="flex flex-col">
+                                    <div class="relative group cursor-pointer h-48" wire:click="viewDocument({{ $document->id }})">
+                                        @if(Str::contains($document->file_type, 'image'))
+                                        <img src="{{ asset('storage/' . $document->file_path) }}"
+                                            alt="{{ $document->document_name }}"
+                                            class="w-full h-full object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 z-10">
+                                        @else
+                                        <div class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                                            <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M4 18h12V6h-4V2H4v16zm-2 1V1h11l5 5v13H2z"></path>
+                                            </svg>
                                         </div>
-
-                                        <!-- 2nd attachment - Certificate of Indigency -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 2)->first()->attachment_name ?? 'Certificate of Indigency' }}
-
-                                                </p>
-                                            </div>
-
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('certificateOfIndigency', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('certificateOfIndigency', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                @if (isset($documents[2])) <!-- Check if Certificate of Indigency is uploaded -->
-                                                <div>
-                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[2]) }}" target="_blank">
-                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[2]) }}" alt="Certificate of Indigency" class="img-fluid">
-                                                    </a>
-                                                    <button wire:click="removeUpload(2)" class="btn btn-danger">Remove</button>
-                                                </div>
-                                                @else
-                                                <div>
-                                                    <input x-ref="input" type="file" wire:model="certificateOfIndigency" accept="image/jpeg,image/png,image/jpg">
-                                                </div>
-                                                @endif
-                                            </div>
+                                        @endif
+                                        <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
+                                            Click to view
                                         </div>
-
-                                        <!-- 3rd attachment - Consent Letter (if the land is not theirs) -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 3)->first()->attachment_name ?? 'Consent Letter (if the land is not theirs)' }}
-
-                                                </p>
-                                            </div>
-
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('consentLetterIfTheLandIsNotTheirs', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('consentLetterIfTheLandIsNotTheirs', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                               
-                                                @if (isset($documents[3])) <!-- Check if Certificate of Indigency is uploaded -->
-                                                <div>
-                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[3]) }}" target="_blank">
-                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[3]) }}" alt="consentLetterIfTheLandIsNotTheirs" class="img-fluid">
-                                                    </a>
-                                                    <button wire:click="removeUpload(3)" class="btn btn-danger">Remove</button>
-                                                </div>
-                                                @else
-                                                <div>
-                                                    <input x-ref="input" type="file" wire:model="consentLetterIfTheLandIsNotTheirs" accept="image/jpeg,image/png,image/jpg">
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- 4th attachment - Photocopy of ID from the Land Owner (if the land is not theirs)  -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 4)->first()->attachment_name ?? 'Photocopy of ID from the Land Owner (if the land is not theirs) ' }}
-                                                </p>
-                                            </div>
-
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                               
-                                                @if (isset($documents[4])) <!-- Check if Certificate of Indigency is uploaded -->
-                                                <div>
-                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[4]) }}" target="_blank">
-                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[4]) }}" alt="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" class="img-fluid">
-                                                    </a>
-                                                    <button wire:click="removeUpload(4)" class="btn btn-danger">Remove</button>
-                                                </div>
-                                                @else
-                                                <div>
-                                                    <input x-ref="input" type="file" wire:model="photocopyOfIdFromTheLandOwnerIfTheLandIsNotTheirs" accept="image/jpeg,image/png,image/jpg">
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- 5th attachment - Profiling Form  -->
-                                        <div class="flex-none w-80 bg-gray-50 p-2 rounded-lg shadow-sm">
-                                            <div class="mb-1">
-                                                <p class="uppercase font-bold text-gray-900 text-sm">
-                                                    {{ $attachmentLists->where('id', 5)->first()->attachment_name ?? 'Profiling Form ' }}
-
-                                                </p>
-                                            </div>
-
-                                            <!-- File upload -->
-                                            <div wire:ignore x-data="{ isUploading: false }" x-init="
-                                                FilePond.registerPlugin(FilePondPluginImagePreview);
-                                                const pond = FilePond.create($refs.input, {
-                                                    allowFileEncode: true,
-                                                    onprocessfilestart: () => { isUploading = true; },
-                                                    onprocessfile: (error, file) => { isUploading = false; },
-                                                    server: {
-                                                        process: (fileName, file, metadata, load, error, progress, abort, transfer, options) => {
-                                                            @this.upload('profilingForm', file, load, error, progress);
-                                                        },
-                                                        revert: (fileName, load) => {
-                                                            @this.removeUpload('profilingForm', fileName, load);
-                                                        },
-                                                    },
-                                                });">
-                                                @if (isset($documents[6])) <!-- Check if Certificate of Indigency is uploaded -->
-                                                <div>
-                                                    <a href="{{ Storage::disk('grantee-photo-requirements')->url($documents[5]) }}" target="_blank">
-                                                        <img src="{{ Storage::disk('grantee-photo-requirements')->url($documents[5]) }}" alt="profilingForm" class="img-fluid">
-                                                    </a>
-                                                    <button wire:click="removeUpload(5)" class="btn btn-danger">Remove</button>
-                                                </div>
-                                                @else
-                                                <div>
-                                                    <input x-ref="input" type="file" wire:model="profilingForm" accept="image/jpeg,image/png,image/jpg">
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-
+                                    </div>
+                                    <div class="mt-2 text-center">
+                                        <h3 class="text-sm font-medium text-gray-900 truncate" title="{{ $document->document_name }}">
+                                            {{ $document->document_name }}
+                                        </h3>
+                                        <p class="text-xs text-gray-500">
+                                            Uploaded {{ $document->created_at->diffForHumans() }}
+                                        </p>
                                     </div>
                                 </div>
-
-                                <!-- Submit Button Section - Fixed at bottom -->
-                                <div class="mt-4">
-                                    <button type="submit"
-                                        class="w-full py-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white font-semibold rounded-lg flex items-center justify-center space-x-2">
-                                        <span class="text-[12px]">SUBMIT</span>
-                                        <div wire:loading>
-                                            <svg aria-hidden="true"
-                                                class="w-5 h-5 mx-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-                                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                                                    fill="currentColor" />
-                                                <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                                                    fill="currentFill" />
-                                            </svg>
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                    </button>
+                                @empty
+                                <div class="col-span-full text-center py-4 text-gray-500">
+                                    No documents available
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                                @endforelse
+                            </div>
 
-                <!-- Modal for viewing -->
-                <div x-show="$wire.showDocumentModal"
-                    class="fixed inset-0 z-50 overflow-y-auto"
-                    aria-labelledby="modal-title"
-                    role="dialog"
-                    aria-modal="true" x-cloack>
-                    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
-                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div class="sm:flex sm:items-start">
-                                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                            Submitted Documents
-                                        </h3>
-                                        <div class="mt-4 grid grid-cols-1 gap-4">
-                                            @foreach($currentDocuments as $document)
-                                            <div class="border rounded-lg p-4 bg-gray-50">
-                                                <div class="space-y-4">
-                                                    <!-- Document Header -->
-                                                    <div class="flex justify-between items-start">
-                                                        <h4 class="font-medium text-lg text-gray-900">{{ $document['attachment_name'] }}</h4>
-                                                        @if($editingDocumentId === $document['id'])
-                                                        <button wire:click="cancelEdit"
-                                                            class="text-gray-400 hover:text-gray-500">
+                            <!-- Document Viewer Modal -->
+                            @if($selectedDocument)
+                            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <div>
+                                            <h3 class="text-lg font-semibold">{{ $selectedDocument->document_name }}</h3>
+                                            <p class="text-sm text-gray-500">Uploaded {{ $selectedDocument->created_at->diffForHumans() }}</p>
+                                        </div>
+                                        <button wire:click="closeDocumentViewer" class="text-gray-500 hover:text-gray-700">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    @if(Str::contains($selectedDocument->file_type, 'image'))
+                                    <img src="{{ asset('storage/' . $document->file_path) }}"
+                                        alt="{{ $document->document_name }}"
+                                        class="max-w-full h-auto">
+                                    @else
+                                    <div class="text-center py-8">
+                                        <a href="{{ Storage::url($selectedDocument->file_path) }}"
+                                            target="_blank"
+                                            class="bg-custom-red text-white px-4 py-2 rounded">
+                                            Download Document
+                                        </a>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+
+                            <!-- Edit Documents Modal -->
+                            <div class="modal" wire:model="showEditDocumentsModal">
+                                @if($showEditDocumentsModal)
+                                <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                    <div class="flex items-center justify-center min-h-screen px-4 text-center sm:block sm:p-0">
+                                        <!-- Background overlay -->
+                                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                                        <!-- Modal panel -->
+                                        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                                            <form wire:submit.prevent="updateDocuments">
+                                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                    <div class="flex justify-between items-center pb-4 mb-4 border-b">
+                                                        <h3 class="text-lg font-semibold text-gray-900">Edit Documents</h3>
+                                                        <button type="button" wire:click="$set('showEditDocumentsModal', false)" class="text-gray-400 hover:text-gray-500">
                                                             <span class="sr-only">Close</span>
                                                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                             </svg>
                                                         </button>
-                                                        @else
-                                                        <button wire:click="startEditingDocument({{ $document['id'] }})"
-                                                            class="bg-custom-red text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                            Edit Photo
-                                                        </button>
-                                                        @endif
                                                     </div>
 
-                                                    <!-- Current File Info -->
-                                                    <div class="text-sm text-gray-600">
-                                                        Current file: <span class="font-medium text-gray-900">{{ $document['file_name'] }}</span>
-                                                    </div>
+                                                    <!-- Current Documents -->
+                                                    <div class="mb-6">
+                                                        <h4 class="text-sm font-medium text-gray-700 mb-2">Current Documents</h4>
+                                                        <div class="grid grid-cols-3 gap-4">
+                                                            @forelse($existingDocuments as $document)
+                                                            <div class="relative group">
+                                                                @if(Str::contains($document['file_type'], 'image'))
+                                                                <img src="{{ asset('storage/' . $document['file_path']) }}"
+                                                                    alt="{{ $document['document_name'] }}"
+                                                                    class="w-full h-48 object-cover rounded-lg">
+                                                                @else
+                                                                <div class="w-full h-48 flex items-center justify-center bg-gray-100 rounded-lg">
+                                                                    <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                                        <path d="M4 18h12V6h-4V2H4v16zm-2 1V1h11l5 5v13H2z"></path>
+                                                                    </svg>
+                                                                </div>
+                                                                @endif
 
-                                                    <!-- Image Preview -->
-                                                    <div class="relative">
-                                                        <img src="{{ $document['file_url'] }}"
-                                                            alt="{{ $document['attachment_name'] }}"
-                                                            class="rounded-lg shadow-sm max-h-48 object-cover">
-                                                    </div>
+                                                                <!-- Document Name Input -->
+                                                                <div class="mt-2">
+                                                                    <input type="text"
+                                                                        wire:model="existingDocumentNames.{{ $document['id'] }}"
+                                                                        class="w-full px-2 py-1 text-sm border rounded focus:ring-blue-500 focus:border-blue-500"
+                                                                        placeholder="Document name">
+                                                                    @error('existingDocumentNames.' . $document['id'])
+                                                                    <span class="text-red-500 text-xs">{{ $message }}</span>
+                                                                    @enderror
+                                                                </div>
 
-                                                    <!-- Edit Form -->
-                                                    @if($editingDocumentId === $document['id'])
-                                                    <div class="space-y-4 mt-4 bg-white p-4 rounded-lg border">
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                                                Upload New Photo
-                                                            </label>
-                                                            <input type="file"
-                                                                wire:model="newDocument"
-                                                                class="block w-full text-sm text-gray-500
-                                                                  file:mr-4 file:py-2 file:px-4
-                                                                  file:rounded-full file:border-0
-                                                                  file:text-sm file:font-semibold
-                                                                  file:bg-custom-red file:text-white
-                                                                  hover:file:bg-custom-green
-                                                                  cursor-pointer"
-                                                                accept="image/*">
+                                                                <!-- Delete Button -->
+                                                                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <button type="button"
+                                                                        wire:click="removeDocument({{ $document['id'] }})"
+                                                                        class="bg-red-600 text-white rounded-full p-2 hover:bg-red-700">
+                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            @empty
+                                                            <div class="col-span-3 text-center py-4 text-gray-500">
+                                                                No documents available
+                                                            </div>
+                                                            @endforelse
                                                         </div>
-                                                        <div class="flex justify-end space-x-2">
-                                                            <button wire:click="updateDocument"
-                                                                class="bg-custom-green text-white px-4 py-2 rounded-full text-sm hover:bg-opacity-90 transition-colors">
-                                                                Save Changes
-                                                            </button>
+                                                    </div>
+
+                                                    <!-- Upload New Documents -->
+                                                    <div>
+                                                        <h4 class="text-sm font-medium text-gray-700 mb-2">Upload New Documents</h4>
+                                                        <div class="mt-2"
+                                                            x-data="{ isUploading: false, progress: 0 }"
+                                                            x-on:livewire-upload-start="isUploading = true"
+                                                            x-on:livewire-upload-finish="isUploading = false"
+                                                            x-on:livewire-upload-error="isUploading = false"
+                                                            x-on:livewire-upload-progress="progress = $event.detail.progress">
+
+                                                            <!-- File Input -->
+                                                            <div class="flex items-center justify-center w-full">
+                                                                <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                                                        <svg class="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                                                        </svg>
+                                                                        <p class="mb-2 text-sm text-gray-500">
+                                                                            <span class="font-semibold">Click to upload</span> or drag and drop
+                                                                        </p>
+                                                                        <p class="text-xs text-gray-500">PNG, JPG or JPEG (MAX. 2MB per file)</p>
+                                                                    </div>
+                                                                    <input id="dropzone-file"
+                                                                        type="file"
+                                                                        wire:model="newDocuments"
+                                                                        class="hidden"
+                                                                        multiple
+                                                                        accept="image/*">
+                                                                </label>
+                                                            </div>
+
+                                                            <!-- Upload Progress Bar -->
+                                                            <div x-data="{ isUploading: false, progress: 0 }" class="mt-4"
+                                                                x-on:livewire-upload-start="isUploading = true"
+                                                                x-on:livewire-upload-finish="isUploading = false"
+                                                                x-on:livewire-upload-progress="progress = $event.detail.progress">
+                                                                <div x-show="isUploading" class="mt-4">
+                                                                    <progress class="w-full" max="100" x-bind:value="progress"></progress>
+                                                                    <span x-text="`${progress}%`"></span>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Preview Section with Name Inputs -->
+                                                            @if($newDocuments)
+                                                            <div class="mt-4 grid grid-cols-3 gap-4">
+                                                                @foreach($newDocuments as $index => $document)
+                                                                <div class="relative">
+                                                                    <img src="{{ $document->temporaryUrl() }}"
+                                                                        class="w-full h-48 object-cover rounded-lg">
+
+                                                                    <!-- Document Name Input -->
+                                                                    <div class="mt-2">
+                                                                        <input type="text"
+                                                                            wire:model="newDocumentNames.{{ $index }}"
+                                                                            class="w-full px-2 py-1 text-sm border rounded focus:ring-blue-500 focus:border-blue-500"
+                                                                            placeholder="Document name">
+                                                                        @error('newDocumentNames.' . $index)
+                                                                        <span class="text-red-500 text-xs">{{ $message }}</span>
+                                                                        @enderror
+                                                                    </div>
+
+                                                                    <!-- Remove Button -->
+                                                                    <button type="button"
+                                                                        wire:click="removeNewDocument({{ $index }})"
+                                                                        class="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700">
+                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                                @endforeach
+                                                            </div>
+                                                            @endif
+
+                                                            @error('newDocuments.*')
+                                                            <span class="text-red-500 text-xs mt-2">{{ $message }}</span>
+                                                            @enderror
                                                         </div>
                                                     </div>
-                                                    @endif
                                                 </div>
-                                            </div>
-                                            @endforeach
+
+                                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                    <button type="submit"
+                                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                        Save Changes
+                                                    </button>
+                                                    <button type="button"
+                                                        wire:click="$set('showEditDocumentsModal', false)"
+                                                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                <button type="button"
-                                    wire:click="$set('showDocumentModal', false)"
-                                    class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
-                                    Close
-                                </button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -738,21 +680,6 @@
         </div>
     </div>
 </div>
-
-<!-- <script>
-    // Initialize FilePond instance
-    document.addEventListener('livewire:load', function() {
-        FilePond.create(document.querySelector('.filepond'), {
-            onprocessfile: (error, file) => {
-                if (error) {
-                    console.error('FilePond Error:', error);
-                } else {
-                    console.log('File processed:', file);
-                }
-            }
-        });
-    });
-</script> -->
 <script>
     function fileUpload() {
         return {
@@ -790,4 +717,9 @@
             }
         };
     }
+</script>
+<script>
+    document.addEventListener('requirements-completed', () => {
+        alert('Requirements marked as complete!');
+    });
 </script>
