@@ -18,6 +18,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage housing system',
             'housing system user',
             'tag housing applicants',
+            'manage relocation sites',
 
             'manage shelter system',
             'shelter system user',
@@ -35,6 +36,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'Housing System Admin' => ['manage housing system', 'housing system user'],
             'Housing System Staff' => ['housing system user'],
             'Housing System Tagger' => ['tag housing applicants'],
+            'Housing System Relocation Site Manager' => ['manage relocation sites'],
 
             'Shelter System Admin' => ['manage shelter system', 'shelter system user'],
             'Shelter System Staff' => ['shelter system user'],

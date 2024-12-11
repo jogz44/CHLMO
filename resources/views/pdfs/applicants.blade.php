@@ -78,7 +78,7 @@
         <span style="font-size: 10px;">Province of Davao del Norte</span> <br>
         <span style="font-size: 10px;">City of Tagum</span> <br>
         <span style="font-size: 12px;">CITY HOUSING AND LAND MANAGEMENT SYSTEM</span> <br>
-        <span style="font-size: 14px; font-weight: bolder">HOUSING APPLICANTS LIST</span>
+        <span style="font-size: 14px; font-weight: bolder">{{ $title }}</span>
     </p>
 
     @if(!empty($subtitle))
@@ -109,20 +109,42 @@
         </tr>
         </thead>
         <tbody>
-        @foreach($applicants as $applicant)
-            <tr>
-                <td>{{ $applicant->applicant_id }}</td>
-                <td>{{ $applicant->person->full_name }}</td>
-                <td>{{ $applicant->person->suffix_name }}</td>
-                <td>{{ $applicant->person->contact_number }}</td>
-                <td>{{ $applicant->address->purok->name }}</td>
-                <td>{{ $applicant->address->barangay->name }}</td>
-                <td>{{ $applicant->transactionType->type_name }}</td>
-                <td>{{ $applicant->date_applied->format('m/d/Y') }}</td>
-            </tr>
-        @endforeach
+            @foreach($applicants as $applicant)
+                <tr style="background-color: {{ $applicant->is_tagged ? '#E8F5E9' : '#FFEBEE' }}">
+                    <td>{{ $applicant->applicant_id }}</td>
+                    <td>{{ $applicant->person->full_name }}</td>
+                    <td>{{ $applicant->person->suffix_name }}</td>
+                    <td>{{ $applicant->person->contact_number }}</td>
+                    <td>{{ $applicant->address->purok->name }}</td>
+                    <td>{{ $applicant->address->barangay->name }}</td>
+                    <td>{{ $applicant->transaction_type }}</td>
+                    <td>{{ $applicant->date_applied->format('m/d/Y') }}</td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
+
+    <div style="margin-top: 20px;">
+        <table class="summary-table" style="width: 100%;">
+            <tr>
+                <td style="text-align: right; padding: 5px; font-weight: bold;">
+                    Total Walk-in: {{ $applicants->count() }} |
+                    Tagged: {{ $applicants->where('is_tagged', true)->count() }} |
+                    Untagged: {{ $applicants->where('is_tagged', false)->count() }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Add this after the totals table -->
+    <div style="margin-top: 20px; font-size: 12px;">
+        <p><strong>Color Legend:</strong></p>
+        <div style="margin-top: 5px;">
+            <div style="background-color: #E8F5E9; padding: 5px; margin-bottom: 5px;">Tagged Applicants</div>
+            <div style="background-color: #FFEBEE; padding: 5px;">Untagged Applicants</div>
+        </div>
+    </div>
+
 </div>
 </body>
 </html>

@@ -25,6 +25,10 @@ class CustomLoginResponse implements LoginResponseContract
         if (Auth::user()->hasRole('Housing System Tagger')) {
             return redirect('/applicants');
         }
+        // Housing System Tagger
+        if (Auth::user()->hasRole('Housing System Relocation Site Manager')) {
+            return redirect('/relocation-sites');
+        }
 
         if (Auth::user()->hasRole('Shelter System Admin')) {
             return redirect('/shelter-dashboard');
