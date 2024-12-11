@@ -123,7 +123,7 @@
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
                         </tr>
                     </thead>
-                    <tbody x-data>
+                    <tbody class="hover:bg-gray-100">
                         @forelse($grantees as $grantee)
                         <tr @click="window.location.href = '{{ route('grantee-details', ['profileNo' => $grantee->id]) }}'" class="cursor-pointer">
                             <td class="py-4 px-2 text-center border-b whitespace-nowrap">{{ $grantee->profiledTaggedApplicant->shelterApplicant->profile_no }}</td>
