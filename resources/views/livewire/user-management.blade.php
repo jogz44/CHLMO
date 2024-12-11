@@ -164,12 +164,8 @@
                                         👁️
                                     </button>
                                 </div>
-                                @if($password)
-                                    <p class="text-xs text-gray-500 mt-1">Password strength: {{ $this->passwordStrength }}</p>
-                                @endif
                                 @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                             </div>
-
 
                             <!-- Confirm Password -->
                             <div class="mb-4 relative">

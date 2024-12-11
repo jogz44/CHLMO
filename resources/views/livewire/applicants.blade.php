@@ -190,6 +190,16 @@
                                         </tr>
                                     @endforelse
                                 </tbody>
+                                <tfoot class="bg-gray-50">
+                                    <tr>
+                                        <td colspan="9" class="py-3 px-2 text-left font-semibold border-b">
+                                            Total Walk-in: {{ $applicants->where('transaction_type', 'Walk-in')->count() }} |
+                                            Tagged: {{ $applicants->where('transaction_type', 'Walk-in')->where('is_tagged', true)->count() }} |
+                                            Untagged: {{ $applicants->where('transaction_type', 'Walk-in')->where('is_tagged', false)->count() }}
+                                        </td>
+                                        <td colspan="9" class="py-3 px-2 text-left border-b"></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
