@@ -53,6 +53,7 @@ class ProfiledTaggedApplicant extends Model
         'middle_name',
         'last_name',
         'is_awarding_on_going',
+        'documents_submitted',
         'date_request',
         'is_granted'
     ];
@@ -68,6 +69,7 @@ class ProfiledTaggedApplicant extends Model
         'civil_status_id' => 'integer',
         'request_origin_id' => 'integer',
         'government_program_id' => 'integer',
+        'documents_submitted' => 'boolean',
         'year_of_residency' => 'integer',
         'date_tagged' => 'date',
     ];
@@ -136,7 +138,7 @@ class ProfiledTaggedApplicant extends Model
         return $this->hasMany(ShelterImagesForHousing::class, 'profiled_tagged_applicant_id');
     }
     // In ProfiledTaggedApplicant model
-    public function granteeDocumentsSubmission()
+    public function documents(): HasMany
     {
         return $this->hasMany(GranteeDocumentsSubmission::class, 'profiled_tagged_applicant_id');
     }
