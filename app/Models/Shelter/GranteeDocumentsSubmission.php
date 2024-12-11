@@ -12,7 +12,7 @@ class GranteeDocumentsSubmission extends Model
 
     protected $fillable = [
         'profiled_tagged_applicant_id',
-        'attachment_id',
+        'document_name',
         'file_path',
         'file_name',
         'file_type',
@@ -22,17 +22,11 @@ class GranteeDocumentsSubmission extends Model
     protected $casts = [
         'id' => 'integer',
         'profiled_tagged_applicant_id' => 'integer',
-        'profiled_tagged_attachments_list_id' => 'integer'
     ];
 
     public function profiledTaggedApplicant(): BelongsTo
     {
         return $this->belongsTo(ProfiledTaggedApplicant::class, 'profiled_tagged_applicant_id');
-    }
-
-    public function attachmentType(): BelongsTo
-    {
-        return $this->belongsTo(GranteeAttachmentList::class, 'profiled_tagged_attachments_list_id');
     }
 
 }

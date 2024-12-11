@@ -10,6 +10,7 @@ use App\Models\CaseSpecification;
 use App\Models\CivilStatus;
 use App\Models\Barangay;
 use App\Models\GovernmentProgram;
+use App\Models\Shelter\GranteeDocumentsSubmission;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\ShelterLivingSituation;
 use App\Models\Shelter\ShelterLiveInPartner;
@@ -32,6 +33,7 @@ class GranteeDetails extends Component
     public $shelterApplicant;
     public $profiledTagged;
     public $selectedPO;
+    public $profiledTaggedApplicantId; // Add this property definition
     public $poNumbers = [];
 
     public $first_name;
@@ -65,7 +67,7 @@ class GranteeDetails extends Component
         $this->grantee = Grantee::with([
             'profiledTaggedApplicant.civilStatus',
             'profiledTaggedApplicant.originOfRequest',
-            'profiledTaggedApplicant.livingSituation',
+            'profiledTaggedApplicant.shelterLivingSituation',
             'profiledTaggedApplicant.caseSpecification',
             'profiledTaggedApplicant.governmentProgram',
             'profiledTaggedApplicant.shelterSpouse',
@@ -73,11 +75,13 @@ class GranteeDetails extends Component
             'profiledTaggedApplicant.address.purok',
             'profiledTaggedApplicant.address.barangay',
         ])->findOrFail($profileNo);
-        $this->grantee = Grantee::with(['deliveredMaterials.material'])->findOrFail($profileNo);
+
+        $this->profiledTaggedApplicantId = $this->grantee->profiledTaggedApplicant->id; // Set the applicant ID
         $this->profiledTagged = $this->grantee->profiledTaggedApplicant;
         $this->shelterApplicant = $this->profiledTagged->shelterApplicant;
         $this->loadFormData();
     }
+
     public function loadFormData(): void
     {
         // Load Applicant Information
@@ -157,14 +161,17 @@ class GranteeDetails extends Component
         $this->photo = $this->shelterApplicant->profiledTagged?->photo ?? [];
 
         $this->photoForGranting = $this->shelterApplicant->profiledTagged
-            ? collect([$this->shelterApplicant->profiledTagged])->flatMap(function ($profiledTagged) {
-                return $profiledTagged->granteeDocumentsSubmission()
-                    ->get()
+        ? collect([$this->shelterApplicant->profiledTagged])->flatMap(function ($profiledTagged) {
+            return $profiledTagged->grantee
+                ? $profiledTagged->grantee->documents()->get()
                     ->map(function ($submission) {
                         return $submission->file_name;
-                    })->filter();
-            })
-            : collect();
+                    })
+                    ->filter()
+                : collect();
+        })
+            : collect(); // Return empty collection if profiledTagged is null
+
 
         $this->poNumbers = $this->grantee->deliveredMaterials
             ->pluck('material.purchaseOrder.po_number')
@@ -226,9 +233,15 @@ class GranteeDetails extends Component
 
     public function render()
     {
+        $profiledTaggedApplicant = ProfiledTaggedApplicant::with('documents')
+            ->find($this->profiledTaggedApplicantId);
+
         $materialsList = Material::all(); // Fetch all materials for the dropdown
         $OriginOfRequests = OriginOfRequest::all();
         return view('livewire.grantee-details', [
+            'photoForGranting' => $profiledTaggedApplicant->granteeDocumentsSubmissions
+                ? $profiledTaggedApplicant->granteeDocumentsSubmissions->pluck('file_name')
+                : collect(), // Return an empty collection if granteeDocumentsSubmissions is null
             'grantee' => $this->grantee,
             'OriginOfRequests' => $OriginOfRequests,
             'barangays' => Barangay::all(),

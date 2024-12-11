@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('contact_number');
             $table->dateTime('date_tagged');
             $table->boolean('is_tagged')->default(false);
+            $table->boolean('documents_submitted')->default(false);
             $table->boolean('is_awarding_on_going')->default(false);
             $table->text('remarks', 255)->nullable();
             $table->timestamps();

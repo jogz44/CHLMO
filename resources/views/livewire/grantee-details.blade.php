@@ -447,26 +447,26 @@
 
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">
+                            <label for="shelter_living_situation_id" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 LIVING SITUATION (CASE)
                             </label>
                             @if($isEditing)
-                            <select wire:model="living_situation_id"
-                                x-model="livingSituation"
-                                id="living_situation_id"
+                            <select wire:model="shelter_living_situation_id"
+                                x-model="shelterLivingSituation"
+                                id="shelter_living_situation_id"
                                 class="uppercase w-full p-1 border-b text-[12px] border-gray-300 bg-white rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Living Situation</option>
-                                @foreach($livingSituations as $livingSituation)
+                                @foreach($shelterLivingSituations as $livingSituation)
                                 <option value="{{ $livingSituation->id }}">{{ $livingSituation->living_situation_description }}</option>
                                 @endforeach
                             </select>
-                            @error('living_situation_id')
+                            @error('shelter_living_situation_id')
                             <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                             @else
                             <textarea rows="2"
                                 disabled
-                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->livingSituation)->living_situation_description ?? '--' }}
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->shelterLivingSituation)->living_situation_description ?? '--' }}
                             </textarea>
                             @endif
                         </div>
@@ -475,7 +475,7 @@
                                 CASE SPECIFICATION
                             </label>
                             @if($isEditing)
-                            <div x-show="living_situation_id != 8">
+                            <div x-show="shelter_living_situation_id != 8">
                                 <textarea
                                     wire:model="living_situation_case_specification"
                                     placeholder="Enter case details"
@@ -487,7 +487,7 @@
                                 <span class="error text-red-600">{{ $message }}</span>
                                 @enderror
                             </div>
-                            <div x-show="living_situation_id == 8">
+                            <div x-show="shelter_living_situation_id == 8">
                                 <select
                                     wire:model="case_specification_id"
                                     class="w-full p-1 bg-white border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow uppercase"
@@ -502,7 +502,7 @@
                                 @enderror
                             </div>
                             @else
-                            @if($profiledTagged->living_situation_id == 8)
+                            @if($profiledTagged->shelter_living_situation_id == 8)
                             <textarea rows="2"
                                 disabled
                                 class="justify-items-start uppercase w-full p-1 border-b text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($profiledTagged->caseSpecification)->case_specification_name ?? '--' }}
@@ -533,72 +533,6 @@
                             @enderror
                         </div>
 
-                    </div>
-                </div>
-
-                <div class="flex flex-col p-3 rounded mt-5 mb-1">
-                    <h2 class="text-[12px] ml-2 items-center font-bold text-gray-700">GRANTEE'S SUBMIITED REQUIREMENTS DURING APPLICATION</h2>
-                </div>
-
-                <div class="bg-white p-6 rounded shadow mb-6">
-                    <!-- Display images -->
-                    <div class="p-6 rounded">
-                        <!-- Image Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 ">
-                            @forelse($photoForGranting as $fileName)
-                            @if($isEditing)
-                            <div class="relative group cursor-pointer " wire:click="viewAttachment('{{ $fileName }}')">
-                                <img
-                                    src="{{ asset('grantee-photo-requirements/documents/' . $fileName) }}"
-                                    alt="{{ $fileName }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 -z-10"
-                                    loading="lazy">
-                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                    {{ $fileName }}
-                                </div>
-                            </div>
-                            @else
-                            <div class="relative group cursor-not-allowed">
-                                <img
-                                    src="{{ asset('grantee-photo-requirements/documents/' . $fileName) }}"
-                                    alt="{{ $fileName }}"
-                                    class="w-full h-48 object-cover rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                                    loading="lazy">
-                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm rounded-b-lg">
-                                    {{ $fileName }}
-                                </div>
-                            </div>
-                            @endif
-
-                            @empty
-                            <div class="col-span-full text-center py-4 text-gray-500">
-                                No images available
-                            </div>
-                            @endforelse
-                        </div>
-
-                        <!-- Modal -->
-                        @if($isEditing)
-                        @if($selectedAttachment)
-                        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                            <div class="bg-white rounded-lg p-4 max-w-4xl max-h-[90vh] overflow-auto">
-                                <div class="flex justify-end mb-2">
-                                    <button wire:click="closeAttachment" class="text-gray-500 hover:text-gray-700">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <img src="{{ asset('grantee-photo-requirements/documents/' . $selectedAttachment) }}"
-                                    alt="{{ $selectedAttachment }}"
-                                    class="max-w-full h-auto">
-                                <div class="mt-2 text-center text-gray-700">
-                                    {{ $selectedAttachment }}
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                        @endif
                     </div>
                 </div>
 
