@@ -1,4 +1,4 @@
-@hasanyrole('Super Admin|Housing System Admin|Housing System Staff|Housing System Relocation Site Manager')
+@hasanyrole('Super Admin|Housing System Admin|Housing System Staff|Housing System Relocation Site Manager|Shelter System Admin|Shelter System Staff|Shelter System Tagger')
     <div class="flex-1 flex flex-col ml-[17%] mt-[-50%]">
         <!-- Header for large screens -->
         <header class="fixed top-0 left-0 bg-[#ffffff] p-4 hidden md:flex w-full justify-between items-center z-10"

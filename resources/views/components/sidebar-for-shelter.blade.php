@@ -1,4 +1,4 @@
-@hasanyrole('Super Admin|Housing System Admin|Shelter System Admin')
+@hasanyrole('Super Admin|Housing System Admin|Shelter System Admin|Shelter System Staff|Shelter System Tagger')
 <div class="bg-none shadow-md font-poppins text-black 0 p-0 " x-data="{ open: false, activeLink: localStorage.getItem('activeLink') || '', activeChildLink: localStorage.getItem('activeChildLink') || '' }">
 
     <div class="flex h-[100vh]">
@@ -14,9 +14,9 @@
                 x-data="{
                     activeLink: localStorage.getItem('activeLink') || '',
                     activeChildLink: localStorage.getItem('activeChildLink') || ''}">
-                   
-                
-                @role('Shelter System Admin')
+
+
+                @role('Shelter System Admin|Shelter System Staff|Shelter System Tagger')
                 <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
                     :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"
                     class="mx-2 flex items-center py-2 px-4 hover:text-[#FF9100]">
@@ -245,6 +245,7 @@
                     <!-- </svg> -->
                     <!-- <p class="ml-2">Masterlist of Applicants</p>
                 </a> -->
+                @hasanyrole('Shelter System Admin|Shelter System Staff')
                 <a href="{{ route('shelter-material-inventory') }}"
                     @click="activeLink = 'shelter-material-inventory'; activeChildLink = ''; localStorage.setItem('activeLink', 'shelter-material-inventory'); localStorage.setItem('activeChildLink', '')"
                     :class="{ 'bg-[rgb(217,217,217)] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'shelter-material-inventory' }"
@@ -254,6 +255,9 @@
                     </svg>
                     <p class="ml-2">Material Inventory</p>
                 </a>
+                @endhasanyrole
+
+                @hasanyrole('Shelter System Admin|Shelter System Staff')
                 <div x-data="{
                             activeLink: localStorage.getItem('activeLink') || '',
                             activeChildLink: localStorage.getItem('activeChildLink') || '',
@@ -350,6 +354,7 @@
                         <p class="ml-2">System Configuration</p>
                     </a>
                 </div>
+                @endhasanyrole
             </nav>
         </aside>
     </div>

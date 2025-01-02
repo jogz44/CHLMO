@@ -34,6 +34,14 @@ class CustomLoginResponse implements LoginResponseContract
             return redirect('/shelter-dashboard');
         }
 
+        if (Auth::user()->hasRole('Shelter System Staff')) {
+            return redirect('/shelter-dashboard');
+        }
+
+        if (Auth::user()->hasRole('Shelter System Tagger')) {
+            return redirect('/shelter-transaction-applicants');
+        }
+
         // Fallback to a default route if no specific role matches
         return redirect('/');
     }

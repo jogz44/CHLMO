@@ -258,7 +258,7 @@
                     </a>
                 @endrole
 
-                @role('Housing System Admin')
+                @role('Housing System Admin|Housing System Staff')
                     <!-- Housing menu will be shown for Housing System Admin only -->
                     <a href="{{ route('dashboard') }}" @click="activeLink = 'dashboard'; activeChildLink = ''; localStorage.setItem('activeLink', 'dashboard'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'dashboard' }"
                        class="mx-2 flex items-center  py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[12px] hover:text-[#FF9100]">
