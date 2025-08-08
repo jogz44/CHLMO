@@ -115,40 +115,6 @@ class SummaryOfIdentifiedInformalSettlers extends Component
         $this->filterPurok = '';
     }
 
-//    public function updatedFilterBarangay(): void
-//    {
-//        if ($this->filterBarangay) {
-//            $barangay = Barangay::where('name', $this->filterBarangay)->first();
-//
-//            if ($barangay) {
-//                $this->availablePuroks = Purok::join('addresses', 'puroks.id', '=', 'addresses.purok_id')
-//                    ->where('addresses.barangay_id', $barangay->id)
-//                    ->distinct()
-//                    ->pluck('puroks.name')
-//                    ->toArray();
-//
-//                // Add this for debugging
-//                logger('Available Puroks:', $this->availablePuroks);
-//            }
-//        } else {
-//            $this->availablePuroks = [];
-//        }
-//
-//        $this->filterPurok = '';
-//        if ($this->filterBarangay) {
-//            $barangay = Barangay::where('name', $this->filterBarangay)->first();
-//            if ($barangay) {
-//                $query = Purok::join('addresses', 'puroks.id', '=', 'addresses.purok_id')
-//                    ->where('addresses.barangay_id', $barangay->id)
-//                    ->distinct();
-//
-//                // Log the SQL query and results
-//                logger('SQL Query: ' . $query->toSql());
-//                logger('Query Bindings:', $query->getBindings());
-//                logger('Results:', $query->pluck('puroks.name')->toArray());
-//            }
-//        }
-//    }
     public function updatingFilterPurok(): void
     {
         $this->resetPage();
@@ -223,10 +189,10 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                 'barangays.name as barangay',
                 'puroks.name as purok',
                 'living_situations.living_situation_description as living_situation',
-                DB::raw('CASE 
+                DB::raw('CASE
                     WHEN tagged_and_validated_applicants.living_situation_id = ' . self::DANGER_ZONE_ID . '
-                    THEN case_specifications.case_specification_name 
-                    ELSE tagged_and_validated_applicants.living_situation_case_specification 
+                    THEN case_specifications.case_specification_name
+                    ELSE tagged_and_validated_applicants.living_situation_case_specification
                 END as case_specification'),
                 'assigned_relocation_sites.relocation_site_name as assigned_relocation_site',
                 DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as occupants_count'),
@@ -238,13 +204,33 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             ->join('barangays', 'addresses.barangay_id', '=', 'barangays.id')
             ->join('puroks', 'addresses.purok_id', '=', 'puroks.id')
             ->join('living_situations', 'tagged_and_validated_applicants.living_situation_id', '=', 'living_situations.id')
-            ->leftJoin('case_specifications', function($join) {
+            ->leftJoin('case_specifications', function ($join) {
                 $join->on('tagged_and_validated_applicants.case_specification_id', '=', 'case_specifications.id')
                     ->where('tagged_and_validated_applicants.living_situation_id', '=', self::DANGER_ZONE_ID);
             })
             ->leftJoin('awardees', 'tagged_and_validated_applicants.id', '=', 'awardees.tagged_and_validated_applicant_id')
             ->leftJoin('relocation_sites as assigned_relocation_sites', 'awardees.assigned_relocation_site_id', '=', 'assigned_relocation_sites.id')
             ->leftJoin('relocation_sites as actual_relocation_sites', 'awardees.actual_relocation_site_id', '=', 'actual_relocation_sites.id');
+
+        // 🔍 Flexible Search Filter
+        if (!empty($this->search)) {
+            $words = preg_split('/\s+/', trim($this->search));
+
+            $query->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $like = '%' . $word . '%';
+                    $q->where(function ($subQ) use ($like) {
+                        $subQ->orWhere('barangays.name', 'like', $like)
+                            ->orWhere('puroks.name', 'like', $like)
+                            ->orWhere('living_situations.living_situation_description', 'like', $like)
+                            ->orWhere('tagged_and_validated_applicants.living_situation_case_specification', 'like', $like)
+                            ->orWhere('case_specifications.case_specification_name', 'like', $like)
+                            ->orWhere('assigned_relocation_sites.relocation_site_name', 'like', $like)
+                            ->orWhere(DB::raw("DATE_FORMAT(tagged_and_validated_applicants.tagging_date, '%M %d, %Y')"), 'like', $like);
+                    });
+                }
+            });
+        }
 
         // Apply filters
         if ($this->filterBarangay) {
@@ -261,10 +247,10 @@ class SummaryOfIdentifiedInformalSettlers extends Component
 
         if ($this->filterCaseSpecification) {
             $query->where(function ($q) {
-                $q->where(function($subQ) {
+                $q->where(function ($subQ) {
                     $subQ->where('tagged_and_validated_applicants.living_situation_id', self::DANGER_ZONE_ID)
                         ->where('case_specifications.case_specification_name', $this->filterCaseSpecification);
-                })->orWhere(function($subQ) {
+                })->orWhere(function ($subQ) {
                     $subQ->where('tagged_and_validated_applicants.living_situation_id', '!=', self::DANGER_ZONE_ID)
                         ->where('tagged_and_validated_applicants.living_situation_case_specification', $this->filterCaseSpecification);
                 });
@@ -279,10 +265,8 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             $query->where('tagged_and_validated_applicants.tagging_date', '<=', $this->endDate);
         }
 
-        // Get all relocation sites for Assigned dropdown
         $relocationSites = RelocationSite::all();
 
-        // Get distinct actual relocation sites that are actually used
         $actualRelocationSites = RelocationSite::whereExists(function ($query) {
             $query->select(DB::raw(1))
                 ->from('awardees')
@@ -290,12 +274,10 @@ class SummaryOfIdentifiedInformalSettlers extends Component
                 ->whereNotNull('actual_relocation_site_id');
         })->get();
 
-        // Assigned Relocation Site Filter
         if ($this->filterAssignedRelocationSite) {
             $query->where('assigned_relocation_sites.relocation_site_name', $this->filterAssignedRelocationSite);
         }
 
-        // Actual Relocation Site Filter
         if ($this->filterActualRelocationSite) {
             $query->whereExists(function ($subquery) {
                 $subquery->select(DB::raw(1))
@@ -306,68 +288,52 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             });
         }
 
-        // Get filter options (cached for performance)
         if (empty($this->filterOptions)) {
             $this->filterOptions = [
                 'barangays' => Barangay::pluck('name')->unique()->sort()->values(),
                 'puroks' => Purok::pluck('name')->unique()->sort()->values(),
                 'livingSituations' => LivingSituation::pluck('living_situation_description')->unique()->sort()->values(),
                 'caseSpecifications' => collect([
-                    // Get Danger Zone case specifications
                     CaseSpecification::pluck('case_specification_name'),
-                    // Get other living situation case specifications
                     TaggedAndValidatedApplicant::where('living_situation_id', '!=', self::DANGER_ZONE_ID)
                         ->whereNotNull('living_situation_case_specification')
                         ->pluck('living_situation_case_specification')
                 ])->flatten()->unique()->sort()->values(),
-                // Add filter options for Assigned and Actual Relocation Sites
                 'relocationSites' => RelocationSite::all(),
             ];
         }
 
-        // Create a copy of the base query for totals
         $totalsQuery = (clone $query);
+        $totals = $totalsQuery->select([
+            DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as total_occupants'),
+            DB::raw('COUNT(DISTINCT awardees.id) as total_awarded')
+        ])->first();
 
-        // Calculate totals without grouping
-        $totals = $totalsQuery
-            ->select([
-                DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as total_occupants'),
-                DB::raw('COUNT(DISTINCT awardees.id) as total_awarded')
-            ])
-            ->first();
+        $grandTotals = (clone $query)->select([
+            DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as total_occupants'),
+            DB::raw('COUNT(DISTINCT awardees.id) as total_awarded'),
+            DB::raw('COUNT(DISTINCT CASE WHEN awardees.id IS NULL THEN tagged_and_validated_applicants.id END) as total_pending')
+        ])->first();
 
-        // Create a copy of the base query before grouping for totals calculation
-        $totalsQuery = (clone $query);
-        $grandTotals = (clone $totalsQuery)
-            ->select([
-                DB::raw('COUNT(DISTINCT tagged_and_validated_applicants.id) as total_occupants'),
-                DB::raw('COUNT(DISTINCT awardees.id) as total_awarded'),
-                DB::raw('COUNT(DISTINCT CASE WHEN awardees.id IS NULL THEN tagged_and_validated_applicants.id END) as total_pending')
-            ])
-            ->first();
-
-        // Group by all relevant fields
         $query->groupBy([
             'tagged_and_validated_applicants.tagging_date',
             'barangays.name',
             'puroks.name',
             'living_situations.living_situation_description',
-            DB::raw('CASE 
+            DB::raw('CASE
                 WHEN tagged_and_validated_applicants.living_situation_id = ' . self::DANGER_ZONE_ID . '
-                THEN case_specifications.case_specification_name 
-                ELSE tagged_and_validated_applicants.living_situation_case_specification 
+                THEN case_specifications.case_specification_name
+                ELSE tagged_and_validated_applicants.living_situation_case_specification
             END'),
             'assigned_relocation_sites.relocation_site_name'
         ]);
 
-        // Apply sorting
         if ($this->sortField === 'occupants_count' || $this->sortField === 'awarded_count') {
             $query->orderBy(DB::raw($this->sortField), $this->sortDirection);
         } else {
             $query->orderBy($this->sortField, $this->sortDirection);
         }
 
-        // Your existing grouping and pagination code...
         $groupedApplicants = $query->paginate(5);
 
         return view('livewire.summary-of-identified-informal-settlers', [
@@ -375,11 +341,11 @@ class SummaryOfIdentifiedInformalSettlers extends Component
             'totals' => $totals,
             'grandTotals' => $grandTotals,
             'barangays' => $this->filterOptions['barangays'],
-            'puroks' => $this->availablePuroks, // Use dynamic puroks instead of all puroks
+            'puroks' => $this->availablePuroks,
             'livingSituations' => $this->filterOptions['livingSituations'],
             'caseSpecifications' => $this->filterOptions['caseSpecifications'],
-            'relocationSites' => $relocationSites, // For assigned sites
-            'actualRelocationSites' => $actualRelocationSites, // For actual sites
+            'relocationSites' => $relocationSites,
+            'actualRelocationSites' => $actualRelocationSites,
         ]);
     }
 }

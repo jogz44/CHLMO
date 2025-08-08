@@ -494,7 +494,7 @@ class AddNewOccupant extends Component
     {
         $this->isFilePondUploadComplete = true;
         $this->validate([
-            'houseStructureImages.*' => 'required|image|max:2048', // Validate each image
+            'houseStructureImages.*' => 'required|image|max:20048', // Validate each image
         ]);
     }
 
@@ -564,7 +564,6 @@ class AddNewOccupant extends Component
             'is_transfer' => $this->isTransfer,
             'form_data' => $this->getValidationData()  // Log all form data
         ]);
-
 
         try {
             $validatedData = $this->validate($this->rules());
@@ -749,13 +748,18 @@ class AddNewOccupant extends Component
                 ]);
 
                 // Create blacklist entry
-                Blacklist::create([
-                    'awardee_id' => $existingAwardee->id,
-                    'user_id' => auth()->id(),
-                    'date_blacklisted' => now(),
-                    'blacklist_reason_description' => 'Transfer of Rights - Property transferred to new occupant',
-                    'updated_by' => auth()->user()->full_name
-                ]);
+                if (empty(trim($this->relationship))) {
+                    Blacklist::create([
+                        'awardee_id' => $existingAwardee->id,
+                        'user_id' => auth()->id(),
+                        'date_blacklisted' => now(),
+                        'blacklist_reason_description' => 'Transfer of Rights - Property transferred to new occupant',
+                        'updated_by' => auth()->user()->full_name,
+                    ]);
+                    Log::info('Previous awardee blacklisted: no relationship specified.');
+                } else {
+                    Log::info('Previous awardee not blacklisted: relationship provided as "' . $this->relationship . '"');
+                }
             }
 
             DB::commit();

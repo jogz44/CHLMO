@@ -84,16 +84,22 @@
                                 <td class="py-2 px-2 text-center border-b whitespace-normal break-words">{{ $relocationSite->relocation_site_name }}</td>
                                 <td class="py-2 px-2 text-center border-b">{{ $relocationSite->barangay->name ?? 'N/A' }}</td>
                                 <td class="py-2 px-2 text-center border-b">
-                                    {{ $relocationSite->total_land_area ?? 'N/A' }} hectares
+                                    {{ isset($relocationSite->total_land_area) ? rtrim(rtrim(number_format($relocationSite->total_land_area, 2, '.', ''), '0'), '.') : 'N/A' }} hectares
                                 </td>
+
                                 <td class="py-2 px-2 text-center border-b">
-                                    {{ $relocationSite->total_no_of_lots ?? 'N/A' }} m&sup2;
+                                    {{ isset($relocationSite->total_no_of_lots) ? rtrim(rtrim(number_format($relocationSite->total_no_of_lots, 2, '.', ''), '0'), '.') : 'N/A' }} m&sup2;
                                 </td>
+
                                 <td class="py-2 px-2 text-center border-b">
-                                    {{ $relocationSite->community_facilities_road_lots_open_space ?? 'N/A' }} m&sup2;
+                                    {{ isset($relocationSite->community_facilities_road_lots_open_space) ? rtrim(rtrim(number_format($relocationSite->community_facilities_road_lots_open_space, 2, '.', ''), '0'), '.') : 'N/A' }} m&sup2;
                                 </td>
+
                                 <td class="py-2 px-2 text-center border-b">
-                                    {{ $relocationSite->total_no_of_lots - $relocationSite->community_facilities_road_lots_open_space }}
+                                    @php
+                                        $residentialSize = $relocationSite->total_no_of_lots - $relocationSite->community_facilities_road_lots_open_space;
+                                    @endphp
+                                    {{ rtrim(rtrim(number_format($residentialSize, 2, '.', ''), '0'), '.') }}
                                     <span class="text-sm text-gray-500">
                                         ({{ $relocationSite->awardees->count() }} awarded)
                                     </span>
@@ -187,56 +193,57 @@
                             @error('barangay_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Lot Land Area -->
+                        <!-- TOTAL LAND AREA (hectares) -->
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-black">
                                 TOTAL LAND AREA (hectares)<span class="text-red-500">*</span>
                             </label>
                             <input wire:model="total_land_area"
-                                   type="number"
-                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                   placeholder="5"
-                                   oninput="validateNumberInput(this)">
+                                type="number"
+                                step="0.01"
+                                class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                placeholder="5.5">
                             @error('total_land_area') <span class="error">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Total Number of Lots -->
+                        <!-- TOTAL NUMBER OF LOTS (m²) -->
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-black">
                                 TOTAL NUMBER OF LOTS (m&sup2;)<span class="text-red-500">*</span>
                             </label>
                             <input wire:model="total_no_of_lots"
-                                   type="number"
-                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                   placeholder="200"
-                                   oninput="validateNumberInput(this)">
+                                type="number"
+                                step="0.01"
+                                class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                placeholder="200.25">
                             @error('total_number_of_lots') <span class="error">{{ $message }}</span> @enderror
                         </div>
 
-                        <!-- Total Number of Community Facilities/Road Lots/ Open Space -->
+                        <!-- TOTAL LOT NUMBER OF COMMUNITY FACILITIES/ ROAD LOTS/ OPEN SPACE (m²) -->
                         <div class="mb-4">
                             <label class="block text-[12px] font-medium mb-2 text-black">
                                 TOTAL LOT NUMBER OF COMMUNITY FACILITIES/ ROAD LOTS/ OPEN SPACE (m&sup2;)<span class="text-red-500">*</span>
                             </label>
                             <input wire:model="total_lot_number_of_community_facilities"
-                                   type="number"
-                                   class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
-                                   placeholder="30"
-                                   oninput="validateNumberInput(this)">
+                                type="number"
+                                step="0.01"
+                                class="w-full px-3 py-1 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"
+                                placeholder="30.75">
                             @error('total_lot_number_of_community_facilities') <span class="error">{{ $message }}</span> @enderror
                         </div>
 
+
                         <!-- Residential Lots -->
-{{--                        <div class="mb-4">--}}
-{{--                            <label class="block text-[12px] font-medium mb-2 text-black">--}}
-{{--                                RESIDENTIAL LOTS (m&sup2;)--}}
-{{--                            </label>--}}
-{{--                            <input wire:model="residential_lots"--}}
-{{--                                    type="number"--}}
-{{--                                   disabled--}}
-{{--                                   class="w-full px-3 py-1 bg-gray-200 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"--}}
-{{--                                   placeholder="200">--}}
-{{--                        </div>--}}
+                        {{--                        <div class="mb-4">--}}
+                        {{--                            <label class="block text-[12px] font-medium mb-2 text-black">--}}
+                        {{--                                RESIDENTIAL LOTS (m&sup2;)--}}
+                        {{--                            </label>--}}
+                        {{--                            <input wire:model="residential_lots"--}}
+                        {{--                                    type="number"--}}
+                        {{--                                   disabled--}}
+                        {{--                                   class="w-full px-3 py-1 bg-gray-200 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]"--}}
+                        {{--                                   placeholder="200">--}}
+                        {{--                        </div>--}}
 
                         {{-- Modal Footer --}}
                         <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-6">
@@ -359,63 +366,84 @@
 
                         <!-- Site Configuration -->
                         <div class="space-y-4">
+                            <!-- Total Land Area -->
                             <div>
                                 <label class="block text-sm font-medium mb-2">
-                                    Total Land Area (m²) <span class="text-red-500">*</span>
+                                    Total Land Area (hectares) <span class="text-red-500">*</span>
                                 </label>
                                 <input
-                                        type="number"
-                                        wire:model="new_total_land_area"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        step="0.01"
-                                        min="0"
+                                    type="number"
+                                    wire:model="new_total_land_area"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    step="0.01"
+                                    min="0"
                                 >
+                                @if(is_numeric($new_total_land_area))
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        Formatted: {{ number_format($new_total_land_area, 2) }} ha
+                                    </div>
+                                @endif
                                 @error('new_total_land_area')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
 
+                            <!-- Total Number of Lots -->
                             <div>
                                 <label class="block text-sm font-medium mb-2">
-                                    Total Number of Lots <span class="text-red-500">*</span>
+                                    Total Number of Lots (m²)<span class="text-red-500">*</span>
                                 </label>
                                 <input
-                                        type="number"
-                                        wire:model="new_total_no_of_lots"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        step="1"
-                                        min="0"
+                                    type="number"
+                                    wire:model="new_total_no_of_lots"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    step="0.01" {{-- changed from 1 to 0.01 --}}
+                                    min="0"
                                 >
+                                @if(is_numeric($new_total_no_of_lots))
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        Formatted: {{ number_format($new_total_no_of_lots, 2) }} m²
+                                    </div>
+                                @endif
                                 @error('new_total_no_of_lots')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
 
+                            <!-- Community Facilities -->
                             <div>
                                 <label class="block text-sm font-medium mb-2">
-                                    Community Facilities/Road Lots/Open Space <span class="text-red-500">*</span>
+                                    Community Facilities/Road Lots/Open Space (m²)<span class="text-red-500">*</span>
                                 </label>
                                 <input
-                                        type="number"
-                                        wire:model="new_total_lot_number_of_community_facilities"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                        step="1"
-                                        min="0"
+                                    type="number"
+                                    wire:model="new_total_lot_number_of_community_facilities"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    step="0.01" {{-- changed from 1 to 0.01 --}}
+                                    min="0"
                                 >
+                                @if(is_numeric($new_total_lot_number_of_community_facilities))
+                                    <div class="text-sm text-gray-500 mt-1">
+                                        Formatted: {{ number_format($new_total_lot_number_of_community_facilities, 2) }} m²
+                                    </div>
+                                @endif
                                 @error('new_total_lot_number_of_community_facilities')
                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
 
+                            <!-- Available Residential Lots -->
                             <div class="bg-blue-50 p-3 rounded-md">
                                 <label class="block text-sm font-medium mb-2">
                                     Available Residential Lots
                                 </label>
                                 <div class="text-gray-700 font-medium">
-                                    {{ $new_residential_lots ?? ($new_total_no_of_lots - $new_total_lot_number_of_community_facilities) }} lots
+                                    {{ number_format($new_residential_lots ?? ($new_total_no_of_lots - $new_total_lot_number_of_community_facilities), 2) }} lots
                                 </div>
                             </div>
+
                         </div>
+
 
                         <div class="flex justify-end space-x-2">
                             <button type="button"

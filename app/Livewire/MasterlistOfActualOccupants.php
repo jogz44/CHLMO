@@ -14,6 +14,7 @@ use App\Models\TaggedAndValidatedApplicant;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
 class MasterlistOfActualOccupants extends Component
 {
@@ -161,12 +162,23 @@ class MasterlistOfActualOccupants extends Component
 
         // Apply existing search logic
         if ($this->search) {
-            $query->where(function($q) {
-                $q->where('people.first_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('people.last_name', 'like', '%' . $this->search . '%')
-                    ->orWhere('people.middle_name', 'like', '%' . $this->search . '%');
+            $keywords = preg_split('/\s+/', trim($this->search)); // Split search into words
+
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $like = '%' . $word . '%';
+                    $q->where(function ($subQ) use ($like) {
+                        $subQ->orWhere('people.first_name', 'like', $like)
+                            ->orWhere('people.middle_name', 'like', $like)
+                            ->orWhere('people.last_name', 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(people.first_name, ' ', people.last_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(people.last_name, ' ', people.first_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(people.first_name, ' ', people.middle_name, ' ', people.last_name)"), 'like', $like);
+                    });
+                }
             });
         }
+
 
         // Apply existing filters...
         if ($this->filters['barangay']) {

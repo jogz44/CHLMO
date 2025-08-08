@@ -23,9 +23,9 @@ class RelocationSite extends Model
     protected $casts = [
         'id' => 'integer',
         'address_id' => 'integer',
-        'total_land_area' => 'integer',
-        'total_no_of_lots' => 'integer',
-        'community_facilities_road_lots_open_space' => 'integer'
+        'total_land_area' => 'float',
+        'total_no_of_lots' => 'float',
+        'community_facilities_road_lots_open_space' => 'float'
     ];
 
     public function getRemainingLotSize(): float

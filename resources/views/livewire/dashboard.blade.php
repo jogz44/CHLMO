@@ -29,7 +29,7 @@
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -52,7 +52,7 @@
                     <p class="text-[13px] text-gray-500">Total Tagged</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -74,7 +74,7 @@
                     <p class="text-[13px] text-gray-500">Total Awardees</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -97,7 +97,7 @@
                     <p class="text-[13px] text-gray-500">Total Blacklisted</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>

@@ -78,21 +78,16 @@
                         @forelse($blacklisted as $blacklistedApplicant)
                             <tr>
                                 <td class="py-4 px-2 text-center border-b">
-                                    @php
-                                        $person = optional(optional(optional(optional($blacklistedApplicant->awardee)
-                                            ->taggedAndValidatedApplicant)
-                                            ->applicant)
-                                            ->person);
-                                    @endphp
                                     <div class="flex flex-col">
                                         <span class="font-medium">
-                                            {{ $person->full_name ?? 'N/A' }}
+                                            {{ $blacklistedApplicant->awardee->previous_awardee_name ?? 'N/A' }}
                                         </span>
-                                                    <span class="text-xs text-gray-500">
-                                            {{ $person->contact_number ?? 'No contact' }}
+                                        <span class="text-xs text-gray-500">
+                                            {{ $blacklistedApplicant->awardee->previous_awardee_contact ?? 'No contact' }}
                                         </span>
                                     </div>
                                 </td>
+
                                 <td class="py-4 px-2 text-center border-b">
                                     @php
                                         $awardee = $blacklistedApplicant->awardee;

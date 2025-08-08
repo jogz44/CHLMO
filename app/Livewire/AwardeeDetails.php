@@ -43,7 +43,7 @@ class AwardeeDetails extends Component
     ];
 
     protected $rules = [
-        'newDocuments.*' => 'required|file|max:2048',
+        'newDocuments.*' => 'required|file|max:20048',
         'newDocumentNames.*' => 'required|string|max:255',
         'existingDocumentNames.*' => 'required|string|max:255'
     ];

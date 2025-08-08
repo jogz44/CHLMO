@@ -74,7 +74,7 @@ class ShelterProfiledTaggedApplicants extends Component
             $this->shelterLivingStatusesFilter = Cache::remember('shelter_living_situations', 60 * 60, function () {
                 return ShelterLivingSituation::all();
             });
-            $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here        
+            $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
             $this->date_request = now()->toDateString(); // YYYY-MM-DD format
 
             // For Granting Modal
@@ -154,7 +154,7 @@ class ShelterProfiledTaggedApplicants extends Component
     {
         $this->validate([
             'existingDocumentNames.*' => 'required|string|max:255',
-            'newDocuments.*' => 'file|max:2048', // 2MB max, supports all file types
+            'newDocuments.*' => 'file|max:20048', // 2MB max, supports all file types
             'newDocumentNames.*' => 'required|string|max:255'
         ]);
 

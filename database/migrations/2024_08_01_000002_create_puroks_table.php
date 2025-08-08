@@ -76,7 +76,7 @@ return new class extends Migration
             ],
             9 => [
                 'Purok 1', 'Purok 1-A', 'Purok 2', 'Purok 2-A', 'Purok 3', 'Purok 4', 'Purok 4-A',
-                'Purok 5', 'Purok 56-A', 'Purok 6', 'Purok 6-A', 'Purok 7', 'Purok 8', 'Purok 8-A',
+                'Purok 5', 'Purok 5-A', 'Purok 6', 'Purok 6-A', 'Purok 7', 'Purok 8', 'Purok 8-A',
                 'Purok 8-B', 'Purok 8-C', 'Purok 9', 'Purok 10',
             ],
             10 => [

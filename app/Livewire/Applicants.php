@@ -163,6 +163,7 @@ class Applicants extends Component
         // Remove this line as we don't want to store immediately
         // $this->storeApplicant();
     }
+
     public function store()
     {
         // Validate the input data
@@ -229,7 +230,7 @@ class Applicants extends Component
                 'address_id' => $address->id,
                 'transaction_type' => 'Walk-in'  // Explicitly set for new applicants
             ]);
-            
+
              // Log the activity using ActivityLogs
              $logger = new ActivityLogs();
              $user = Auth::user();
@@ -460,20 +461,27 @@ class Applicants extends Component
     {
         $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'person'])
             ->where(function($query) {
-                $query->whereHas('person', function($q) {
-                    $q->where('first_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('last_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
-                        ->orWhere('contact_number', 'like', '%'.$this->search.'%');
-                })
-                    ->orWhere('applicant_id', 'like', '%'.$this->search.'%')
-                    ->orWhereHas('address.purok', function ($query) {
-                        $query->where('name', 'like', '%'.$this->search.'%');
-                    })
-                    ->orWhereHas('address.barangay', function ($query) {
-                        $query->where('name', 'like', '%'.$this->search.'%');
+                // Split search input into words
+                $searchWords = explode(' ', strtolower($this->search));
+
+                foreach ($searchWords as $word) {
+                    $query->where(function($subQuery) use ($word) {
+                        $subQuery->whereHas('person', function($q) use ($word) {
+                            $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(middle_name) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(suffix_name) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(contact_number) LIKE ?', ["%{$word}%"]);
+                        })
+                        ->orWhereRaw('LOWER(applicant_id) LIKE ?', ["%{$word}%"])
+                        ->orWhereHas('address.purok', function ($q) use ($word) {
+                            $q->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"]);
+                        })
+                        ->orWhereHas('address.barangay', function ($q) use ($word) {
+                            $q->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"]);
+                        });
                     });
+                }
             });
 
         // Apply filters
@@ -499,11 +507,11 @@ class Applicants extends Component
 
         $applicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
-        // Pass data to the view
         return view('livewire.applicants', [
             'puroks' => $this->puroks,
             'puroksFilter' => $this->puroksFilter,
             'applicants' => $applicants
         ]);
     }
+
 }

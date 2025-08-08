@@ -87,12 +87,12 @@ class AwardeeList extends Component
     public function render()
     {
         $query = Awardee::with([
-            'taggedAndValidatedApplicant.applicant.person',  // Load the full chain
+            'taggedAndValidatedApplicant.applicant.person',
             'assignedRelocationSite',
             'actualRelocationSite',
         ]);
 
-        // Apply filters
+        // Apply relocation site filter
         if ($this->relocation_site) {
             $query->where(function($q) {
                 $q->whereHas('assignedRelocationSite', function($subQ) {
@@ -111,19 +111,29 @@ class AwardeeList extends Component
             ]);
         }
 
-        // Search
+        // Advanced name search logic
         if ($this->search) {
-            $query->where(function ($q) {
-                $q->whereHas('taggedAndValidatedApplicant.applicant.person', function ($subQuery) {
-                    $subQuery->where('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
+            $keywords = explode(' ', strtolower($this->search)); // Split search into parts
+
+            $query->where(function ($query) use ($keywords) {
+                $query->whereHas('taggedAndValidatedApplicant.applicant.person', function ($q) use ($keywords) {
+                    $q->where(function ($nameQuery) use ($keywords) {
+                        foreach ($keywords as $word) {
+                            $nameQuery->where(function ($subQuery) use ($word) {
+                                $subQuery->whereRaw('LOWER(first_name) LIKE ?', ["%$word%"])
+                                        ->orWhereRaw('LOWER(middle_name) LIKE ?', ["%$word%"])
+                                        ->orWhereRaw('LOWER(last_name) LIKE ?', ["%$word%"])
+                                        ->orWhereRaw('LOWER(suffix_name) LIKE ?', ["%$word%"]);
+                            });
+                        }
+                    });
                 });
             });
         }
 
         $awardees = $query->orderBy('created_at', 'desc')->paginate(5);
 
-        // Add debug logging
+        // Optional debug logging
         foreach ($awardees as $awardee) {
             Log::info('Awardee details', [
                 'awardee_id' => $awardee->id,
@@ -134,7 +144,6 @@ class AwardeeList extends Component
             ]);
         }
 
-        // Get puroks based on selected barangay
         $puroks = !empty($this->barangay)
             ? Purok::whereHas('barangay', function ($query) {
                 $query->where('name', $this->barangay);
@@ -147,4 +156,5 @@ class AwardeeList extends Component
             'puroks' => $puroks,
         ]);
     }
+
 }

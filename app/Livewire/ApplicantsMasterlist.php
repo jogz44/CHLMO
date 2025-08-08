@@ -73,18 +73,22 @@ class ApplicantsMasterlist extends Component
 
         // Apply search if provided
         if ($this->search) {
-            $query->where(function ($query) {
-                $query->where('first_name', 'LIKE', '%' . $this->search . '%')
-                    ->orWhere('middle_name', 'LIKE', '%' . $this->search . '%')
-                    ->orWhere('last_name', 'LIKE', '%' . $this->search . '%')
-                    ->orWhereHas('applicants', function ($subQuery) {
-                        $subQuery->where('applicant_id', $this->search)  // Exact match
-                        ->orWhere('applicant_id', 'LIKE', '%' . $this->search . '%');  // Partial match
-                    })
-                    ->orWhereHas('shelterApplicants', function ($subQuery) {
-                        $subQuery->where('profile_no', $this->search)  // Exact match
-                        ->orWhere('profile_no', 'LIKE', '%' . $this->search . '%');  // Partial match
+            $searchWords = explode(' ', strtolower($this->search));
+
+            $query->where(function ($query) use ($searchWords) {
+                foreach ($searchWords as $word) {
+                    $query->where(function ($subQuery) use ($word) {
+                        $subQuery->whereRaw('LOWER(first_name) LIKE ?', ["%{$word}%"])
+                                ->orWhereRaw('LOWER(middle_name) LIKE ?', ["%{$word}%"])
+                                ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$word}%"])
+                                ->orWhereHas('applicants', function ($q) use ($word) {
+                                    $q->whereRaw('LOWER(applicant_id) LIKE ?', ["%{$word}%"]);
+                                })
+                                ->orWhereHas('shelterApplicants', function ($q) use ($word) {
+                                    $q->whereRaw('LOWER(profile_no) LIKE ?', ["%{$word}%"]);
+                                });
                     });
+                }
             });
         }
 

@@ -245,36 +245,53 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'awardees'
         ]);
 
-        // Apply search filter
+        // Apply search filter with flexible name matching
         if ($this->search) {
-            $query->whereHas('applicant', function($q) {
-                $q->where('applicant_id', 'like', '%'.$this->search.'%')
-                    ->orWhereHas('person', function($personQuery) {
-                        $personQuery->where('first_name', 'like', '%'.$this->search.'%')
-                            ->orWhere('middle_name', 'like', '%'.$this->search.'%')
-                            ->orWhere('last_name', 'like', '%'.$this->search.'%')
-                            ->orWhere('suffix_name', 'like', '%'.$this->search.'%')
-                            ->orWhere('contact_number', 'like', '%'.$this->search.'%');
-                    })
-                    ->orWhereHas('address.purok', function ($subQuery) {
-                        $subQuery->where('name', 'like', '%'.$this->search.'%');
-                    })
-                    ->orWhereHas('address.barangay', function ($subQuery) {
+            $searchTerms = preg_split('/\s+/', $this->search, -1, PREG_SPLIT_NO_EMPTY);
+
+            $query->where(function($q) use ($searchTerms) {
+                $q->whereHas('applicant', function($applicantQuery) use ($searchTerms) {
+                    $applicantQuery->where('applicant_id', 'like', '%'.$this->search.'%');
+
+                    // Flexible name matching
+                    $applicantQuery->orWhereHas('person', function($personQuery) use ($searchTerms) {
+                        foreach ($searchTerms as $term) {
+                            $personQuery->where(function($subQuery) use ($term) {
+                                $subQuery->where('first_name', 'like', '%'.$term.'%')
+                                        ->orWhere('middle_name', 'like', '%'.$term.'%')
+                                        ->orWhere('last_name', 'like', '%'.$term.'%')
+                                        ->orWhere('suffix_name', 'like', '%'.$term.'%');
+                            });
+                        }
+                    });
+
+                    $applicantQuery->orWhereHas('address.purok', function ($subQuery) {
                         $subQuery->where('name', 'like', '%'.$this->search.'%');
                     });
-            })->orWhereHas('livingSituation', function($q) {
-                $q->where('living_situation_description', 'like', '%' . $this->search . '%');
-            })->orWhereHas('caseSpecification', function($q) {
-                $q->where('case_specification_name', 'like', '%' . $this->search . '%');
-            })->orWhere('living_situation_case_specification', 'like', '%'.$this->search.'%');
+
+                    $applicantQuery->orWhereHas('address.barangay', function ($subQuery) {
+                        $subQuery->where('name', 'like', '%'.$this->search.'%');
+                    });
+                });
+
+                $q->orWhereHas('livingSituation', function($q) {
+                    $q->where('living_situation_description', 'like', '%' . $this->search . '%');
+                });
+
+                $q->orWhereHas('caseSpecification', function($q) {
+                    $q->where('case_specification_name', 'like', '%' . $this->search . '%');
+                });
+
+                $q->orWhere('living_situation_case_specification', 'like', '%'.$this->search.'%');
+            });
         }
 
-        // Apply date range filter (if both dates are present)
+        // Date filter
         if ($this->startTaggingDate && $this->endTaggingDate) {
             $query->whereBetween('tagging_date', [$this->startTaggingDate, $this->endTaggingDate]);
         }
 
-        // Additional filters
+        // Other filters
         if ($this->selectedPurok_id) {
             $query->whereHas('applicant.address', function ($q) {
                 $q->where('purok_id', $this->selectedPurok_id);
@@ -296,8 +313,8 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         if ($this->selectedCaseSpecification_id) {
             $query->where(function($q) {
                 $q->where('case_specification_id', $this->selectedCaseSpecification_id)
-                    ->orWhere('living_situation_case_specification', $this->selectedCaseSpecification_id)
-                    ->orWhere('non_informal_settler_case_specification', $this->selectedCaseSpecification_id);
+                ->orWhere('living_situation_case_specification', $this->selectedCaseSpecification_id)
+                ->orWhere('non_informal_settler_case_specification', $this->selectedCaseSpecification_id);
             });
         }
 
@@ -305,7 +322,6 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             $query->where('is_awarding_on_going', $this->selectedTaggingStatus === 'Awarded');
         }
 
-        // Paginate the filtered results
         $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate(5);
 
         return view('livewire.tagged_and_validated_applicants_for_awarding', [
@@ -313,8 +329,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'puroks' => $this->puroksFilter,
             'barangays' => $this->barangaysFilter,
             'livingSituations' => $this->livingSituationsFilter,
-            'caseSpecifications' => $this->caseSpecificationsFilter,  // Add this
+            'caseSpecifications' => $this->caseSpecificationsFilter,
             'taggingStatuses' => $this->taggingStatuses,
         ]);
     }
+
 }

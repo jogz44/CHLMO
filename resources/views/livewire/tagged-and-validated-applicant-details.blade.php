@@ -99,7 +99,7 @@
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-semibold">Primary Information</h2>
                     <button wire:click="openPrimaryInfoModal"
-                            class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-3 py-1 rounded-md text-sm relative">
+                            class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-3 py-1 rounded-md text-sm">
                         <span wire:loading.remove>
                             Edit
                         </span>
@@ -503,10 +503,10 @@
                         <label class="block text-[12px] font-semibold text-gray-700 mb-1">
                             CASE SPECIFICATION
                         </label>
-                        @if($taggedAndValidatedApplicant->livingSituation->living_situation_id == 8)
+                        @if($taggedAndValidatedApplicant->living_situation_id == 8)
                             <textarea rows="2"
-                                      disabled
-                                      class="justify-items-start uppercase w-full p-1 border-b text-[12px] bg-gray-200 border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($taggedAndValidatedApplicant->caseSpecification)->case_specification_name ?? '--' }}
+                                disabled
+                                class="justify-items-start uppercase w-full p-1 border-b text-[12px] bg-gray-200 border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($taggedAndValidatedApplicant->caseSpecification)->case_specification_name ?? '--' }}
                             </textarea>
                         @else
                             <textarea rows="2"
@@ -1082,10 +1082,10 @@
                                                     <tbody class="bg-white divide-y divide-gray-200">
                                                     @foreach($editDependents as $index => $dependent)
                                                         <tr>
-                                                            <td class="px-2 py-2">
+                                                            <td class="px-2 py-2 ">
                                                                 <input type="text"
                                                                        wire:model="editDependents.{{ $index }}.dependent_first_name"
-                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                 @error("editDependents.$index.dependent_first_name")
                                                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                                                                 @enderror
@@ -1093,19 +1093,19 @@
                                                             <td class="px-2 py-2">
                                                                 <input type="text"
                                                                        wire:model="editDependents.{{ $index }}.dependent_middle_name"
-                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                             </td>
                                                             <td class="px-2 py-2">
                                                                 <input type="text"
                                                                        wire:model="editDependents.{{ $index }}.dependent_last_name"
-                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                 @error("editDependents.$index.dependent_last_name")
                                                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                                                                 @enderror
                                                             </td>
                                                             <td class="px-2 py-2">
                                                                 <select wire:model="editDependents.{{ $index }}.dependent_sex"
-                                                                        class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                        class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                     <option value="">Select</option>
                                                                     <option value="Male">Male</option>
                                                                     <option value="Female">Female</option>
@@ -1116,7 +1116,7 @@
                                                             </td>
                                                             <td class="px-2 py-2">
                                                                 <select wire:model="editDependents.{{ $index }}.dependent_civil_status_id"
-                                                                        class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                        class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                     <option value="">Select</option>
                                                                     @foreach($dependent_civilStatuses as $status)
                                                                         <option value="{{ $status->id }}">{{ $status->civil_status }}</option>
@@ -1129,14 +1129,14 @@
                                                             <td class="px-2 py-2">
                                                                 <input type="date"
                                                                        wire:model="editDependents.{{ $index }}.dependent_date_of_birth"
-                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                 @error("editDependents.$index.dependent_date_of_birth")
                                                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                                                                 @enderror
                                                             </td>
                                                             <td class="px-2 py-2">
                                                                 <select wire:model="editDependents.{{ $index }}.dependent_relationship_id"
-                                                                        class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                        class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                     <option value="">Select</option>
                                                                     @foreach($dependentRelationships as $relationship)
                                                                         <option value="{{ $relationship->id }}">{{ $relationship->relationship }}</option>
@@ -1149,7 +1149,7 @@
                                                             <td class="px-2 py-2">
                                                                 <input type="text"
                                                                        wire:model="editDependents.{{ $index }}.dependent_occupation"
-                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                 @error("editDependents.$index.dependent_occupation")
                                                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                                                                 @enderror
@@ -1157,7 +1157,7 @@
                                                             <td class="px-2 py-2">
                                                                 <input type="number"
                                                                        wire:model="editDependents.{{ $index }}.dependent_monthly_income"
-                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red">
+                                                                       class="w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-custom-red focus:ring-custom-red bg-gray-100">
                                                                 @error("editDependents.$index.dependent_monthly_income")
                                                                 <span class="text-red-500 text-xs">{{ $message }}</span>
                                                                 @enderror
@@ -1812,7 +1812,7 @@
                                             <option value="">Select a relocation site</option>
                                             @foreach($relocationSites as $site)
                                                 <option value="{{ $site['id'] }}">
-                                                    {{ $site['name'] }} (Available: {{ $site['available_space'] }} sqm)
+                                                    {{ $site['name'] }} (Available: {{ $site['available_space'] }} Lot)
                                                 </option>
                                             @endforeach
                                         </select>

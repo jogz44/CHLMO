@@ -18,6 +18,10 @@ class Blacklists extends Component
     public $grantDateEnd = '';
     public $blacklistDateStart = '';
     public $blacklistDateEnd = '';
+    public bool $showTransferConfirmation = false;
+    public bool $transferToDependent = false;
+    public $pendingTransferData = []; // Store transfer data temporarily
+
 
     // Reset pagination when filters change
     protected $queryString = [

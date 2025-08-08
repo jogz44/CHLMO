@@ -59,6 +59,12 @@ class RelocationSites extends Component
         'total_lot_number_of_community_facilities' => 'required|numeric|min:0|lte:total_no_of_lots'
     ];
 
+    protected $casts = [
+        'total_land_area' => 'float', // not 'int'
+        'total_no_of_lots' => 'float',
+        'total_lot_number_of_community_facilities' => 'float',
+    ];
+
     protected $messages = [
         'relocation_site_name.required' => 'Relocation site name is required.',
         'relocation_site_name.unique' => 'This relocation site name already exists.',
@@ -344,7 +350,21 @@ class RelocationSites extends Component
         $query = RelocationSite::with(['barangay']);
 
         if ($this->search) {
-            $query->where('relocation_site_name', 'like', '%' . $this->search . '%');
+            $searchTerms = preg_split('/\s+/', $this->search, -1, PREG_SPLIT_NO_EMPTY);
+
+            $query->where(function ($query) use ($searchTerms) {
+                // Match all terms against relocation_site_name
+                foreach ($searchTerms as $term) {
+                    $query->where('relocation_site_name', 'like', '%' . $term . '%');
+                }
+
+                // OR: match all terms against barangay name
+                $query->orWhereHas('barangay', function ($subQuery) use ($searchTerms) {
+                    foreach ($searchTerms as $term) {
+                        $subQuery->where('name', 'like', '%' . $term . '%');
+                    }
+                });
+            });
         }
 
         if ($this->filterBarangay) {
@@ -358,6 +378,7 @@ class RelocationSites extends Component
             'relocationSites' => $relocationSites
         ]);
     }
+
 
     public function openModal(): void
     {

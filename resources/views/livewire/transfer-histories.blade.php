@@ -24,12 +24,8 @@
                                       stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             <input wire:model.live.debounce.300ms="search" type="search" name="search"
-                                   class="rounded-md px-12 py-2 placeholder:text-[13px] z-60 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
-                                   placeholder="Search">
-                            <!-- Clear Button -->
-                            <button wire:click="clearSearch" class="absolute bottom-1 right-4 text-2xl text-gray-500">
-                                &times; <!-- This is the "x" symbol -->
-                            </button>
+                                class="rounded-md px-12 py-2 placeholder:text-[13px] z-60 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow"
+                                placeholder="Search">
                         </div>
                     </div>
                 </div>

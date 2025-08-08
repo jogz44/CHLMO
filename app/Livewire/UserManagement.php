@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Livewire\Logs\ActivityLogs;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -53,6 +54,7 @@ class UserManagement extends Component
         $this->selectedRole = '';
         $this->isEditing = false;
     }
+
     public function openModal(): void
     {
         $this->isModalOpen = true;
@@ -64,6 +66,7 @@ class UserManagement extends Component
         $this->isModalOpen = false;
         $this->resetInputFields();
     }
+
     public function edit($userId): void
     {
         $this->isEditing = true;
@@ -78,6 +81,7 @@ class UserManagement extends Component
 
         $this->isModalOpen = true;
     }
+
     public function save(): void
     {
         try {
@@ -245,12 +249,27 @@ class UserManagement extends Component
 
     public function render()
     {
+        $keywords = preg_split('/\s+/', trim($this->search));
+
         $query = User::query()
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('username', 'like', '%' . $this->search . '%')
-                        ->orWhere('first_name', 'like', '%' . $this->search . '%')
-                        ->orWhere('last_name', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) use ($keywords) {
+                $query->where(function ($q) use ($keywords) {
+                    foreach ($keywords as $word) {
+                        $like = '%' . $word . '%';
+
+                        $q->orWhere('username', 'like', $like)
+                            ->orWhere('first_name', 'like', $like)
+                            ->orWhere('last_name', 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(first_name, ' ', middle_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(last_name, ' ', first_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(last_name, ' ', middle_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(middle_name, ' ', first_name)"), 'like', $like)
+                            ->orWhere(DB::raw("CONCAT(middle_name, ' ', last_name)"), 'like', $like)
+                            ->orWhereHas('roles', function ($roleQ) use ($like) {
+                                $roleQ->where('name', 'like', $like);
+                            });
+                    }
                 });
             })
             ->when($this->roleFilter, function ($query) {
@@ -265,4 +284,5 @@ class UserManagement extends Component
             'roles' => Role::all(),
         ])->layout('layouts.app');
     }
+
 }

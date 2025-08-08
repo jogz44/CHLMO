@@ -97,6 +97,7 @@ class TaggedAndValidatedApplicantDetails extends Component
         'spouse_occupation' => '',
         'spouse_monthly_income' => '',
     ];
+
     public $editLivingSituation = [
         'date_tagged' => '',
         'living_situation_id' => '',
@@ -170,12 +171,14 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->resetLivingSituationForm();
         $this->resetPhotosData();
     }
+
     public function getFormattedDateOfBirthProperty(): string
     {
         return $this->date_of_birth
             ? Carbon::parse($this->date_of_birth)->format('F d, Y')
             : 'N/A';
     }
+
     public function loadFormData(): void
     {
         $this->civilStatuses = Cache::remember('civil_statuses', 60*60, function() {
@@ -916,7 +919,7 @@ class TaggedAndValidatedApplicantDetails extends Component
     protected function rules()
     {
         return [
-            'newPhotos.*' => 'image|max:2048' // 2MB Max
+            'newPhotos.*' => 'image|max:20048' // 2MB Max
         ];
     }
 

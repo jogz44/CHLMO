@@ -19,7 +19,7 @@
     <!-- Main Content -->
     <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
         <div class="bg-white rounded shadow mb-4 mt-[60px] flex items-center justify-between">
-            <h2 class="text-[13px] ml-5 text-gray-700">MASTERLIST OF APPLICANTS</h2>
+            <h2 class="text-[13px] ml-5 text-gray-700">MASTERLIST OF aca</h2>
             <img src="{{ asset('storage/halmsAssets/design.png') }}" alt="Design" class="h-full object-cover">
         </div>
 
@@ -264,7 +264,7 @@
                                     class="text-custom-red text-bold underline px-4 py-1.5">Details</button>
                             </td>
                         </tr>
-                        
+
                     </tbody>
                 </table>
 

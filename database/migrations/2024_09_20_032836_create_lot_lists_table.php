@@ -58,7 +58,7 @@ return new class extends Migration
             ],
             9 => [
                 'Purok 1 Relocation Site', 'Purok 1-A Relocation Site', 'Purok 2 Relocation Site', 'Purok 2-A Relocation Site', 'Purok  Relocation Site', 'Purok 4 Relocation Site', 'Purok 4-A Relocation Site',
-                'Purok 5 Relocation Site', 'Purok 56-A Relocation Site', 'Purok 6 Relocation Site', 'Purok 6-A Relocation Site', 'Purok 7 Relocation Site', 'Purok 8 Relocation Site', 'Purok 8-Relocation Site',
+                'Purok 5 Relocation Site', 'Purok 5-A Relocation Site', 'Purok 6 Relocation Site', 'Purok 6-A Relocation Site', 'Purok 7 Relocation Site', 'Purok 8 Relocation Site', 'Purok 8-Relocation Site',
                 'Purok 8-B Relocation Site', 'Purok 8-C Relocation Site', 'Purok 9 Relocation Site', 'Purok 10 Relocation Site',
             ],
             10 => [

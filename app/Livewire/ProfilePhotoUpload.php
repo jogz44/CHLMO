@@ -26,7 +26,7 @@ class ProfilePhotoUpload extends Component
 
         // Validate that the uploaded file is an image and is less than 1MB
         $this->validate([
-            'photo' => 'image|max:1024', // Max size of 1MB
+            'photo' => 'image|max:20048', // Max size of 1MB
         ]);
     }
 

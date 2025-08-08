@@ -53,20 +53,25 @@
                                 </div>
                             </button>
                             <!-- Search -->
-                            <div class="@role('Housing System Tagger') relative w-full sm:w-auto border-gray-300 z-60 @else relative hidden md:block border-gray-300 z-60 @endrole">
-                                <svg class="absolute top-[8px] left-4" width="19" height="19" viewBox="0 0 21 21"
-                                     fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <div class="@role('Housing System Tagger') relative w-full sm:w-auto z-60 @else relative hidden md:block z-60 @endrole">
+                                <!-- Search Icon -->
+                                <svg class="absolute top-[10px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z"
-                                          stroke="#787C7F" stroke-width="1.75" stroke-linecap="round"
-                                          stroke-linejoin="round" />
-                                    <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75"
-                                          stroke-linecap="round" stroke-linejoin="round" />
+                                        stroke="#787C7F" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M18.3746 18.375L14.5684 14.5688" stroke="#787C7F" stroke-width="1.75" stroke-linecap="round"
+                                        stroke-linejoin="round" />
                                 </svg>
+
+                                <!-- Search Input -->
                                 <input wire:model.live.debounce.300ms="search" type="search" name="search"
-                                       class="@role('Housing System Tagger') w-full rounded-md px-12 py-2 placeholder:text-[13px] z-60 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow @else rounded-md px-12 py-2 placeholder:text-[13px] z-60 border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow @endrole" placeholder="Search">
+                                    class="@role('Housing System Tagger') w-full rounded-md px-12 py-2 pr-10 placeholder:text-[13px] border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow @else rounded-md px-12 py-2 pr-10 placeholder:text-[13px] border border-gray-300 bg-[#f7f7f9] hover:ring-custom-yellow focus:ring-custom-yellow @endrole"
+                                    placeholder="Search">
+
                                 <!-- Clear Button -->
-                                <button wire:click="clearSearch" class="@role('Housing System Tagger') absolute bottom-1 right-4 text-2xl text-gray-500 @else absolute bottom-1 right-4 text-2xl text-gray-500 @endrole">
-                                    &times; <!-- This is the "x" symbol -->
+                                <button wire:click="clearSearch" type="button"
+                                    class="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500 hover:text-red-500">
+                                    <!-- keep it empty, Livewire will render default clear -->
                                 </button>
                             </div>
                         </div>
@@ -293,7 +298,7 @@
                                     <!-- Middle Name Field -->
                                     <div>
                                         <label class="block text-[12px] font-medium mb-2 text-black">
-                                            MIDDLE NAME <span class="text-red-500">*</span>
+                                            MIDDLE NAME
                                         </label>
                                         <input type="text"
                                                wire:model="middle_name"

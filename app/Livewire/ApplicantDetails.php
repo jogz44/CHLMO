@@ -349,7 +349,7 @@ class ApplicantDetails extends Component
                     if ($this->civil_status_id == 3) {
                         if (empty($value)) {
                             $fail('Spouse last name is required.');
-                        } 
+                        }
                     }
                 },
             ],
@@ -613,6 +613,7 @@ class ApplicantDetails extends Component
         ];
     }
 
+
     public function store()
     {
         // Validate the input data
@@ -787,9 +788,11 @@ class ApplicantDetails extends Component
             }
         }
     }
+
     /**
      * Store individual attachment
      */
+
     private function storeAttachment($image, $taggedApplicantId): void
     {
         if ($image instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
