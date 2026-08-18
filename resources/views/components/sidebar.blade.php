@@ -1,15 +1,19 @@
-@hasanyrole('Super Admin|Housing System Admin|Housing System Staff|Housing System Relocation Site Manager')
-<div class="bg-none shadow-md font-poppins text-black 0 p-0 " x-data="{ open: false, activeLink: localStorage.getItem('activeLink') || '', activeChildLink: localStorage.getItem('activeChildLink') || '' }">
-    <div class="flex h-[100vh]">
+@hasanyrole('Super Admin|Housing System Admin|Housing System Staff|Housing System Relocation Site Manager|Housing System Tagger')
+<div class="font-poppins text-black" x-data="{ activeLink: localStorage.getItem('activeLink') || '', activeChildLink: localStorage.getItem('activeChildLink') || '' }">
+    <!-- Mobile Overlay -->
+    <div x-show="showSidebar" @click="showSidebar = false" class="fixed inset-0 bg-black bg-opacity-30 z-30 md:hidden" x-transition></div>
+    
+    <div>
         <!-- Sidebar -->
-        <aside :class="open ? 'block' : 'hidden md:block'" class="fixed w-[17%] bg-[#ffffff] max-h-screen  py-3 pl-4 pr-2 md:block mr-2 pb-[8px] shadow-lg ">
-            <div class="text-20 font-bold mb-4 ml-1 flex items-center ">
+        <aside :class="showSidebar ? 'block' : 'hidden md:block'" class="app-sidebar">
+            <div class="text-20 font-bold mb-4 flex items-center justify-between">
                 <div class="w-[85%] h-auto inline-block">
                     <x-application-sidebar-logo />
                 </div>
+                
             </div>
             <!-- SIDEBAR MENU -->
-            <nav class="space-y-2 mt-15 flex-1 text-[13px] h-[calc(100vh-4rem)] overflow-auto scrollbar-hidden" x-data="{
+            <nav class="space-y-2 mt-15 text-[13px]" x-data="{
                     activeLink: localStorage.getItem('activeLink') || '',
                     activeChildLink: localStorage.getItem('activeChildLink') || ''}">
 
@@ -458,13 +462,10 @@
                     </a>
                 @endrole
             </nav>
+              <!-- <img src="/storage/images/designProfile.png"
+                alt="Design Profile"
+                class="absolute right-0 top-0 h-full object-cover opacity-70 z-0 pointer-events-none scale-x-[-1]"> -->
         </aside>
     </div>
 </div>
 @endhasanyrole
-
-@role('Housing System Tagger')
-    <div class="flex h-[100vh]">
-
-    </div>
-@endrole

@@ -1,10 +1,10 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
-        <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
+        <div x-data="{ isEditable: false }" class="flex-1 overflow-auto">
             <form wire:submit.prevent="store">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-10 p-3 fixed top-[80px] left-[20%] right-[3%]">
+                <div class="app-page-heading">
                     <div class="flex items-center">
-                        <a href="{{ route('shelter-transaction-applicants') }}">
+                        <a href="{{ route('shelter-transaction-applicants') }}" class="z-10">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -136,21 +136,24 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col p-3 rounded mt-5">
+                <div class="flex flex-col lg:flex-row rounded mt-5 mb-3">
                     <h2 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline">{{ $applicant->profile_no }}</h2>
-                    <h1 class="text-[25px] ml-2 items-center font-bold text-gray-700 mb-3">
+                    <h1 class="text-[33px] ml-3 items-center font-semibold text-gray-700 justify-content hidden lg:flex md:flex"> | </h1>
+                    <h1 class="text-[20px] ml-3 lg:text-[30px] ml-3 items-center font-bold text-gray-700">
                         {{ $applicant->person->last_name }}, {{ $applicant->person->first_name }}
                         @if($applicant->person->middle_name) {{ $applicant->person->middle_name }} @endif
                     </h1>
-                    <h2 class="text-[13px] ml-2 items-center font-bold text-gray-700">PERSONAL INFORMATION</h2>
-                    <p class="text-[12px] ml-2 items-center text-gray-700">Encode here the personal information of the
+                </div>
+                <div class="flex flex-col rounded mb-2">
+                    <h2 class="text-[13px] items-center ml-2 font-bold text-gray-700">PERSONAL INFORMATION</h2>
+                    <p class="text-[12px] items-center ml-2 text-gray-700">Encode here the personal information of the
                         Applicant from the form.</p>
                 </div>
 
                 <div class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="first-name" class="block text-[13px] font-medium text-gray-700 mb-1">FIRST
+                            <label for="first-name" class="block text-[12px] font-semibold text-gray-700 mb-1">FIRST
                                 NAME</label>
                             <input type="text" id="first-name" name="first-name"
                                 :disabled="!isEditable" wire:model="first_name"
@@ -158,21 +161,21 @@
                             @error('first_name') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="middle-name" class="block text-[13px] font-medium text-gray-700 mb-1">MIDDLE
+                            <label for="middle-name" class="block text-[12px] font-semibold text-gray-700 mb-1">MIDDLE
                                 NAME</label>
                             <input type="text" id="middle-name" name="middle-name"
                                 :disabled="!isEditable" wire:model="middle_name"
                                 class="capitalize w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="last-name" class="block text-[13px] font-medium text-gray-700 mb-1">LAST
+                            <label for="last-name" class="block text-[12px] font-semibold text-gray-700 mb-1">LAST
                                 NAME</label>
                             <input type="text" id="last-name" name="last-name"
                                 :disabled="!isEditable" wire:model="last_name"
                                 class="capitalize w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/4 px-2 mb-4">
-                            <label for="name-suffix" class="block text-[13px] font-medium text-gray-700 mb-1">NAME
+                            <label for="name-suffix" class="block text-[12px] font-semibold text-gray-700 mb-1">NAME
                                 SUFFIX</label>
                             <input type="text" id="name-suffix" name="name-suffix"
                                 :disabled="!isEditable" wire:model="name_suffix"
@@ -182,18 +185,18 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="origin-request"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">ORIGIN OF REQUEST</label>
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">ORIGIN OF REQUEST</label>
                             <input wire:model="origin_name" id="origin-request" name="origin-request"
                                 class="w-full p-1 border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize cursor-default" readonly>
                             @error('origin-request') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="requestDate" class="block text-[13px] font-medium text-gray-700 mb-1">REQUEST DATE</label>
+                            <label for="requestDate" class="block text-[12px] font-semibold text-gray-700 mb-1">REQUEST DATE</label>
                             <input type="date" wire:model="date_request" id="requestDate" name="requestDate"
                                 class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" readonly>
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="taggedDate" class="block text-[13px] font-medium text-gray-700 mb-1">DATE PROFILED/TAGGED <span class="text-red-500">*</span></label>
+                            <label for="taggedDate" class="block text-[12px] font-semibold text-gray-700 mb-1">DATE PROFILED/TAGGED <span class="text-red-500">*</span></label>
                             <input type="date" id="taggedDate" name="taggedDate" wire:model="date_tagged" max="{{ date('Y-m-d') }}"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                             @error('date_tagged') <span class="text-red-600 error">{{ $message }}</span> @enderror
@@ -205,12 +208,12 @@
                 <div x-data="{ civilStatus: '' }" class="bg-white p-6 rounded shadow mb-6">
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-2">
-                            <label for="age" class="block text-[13px] font-medium text-gray-700 mb-1">AGE <span class="text-red-500">*</span></label>
+                            <label for="age" class="block text-[12px] font-semibold text-gray-700 mb-1">AGE <span class="text-red-500">*</span></label>
                             <input type="number" id="age" name="age" wire:model="age"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-2">
-                            <label for="civil_status" class="block text-[13px] font-medium text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
+                            <label for="civil_status" class="block text-[12px] font-semibold text-gray-700 mb-1">CIVIL STATUS <span class="text-red-500">*</span></label>
                             <select id="civil_status" name="civil_status" wire:model="civil_status_id" x-model="civilStatus"
                                 class="w-full p-1.5 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select Status</option>
@@ -305,18 +308,18 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="occupation"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">OCCUPATION <span class="text-red-500">*</span></label>
                             <input type="text" id="occupation" name="occupation" wire:model="occupation"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="years-residency"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">YEARS OF RESIDENCY <span class="text-red-500">*</span></label>
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">YEARS OF RESIDENCY <span class="text-red-500">*</span></label>
                             <input type="number" id="years-residency" name="years-residency" wire:model="year_of_residency"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="govAssistance" class="block text-[13px] font-medium text-gray-700 mb-1">SOCIAL WELFARE SECTOR <span class="text-red-500">*</span></label>
+                            <label for="govAssistance" class="block text-[12px] font-semibold text-gray-700 mb-1">SOCIAL WELFARE SECTOR <span class="text-red-500">*</span></label>
                             <select id="govAssistance" name="govAssistance" wire:model="government_program_id"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">
                                 <option value="">Select type of assistance</option>
@@ -330,17 +333,31 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="religion" class="block text-[13px] font-medium text-gray-700 mb-1">RELIGION <span class="text-red-500">*</span></label>
-                            <input type="text" id="religion" name="religion" wire:model="religion"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                            <label for="religion" class="block text-[12px] font-semibold text-gray-700 mb-1">RELIGION <span class="text-red-500">*</span></label>
+                            <select wire:model="religion_id"
+                                id="religion"
+                                class="w-full p-1.5 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
+                                <option value="">Select Religion</option>
+                                @foreach($religions as $religion)
+                                <option value="{{ $religion->id }}">{{ $religion->religion_name }}</option>
+                                @endforeach
+                            </select>
+                            @error('religion') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="tribe" class="block text-[13px] font-medium text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
-                            <input type="text" id="tribe" name="tribe" wire:model="tribe"
-                                class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
+                            <label for="tribe" class="block text-[12px] font-semibold text-gray-700 mb-1">TRIBE/ETHNICITY <span class="text-red-500">*</span></label>
+                            <select wire:model="tribe_id"
+                                id="tribe"
+                                class="w-full p-1.5 bg-white border text-[12px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow capitalize">
+                                <option value="">Select Tribe</option>
+                                @foreach($tribes as $tribe)
+                                <option value="{{ $tribe->id }}">{{ $tribe->tribe_name }}</option>
+                                @endforeach
+                            </select>
+                            @error('tribe') <span class="text-red-600 error">{{ $message }}</span> @enderror
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="contactNo" class="block text-[13px] font-medium text-gray-700 mb-1">CONTACT
+                            <label for="contactNo" class="block text-[12px] font-semibold text-gray-700 mb-1">CONTACT
                                 NUMBER <span class="text-red-500">*</span></label>
                             <input type="text"
                                 wire:model="contact_number"
@@ -357,7 +374,7 @@
 
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="barangay" class="block text-[13px] font-medium text-gray-700 mb-1">
+                            <label for="barangay" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 BARANGAY <span class="text-red-500">*</span>
                             </label>
                             <input wire:model="barangay_name"
@@ -367,7 +384,7 @@
                         </div>
 
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="purok" class="block text-[13px] font-medium text-gray-700 mb-1">
+                            <label for="purok" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 PUROK <span class="text-red-500">*</span>
                             </label>
                             <input wire:model="purok_name"
@@ -378,7 +395,7 @@
 
                         <div class="w-full md:w-1/3 px-2 mb-4">
                             <label for="houseNo"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">FULL ADDRESS</label>
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">FULL ADDRESS</label>
                             <input type="text" id="houseNo" name="houseNo" wire:model="full_address"
                                 class="w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>
@@ -403,7 +420,7 @@
 
                         </div>
                         <div class="w-full md:w-1/3 px-2 mb-4">
-                            <label for="shelter_living_situation" class="block text-[13px] font-medium text-gray-700 mb-1">
+                            <label for="shelter_living_situation" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                 LIVING SITUATION (CASE) <span class="text-red-500">*</span>
                             </label>
                             <select x-model.number="shelterLivingSituations" wire:model.live="shelter_living_situation_id" id="shelter_living_situation"
@@ -420,7 +437,7 @@
                         </div>
                         <template x-if="shelterLivingSituations >= 1 && shelterLivingSituations <= 7 || shelterLivingSituations === 9">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="living_situation_case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                <label for="living_situation_case_specification" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                     LIVING SITUATION CASE SPECIFICATION <span class="text-red-500">*</span>
                                 </label>
                                 <textarea wire:model.live="living_situation_case_specification" type="text" id="living_situation_case_specification"
@@ -436,7 +453,7 @@
 
                         <template x-if="shelterLivingSituations == 8">
                             <div class="w-full md:w-1/3 px-2 mb-4">
-                                <label for="case_specification" class="block text-[13px] font-medium text-gray-700 mb-1">
+                                <label for="case_specification" class="block text-[12px] font-semibold text-gray-700 mb-1">
                                     CASE SPECIFICATION <span class="text-red-500">*</span>
                                 </label>
                                 <select wire:model.live="case_specification_id" id="case_specification" name="case_specification"
@@ -455,7 +472,7 @@
                     <div class="flex flex-wrap -mx-2">
                         <div class="w-full md:w-full px-2 mb-4">
                             <label for="remarks"
-                                class="block text-[13px] font-medium text-gray-700 mb-1">REMARKS</label>
+                                class="block text-[12px] font-semibold text-gray-700 mb-1">REMARKS</label>
                             <input type="text" id="remarks" name="remarks" wire:model="remarks"
                                 class="capitalize w-full p-3 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow" oninput="capitalizeInput(this)">
                         </div>

@@ -16,6 +16,8 @@ use App\Models\CivilStatus;
 use App\Models\GovernmentProgram;
 use App\Models\LivingSituation;
 use App\Models\CaseSpecification;
+use App\Models\Tribe;
+use App\Models\Religion;
 use App\Models\RoofType;
 use App\Models\WallType;
 use App\Models\StructureStatusType;
@@ -49,7 +51,7 @@ class ShelterApplicantDetails extends Component
     public $occupation;
     public $contact_number;
     public $isLoading = false;
-    public $tribe, $religion;
+    public $tribes, $tribe_id, $religions, $religion_id;
     public $year_of_residency;
 
 
@@ -81,6 +83,14 @@ class ShelterApplicantDetails extends Component
     {
         $this->civil_statuses = Cache::remember('civil_statuses', 60 * 60, function () {
             return CivilStatus::all();  // Cache for 1 hour
+        });
+
+         $this->tribes = Cache::remember('tribes', 60 * 60, function () {
+            return Tribe::all();  // Cache for 1 hour
+        });
+
+         $this->religions = Cache::remember('religions', 60 * 60, function () {
+            return Religion::all();  // Cache for 1 hour
         });
 
 
@@ -161,8 +171,8 @@ class ShelterApplicantDetails extends Component
     {
         return [
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'tribe' => 'required|string|max:255',
-            'religion' => 'required|string|max:255',
+            'tribe_id' => 'required|exists:tribes,id',
+            'religion_id' => 'required|exists:religions,id',
             'sex' => 'required|in:Male,Female',
             'age' => 'required|integer',
             'occupation' => 'required|string|max:255',
@@ -307,10 +317,10 @@ class ShelterApplicantDetails extends Component
             $taggedApplicant = ProfiledTaggedApplicant::create([
                 'profile_no' => $this->profileNo,
                 'civil_status_id' => $this->civil_status_id,
-                'tribe' => $this->tribe,
+                'tribe_id' => $this->tribe_id,
                 'sex' => $this->sex,
                 'age' => $this->age,
-                'religion' => $this->religion,
+                'religion_id' => $this->religion_id,
                 'occupation' => $this->occupation ?: null,
                 'year_of_residency' => $this->year_of_residency,
                 'contact_number' => $this->contact_number ?: null,

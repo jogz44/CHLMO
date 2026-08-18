@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\People;
 use App\Models\Barangay;
 use App\Models\Purok;
@@ -11,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use App\Exports\ShelterApplicantDataExport;
 use App\Models\Shelter\ShelterApplicant;
-use Livewire\WithPagination;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\ProfiledTaggedApplicant;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +25,7 @@ use App\Livewire\Logs\ActivityLogs;
 
 class ShelterApplicants extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     public $search = '';
 
     public $openModal = false;
@@ -542,7 +542,7 @@ class ShelterApplicants extends Component
             });
         }
 
-        $applicants = $query->orderBy('date_request', 'desc')->paginate(5);
+        $applicants = $query->orderBy('date_request', 'desc')->paginate($this->perPage);
         $OriginOfRequests = OriginOfRequest::all();
 
         // // Return the view with the filtered applicants

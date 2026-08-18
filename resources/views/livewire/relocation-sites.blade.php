@@ -1,7 +1,7 @@
-<div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
+<div x-data="{ openFilters: false }" class="app-page">
     <div x-data="{ openModalLot: false}" class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
-        <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
+        <div x-data="pagination()" class="app-table-scroll">
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between relative p-3 z-0">
                 <div class="flex items-center">
                     <h2 class="text-[13px] ml-5 text-gray-700">RELOCATION SITES</h2>
@@ -444,8 +444,7 @@
 
                         </div>
 
-
-                        <div class="flex justify-end space-x-2">
+                        <div class="flex justify-end space-x-2 mt-4">
                             <button type="button"
                                     wire:click="closeEditModal"
                                     class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">

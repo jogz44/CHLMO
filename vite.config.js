@@ -11,4 +11,9 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: '192.168.8.67',
+        port: 3001,
+        cors: true,
+    },
 });

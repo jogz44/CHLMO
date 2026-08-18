@@ -1,6 +1,6 @@
 <div class="min-h-screen flex justify-center items-center relative">
     <!-- Container with flex to hold both content and SVG -->
-    <div class="flex flex-col sm:flex-row w-full sm:max-w-2xl lg:max-w-4xl px-48 py-14 bg-white bg-opacity-90 shadow-md overflow-hidden sm:rounded-lg relative">
+    <div class="flex flex-col sm:flex-row w-full sm:max-w-2xl lg:max-w-4xl lg:px-48 lg:py-14 px-[10%] mx-4 md:p-12 p-4 bg-white bg-opacity-90 shadow-md overflow-hidden rounded-lg relative">
         <!-- Left side content (logo and slot) -->
         <div class="w-full sm:max-w-md z-10">
             <div>
@@ -12,7 +12,7 @@
         </div>
 
         <!-- Right side SVG -->
-        <div class="absolute inset-y-0 right-0 hidden sm:flex items-center justify-end">
+        <div class="absolute inset-y-0 right-0 hidden lg:flex items-center justify-end sm:hidden">
             <svg class="w-auto h-full sm:w-[300px] lg:w-[400px]" width="548" height="677" viewBox="0 0 548 677" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="883.5" cy="451.241" rx="628.553" ry="626.673" transform="rotate(140.581 883.5 451.241)" fill="#FF9100"/>
                 <ellipse cx="829.374" cy="454.5" rx="511.228" ry="526.686" transform="rotate(140.581 829.374 454.5)" fill="#10B152" fill-opacity="0.9"/>

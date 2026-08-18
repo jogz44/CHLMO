@@ -1,7 +1,7 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
-        <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
-            <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-5">
+        <div x-data="{ isEditable: false }" class="flex-1 overflow-auto">
+            <div class="app-page-heading">
                 <div class="flex items-center">
                     <a href="{{ route('shelter-profiled-tagged-applicants') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -30,9 +30,10 @@
             </div>
 
 
-            <div class="flex flex-col p-3 rounded mt-11">
-                <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $profiledTaggedApplicant->shelterApplicant->profile_no }}</h2>
-                <h1 class="text-[25px] items-center font-bold text-gray-700">
+            <div class="flex flex-row rounded mt-2">
+                <h2 class="text-[30px] ml-2 items-center font-bold text-gray-700 underline">{{ $profiledTaggedApplicant->shelterApplicant->profile_no }}</h2>
+                <h1 class="text-[33px] ml-3 mr-3 items-center font-semibold text-gray-700 justify-content"> | </h1>
+                <h1 class="text-[30px] items-center font-bold text-gray-700 justify-content">
                     {{ $profiledTaggedApplicant->shelterApplicant->person->first_name }}
                     @if($profiledTaggedApplicant->shelterApplicant->person->middle_name) {{ substr($profiledTaggedApplicant->shelterApplicant->person->middle_name, 0, 1) }}. @endif
                     {{ $profiledTaggedApplicant->shelterApplicant->person->last_name }}

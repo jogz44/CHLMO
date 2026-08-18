@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\GovernmentProgram;
 use App\Models\Shelter\Grantee;
 use App\Models\Barangay;
@@ -19,7 +20,7 @@ use Illuminate\Support\Carbon;
 
 class Grantees extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     public $search = '';
     public $startGrantingDate, $endGrantingDate;
     public $profileNo;
@@ -227,7 +228,7 @@ class Grantees extends Component
     $OriginOfRequests = OriginOfRequest::all();
     $GovernmentPrograms = GovernmentProgram::all();
 
-    $grantees = $query->orderBy('date_of_delivery', 'desc')->paginate(5);
+    $grantees = $query->orderBy('date_of_delivery', 'desc')->paginate($this->perPage);
 
     return view('livewire.grantees', [
         'grantees' => $grantees,

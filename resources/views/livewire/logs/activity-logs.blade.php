@@ -1,7 +1,7 @@
-<div x-data="{ openFilters: false }" class="p-10  ml-[17%] mt-[60px]">
+<div x-data="{ openFilters: false }" class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
         <!-- Main Content -->
-        <div x-data="pagination()" class="flex-1 p-6 overflow-auto">
+        <div x-data="pagination()" class="flex-1 overflow-auto">
             <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
                 <div class="flex items-center">
                     <h2 class="text-[13px] ml-5 text-gray-700">ACTIVITY LOGS</h2>

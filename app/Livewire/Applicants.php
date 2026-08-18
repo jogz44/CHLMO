@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use AllowDynamicProperties;
 use App\Exports\ApplicantsDataExport;
+use App\Livewire\Logs\ActivityLogs;
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\Address;
 use App\Models\Applicant;
 use App\Models\Barangay;
@@ -17,14 +19,12 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
-use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
-use App\Livewire\Logs\ActivityLogs;
 
 class Applicants extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     public $paginationTheme = 'tailwind', $search = '';
 
     public $isModalOpen = false, $isLoading = false;
@@ -47,6 +47,7 @@ class Applicants extends Component
         // This ensures that the search query is updated dynamically as the user types
         $this->resetPage();
     }
+
     public function clearSearch(): void
     {
         $this->search = ''; // Clear the search input
@@ -505,7 +506,7 @@ class Applicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        $applicants = $query->orderBy('created_at', 'desc')->paginate(5);
+        $applicants = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         return view('livewire.applicants', [
             'puroks' => $this->puroks,

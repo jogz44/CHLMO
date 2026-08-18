@@ -2,15 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\Applicant;
 use App\Models\People;
 use App\Models\TaggedAndValidatedApplicant;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class ApplicantsMasterlist extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     protected $paginationTheme = 'tailwind';
     // Search and filter properties
     public $search = '';
@@ -98,7 +98,7 @@ class ApplicantsMasterlist extends Component
         }
 
         // Get paginated results
-        $people = $query->orderBy('last_name', 'asc')->paginate(5);
+        $people = $query->orderBy('last_name', 'asc')->paginate($this->perPage);
 
         return view('livewire.applicants-masterlist', [
             'people' => $people

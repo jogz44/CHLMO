@@ -74,34 +74,30 @@ class ShelterReportAvailabilityMaterials extends Component
     
         // Correctly parse and apply filtering
         if ($this->selectedPrPo) {
-            // Remove the 'PR-' and 'PO-' prefixes
-            $prPo = str_replace(['PR-', 'PO-'], '', $this->selectedPrPo);
-            $parts = explode('-', $prPo);
-            
-            if (count($parts) == 2) {
-                $prNumber = 'PR-' . $parts[0];
-                $poNumber = 'PO-' . $parts[1];
-    
-                Log::info('Filtering with PR: ' . $prNumber . ' and PO: ' . $poNumber);
-    
-                $query->where('purchase_requisitions.pr_number', $prNumber)
-                      ->where('purchase_orders.po_number', $poNumber);
-                
-                $this->isFiltered = true;
-            } else {
-                Log::error('Invalid PR-PO format: ' . $this->selectedPrPo);
-                $this->isFiltered = false;
-            }
-        } else {
-            $this->isFiltered = false;
-        }
+    if (str_contains($this->selectedPrPo, '-PO-')) {
+        [$prNumber, $poPart] = explode('-PO-', $this->selectedPrPo, 2);
+        $poNumber = 'PO-' . $poPart;
+
+        Log::info('Filtering with PR: ' . $prNumber . ' and PO: ' . $poNumber);
+
+        $query->where('purchase_requisitions.pr_number', $prNumber)
+              ->where('purchase_orders.po_number', $poNumber);
+
+        $this->isFiltered = true;
+    } else {
+        Log::error('Invalid PR-PO format: ' . $this->selectedPrPo);
+        $this->isFiltered = false;
+    }
+} else {
+    $this->isFiltered = false;
+}
     
         $this->materials = $query->get()->groupBy('material_id');
     
     }
 
     public function updatedSelectedPrPo()
-    {
+    {   
         $this->fetchMaterials();
 
         Log::info('Selected PR-PO: ' . $this->selectedPrPo);
@@ -117,19 +113,13 @@ class ShelterReportAvailabilityMaterials extends Component
 
     }
 
-
-    public function export()
+public function export()
 {
     try {
-        $filters = array_filter([
-            'po_number' => $this->poNumber,        // PO Number filter
-            'pr_number' => $this->prNumber,        // PR Number filter
-            'item_description' => $this->itemsDescription,  // Filter for item description
-            'availability_status' => $this->available_quantity > 0 ? 1 : 0,  // Filter for availability
-        ]);
-
+        // Pass the SAME filter currently applied on the page (selectedPrPo)
+        // so the Excel export matches exactly what's displayed in the table.
         return Excel::download(
-            new ShelterReportMaterialAvailabilityDataExport($filters),
+            new ShelterReportMaterialAvailabilityDataExport($this->selectedPrPo),
             'shelter-' . now()->format('Y-m-d') . '.xlsx'
         );
     } catch (\Exception $e) {

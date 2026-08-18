@@ -14,7 +14,7 @@
 
         <!-- Scripts -->
 {{--        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/alpine.min.js" defer></script>--}}
-{{--               @vite(['resources/css/app.css', 'resources/js/app.js'])--}}
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
 {{--        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>--}}
 
 
@@ -36,7 +36,7 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1">
+            <main class="app-main flex-1">
                 @yield('content')
             </main>
         </div>

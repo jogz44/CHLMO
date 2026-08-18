@@ -1,9 +1,9 @@
 <div>
-    <div class="p-10 h-screen ml-[17%] mt-[60px]">
+    <div class="app-page">
         <div x-data="{ openModal: false, openFilters: false}" class="flex bg-gray-100 text-[12px]">
 
             <!-- Main Content -->
-            <div class="flex-1 h-screen p-6 overflow-auto">
+            <div class="app-table-scroll">
 
                 <!-- Container for the Title -->
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-0 relative p-3">
@@ -17,10 +17,10 @@
 
                 <!-- Search and Filters -->
                 <div class="bg-white p-6 rounded shadow">
-                    <div class="flex justify-between items-center">
-                        <div class="flex space-x-2">
+                    <div class="flex justify-between items-center flex-col lg:flex-row md:flex-row">
+                        <div class="flex space-x-2 mb-2 lg:mb-0 md:mb-0">
                             <!-- Search -->
-                            <div class="relative hidden md:block border-gray-300 z-60">
+                            <div class="relative block border-gray-300 z-60">
                                 <svg class="absolute top-[8px] left-4" width="19" height="19" viewBox="0 0 21 21"
                                      fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z"

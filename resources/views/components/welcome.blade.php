@@ -1,4 +1,4 @@
-{{--<div class="p-10 h-screen ml-[17%] mt-[60px]">--}}
+{{--<div class="app-page">--}}
 {{--<div class="flex justify-end items-center mb-6 space-x-3">--}}
 {{--        <div class="flex items-center space-x-2">--}}
 {{--            <label for="year" class="text-[13px] font-medium">Yearly:</label>--}}

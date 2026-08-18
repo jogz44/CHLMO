@@ -12,7 +12,7 @@
             </div>
         @endsession
 
-        <form method="POST" action="{{ route('login') }}" class="w-full max-w-md mx-auto px-4 sm:px-6">
+        <form method="POST" action="{{ route('login') }}" class="w-full max-w-md mx-auto">
             @csrf
             <div class="mb-5 relative">
                 <div class="absolute inset-y-0 left-0 pl-3 mt-5 flex items-center pointer-events-none">

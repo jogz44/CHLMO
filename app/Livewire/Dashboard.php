@@ -8,6 +8,7 @@ use App\Models\Blacklist;
 use App\Models\LivingSituation;
 use App\Models\TaggedAndValidatedApplicant;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Dashboard extends Component
@@ -98,7 +99,7 @@ class Dashboard extends Component
     protected function fetchYears(): void
     {
         // Get distinct years from Applicant model
-        $this->years = Applicant::selectRaw('YEAR(date_applied) as year')
+        $this->years = Applicant::selectRaw($this->yearSelectExpression('date_applied'))
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
@@ -109,6 +110,15 @@ class Dashboard extends Component
 
         // Set default year to the first option (Overall Total)
         $this->selectedYear = $this->years[0];
+    }
+
+    protected function yearSelectExpression(string $column): string
+    {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return "strftime('%Y', {$column}) as year";
+        }
+
+        return "YEAR({$column}) as year";
     }
     protected function updateCounts()
     {

@@ -1,7 +1,7 @@
-<div class="p-10 h-screen ml-[17%] mt-[70px]">
+<div class="app-page">
     <div class="flex justify-end items-center mb-6 space-x-3 mt-2">
         <!-- Filter -->
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 mx-2 lg:mx-0 md:mx-0">
             <select id="year"
                     wire:model.live="selectedYear"
                     class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">
@@ -11,7 +11,7 @@
             </select>
         </div>
     </div>
-    <div class="grid grid-cols-4 gap-10 mb-12">
+    <div class="grid lg:grid-cols-4 md:grid-cols-4 grid-row-1 lg:gap-10 md:gap-10 gap-1 mb-12 mx-2 lg:mx-0 md:mx-0">
         <a href="{{ route('applicants') }}">
             <div @click="window.location.href='{{ route('applicants') }}'"
                  class="relative cursor-pointer bg-white shadow rounded-lg flex items-center">
@@ -28,8 +28,8 @@
                     </h3>
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
-                <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                <div class="flex-shrink-0"> 
+                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -52,7 +52,7 @@
                     <p class="text-[13px] text-gray-500">Total Tagged</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -74,7 +74,7 @@
                     <p class="text-[13px] text-gray-500">Total Awardees</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -97,14 +97,14 @@
                     <p class="text-[13px] text-gray-500">Total Blacklisted</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
     </div>
 
     <!-- Monthly Report Section -->
-    <div class="grid grid-cols-2 gap-6">
+    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-row-1 lg:gap-6 md:gap-6 gap-3 mx-2 lg:mx-0 md:mx-0">
         <div class="bg-white shadow rounded-lg p-6">
             <h4 class="text-[13px] mb-2 font-semibold text-center">
                 Walk-in Applicants
@@ -139,13 +139,13 @@
                             borderColor: 'rgba(255, 145, 0, 100)',
                             borderWidth: 2
                         }]
-                        {{--{--}}
-                        {{--    label: 'Applicants via Request',--}}
-                        {{--    data: @js($relocationLotData['applicantsViaRequest']),--}}
-                        {{--    backgroundColor: 'rgba(0, 113, 45, 100)',--}}
-                        {{--    borderColor: 'rgba(0, 113, 45, 100)',--}}
-                        {{--    borderWidth: 2--}}
-                        {{--}]--}}
+                        // {{--{--}}
+                        // {{--    label: 'Applicants via Request',--}}
+                        // {{--    data: @js($relocationLotData['applicantsViaRequest']),--}}
+                        // {{--    backgroundColor: 'rgba(0, 113, 45, 100)',--}}
+                        // {{--    borderColor: 'rgba(0, 113, 45, 100)',--}}
+                        // {{--    borderWidth: 2--}}
+                        // {{--}]--}}
                     },
                     options: {
                         responsive: true,

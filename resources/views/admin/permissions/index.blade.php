@@ -1,5 +1,5 @@
 <x-admin-wow-layout>
-    <div class="p-10 h-screen ml-[17%] mt-[60px]">
+    <div class="app-page">
         <div class="grid grid-cols-2 gap-10 mb-6">
             <div class="sm:flex-auto">
                 <h1 class="text-base font-semibold leading-6 text-gray-900">Permissions</h1>

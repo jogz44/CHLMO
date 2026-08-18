@@ -13,7 +13,7 @@ class TaggedAndValidatedApplicant extends Model
     use HasFactory;
 
     protected $fillable = [
-        'applicant_id', 'civil_status_id', 'tribe', 'religion', 'living_situation_id', 'case_specification_id',
+        'applicant_id', 'civil_status_id', 'tribe_id', 'religion_id', 'living_situation_id', 'case_specification_id',
         'living_situation_case_specification', 'non_informal_settler_case_specification', 'government_program_id', 'living_status_id', 'roof_type_id',
         'wall_type_id', 'structure_status_id', 'full_address', 'sex', 'date_of_birth', 'occupation',
         'monthly_income', 'tagging_date', 'room_rent_fee', 'room_landlord', 'house_rent_fee', 'house_landlord',
@@ -74,6 +74,19 @@ class TaggedAndValidatedApplicant extends Model
     {
         return $this->belongsTo(LivingSituation::class, 'living_situation_id');
     }
+
+    // Relationship with Tribe
+    public function tribe(): BelongsTo
+    {
+        return $this->belongsTo(Tribe::class, 'tribe_id');
+    }
+
+     // Relationship with Religion
+    public function religion(): BelongsTo
+    {
+        return $this->belongsTo(Religion::class, 'religion_id');
+    }
+
     // Relationship with CaseSpecification
     public function caseSpecification(): BelongsTo
     {

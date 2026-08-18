@@ -5,294 +5,218 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\CivilStatus;
 use App\Models\Tribe;
-use App\Models\Religion; // Assuming you have a Religion model for storing religions
+use App\Models\Religion;
 use App\Models\LivingSituation;
 use App\Models\CaseSpecification;
 use App\Models\LivingStatus;
 use App\Models\Barangay;
+use App\Models\GovernmentProgram;
 use App\Models\Purok;
-use App\Models\StructureStatusType;
 use App\Livewire\Logs\ActivityLogs;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class SystemConfiguration extends Component
 {
-    public $civilStatuses = [];
-    public $newStatus = ''; // For the input field
-    public $showConfirmModal = false;
-    public $indexToRemove = null;
+    private array $lookupConfig = [
+        'civil-status' => [
+            'model' => CivilStatus::class,
+            'table' => 'civil_statuses',
+            'column' => 'civil_status',
+            'label' => 'Civil Status',
+        ],
+        'tribe' => [
+            'model' => Tribe::class,
+            'table' => 'tribes',
+            'column' => 'tribe_name',
+            'label' => 'Tribe/Ethnicity',
+        ],
+        'religion' => [
+            'model' => Religion::class,
+            'table' => 'religions',
+            'column' => 'religion_name',
+            'label' => 'Religion',
+        ],
+        'living-situation' => [
+            'model' => LivingSituation::class,
+            'table' => 'living_situations',
+            'column' => 'living_situation_description',
+            'label' => 'Living Situation',
+        ],
+        'case-specification' => [
+            'model' => CaseSpecification::class,
+            'table' => 'case_specifications',
+            'column' => 'case_specification_name',
+            'label' => 'Case Specification',
+        ],
+        'living-status' => [
+            'model' => LivingStatus::class,
+            'table' => 'living_statuses',
+            'column' => 'living_status_name',
+            'label' => 'Living Status',
+        ],
+        'barangay' => [
+            'model' => Barangay::class,
+            'table' => 'barangays',
+            'column' => 'name',
+            'label' => 'Barangay',
+        ],
+        'social-welfare-sector' => [
+            'model' => GovernmentProgram::class,
+            'table' => 'government_programs',
+            'column' => 'program_name',
+            'label' => 'Social Welfare Sector',
+        ],
+    ];
 
-    public $livingSituations = [];
-    public $newSituation = '';
-    public $living_situations;
+    // search[type] and newValue[type] keyed by lookup key
+    public array $search = [];
+    public array $newValue = [];
 
-    public $caseSpecifications = [];
-    public $newSpecification = '';
-    public $case_specifications;
+    // purok
+    public string $newPurok = '';
+    public $barangay_id = '';
+    public string $purokSearch = '';
 
-    public $livingStatuses = [];
-    public $newLivingStatus = '';
-    public $living_statuses;
+    // confirm-delete modal
+    public bool $showConfirmModal = false;
+    public ?string $confirmType = null;
+    public ?int $confirmId = null;
 
-    public $barangays = [];
-    public $newBarangay;
-
-    public $puroks = [];
-    public $newPurok;
-    public $barangay_id;
-
-    public $structure_status_types = [];
-    public $newStructure = '';
-
-
-
-
-
-    public function mount()
-{
-    $this->civilStatuses = CivilStatus::pluck('civil_status')->toArray();
-    $this->living_situations = LivingSituation::pluck('living_situation_description')->toArray();
-    $this->case_specifications = CaseSpecification::pluck('case_specification_name')->toArray();
-    $this->living_statuses = LivingStatus::pluck('living_status_name')->toArray();
-    $this->barangays = Barangay::pluck('name')->toArray();
-    $this->puroks = Purok::pluck('name')->toArray();
-    $this->structure_status_types = StructureStatusType::pluck('structure_status')->toArray(); // Added Structure Status Type
-}
-
-    public function addCivilStatusField()
+    public function mount(): void
     {
-        // Add an empty field for civil status
-        $this->civilStatuses[] = '';
-    }
-    public function addCivilStatus()
-    {
-        // Validate new status
-        $this->validate([
-            'newStatus' => 'required|string|unique:civil_statuses,civil_status',
-        ]);
-
-        // Add the civil status to the database and update array
-        CivilStatus::create(['civil_status' => $this->newStatus]);
-        $this->civilStatuses[] = $this->newStatus;
-
-        //Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Civil Status', $user);
-
-        // Clear input and show success message
-        $this->newStatus = '';
-        session()->flash('message', 'Civil status added successfully!');
-    }
-    // Method to open the confirmation modal and set the index of the field to be removed
-    public function confirmRemoveCivilStatus($index)
-    {
-        $this->indexToRemove = $index;
-        $this->showConfirmModal = true;
-    }
-    // Method to remove the civil status field if confirmed
-    public function removeCivilStatus()
-    {
-        if ($this->indexToRemove !== null) {
-            unset($this->civilStatuses[$this->indexToRemove]);
-            $this->civilStatuses = array_values($this->civilStatuses); // Re-index array
-            $this->indexToRemove = null;
-            $this->showConfirmModal = false;
-            session()->flash('message', 'Civil status removed successfully.'); // Flash message for confirmation
+        foreach (array_keys($this->lookupConfig) as $key) {
+            $this->search[$key] = '';
+            $this->newValue[$key] = '';
         }
     }
-   
 
-    public function addLivingSituationField()
+    private function config(string $type): array
     {
-        // Add a blank field for new entries
-        $this->livingSituations[] = '';
+        abort_unless(array_key_exists($type, $this->lookupConfig), 404);
+
+        return $this->lookupConfig[$type];
     }
 
-    public function addLivingSituation()
+    public function getCardsProperty()
     {
-        // Validate new living situation input
+        return collect($this->lookupConfig)->map(function ($cfg, $key) {
+            $term = trim($this->search[$key] ?? '');
+
+            $query = $cfg['model']::query()
+                ->select(['id', $cfg['column']])
+                ->orderBy($cfg['column']);
+
+            if ($term !== '') {
+                $query->where($cfg['column'], 'like', "%{$term}%");
+            }
+
+            return [
+                'key' => $key,
+                'label' => $cfg['label'],
+                'column' => $cfg['column'],
+                'items' => $query->get(),
+                'total' => $cfg['model']::count(),
+            ];
+        })->values();
+    }
+
+    public function getPuroksProperty()
+    {
+        $term = trim($this->purokSearch);
+
+        $query = Purok::with('barangay')->orderBy('name');
+
+        if ($term !== '') {
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                    ->orWhereHas('barangay', fn ($b) => $b->where('name', 'like', "%{$term}%"));
+            });
+        }
+
+        return $query->get();
+    }
+
+    public function getBarangaysProperty()
+    {
+        return Barangay::orderBy('name')->get(['id', 'name']);
+    }
+
+    public function addItem(string $type): void
+    {
+        $cfg = $this->config($type);
+
         $this->validate([
-            'newSituation' => 'required|string|unique:living_situations,living_situation_description',
+            "newValue.$type" => ['required', 'string', 'max:255', Rule::unique($cfg['table'], $cfg['column'])],
         ]);
 
-        // Save to the database and update the list
-        LivingSituation::create(['living_situation_description' => $this->newSituation]);
-        $this->livingSituations[] = $this->newSituation;
+        $cfg['model']::create([$cfg['column'] => $this->newValue[$type]]);
 
-        // Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Living Situation', $user);
+        (new ActivityLogs())->logActivity('Add New ' . $cfg['label'], Auth::user());
 
-        // Clear the input field and display success message
-        $this->newSituation = '';
-        session()->flash('message', 'Living Situation added successfully!');
+        $this->newValue[$type] = '';
+        session()->flash('message', $cfg['label'] . ' added successfully.');
     }
 
-    public function confirmRemoveLivingSituation($index)
+    public function addPurok(): void
     {
-        // Set the index of the item to remove and show confirmation modal
-        $this->indexToRemove = $index;
+        $this->validate([
+            'newPurok' => [
+                'required', 'string', 'max:255',
+                Rule::unique('puroks', 'name')->where('barangay_id', $this->barangay_id),
+            ],
+            'barangay_id' => ['required', 'exists:barangays,id'],
+        ]);
+
+        Purok::create([
+            'name' => $this->newPurok,
+            'barangay_id' => $this->barangay_id,
+        ]);
+
+        (new ActivityLogs())->logActivity('Add New Purok', Auth::user());
+
+        $this->newPurok = '';
+        $this->barangay_id = '';
+        session()->flash('message', 'Purok added successfully.');
+    }
+
+    public function confirmRemove(string $type, int $id): void
+    {
+        $this->confirmType = $type;
+        $this->confirmId = $id;
         $this->showConfirmModal = true;
     }
 
-    public function addCaseSpecificationField()
+    public function cancelRemove(): void
     {
-        // Add an empty field for case specification
-        $this->caseSpecifications[] = '';
+        $this->reset(['confirmType', 'confirmId', 'showConfirmModal']);
     }
 
-    public function addCaseSpecification()
+    public function removeConfirmed(): void
     {
-        // Validate new specification
-        $this->validate([
-            'newSpecification' => 'required|string|unique:case_specifications,case_specification_name',
-        ]);
+        if (! $this->confirmType || ! $this->confirmId) {
+            return;
+        }
 
-        // Add the case specification to the database and update array
-        CaseSpecification::create(['case_specification_name' => $this->newSpecification]);
-        $this->caseSpecifications[] = $this->newSpecification;
+        try {
+            if ($this->confirmType === 'purok') {
+                Purok::findOrFail($this->confirmId)->delete();
+                $label = 'Purok';
+            } else {
+                $cfg = $this->config($this->confirmType);
+                $cfg['model']::findOrFail($this->confirmId)->delete();
+                $label = $cfg['label'];
+            }
 
-        // Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Case Specification', $user);
+            (new ActivityLogs())->logActivity('Remove ' . $label, Auth::user());
+            session()->flash('message', $label . ' removed successfully.');
+        } catch (\Illuminate\Database\QueryException) {
+            session()->flash('error', 'This record is already used elsewhere and cannot be removed.');
+        }
 
-        // Clear input and show success message
-        $this->newSpecification = '';
-        session()->flash('message', 'Case Specification added Successfully!');
+        $this->reset(['confirmType', 'confirmId', 'showConfirmModal']);
     }
 
-    public function addLivingStatusField()
-    {
-        // Add an empty field for case specification
-        $this->livingStatuses[] = '';
-    }
-
-    public function addLivingStatus()
-    {
-        // Validate new specification
-        $this->validate([
-            'newLivingStatus' => 'required|string|unique:living_statuses,living_status_name',
-        ]);
-
-        // Add the case specification to the database and update array
-        LivingStatus::create(['living_status_name' => $this->newLivingStatus]);
-        $this->livingStatuses[] = $this->newLivingStatus;
-
-        // Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Living Status', $user);
-
-        // Clear input and show success message
-        $this->newLivingStatus = '';
-        session()->flash('message', 'Living Status added Successfully!');
-
-        // Force a re-render to update the displayed list
-        $this->livingStatuses = array_values($this->livingStatuses);
-    }
-
-    public function addBarangayField()
-    {
-        // Add an empty field for civil status
-        $this->barangays[] = '';
-    }
-    public function addBarangay()
-    {
-        // Validate new status
-        $this->validate([
-            'newBarangay' => 'required|string|unique:barangays,name',
-        ]);
-
-        // Add the civil status to the database and update array
-        Barangay::create(['name' => $this->newBarangay]);
-        $this->barangays[] = $this->newBarangay;
-
-        // Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Barangay', $user);
-
-        // Clear input and show success message
-        $this->newBarangay = '';
-        session()->flash('message', 'Barangay added successfully!');
-    }
-
-    public function addPurokField()
-    {
-        // Add an empty field for civil status
-        $this->puroks[] = '';
-    }
-    public function addPurok()
-    {
-        // Validate new status
-        $this->validate([
-            'newPurok' => 'required|string|unique:puroks,name',
-            'barangay_id' => 'required|exists:barangays,id' // Add this validation rule
-        ]);
-
-        // Log the activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Purok', $user);
-
-        // Add the Purok to the database and update array
-        Purok::create(['name' => $this->newPurok]);
-        $this->puroks[] = $this->newPurok;
-
-        // Add the Purok to the database with barangay_id
-        // Purok::create([
-        // 'name' => $this->newPurok,
-        // 'barangay_id' => $this->barangay_id // Include barangay_id here
-        // ]);
-
-
-        // Clear input and show success message
-        $this->newPurok = '';
-        session()->flash('message', 'Purok Added Successfully!');
-    }
-    // public function removeLivingSituation()
-    // {
-    //     if ($this->indexToRemove !== null) {
-    //         $situation = $this->livingSituations[$this->indexToRemove];
-
-    //         // Remove from database
-    //         LivingSituation::where('living_situation_description', $situation)->delete();
-
-    //         // Remove from list and re-index array
-    //         unset($this->livingSituations[$this->indexToRemove]);
-    //         $this->livingSituations = array_values($this->livingSituations);
-
-    //         $this->showConfirmModal = false;
-    //         session()->flash('message', 'Living Situation removed successfully!');
-    //     }
-    // }
-
-   
-    
-    public function addStructure()
-    {
-        $this->validate([
-            'newStructure' => 'required|string|unique:structure_status_types,structure_status|max:255',
-        ]);
-
-        // // Log activity
-        $logger = new ActivityLogs();
-        $user = Auth::user();
-        $logger->logActivity('Add New Structure Status', $user);
-
-        // Save the new structure status
-        StructureStatusType::create(['structure_status' => $this->newStructure]);
-
-        // Update the list and reset the input
-        $this->structure_status_types[] = $this->newStructure;
-        $this->newStructure = '';
-
-        session()->flash('message', 'Structure status added successfully!');
-    }
-    
     public function render()
     {
         return view('livewire.system-configuration');

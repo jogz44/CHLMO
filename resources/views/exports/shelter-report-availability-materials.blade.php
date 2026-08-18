@@ -79,18 +79,37 @@
             PR {{ $header->pr_number }}<br>PO {{ $header->po_number }}
         </th>
         @endforeach
+        @else
+        <th style="border: 2px solid #000000; text-align: center; padding: 8px;">TOTAL QUANTITY</th>
+        <th style="border: 2px solid #000000; text-align: center; padding: 8px;">WITHDRAWAL</th>
+        <th style="border: 2px solid #000000; text-align: center; padding: 8px;">AVAILABLE MATERIALS</th>
         @endif
     </tr>
 
     <!-- Table Body -->
-    @foreach($materials as $index => $material)
+    @foreach($materials as $index => $materialGroup)
+    @php
+    $firstMaterial = $materialGroup->first();
+    @endphp
     <tr>
         <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $index + 1 }}</td>
-        <td style="border: 1px solid #000000; padding: 8px;">{{ $material->item_description }}</td>
-        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $material->unit }}</td>
-        <!-- <td style="border: 1px solid #000000; text-align: center; padding: 8px;">>{{ $material->pr_number }}</td> -->
-        <!-- <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $material->po_number }}</td> -->
-        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $material->available_quantity }}</td>
+        <td style="border: 1px solid #000000; padding: 8px;">{{ $firstMaterial->description }}</td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $firstMaterial->unit }}</td>
+
+        @if(!$isFiltered)
+        @foreach($prPoHeaders as $header)
+        @php
+        $quantity = $materialGroup->where('pr_number', $header->pr_number)
+        ->where('po_number', $header->po_number)
+        ->first()->available_quantity ?? 0;
+        @endphp
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $quantity }}</td>
+        @endforeach
+        @else
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $firstMaterial->total_quantity }}</td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $firstMaterial->delivered_quantity }}</td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">{{ $firstMaterial->available_quantity }}</td>
+        @endif
     </tr>
     @endforeach
 
@@ -112,7 +131,7 @@
         <td colspan="4" style="padding-top: 20px; font-weight: bold;">
             {{ auth()->user()->first_name }} {{ auth()->user()->middle_name }} {{ auth()->user()->last_name }}
         </td>
-        <td colspan="4" style="padding-top: 20px; font-weight: bold;">
+        <td colspan="4" style="padding-top: 20px">
             ____________________
         </td>
     </tr>

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log; // was missing
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -12,44 +13,53 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Illuminate\Contracts\View\View;
-use App\Models\Shelter\Material; // Make sure this model exists
 use Maatwebsite\Excel\Concerns\Exportable;
 
 class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAutoSize, WithEvents, WithStyles, WithDrawings
 {
     use Exportable;
 
-    private $filters;
+    private $selectedPrPo = null;
+    private $isFiltered = false;
     private $materials = [];
     private $prPoHeaders = [];
-    private $selectedPrPo = null; // Track selected PR-PO combination
-    private $isFiltered = false; // Flag to track if a filter is applied
-    private $groupedMaterials = [];
 
-    public function __construct($filters = null)
+    // Now accepts the exact same value as the page's $this->selectedPrPo
+    public function __construct($selectedPrPo = null)
     {
-        $this->filters = $filters;
+        $this->selectedPrPo = $selectedPrPo;
     }
 
     private function getTitle(): string
     {
-        $title = 'REPORT ON AVAILABILITY OF MATERIALS UNDER THE SHELTER ASSISTANCE PROGRAM';
-
-        return $title;
+        return 'REPORT ON AVAILABILITY OF MATERIALS UNDER THE SHELTER ASSISTANCE PROGRAM';
     }
-
 
     public function view(): View
     {
-
+        $this->fetchPrPoHeaders();
         $materials = $this->fetchMaterials();
 
         return view('exports.shelter-report-availability-materials', [
-            'materials' => $materials,
-            'title' => $this->getTitle(),
-            'isFiltered' => $this->isFiltered,
-            'prPoHeaders' => $this->prPoHeaders,
+            'materials'    => $materials,
+            'title'        => $this->getTitle(),
+            'isFiltered'   => $this->isFiltered,
+            'prPoHeaders'  => $this->prPoHeaders,
         ]);
+    }
+
+    // Needed for the unfiltered case — the blade uses $prPoHeaders
+    // to build the PR/PO columns, same as the Livewire component does.
+    public function fetchPrPoHeaders()
+    {
+        $this->prPoHeaders = DB::table('purchase_orders')
+            ->join('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
+            ->select(
+                'purchase_requisitions.pr_number',
+                'purchase_orders.po_number'
+            )
+            ->distinct()
+            ->get();
     }
 
     public function fetchMaterials()
@@ -77,21 +87,19 @@ class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAut
                 'purchase_orders.po_number'
             );
 
-        // Correctly parse and apply filtering
         if ($this->selectedPrPo) {
-            // Remove the 'PR-' and 'PO-' prefixes
-            $prPo = str_replace(['PR-', 'PO-'], '', $this->selectedPrPo);
-            $parts = explode('-', $prPo);
+            if (str_contains($this->selectedPrPo, '-PO-')) {
+                [$prNumber, $poPart] = explode('-PO-', $this->selectedPrPo, 2);
+                $poNumber = 'PO-' . $poPart;
 
-            if (count($parts) == 2) {
-                $prNumber = 'PR-' . $parts[0];
-                $poNumber = 'PO-' . $parts[1];
+                Log::info('Export filtering with PR: ' . $prNumber . ' and PO: ' . $poNumber);
 
                 $query->where('purchase_requisitions.pr_number', $prNumber)
                     ->where('purchase_orders.po_number', $poNumber);
 
                 $this->isFiltered = true;
             } else {
+                Log::error('Invalid PR-PO format in export: ' . $this->selectedPrPo);
                 $this->isFiltered = false;
             }
         } else {
@@ -99,13 +107,14 @@ class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAut
         }
 
         $this->materials = $query->get()->groupBy('material_id');
+        return $this->materials;
     }
 
     public function styles(Worksheet $sheet): array
     {
         return [
-            1 => ['font' => ['bold' => true, 'size' => 16]], // Title
-            2 => ['font' => ['bold' => true, 'size' => 12]], // Column headers
+            1 => ['font' => ['bold' => true, 'size' => 16]],
+            2 => ['font' => ['bold' => true, 'size' => 12]],
         ];
     }
 
@@ -113,31 +122,30 @@ class ShelterReportMaterialAvailabilityDataExport implements FromView, ShouldAut
     {
         $drawings = [];
 
-        // Left Logo
         $leftDrawing = new Drawing();
         $leftDrawing->setName('Left Logo');
         $leftDrawing->setDescription('Left Logo');
-        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
-        $leftDrawing->setHeight(100); // Adjust height as needed
-        $leftDrawing->setCoordinates('A2'); // Starting cell
-        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
-        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png'));
+        $leftDrawing->setHeight(100);
+        $leftDrawing->setCoordinates('A2');
+        $leftDrawing->setOffsetX(5);
+        $leftDrawing->setOffsetY(5);
 
-        // Right Logo
         $rightDrawing = new Drawing();
         $rightDrawing->setName('Right Logo');
         $rightDrawing->setDescription('Right Logo');
-        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
-        $rightDrawing->setHeight(100); // Adjust height as needed
-        $rightDrawing->setCoordinates('G2'); // Starting cell for the right logo
-        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
-        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png'));
+        $rightDrawing->setHeight(100);
+        $rightDrawing->setCoordinates('G2');
+        $rightDrawing->setOffsetX(5);
+        $rightDrawing->setOffsetY(5);
 
         $drawings[] = $leftDrawing;
         $drawings[] = $rightDrawing;
 
         return $drawings;
     }
+
     public function registerEvents(): array
     {
         return [

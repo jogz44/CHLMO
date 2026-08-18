@@ -1,7 +1,6 @@
 <x-app-layout>
-    <div x-data="{ openModal1: false }" class="p-10 h-screen ml-[17%] mt-[60px]">
-        <div class="flex bg-gray-100 text-[12px] mt-5 mb-5">
-        </div>
+    <div x-data="{ openModal1: false }" class="app-page">
+        <div class="flex bg-gray-100 text-[12px] mt-5 mb-5"></div>
         <div x-data="{
         civilStatuses: [''],
         openModal1: false,
@@ -32,7 +31,7 @@
                         <p class="text-[13px] text-gray-500">Civil Status</p>
                     </div>
                     <div class="flex-shrink-0">
-                        <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                         <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                     </div>
                 </button>
 
@@ -99,7 +98,7 @@
                             <p class="text-[13px] text-gray-500">Tribe/Ethnicity</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
 
@@ -190,7 +189,7 @@
                             <p class="text-[13px] text-gray-500">Religion</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
 
@@ -272,7 +271,7 @@
                             <p class="text-[13px] text-gray-500">Living Situation(Case)</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
                     <!-- Modal -->
@@ -354,7 +353,7 @@
                             <p class="text-[13px] text-gray-500">Case Specification</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
                     <!-- Modal -->
@@ -425,7 +424,7 @@
                             <p class="text-[13px] text-gray-500">Living Status</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
                     <!-- Modal -->
@@ -495,7 +494,7 @@
                             <p class="text-[13px] text-gray-500">Barangay</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
 
@@ -567,7 +566,7 @@
                             <p class="text-[13px] text-gray-500">Purok</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
 
@@ -639,7 +638,7 @@
                             <p class="text-[13px] text-gray-500">Social Welfare Sector</p>
                         </div>
                         <div class="flex-shrink-0">
-                            <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                             <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                         </div>
                     </button>
 

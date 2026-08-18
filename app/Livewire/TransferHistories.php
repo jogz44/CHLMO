@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\AwardeeTransferHistory;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -9,7 +10,7 @@ use Livewire\WithPagination;
 
 class TransferHistories extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
 
     public $search = '';
 
@@ -63,7 +64,7 @@ class TransferHistories extends Component
             });
         })
         ->orderBy('created_at', 'desc')
-        ->paginate(5);
+        ->paginate($this->perPage);
 
         return view('livewire.transfer-histories', compact('transfers'))->layout('layouts.app');
     }

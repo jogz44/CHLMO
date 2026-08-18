@@ -7,13 +7,13 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
-        "laravel/framework": "^11.9",
+        "laravel/framework": "12.61.1",
         "laravel/jetstream": "^5.2",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "livewire/livewire": "^3.5",
+        "livewire/livewire": "^3.8",
         "maatwebsite/excel": "^3.1",
-        "power-components/livewire-powergrid": "^5.10",
+        "power-components/livewire-powergrid": "6.11",
         "spatie/laravel-activitylog": "^4.9",
         "spatie/laravel-permission": "^6.9"
     },

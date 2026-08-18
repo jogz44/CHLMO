@@ -7,6 +7,7 @@ use App\Models\Shelter\Grantee;
 use App\Models\Shelter\OriginOfRequest;
 use App\Models\Shelter\ProfiledTaggedApplicant;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class ShelterDashboard extends Component
@@ -95,7 +96,7 @@ class ShelterDashboard extends Component
 
     protected function fetchYears(): void
     {
-        $this->years = ShelterApplicant::selectRaw('YEAR(date_request) as year')
+        $this->years = ShelterApplicant::selectRaw($this->yearSelectExpression('date_request'))
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year')
@@ -103,6 +104,15 @@ class ShelterDashboard extends Component
 
         array_unshift($this->years, 'Overall Total');
         $this->selectedYear = $this->years[0];
+    }
+
+    protected function yearSelectExpression(string $column): string
+    {
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return "strftime('%Y', {$column}) as year";
+        }
+
+        return "YEAR({$column}) as year";
     }
 
     public function updatedSelectedYear(): void

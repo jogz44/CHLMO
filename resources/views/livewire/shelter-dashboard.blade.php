@@ -1,7 +1,7 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex justify-end items-center mb-4 space-x-3 mt-2">
         <!-- Filter -->
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 mx-2 lg:mx-0 md:mx-0">
             <select id="year"
                 wire:model.live="selectedYear"
                 class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">
@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-3 gap-10 mb-8">
+    <div class="grid lg:grid-cols-3 md:grid-cols-3 grid-row-1 lg:gap-10 md:gap-10 gap-1 mb-8 mx-2 lg:mx-0 md:mx-0">
         <a href="{{ route('shelter-applicants-masterlist') }}">
             <div @click="window.location.href='{{ route('shelter-applicants-masterlist') }}'" class="relative cursor-pointer bg-white shadow rounded-lg flex items-center">
                 <div class="flex-shrink-0 mr-4">
@@ -29,7 +29,7 @@
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -51,7 +51,7 @@
                     <p class="text-[13px] text-gray-500">Total Profiled/Tagged</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -73,14 +73,14 @@
                     <p class="text-[13px] text-gray-500">Total Grantees</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
     </div>
 
     <!-- Monthly Report Section -->
-    <div class="flex-1 justify-center items-center mt-6 ">
+    <div class="flex-1 justify-center items-center mt-6 mx-2 lg:mx-0 md:mx-0">
         <div class="bg-white shadow rounded-lg p-6">
             <h4 class="text-[14px] mb-2 font-semibold text-center">
                 Applicants and Granted Applicants per Origin of Request

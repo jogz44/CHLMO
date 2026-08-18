@@ -1,38 +1,20 @@
 @hasanyrole('Super Admin|Housing System Admin|Shelter System Admin|Shelter System Staff|Shelter System Tagger')
-<div class="bg-none shadow-md font-poppins text-black 0 p-0 " x-data="{ open: false, activeLink: localStorage.getItem('activeLink') || '', activeChildLink: localStorage.getItem('activeChildLink') || '' }">
-
-    <div class="flex h-[100vh]">
+<div class="font-poppins text-black" x-data="{ open: false, activeLink: localStorage.getItem('activeLink') || '', activeChildLink: localStorage.getItem('activeChildLink') || '' }">
+    <div x-show="showSidebar" @click="showSidebar = false" class="fixed inset-0 bg-black bg-opacity-30 z-30 md:hidden" x-transition></div>
+    <div>
         <!-- Sidebar -->
-        <aside :class="open ? 'block' : 'hidden md:block'" class="fixed w-[17%] bg-[#ffffff] max-h-screen  py-3 pl-4 pr-2 md:block mr-2 pb-[8px] shadow-lg ">
-            <div class="text-20 font-bold mb-4 ml-1 flex items-center ">
+        <aside :class="showSidebar ? 'block' : 'hidden md:block'" class="app-sidebar">
+            <div class="text-20 font-bold mb-4 flex items-center justify-center">
                 <div class="w-[85%] h-auto inline-block">
-                    <a href="{{ route('dashboard') }}" class="text-lg font-semibold tracking-widest text-gray-900 uppercase rounded-lg dark-mode:text-white focus:outline-none focus:shadow-outline"><x-application-sidebar-logo /></a>
+                    <x-application-sidebar-logo />
                 </div>
             </div>
             <!-- SIDEBAR MENU FOR SUPERADMIN AND OTHERS -->
-            <nav class="space-y-2 mt-15 flex-1 text-[13px] h-[calc(100vh-4rem)] overflow-auto scrollbar-hidden"
+            <nav class="space-y-2 mt-15 text-[13px]"
                 x-data="{
                     activeLink: localStorage.getItem('activeLink') || '',
                     activeChildLink: localStorage.getItem('activeChildLink') || ''}">
 
-
-                @role('Shelter System Admin|Shelter System Staff|Shelter System Tagger')
-                <a href="{{ route('shelter-dashboard') }}" @click="activeChildLink = 'dashboard-shelter'; localStorage.setItem('activeChildLink', 'dashboard-shelter')"
-                    :class="{ 'text-[#FF9100] font-bold': activeChildLink === 'dashboard-shelter' }"
-                    class="mx-2 flex items-center py-2 px-4 hover:text-[#FF9100]">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        class="w-5 h-5">
-                        <path stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
-                    </svg>
-                    <span class="ml-2">Dashboard</span>
-                </a>
-                @endrole
 
                 @role('Super Admin')
                     <div x-data="{ isDashboardOpen: false }">
@@ -313,7 +295,36 @@
                 </div>
                 @endhasanyrole
             </nav>
+            <!-- <img src="/storage/images/designProfile.png"
+                alt="Design Profile"
+                class="absolute right-0 top-0 h-full object-cover opacity-70 z-0 pointer-events-none scale-x-[-1]"> -->
         </aside>
     </div>
 </div>
 @endhasanyrole
+
+@role('Housing System Tagger')
+<!-- <div class="font-poppins text-black">
+
+    <div>
+
+        <aside :class="open ? 'block' : 'hidden md:block'" class="app-sidebar">
+            <div class="text-20 font-bold mb-4 ml-1 flex items-center ">
+                <div class="w-[85%] h-auto inline-block">
+                    <a href="{{ route('dashboard') }}" class="text-lg font-semibold tracking-widest text-gray-900 uppercase rounded-lg dark-mode:text-white focus:outline-none focus:shadow-outline"><x-application-sidebar-logo /></a>
+                </div>
+            </div>
+            <nav class="space-y-2 mt-15 text-[13px]">
+                    
+
+                    <a href="{{ route('applicants') }}" @click="activeLink = 'applicants'; activeChildLink = ''; localStorage.setItem('activeLink', 'applicants'); localStorage.setItem('activeChildLink', '')" :class="{ 'bg-[#D9D9D9] text-[12px] bg-opacity-40 text-[#FF9100] border-l-[#FF9100] border-l-[5px] font-bold': activeLink === 'applicants' }" class="mx-2 flex items-center py-2.5 px-4 rounded hover:bg-[#D9D9D9] hover:bg-opacity-40 hover:border-l-[#D9D9D9] hover:border-l-[5px] hover:text-[#FF9100]">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="50" height="50" fill="currentColor" stroke="currentColor" viewBox="0 0 48 48" class="w-5 h-5" stroke-width="0.5">
+                            <path d="M 12.5 4 C 10.02 4 8 6.02 8 8.5 L 8 39.5 C 8 41.98 10.02 44 12.5 44 L 26.539062 44 C 26.189063 43.4 26 42.73 26 42 L 26 41 L 12.5 41 C 11.67 41 11 40.33 11 39.5 L 11 8.5 C 11 7.67 11.67 7 12.5 7 L 35.5 7 C 36.33 7 37 7.67 37 8.5 L 37 24 C 38.01 24 39.02 24.070938 40 24.210938 L 40 8.5 C 40 6.02 37.98 4 35.5 4 L 12.5 4 z M 24 10 A 3.5 3.5 0 1 0 24 17 A 3.5 3.5 0 1 0 24 10 z M 19.5 19 C 18.672 19 18 19.672 18 20.5 L 18 21.5 C 18 23.433 20.686 25 24 25 C 27.314 25 30 23.433 30 21.5 L 30 20.5 C 30 19.672 29.328 19 28.5 19 L 19.5 19 z M 37 26 C 32.029 26 28 27.791 28 30 C 28 32.209 32.029 34 37 34 C 41.971 34 46 32.209 46 30 C 46 27.791 41.971 26 37 26 z M 16.5 28 C 15.67 28 15 28.67 15 29.5 C 15 30.33 15.67 31 16.5 31 L 26 31 L 26 30 C 26 29.27 26.189063 28.6 26.539062 28 L 16.5 28 z M 28 33 L 28 36 C 28 38.21 32.03 40 37 40 C 41.97 40 46 38.21 46 36 L 46 33 C 46 35.21 41.97 37 37 37 C 32.03 37 28 35.21 28 33 z M 16.5 34 C 15.67 34 15 34.67 15 35.5 C 15 36.33 15.67 37 16.5 37 L 26 37 L 26 34 L 16.5 34 z M 28 39 L 28 42 C 28 44.21 32.03 46 37 46 C 41.97 46 46 44.21 46 42 L 46 39 C 46 41.21 41.97 43 37 43 C 32.03 43 28 41.21 28 39 z"></path>
+                        </svg>
+                        <p class="ml-2">Applicants for Tagging</p>
+                    </a>
+            </nav>
+        </aside>
+    </div>
+</div> -->
+@endrole

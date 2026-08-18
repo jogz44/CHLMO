@@ -1,8 +1,8 @@
 <div>
-    <div x-data="{ openFilters: false }" class="p-10 h-screen ml-[17%] mt-[100px]">
+    <div x-data="{ openFilters: false }" class="app-page">
         <div class="flex bg-gray-100 text-[12px]">
             <!-- Main Content -->
-            <div x-data="pagination()" class="flex-1 h-screen p-6 overflow-auto">
+            <div x-data="pagination()" class="app-table-scroll">
                 <div class="bg-white rounded shadow mb-4 flex items-center justify-between z-5 relative p-3">
                     <div class="flex items-center">
                         <h2 class="text-[13px] ml-5 text-gray-700 font-semibold">REPORT ON AVAILABILITY OF MATERIALS UNDER THE SHELTER ASSISTANCE PROGRAM</h2>
@@ -102,5 +102,4 @@
             </div>
         </div>
     </div>
-</div>
 </div>

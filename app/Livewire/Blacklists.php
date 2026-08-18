@@ -2,14 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\Blacklist;
 use Carbon\Carbon;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class Blacklists extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     protected $paginationTheme = 'tailwind';
 
     // Search and filter properties
@@ -91,7 +91,7 @@ class Blacklists extends Component
             ]);
         }
 
-        $blacklisted = $query->orderBy('created_at', 'desc')->paginate(5);
+        $blacklisted = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         return view('livewire.blacklists', [
             'blacklisted' => $blacklisted

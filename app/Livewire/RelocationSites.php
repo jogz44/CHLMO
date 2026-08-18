@@ -13,10 +13,11 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Logs\ActivityLogs;
 use Livewire\WithPagination;
+use App\Livewire\Traits\HandlesPagination;
 
 class RelocationSites extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     protected $paginationTheme = 'tailwind';
 
     public $selectedSiteId, $password = '', $newStatus = '', $showPasswordModal = false;
@@ -96,6 +97,13 @@ class RelocationSites extends Component
         if ($this->total_no_of_lots && $this->total_lot_number_of_community_facilities) {
             $this->residential_lots = $this->total_no_of_lots - $this->total_lot_number_of_community_facilities;
         }
+    }
+
+     public function resetFilters(): void
+    {
+        $this->filterBarangay = null;
+        $this->resetPage();
+        $this->search = '';
     }
 
     // Reset page on search update
@@ -372,7 +380,7 @@ class RelocationSites extends Component
         }
 
         $relocationSites = $query->orderBy('relocation_site_name', 'asc')
-            ->paginate(5);
+            ->paginate($this->perPage);
 
         return view('livewire.relocation-sites', [
             'relocationSites' => $relocationSites

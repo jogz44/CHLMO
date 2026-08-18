@@ -68,7 +68,7 @@ class PermissionsManagement extends Component
                     $query->where('id', $this->filter);
                 });
             })
-            ->paginate(5);
+            ->paginate($this->perPage);
 
         $roles = Role::all();
 

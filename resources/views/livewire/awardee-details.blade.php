@@ -1,8 +1,8 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
-        <div class="flex-1 p-6 overflow-auto">
+        <div class="flex-1 overflow-auto">
             <!-- Header -->
-            <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-10">
+            <div class="app-page-heading">
                 <div class="flex items-center">
                     <a href="{{ route('awardee-list') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -19,8 +19,25 @@
                         <button class="bg-gray-500 text-white text-xs font-semibold px-6 py-2 rounded cursor-not-allowed">
                             BLACKLISTED
                         </button>
+                    @elseif($isAwarded)
+                        <button class="bg-gray-400 text-white text-xs font-semibold px-6 py-2 rounded cursor-not-allowed" disabled>
+                            Awarded
+                        </button>
                     @else
-                        @livewire('award-awardee', ['awardee' => $awardee])
+                        <button wire:click="openAwardModal"
+                            class="bg-custom-red text-white text-xs font-semibold px-6 py-2 rounded">
+                            <span wire:loading.remove>
+                                AWARD THIS APPLICANT
+                            </span>
+                            <span wire:loading class="flex items-center">
+                                <svg class="animate-spin h-4 w-4 text-white mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                Loading...
+                            </span>
+                        </button>
+
                         @livewire('transfer-awardee', ['awardee' => $awardee])
                         <button
                                 class="bg-custom-dark-green text-white text-xs font-semibold px-6 py-2 rounded"
@@ -41,12 +58,15 @@
             </div>
 
             <!-- Awardee Info -->
-            <div class="flex flex-col p-3 rounded mt-11">
-                <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
-                <h1 class="text-[25px] items-center font-bold text-gray-700">
-                    {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name }}
-                </h1>
-                <h1 class="text-[15px] items-center font-regular text-gray-700">
+            <div class="flex flex-col rounded">
+                <div class="flex flex-row rounded">
+                    <h2 class="text-[30px] items-center font-bold text-gray-700 underline">{{ $applicant->applicant_id }}</h2>
+                    <h1 class="text-[33px] ml-3 mr-3 items-center font-semibold text-gray-700 justify-content"> | </h1>
+                    <h1 class="text-[30px] items-center font-bold text-gray-700 justify-content">
+                        {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name }}
+                    </h1>
+                </div>
+                <h1 class="text-[15px] items-center font-regular text-gray-700 mt-2 mb-2">
                     Previous Awardee:
                 </h1>
             </div>
@@ -302,6 +322,86 @@
                 @endif
             </div>
 
+            @if($showAwardModal)
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-6 max-w-lg w-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">Award Property</h3>
+                        <button type="button" wire:click="closeAwardModal" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <form wire:submit.prevent="awardApplicant">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-600">
+                                    <strong>Awardee:</strong>
+                                    {{ $awardee->taggedAndValidatedApplicant->applicant->person->full_name }}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    <strong>Property:</strong>
+                                    @if($awardee->actualRelocationSite)
+                                        {{ $awardee->actualRelocationSite->relocation_site_name }},
+                                        Block {{ $awardee->actual_block }},
+                                        Lot {{ $awardee->actual_lot }}
+                                        <span class="text-green-600 text-xs">(Actual Site)</span>
+                                    @else
+                                        {{ $awardee->assignedRelocationSite->relocation_site_name }},
+                                        Block {{ $awardee->assigned_block }},
+                                        Lot {{ $awardee->assigned_lot }}
+                                        @if($awardee->assignedRelocationSite && $awardee->assignedRelocationSite->is_full)
+                                            <span class="text-red-600 text-xs">(Full)</span>
+                                        @else
+                                            <span class="text-blue-600 text-xs">(Available)</span>
+                                        @endif
+                                    @endif
+                                </p>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Grant Date <span class="text-red-500">*</span></label>
+                                <input type="date" wire:model="grantDate" class="w-full border-gray-300 rounded-md shadow-sm" max="{{ now()->format('Y-m-d') }}" required>
+                                @error('grantDate')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="flex items-center gap-2 text-sm text-gray-700">
+                                    <input type="checkbox" wire:model="documentSubmitted" class="rounded border-gray-300">
+                                    I confirm all required documents have been submitted and verified.
+                                </label>
+                                @error('documentSubmitted')
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" wire:click="closeAwardModal" class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                                <span wire:loading.remove>
+                                    Award Property
+                                </span>
+                                <span wire:loading class="flex items-center">
+                                    <svg class="animate-spin h-4 w-4 text-white mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                    </svg>
+                                    Loading...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            @endif
+
             <!-- Blacklist Modal -->
             @if($isBlacklistModalOpen)
                 <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -313,14 +413,14 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Date</label>
                                     <input type="date" wire:model="blacklistForm.date_blacklisted"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
                                     @error('blacklistForm.date_blacklisted') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Reason</label>
                                     <textarea wire:model="blacklistForm.reason"
-                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"
                                               rows="3"></textarea>
                                     @error('blacklistForm.reason') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
@@ -328,7 +428,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Confirm Password</label>
                                     <input type="password" wire:model="blacklistForm.confirmation_password"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
                                     @error('blacklistForm.confirmation_password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                                 </div>
                             </div>
