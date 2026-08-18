@@ -31,10 +31,13 @@ class AwardeeDetails extends Component
     public Awardee $awardee;
     public $selectedDocument = null;
     public $showEditDocumentsModal = false;
+    public $showAwardModal = false;
     public $newDocuments = [];
     public $newDocumentNames = [];
     public $existingDocuments = [];
     public $existingDocumentNames = [];
+    public $grantDate;
+    public $documentSubmitted = false;
     public $isBlacklistModalOpen = false;
     public $blacklistForm = [
         'date_blacklisted' => '',
@@ -62,6 +65,7 @@ class AwardeeDetails extends Component
         ])->findOrFail($applicantId);
 
         $this->blacklistForm['date_blacklisted'] = now()->format('Y-m-d');
+        $this->grantDate = now()->format('Y-m-d');
 
         $this->loadExistingDocuments();
     }
@@ -177,12 +181,114 @@ class AwardeeDetails extends Component
         $this->selectedDocument = null;
     }
 
+    private function canAwardWithAssignedSite(): array
+    {
+        $site = $this->awardee->assignedRelocationSite;
+
+        if (!$site) {
+            return [
+                'can_award' => false,
+                'message' => 'No relocation site assigned.'
+            ];
+        }
+
+        if ($site->is_full) {
+            return [
+                'can_award' => false,
+                'message' => 'Assigned site is full. Please assign an actual relocation site.'
+            ];
+        }
+
+        $availableSpace = $site->getRemainingLotSize();
+        $requiredSpace = $this->awardee->assigned_relocation_lot_size;
+
+        if ($availableSpace < $requiredSpace) {
+            return [
+                'can_award' => false,
+                'message' => 'Assigned site does not have enough space. Please assign an actual relocation site.'
+            ];
+        }
+
+        return ['can_award' => true];
+    }
+
+    public function openAwardModal(): void
+    {
+        if (!$this->awardee->assignedRelocationSite && !$this->awardee->actualRelocationSite) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Please assign a relocation site first.'
+            ]);
+            return;
+        }
+
+        $this->showAwardModal = true;
+    }
+
+    public function closeAwardModal(): void
+    {
+        $this->showAwardModal = false;
+        $this->documentSubmitted = false;
+    }
+
+    public function awardApplicant(): void
+    {
+        $this->validate([
+            'grantDate' => 'required|date|before_or_equal:today',
+            'documentSubmitted' => 'required|accepted',
+        ], [
+            'documentSubmitted.accepted' => 'You must verify that all required documents have been submitted.'
+        ]);
+
+        try {
+            // Check if we can proceed with assigned site
+            if (!$this->awardee->actualRelocationSite) {
+                $siteCheck = $this->canAwardWithAssignedSite();
+                if (!$siteCheck['can_award']) {
+                    $this->dispatch('alert', [
+                        'type' => 'error',
+                        'message' => $siteCheck['message']
+                    ]);
+                    return;
+                }
+            }
+
+            $this->awardee->update([
+                'grant_date' => $this->grantDate,
+                'documents_submitted' => $this->documentSubmitted,
+                'is_awarded' => true
+            ]);
+
+            $logger = new ActivityLogs();
+            $logger->logActivity(
+                'Awarded property to ' . $this->awardee->taggedAndValidatedApplicant->applicant->person->full_name,
+                Auth::user()
+            );
+
+            $this->showAwardModal = false;
+            $this->documentSubmitted = false;
+            $this->dispatch('alert', [
+                'title' => 'Success!',
+                'message' => 'Applicant has been successfully awarded.',
+                'type' => 'success'
+            ]);
+
+            $this->redirect(route('awardee-list'));
+        } catch (\Exception $e) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Failed to process award. Please try again.'
+            ]);
+        }
+    }
+
     public function confirmBlacklist(): void
     {
         $this->validate([
             'blacklistForm.date_blacklisted' => 'required|date',
             'blacklistForm.reason' => 'required|string|max:255',
             'blacklistForm.confirmation_password' => 'required'
+            // 'blacklistForm.current_password' => 'required'
         ]);
 
         if (!Hash::check($this->blacklistForm['confirmation_password'], Auth::user()->password)) {
@@ -214,10 +320,13 @@ class AwardeeDetails extends Component
 
     public function render()
     {
+        $isAwarded = $this->awardee->is_awarded;
+
         return view('livewire.awardee-details', [
             'documents' => $this->awardee->documents()
                 ->orderBy('created_at', 'desc')
                 ->get(),
+            'isAwarded' => $isAwarded,
             'applicant' => $this->awardee->taggedAndValidatedApplicant->applicant
         ])->layout('layouts.app');
     }

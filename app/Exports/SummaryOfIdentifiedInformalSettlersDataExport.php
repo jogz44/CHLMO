@@ -216,17 +216,17 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
         $sheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
 
         // Adjust column widths
-        $sheet->getColumnDimension('A')->setWidth(15.56); // ID.
-        $sheet->getColumnDimension('B')->setWidth(36.89); // PRINCIPAL NAME
-        $sheet->getColumnDimension('C')->setWidth(4.22); // AGE
-        $sheet->getColumnDimension('D')->setWidth(14.67); // Purok
-        $sheet->getColumnDimension('E')->setWidth(20.44); // living Situation (case)
-        $sheet->getColumnDimension('F')->setWidth(22); // Case Specification
+        $sheet->getColumnDimension('A')->setWidth(6.22); // ID.
+        $sheet->getColumnDimension('B')->setWidth(15.56); // PRINCIPAL NAME
+        $sheet->getColumnDimension('C')->setWidth(30); // AGE
+        $sheet->getColumnDimension('D')->setWidth(30); // Purok
+        $sheet->getColumnDimension('E')->setWidth(35); // living Situation (case)
+        $sheet->getColumnDimension('F')->setWidth(35); // Case Specification
         $sheet->getColumnDimension('G')->setWidth(12.44); // No. of Actual Occupants
-        $sheet->getColumnDimension('H')->setWidth(24.11); // Assigned Relocation Site
-        $sheet->getColumnDimension('I')->setWidth(9.67); // Awarded
-        $sheet->getColumnDimension('J')->setWidth(34.56); // Actual Relocation Site
-        $sheet->getColumnDimension('K')->setWidth(16.67); // Remarks
+        $sheet->getColumnDimension('H')->setWidth(35); // Assigned Relocation Site
+        $sheet->getColumnDimension('I')->setWidth(12.44); // Awarded
+        $sheet->getColumnDimension('J')->setWidth(35); // Actual Relocation Site
+        $sheet->getColumnDimension('K')->setWidth(35); // Remarks
 
         // Set print area
         $sheet->getPageSetup()->setPrintArea('A1:K' . ($sheet->getHighestRow()));

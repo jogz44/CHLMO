@@ -1,4 +1,4 @@
-<div class="p-10 h-screen ml-[17%] mt-[70px]">
+<div class="app-page">
     <div class="flex justify-end items-center mb-6 space-x-3 mt-2">
         <!-- Filter -->
         <div class="flex items-center space-x-2">
@@ -28,8 +28,8 @@
                     </h3>
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
-                <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                <div class="flex-shrink-0"> 
+                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -52,7 +52,7 @@
                     <p class="text-[13px] text-gray-500">Total Tagged</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -74,7 +74,7 @@
                     <p class="text-[13px] text-gray-500">Total Awardees</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -97,7 +97,7 @@
                     <p class="text-[13px] text-gray-500">Total Blacklisted</p>
                 </div>
                 <div class="flex-shrink-0">
-                    <img src="/hlms/storage/images/designDasboard.png" alt="dashboard design" class="w-24 h-20 object-contain rounded-lg">
+                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
                 </div>
             </div>
         </a>
@@ -139,13 +139,13 @@
                             borderColor: 'rgba(255, 145, 0, 100)',
                             borderWidth: 2
                         }]
-                        {{--{--}}
-                        {{--    label: 'Applicants via Request',--}}
-                        {{--    data: @js($relocationLotData['applicantsViaRequest']),--}}
-                        {{--    backgroundColor: 'rgba(0, 113, 45, 100)',--}}
-                        {{--    borderColor: 'rgba(0, 113, 45, 100)',--}}
-                        {{--    borderWidth: 2--}}
-                        {{--}]--}}
+                        // {{--{--}}
+                        // {{--    label: 'Applicants via Request',--}}
+                        // {{--    data: @js($relocationLotData['applicantsViaRequest']),--}}
+                        // {{--    backgroundColor: 'rgba(0, 113, 45, 100)',--}}
+                        // {{--    borderColor: 'rgba(0, 113, 45, 100)',--}}
+                        // {{--    borderWidth: 2--}}
+                        // {{--}]--}}
                     },
                     options: {
                         responsive: true,

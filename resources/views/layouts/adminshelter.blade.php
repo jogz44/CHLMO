@@ -9,8 +9,16 @@
     <title>{{ config('app.name', 'Shelter System') }}</title>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <!-- <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" /> -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <!-- Filepond -->
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
@@ -21,17 +29,17 @@
     <link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
 
 
-    <!-- Scripts -->
+    <!-- Scripts -->    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 
     <!-- Styles -->
-    <livewire:styles />
+    @livewireStyles
 </head>
 
-<body class="font-sans antialiased bg-gray-100">
+<body class="font-sans antialiased bg-gray-100"  x-data="{ showSidebar: false }">
 
     <!-- Sidebar -->
     <x-sidebar-for-shelter />
@@ -40,14 +48,13 @@
     <x-header />
 
     <!-- Page Content -->
-    <main>
+    <main class="app-main">
         {{ $slot }}
     </main>
 
     @stack('modals')
 
-    <livewire:scripts />
+    @livewireScripts
 
 </body>
-
 </html>

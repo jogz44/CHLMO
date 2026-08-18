@@ -14,11 +14,12 @@ use App\Models\TaggedAndValidatedApplicant;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Livewire\Traits\HandlesPagination;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SummaryOfIdentifiedInformalSettlers extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
 
     // Constants
     const DANGER_ZONE_ID = 8;
@@ -368,7 +369,7 @@ class SummaryOfIdentifiedInformalSettlers extends Component
         }
 
         // Your existing grouping and pagination code...
-        $groupedApplicants = $query->paginate(5);
+        $groupedApplicants = $query->paginate($this->perPage);
 
         return view('livewire.summary-of-identified-informal-settlers', [
             'groupedApplicants' => $groupedApplicants,

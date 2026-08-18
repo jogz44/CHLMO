@@ -1,10 +1,10 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
-        <div x-data="{ isEditable: false, openPreviewModal: false }" class="flex-1 p-6 overflow-auto">
+        <div x-data="{ isEditable: false, openPreviewModal: false }" class="flex-1 overflow-auto">
             <form wire:submit.prevent="grantApplicant">
-                <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-10">
+                <div class="app-page-heading">
                     <div class="flex items-center">
-                        <a href="{{ route('shelter-profiled-tagged-applicants') }}">
+                        <a href="{{ route('shelter-profiled-tagged-applicants') }}" class="z-10">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                                 stroke="currentColor" class="w-5 h-5 text-custom-yellow mr-2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -93,165 +93,135 @@
                         </div>
                     </div>
 
-                    <label class="block text-[13px] font-bold text-gray-700 mb-4 mt-4">MATERIALS DELIVERED</label>
-                    <div class="flex flex-wrap -mx-2 text-start">
-                        <div class="w-full md:w-4/12 px-2 mb-2">
-                            <label
-                                class="block text-[12px] font-medium text-gray-700">ITEM</label>
-                        </div>
-                        <div class="w-full md:w-2/12 px-2 mb-2">
-                            <label class="block text-[12px] font-medium text-black">STOCK</label>
-                        </div>
-                        <div class="w-full md:w-2/12 px-2 mb-2">
-                            <label class="block text-[12px] font-medium text-black">QTY</label>
-                        </div>
-                        <div class="w-full md:w-2/12 px-2 mb-2">
-                            <label class="block text-[12px] font-medium text-black">UNIT</label>
-                        </div>
-                        <div class="w-full md:w-2/12 px-2 mb-2">
-                            <label class="block text-[12px] font-medium text-black">PO NO.</label>
+                    <div class="mb-2 mt-6 flex items-center justify-between">
+                        <label class="text-[13px] font-semibold uppercase tracking-wide text-gray-700">Materials Delivered</label>
+                        <span class="text-[11px] text-gray-400">{{ count($materials) }} {{ count($materials) === 1 ? 'item' : 'items' }}</span>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-md border border-gray-200" x-data="{ query: '', suggestions: [], showSuggestions: false }" @click.away="showSuggestions = false">
+                        <table class="min-w-full bg-white text-[12px]">
+                            <thead>
+                                <tr class="bg-gray-200 text-left text-[11px] uppercase tracking-wide">
+                                    <th class="px-4 py-3 text-gray-800">Item</th>
+                                    <th class="lg:w-32 px-4 py-3 text-center text-gray-800">Stock</th>
+                                    <th class="lg:w-32 px-4 py-3 text-center text-gray-800">Qty</th>
+                                    <th class="lg:w-40 px-4 py-3 text-center text-gray-800">Unit</th>
+                                    <th class="lg:w-40 px-4 py-3 text-center text-gray-800">PO No.</th>
+                                    <th class="lg:w-12 px-4 py-3 text-gray-800"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @forelse ($materials as $index => $material)
+                                <tr wire:key="material-{{ $index }}" class="odd:bg-gray-50/60 even:bg-white hover:bg-green-50/40">
+                                    <td class="relative px-4 py-2">
+                                        <input
+                                            type="text"
+                                            x-model="query"
+                                            @input.debounce.300ms="$wire.searchMaterials(query).then(data => { suggestions = data; showSuggestions = true; })"
+                                            placeholder="Type to search materials..."
+                                            class="uppercase w-40 lg:w-full md:w-full rounded border border-transparent bg-transparent px-2 py-1.5 text-gray-800 focus:border-gray-300 focus:bg-white focus:outline-none">
+                                        @error('materials.' . $index . '.material_id')
+                                        <span class="mt-1 block text-[11px] text-red-600">{{ $message }}</span>
+                                        @enderror
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="text" wire:model="materials.{{ $index }}.available_quantity" readonly class="uppercase w-20 lg:w-full md:w-full rounded border border-transparent bg-transparent px-1 py-1.5 text-center text-gray-800 focus:outline-none" placeholder="Available">
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="number" wire:model="materials.{{ $index }}.grantee_quantity" required class="w-20 lg:w-full md:w-full rounded border border-transparent bg-transparent px-1 py-1.5 text-center text-gray-800 focus:border-gray-300 focus:bg-white focus:outline-none" placeholder="0">
+                                        @error('materials.' . $index . '.grantee_quantity') <span class="mt-1 block text-[11px] text-red-600">{{ $message }}</span> @enderror
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="text" wire:model="materials.{{ $index }}.materialUnitDisplay" readonly class="uppercase w-20 lg:w-full md:w-full rounded border border-transparent bg-transparent px-1 py-1.5 text-center text-gray-800 focus:outline-none" placeholder="Unit">
+                                    </td>
+                                    <td class="px-4 py-2">
+                                        <input type="text" wire:model="materials.{{ $index }}.purchaseOrderDisplay" readonly class="uppercase w-20 lg:w-full md:w-full rounded border border-transparent bg-transparent px-1 py-1.5 text-center text-gray-800 focus:outline-none" placeholder="PO Number">
+                                    </td>
+                                    <td class="px-4 py-2 text-center">
+                                        <button
+                                            type="button"
+                                            wire:click="removeMaterial({{ $index }})"
+                                            class="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                                            title="Remove material">
+                                            &#x2715;
+                                        </button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="px-4 py-8 text-center text-[12px] text-gray-400">
+                                        No materials added yet. Click "Add Material" to get started.
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                        <div x-show="showSuggestions && suggestions.length" class="absolute">
+                            <ul x-cloak class="left-4 right-4 z-10 mt-1 max-h-44 overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-[12px] uppercase text-gray-700 shadow-lg">
+                                <template x-for="(item, suggestionIndex) in suggestions" :key="suggestionIndex">
+                                    <li
+                                        @click="$wire.selectMaterial({{ $index }}, item.id); query = item.item_description; showSuggestions = false;"
+                                        class="cursor-pointer px-3 py-2 hover:bg-green-50">
+                                        <span class="font-medium" x-text="item.item_description"></span>
+                                        <span class="ml-2 text-gray-500" x-text="item.purchaseOrderDisplay ? item.purchaseOrderDisplay : 'PO: Not available'"></span>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
                     </div>
-                    <div>
-                        @foreach ($materials as $index => $material)
-                        <div class="flex flex-wrap -mx-2">
-                            <!-- Material Select -->
-                            <div class="w-full md:w-4/12 px-2 mb-2" x-data="{ query: '', suggestions: [], showSuggestions: false }" @click.away="showSuggestions = false">
-                                <input
-                                    type="text"
-                                    x-model="query"
-                                    @input.debounce.300ms="$wire.searchMaterials(query).then(data => { suggestions = data; showSuggestions = true; })"
-                                    placeholder="Type to search materials..."
-                                    class="uppercase w-full px-1 py-1.5 bg-white border border-gray-600 rounded-lg placeholder-gray-400 text-gray-700 focus:outline-none text-[12px]" />
 
-                                <ul x-show="showSuggestions && suggestions.length" class="bg-white border text-black border-gray-300 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto uppercase">
-                                    <template x-for="(item, index) in suggestions" :key="index">
-                                        <li
-                                            @click="$wire.selectMaterial({{ $index }}, item.id); query = item.item_description; showSuggestions = false;"
-                                            class="px-3 py-2 cursor-pointer hover:bg-gray-100">
-                                            <span x-text="item.item_description"></span>
-                                            <span class="ml-2 text-gray-600" x-text="item.purchaseOrderDisplay ? `${item.purchaseOrderDisplay}` : 'PO: Not available'"></span>
-                                        </li>
-                                    </template>
-                                </ul>
-
-                                @error('materials.' . $index . '.material_id')
-                                <span class="text-red-400 text-sm">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <!-- Available quantity -->
-                            <div class="w-full md:w-2/12 px-2 mb-2">
-                                <input type="text" wire:model="materials.{{ $index }}.available_quantity" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="available">
-                            </div>
-
-                            <!-- Quantity Input -->
-                            <div class="w-full md:w-2/12 px-2 mb-2">
-                                <input type="number" wire:model="materials.{{ $index }}.grantee_quantity" required class="uppercase w-full px-3 py-1 bg-white-700 border border-gray-600 rounded-lg placeholder-gray-400 text-gray-800 focus:outline-none text-[12px]" placeholder="Quantity">
-                                @error('materials.' . $index . '.grantee_quantity') <span class="text-red-400 text-sm">{{ $message }}</span> @enderror
-                            </div>
-
-                            <!-- Material Unit -->
-                            <div class="w-full md:w-2/12 px-2 mb-2">
-                                <input type="text" wire:model="materials.{{ $index }}.materialUnitDisplay" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="Material Unit">
-                            </div>
-
-                            <!-- PO Number -->
-                            <div class="w-full md:w-2/12 px-2 mb-2">
-                                <input type="text" wire:model="materials.{{ $index }}.purchaseOrderDisplay" readonly class="uppercase w-full p-1 border text-[12px] border-gray-600 rounded-lg text-gray-800 focus:outline-none" placeholder="PO Number">
-                            </div>
-                        </div>
-                        @endforeach
-
-                        <!-- Add Material Button -->
-                        <div class="flex justify-center mt-4 mb-4">
-                            <button type="button" wire:click="addMaterial" class="px-3 py-1 bg-custom-yellow text-white rounded-md text-xs hover:bg-custom-yellow">Add Materials Delivered</button>
-                        </div>
+                    <div class="mt-4 flex justify-end">
+                        <button
+                            type="button"
+                            wire:click="addMaterial"
+                            class="flex items-center gap-1.5 rounded-md border border-green-600 px-3 py-1.5 text-[12px] font-medium text-green-700 hover:bg-green-50">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Add Material
+                        </button>
                     </div>
                 </div>
 
                 <div class="bg-white rounded shadow py-4 px-6 mb-4 mt-4">
-                    <!-- House Situation Upload -->
                     <div class="p-3 rounded">
-                        <h2 class="block text-[12px] font-medium text-black">UPLOAD PHOTO</h2>
+                        <h2 class="block text-[12px] font-semibold text-gray-700">UPLOAD PHOTO</h2>
                         <p class="text-gray-500 text-xs">Upload here the photo after delivery.</p>
                     </div>
 
-                    <!-- Drag and Drop Area -->
-                    <div x-data="fileUpload()" class="w-[60%]  mx-auto ">
-                        <div class="border-2 border-dashed border-green-500 bg-[#e9fff1] rounded-lg p-4 flex flex-col items-center space-y-1">
-                            <svg class="w-10 h-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 011-7.874V7a5 5 0 018.874-2.485A5.5 5.5 0 1118.5 15H5z" />
-                            </svg>
-                            <button type="button" class="px-3 py-1 bg-green-600 text-white rounded-md text-xs hover:bg-green-700"
-                                @click="$refs.fileInput.click()">BROWSE FILES
-                            </button>
-
-                            <!-- Hidden File Input -->
-                            <input type="file" x-ref="fileInput" wire:model="images" class="hidden"
-                                @change="addFiles($refs.fileInput.files)" multiple />
-                            @error('images')
-                            <span class="text-red-400 text-sm">{{ $message }}</span>
+                    <div class="mx-auto w-full">
+                        <div wire:ignore x-data="{ isUploading: false }" x-init="
+                            FilePond.registerPlugin(FilePondPluginImagePreview, FilePondPluginFileValidateType);
+                            const pond = FilePond.create($refs.input, {
+                                allowMultiple: true,
+                                acceptedFileTypes: ['image/*'],
+                                labelIdle: 'Drag & Drop your photos or <span class=&quot;filepond--label-action&quot;>Browse</span>',
+                                server: {
+                                    process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+                                        @this.upload('images', file,
+                                            (uploadedFileName) => {
+                                                load(uploadedFileName);
+                                            },
+                                            () => {
+                                                error('Upload failed');
+                                            },
+                                            (event) => {
+                                                progress(event.lengthComputable, event.loaded, event.total);
+                                            }
+                                        );
+                                    },
+                                    revert: (filename, load) => {
+                                        @this.removeUpload('images', filename, load);
+                                    }
+                                },
+                                allowProcess: true
+                            });
+                        ">
+                            <input type="file" x-ref="input" multiple accept="image/*">
+                            @error('images.*')
+                            <span class="mt-2 block text-[11px] text-red-600">{{ $message }}</span>
                             @enderror
                         </div>
-
-                        <!-- Show selected file and progress bar when a file is selected -->
-                        <template x-for="(fileWrapper, index) in files" :key="index">
-                            <div @click="openPreviewModal = true; selectedFile = fileWrapper" class="mt-4 bg-white p-2 rounded-lg shadow">
-                                <div class="flex items-center justify-between mb-2">
-                                    <div class="flex items-center space-x-2">
-                                        <svg class="w-4 h-4 text-orange-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3v6h4l1 1h4V3H7z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8v10h14V8H5z" />
-                                        </svg>
-                                        <span class="text-xs font-medium text-gray-700" x-text="fileWrapper.displayName"></span>
-                                    </div>
-                                    <!-- Status -->
-                                    <span class="text-xs text-green-500 font-medium" x-text="fileWrapper.progress + '%'"></span>
-                                </div>
-                                <!-- Progress Bar -->
-                                <div class="h-1.5 bg-gray-200 rounded-full overflow-hidden cursor-pointer">
-                                    <div class="h-full bg-green-500" x-bind:style="'width: ' + fileWrapper.progress + '%'"></div>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Preview Modal (Triggered by Clicking the Progress Bar) -->
-                        <div x-show="openPreviewModal"
-                            class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 shadow-lg"
-                            x-cloak>
-                            <div class="bg-white w-[600px] rounded-lg shadow-lg p-6 relative">
-                                <!-- Modal Header with File Name -->
-                                <div class="flex justify-between items-center mb-4">
-                                    <!-- Only show input if selectedFile is not null -->
-                                    <template x-if="selectedFile">
-                                        <input type="text" x-model="selectedFile.displayName"
-                                            class="text-[13px] w-[60%] font-regular text-black border-none focus:outline-none focus:ring-0"
-                                            placeholder="Rename file">
-                                        @error('images') <span class="error text-red-600">{{ $message }}</span> @enderror
-                                    </template>
-                                    <button @click="openPreviewModal = false" class="text-gray-400 hover:text-gray-200">
-                                        &times;
-                                    </button>
-                                </div>
-
-                                <!-- Display Image -->
-                                <div class="flex justify-center mb-4">
-                                    <img :src="selectedFile && selectedFile.file ? URL.createObjectURL(selectedFile.file) :  '/storage/images/default.jpg'"
-                                        alt="Preview Image" class="w-full h-auto max-h-[60vh] object-contain">
-                                </div>
-                                <!-- Modal Buttons -->
-                                <div class="flex justify-between mt-4 ">
-                                    <button type="button" class="px-4 py-2 bg-green-600 text-white rounded-lg"
-                                        @click="confirmFile(); $wire.grantApplicant(selectedFile.file)">CONFIRM
-                                    </button>
-                                    <button type="button" class="px-4 py-2 bg-red-600 text-white rounded-lg"
-                                        @click="removeFile(selectedFile); openPreviewModal = false">REMOVE
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
                 </div>
@@ -259,41 +229,3 @@
         </div>
     </div>
 </div>
-<script>
-    function fileUpload() {
-        return {
-            files: [],
-            selectedFile: null,
-
-            addFiles(fileList) {
-                for (let i = 0; i < fileList.length; i++) {
-                    const file = fileList[i];
-                    this.files.push({
-                        file,
-                        displayName: file.name,
-                        progress: 0 // Initialize progress to 0
-                    });
-                    // Start the upload process for the file
-                    this.uploadFile(file, this.files.length - 1);
-                }
-            },
-            removeFile(fileWrapper) {
-                this.files = this.files.filter(f => f !== fileWrapper);
-            },
-            uploadFile(file, index) {
-                const uploadSimulation = setInterval(() => {
-                    if (this.files[index].progress >= 100) {
-                        clearInterval(uploadSimulation);
-                    } else {
-                        this.files[index].progress += 10; // Simulate progress increase
-                    }
-                }, 100); // Adjust the speed of progress simulation
-            },
-
-            confirmFile() {
-                // Logic to handle file confirmation (just close modal)
-                this.openPreviewModal = false;
-            }
-        };
-    }
-</script>

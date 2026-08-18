@@ -1,5 +1,5 @@
 @php use App\Models\User; @endphp
-<div>
+<div class="app-page">
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold">User Management</h2>
@@ -94,7 +94,7 @@
                 @endforeach
             </tbody>
         </table>
-    </div>
+    </div>  
 
     <!-- Pagination -->
     <div class="mt-4">
@@ -103,7 +103,7 @@
 
     <!-- User management modal -->
     @if($isModalOpen)
-        <div class="fixed z-10 inset-0 overflow-y-auto">
+        <div class="fixed z-50 inset-0 overflow-y-auto mt-4 justify-center mt-20">
             <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 transition-opacity">
                     <div class="absolute inset-0 bg-gray-500 opacity-75"></div>

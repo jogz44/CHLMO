@@ -1,4 +1,4 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex flex-col lg:flex-row p-6 h-screen bg-transparent">
         
         <livewire:profile-photo-upload />

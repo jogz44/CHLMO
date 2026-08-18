@@ -24,6 +24,7 @@ use App\Models\Spouse;
 use App\Models\StructureStatusType;
 use App\Models\TaggedAndValidatedApplicant;
 use App\Models\TaggedDocumentsSubmission;
+use App\Models\Tribe;
 use App\Models\WallType;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Database\QueryException;
@@ -47,8 +48,8 @@ class AddNewOccupant extends Component
     // Form fields
     public $first_name, $middle_name, $last_name, $suffix_name, $contact_number,
         $relationship, $reason_for_transfer,
-        $barangay_id, $barangays = [], $purok_id, $puroks = [], $full_address, $transaction_type, $civil_status_id,
-        $civil_statuses, $religion, $tribe, $living_situation_id, $livingSituations, $case_specification_id,
+        $barangay_id, $barangays = [], $purok_id, $puroks = [], $full_address, $transaction_type, $civil_status_id, $tribe_id,
+        $civil_statuses, $religions, $tribes, $living_situation_id, $livingSituations, $case_specification_id, $religion_id,
         $caseSpecifications, $living_situation_case_specification, $non_informal_settler_case_specification, $government_program_id, $governmentPrograms,
         $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes, $structure_status_id,
         $structureStatuses, $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $room_rent_fee, $room_landlord,
@@ -100,6 +101,14 @@ class AddNewOccupant extends Component
 
         $this->civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();
+        });
+
+         $this->tribes = Cache::remember('tribes', 60*60, function() {
+            return Tribe::all();
+        });
+
+          $this->religions = Cache::remember('religions', 60*60, function() {
+            return Religion::all();
         });
 
         $this->dependent_civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
@@ -160,6 +169,9 @@ class AddNewOccupant extends Component
         $this->houseStructureImages = [];
         $this->isFilePondUploadComplete = false;
         $this->isFilePonduploading = false;
+        
+        // Set today's date as the default value for tagged_date
+        $this->tagging_date = now()->toDateString(); // YYYY-MM-DD format
 
         // Handle specific applicant if ID is provided
         if ($applicantId) {
@@ -255,10 +267,11 @@ class AddNewOccupant extends Component
 
             'full_address' => 'nullable|string|max:255',
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'tribe' => 'required|string|max:255',
+            // 'tribe' => 'required|string|max:255',
+            'tribe_id' => 'required|exists:tribes,id',
             'sex' => 'required|in:Male,Female',
             'date_of_birth' => 'required|date',
-            'religion' => 'required|string|max:255',
+            'religion_id' => 'required|exists:religions,id',
             'occupation' => 'required|string|max:255',
             'monthly_income' => 'required|integer',
             'tagging_date' => 'required|date',
@@ -513,10 +526,10 @@ class AddNewOccupant extends Component
             'applicantId' => $this->applicantId,
             'full_address' => $this->full_address,
             'civil_status_id' => $this->civil_status_id,
-            'tribe' => $this->tribe,
+            'tribe_id' => $this->tribe_id,
             'sex' => $this->sex,
             'date_of_birth' => $this->date_of_birth,
-            'religion' => $this->religion,
+            'religion_id' => $this->religion_id,
             'occupation' => $this->occupation,
             'monthly_income' => $this->monthly_income,
             'tagging_date' => $this->tagging_date,
@@ -609,10 +622,10 @@ class AddNewOccupant extends Component
             $taggedApplicant = TaggedAndValidatedApplicant::create([
                 'applicant_id' => $applicant->id,  // Add this line to link to the new applicant
                 'civil_status_id' => $this->civil_status_id,
-                'tribe' => $this->tribe,
+                'tribe_id' => $this->tribe_id,
                 'sex' => $this->sex,
                 'date_of_birth' => $this->date_of_birth,
-                'religion' => $this->religion ?: null,
+                'religion_id' => $this->religion_id,
                 'occupation' => $this->occupation ?: null,
                 'monthly_income' => $this->monthly_income,
                 'tagging_date' => $this->tagging_date,
@@ -783,7 +796,7 @@ class AddNewOccupant extends Component
     }
 
     private function handleError(\Exception $e): void
-    {
+    {   
         Log::error('Error in store process', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString()
@@ -812,6 +825,7 @@ class AddNewOccupant extends Component
             ]);
         }
     }
+    
 
     /**
      * Store individual attachment

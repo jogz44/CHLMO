@@ -1,7 +1,7 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
         <div x-data="{ isEditable: false }" class="flex-1 p-6 overflow-auto">
-            <div class="bg-white rounded shadow mb-4 flex items-center justify-between p-3 fixed top-[80px] left-[20%] right-[3%] z-5">
+            <div class="app-page-heading">
                 <div class="flex items-center">
                     <a href="{{ route('shelter-grantees') }}">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"

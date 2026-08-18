@@ -2,12 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\AwardeeTransferHistory;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class TransferHistories extends Component
 {
+    use HandlesPagination;
+    
     public function render()
     {
         $transfers = AwardeeTransferHistory::with([
@@ -17,7 +20,7 @@ class TransferHistories extends Component
             'processor'
         ])
             ->orderBy('created_at', 'desc')
-            ->paginate(5);
+            ->paginate($this->perPage);
 
         // Add debug logging
         foreach ($transfers as $transfer) {

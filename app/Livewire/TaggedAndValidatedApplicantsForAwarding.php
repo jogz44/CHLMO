@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Logs\ActivityLogs;
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\Awardee;
 use App\Models\Barangay;
 use App\Models\CaseSpecification;
@@ -14,15 +16,13 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Livewire\WithPagination;
-use App\Livewire\Logs\ActivityLogs;
 use Illuminate\Support\Facades\Auth;
 
 
 
 class TaggedAndValidatedApplicantsForAwarding extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     use WithFileUploads;
 
     public $search = '';
@@ -59,6 +59,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         // This ensures that the search query is updated dynamically as the user types
         $this->resetPage();
     }
+
     public function clearSearch(): void
     {
         $this->search = ''; // Clear the search input
@@ -96,7 +97,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->caseSpecificationsFilter = Cache::remember('case_specifications', 60*60, function() {
             return CaseSpecification::all();
         });
-        $this->taggingStatuses = ['Award Pending', 'Awarded']; // Add your statuses here
+        $this->taggingStatuses = ['Award Pending', 'Awarded', 'Blacklisted']; // Add your statuses here
 
         // For Awarding Modal
 
@@ -302,11 +303,20 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         }
 
         if ($this->selectedTaggingStatus !== null) {
-            $query->where('is_awarding_on_going', $this->selectedTaggingStatus === 'Awarded');
+            if ($this->selectedTaggingStatus === 'Blacklisted') {
+                $query->whereHas('awardees', function ($q) {
+                    $q->where('is_blacklisted', true);
+                });
+            } else {
+                $query->where('is_awarding_on_going', $this->selectedTaggingStatus === 'Awarded')
+                    ->whereDoesntHave('awardees', function ($q) {
+                        $q->where('is_blacklisted', true);
+                    });
+            }
         }
 
         // Paginate the filtered results
-        $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate(5);
+        $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         return view('livewire.tagged_and_validated_applicants_for_awarding', [
             'taggedAndValidatedApplicants' => $taggedAndValidatedApplicants,

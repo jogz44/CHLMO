@@ -50,83 +50,83 @@ class DatabaseSeeder extends Seeder
             RolesAndPermissionsSeeder::class,
             UserSeeder::class,
 //            PermissionSeeder::class,
-//            AddressSeeder::class,
-//            ApplicantSeeder::class,
-////            ShelterApplicantSeeder::class,
+           AddressSeeder::class,
+           ApplicantSeeder::class,
+        //    ShelterApplicantSeeder::class,
 //            PeopleSeeder::class,
         ]);
 
-        // if (OriginOfRequest::count() == 0){
-        //     $this->call(ShelterSeeders\OriginOfRequestSeeder::class);
-        // }
+    //     if (OriginOfRequest::count() == 0){
+    //         $this->call(ShelterSeeders\OriginOfRequestSeeder::class);
+    //     }
 
         // if (ShelterApplicant::count() == 0){
         //     $this->call(ShelterSeeders\ShelterApplicantSeeder::class);
         // }
 
-        // if (PurchaseRequisition::count() == 0){
-        //     $this->call(ShelterSeeders\PurchaseRequisitionSeeder::class);
-        // }
+    //     if (PurchaseRequisition::count() == 0){
+    //         $this->call(ShelterSeeders\PurchaseRequisitionSeeder::class);
+    //     }
 
-        // if (PurchaseOrder::count() == 0){
-        //     $this->call(ShelterSeeders\PurchaseOrderSeeder::class);
-        // }
+    //     if (PurchaseOrder::count() == 0){
+    //         $this->call(ShelterSeeders\PurchaseOrderSeeder::class);
+    //     }
 
-        //if (Material::count() == 0){
-            //$this->call(ShelterSeeders\MaterialSeeder::class);
-       // }
+    //     if (Material::count() == 0){
+    //         $this->call(ShelterSeeders\MaterialSeeder::class);
+    //    }
 
         if (Address::count() == 0){
             $this->call(AddressSeeder::class);
         }
 
-        // if (ProfiledTaggedApplicant::count() == 0){
-        //     $this->call(ShelterSeeders\ProfiledTaggedApplicantSeeder::class);
-        // }
+    //     if (ProfiledTaggedApplicant::count() == 0){
+    //         $this->call(ShelterSeeders\ProfiledTaggedApplicantSeeder::class);
+    //     }
 
-        // if (Grantee::count() == 0){
-        //     $this->call(ShelterSeeders\GranteeSeeder::class);
-        // }
+    //     if (Grantee::count() == 0){
+    //         $this->call(ShelterSeeders\GranteeSeeder::class);
+    //     }
 
-//        if (LotList::count() == 0){
-//            $this->call(LotSeeder::class);
-//        }
+    //    if (LotList::count() == 0){
+    //        $this->call(LotSeeder::class);
+    //    }
+
+       if (Address::count() == 0){
+           $this->call(AddressSeeder::class);
+       }
 //
-//        if (Address::count() == 0){
-//            $this->call(AddressSeeder::class);
-//        }
-//
-//        if (Applicant::count() == 0){
-//            $this->call(ApplicantSeeder::class);
-//        }
-//
+       if (Applicant::count() == 0){
+           $this->call(ApplicantSeeder::class);
+       }
+// //
 //        if (Dependent::count() == 0){
 //            $this->call(DependentSeeder::class);
-//        }
-//
-//        if (Awardee::count() == 0){
-//            $this->call(AwardeeSeeder::class);
-//        }
-//
-//        if (TransferredAwardee::count() == 0){
-//            $this->call(TransferredAwardeeSeeder::class);
-//        }
-//
-//        if (Transaction::count() == 0){
-//            $this->call(TransactionSeeder::class);
-//        }
-//
-//        if (Blacklist::count() == 0){
-//            $this->call(BlacklistSeeder::class);
-//        }
-//
-//        if (Spouse::count() == 0){
-//            $this->call(SpouseSeeder::class);
-//        }
-//
-//        // Shelter seeder
-//        if (ShelterMaterial::count() == 0){
-//            $this->call(ShelterMaterialSeeder::class);
-//        }
+    //    }
+
+    //    if (Awardee::count() == 0){
+    //        $this->call(AwardeeSeeder::class);
+    //    }
+
+    //    if (TransferredAwardee::count() == 0){
+    //        $this->call(TransferredAwardeeSeeder::class);
+    //    }
+
+    //    if (Transaction::count() == 0){
+    //        $this->call(TransactionSeeder::class);
+    //    }
+
+    //    if (Blacklist::count() == 0){
+    //        $this->call(BlacklistSeeder::class);
+    //    }
+
+    //    if (Spouse::count() == 0){
+    //        $this->call(SpouseSeeder::class);
+    //    }
+
+       // Shelter seeder
+    //    if (ShelterMaterial::count() == 0){
+    //        $this->call(ShelterMaterialSeeder::class);
+    //    }
     }
 }

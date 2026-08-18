@@ -21,14 +21,14 @@ use Illuminate\Support\Str;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
-use Livewire\WithPagination;
+use App\Livewire\Traits\HandlesPagination;
 use Illuminate\Support\Facades\Auth;
 use App\Livewire\Logs\ActivityLogs;
 
 
 class ShelterProfiledTaggedApplicants extends Component
 {
-    use WithPagination, WithFileUploads;
+    use HandlesPagination, WithFileUploads;
 
     public $search = '';
     public $isLoading = false;
@@ -480,7 +480,7 @@ class ShelterProfiledTaggedApplicants extends Component
             });
         }
 
-        $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate(10);
+        $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate($this->perPage);
 
         // Load documents for the current profiled tagged applicant if applicable
         if ($this->profiledTaggedApplicantId) {

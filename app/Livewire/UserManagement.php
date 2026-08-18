@@ -8,12 +8,13 @@ use Illuminate\Support\Facades\Log;
 use App\Livewire\Logs\ActivityLogs;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Livewire\Traits\HandlesPagination;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class UserManagement extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
     public $isModalOpen = false, $isEditing = false;
 
     // User Management Properties
@@ -261,7 +262,7 @@ class UserManagement extends Component
             ->with('roles');
 
         return view('livewire.user-management', [
-            'users' => $query->paginate(5),
+            'users' => $query->paginate($this->perPage),
             'roles' => Role::all(),
         ])->layout('layouts.app');
     }

@@ -2,15 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\Shelter\Material;
 use App\Models\Shelter\PurchaseOrder;
 
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class ShelterMaterialsList extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
  
 
     public $search = '';
@@ -19,7 +19,6 @@ class ShelterMaterialsList extends Component
     public $itemsDescription;
     public $quantity;
     public $unit;
-    public $perPage = 15;
 
     protected $queryString = [
         'purchaseOrderNo' => ['except' => ''],

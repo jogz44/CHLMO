@@ -1,8 +1,8 @@
-<div class="p-10 h-screen ml-[17%] mt-[60px]">
+<div class="app-page">
     <div class="flex bg-gray-100 text-[12px]">
 
         <!-- Main Content -->
-        <div class="flex-1 h-screen p-6 overflow-auto">
+        <div class="app-table-scroll">
             <div class="bg-white rounded shadow mb-6 flex items-center justify-between relative p-3">
                 <div class="flex items-center">
                     <h2 class="text-[13px] ml-2 items-center text-gray-700">Relocation Applicant Summary</h2>

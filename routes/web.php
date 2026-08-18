@@ -106,6 +106,10 @@ Route::middleware([
         return view('profile');
     })->name('profile');
 
+    Route::get('/system-configuration', function () {
+        return view('system-configuration');
+    })->name('system-configuration');
+
     Route::get('/summary-of-identified-informal-settlers', function () {
         return view('summary-of-identified-informal-settlers');
     })->name('summary-of-identified-informal-settlers');
@@ -146,9 +150,9 @@ Route::middleware([
         return view('applicants');
     })->name('applicants');
 
-    Route::get('/system-configuration', function () {
-        return view('system-configuration');
-    })->name('system-configuration');
+    // Route::get('/system-configuration', function () {
+    //     return view('system-configuration');
+    // })->name('system-configuration');
 
     //    shelter assistance program
     Route::get('/shelter-dashboard', function () {

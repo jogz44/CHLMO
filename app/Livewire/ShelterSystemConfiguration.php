@@ -5,101 +5,124 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\CivilStatus;
 use App\Models\Tribe;
-use App\Models\Religion; // Assuming you have a Religion model for storing religions
+use App\Models\Religion;
 use App\Livewire\Logs\ActivityLogs;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Validation\Rule;
 
 class ShelterSystemConfiguration extends Component
 {
-    public $civilStatuses = [];
-    public $newStatus = ''; // For the input field
-    public $tribes = [];
-    public $applicant_tribes = []; // Array to hold new tribe entries from Alpine.js
-    public $showModal = true;
-   
-    // Properties for religion management
-    public $religions = [''];
-    public $message = '';
+    private array $lookupConfig = [
+        'civil-status' => [
+            'model' => CivilStatus::class,
+            'table' => 'civil_statuses',
+            'column' => 'civil_status',
+            'label' => 'Civil Status',
+        ],
+        'tribe' => [
+            'model' => Tribe::class,
+            'table' => 'tribes',
+            'column' => 'tribe_name',
+            'label' => 'Tribe/Ethnicity',
+        ],
+        'religion' => [
+            'model' => Religion::class,
+            'table' => 'religions',
+            'column' => 'religion_name',
+            'label' => 'Religion',
+        ],
+    ];
 
-    public function mount()
+    public array $search = [];
+    public array $newValue = [];
+
+    public bool $showConfirmModal = false;
+    public ?string $confirmType = null;
+    public ?int $confirmId = null;
+
+    public function mount(): void
     {
-        $this->civilStatuses = CivilStatus::pluck('civil_status')->toArray();
-        $this->tribes = Tribe::pluck('tribe_name')->toArray();
-        $this->religions = Religion::pluck('religion_name')->toArray();
+        foreach (array_keys($this->lookupConfig) as $key) {
+            $this->search[$key] = '';
+            $this->newValue[$key] = '';
+        }
     }
 
-    public function addCivilStatus()
+    private function config(string $type): array
     {
-        // Validation (ensure the status isn't empty and is unique)
+        abort_unless(array_key_exists($type, $this->lookupConfig), 404);
+
+        return $this->lookupConfig[$type];
+    }
+
+    public function getCardsProperty()
+    {
+        return collect($this->lookupConfig)->map(function ($cfg, $key) {
+            $term = trim($this->search[$key] ?? '');
+
+            $query = $cfg['model']::query()
+                ->select(['id', $cfg['column']])
+                ->orderBy($cfg['column']);
+
+            if ($term !== '') {
+                $query->where($cfg['column'], 'like', "%{$term}%");
+            }
+
+            return [
+                'key' => $key,
+                'label' => $cfg['label'],
+                'column' => $cfg['column'],
+                'items' => $query->get(),
+                'total' => $cfg['model']::count(),
+            ];
+        })->values();
+    }
+
+    public function addItem(string $type): void
+    {
+        $cfg = $this->config($type);
+
         $this->validate([
-            'newStatus' => 'required|string|unique:civil_statuses,civil_status',
+            "newValue.$type" => ['required', 'string', 'max:255', Rule::unique($cfg['table'], $cfg['column'])],
         ]);
 
-        // Add the status to the database
-        CivilStatus::create(['civil_status' => $this->newStatus]);
+        $cfg['model']::create([$cfg['column'] => $this->newValue[$type]]);
 
-        // Update the local array and reset input
-        $this->civilStatuses[] = $this->newStatus;
-        $this->newStatus = '';
-        session()->flash('message', 'Civil Status added successfully!');
+        (new ActivityLogs())->logActivity('Add New ' . $cfg['label'], Auth::user());
+
+        $this->newValue[$type] = '';
+        session()->flash('message', $cfg['label'] . ' added successfully.');
     }
 
-    public function addTribe()
+    public function confirmRemove(string $type, int $id): void
     {
-        // Validate each tribe entry to ensure uniqueness
-        foreach ($this->applicant_tribes as $tribe) {
-            if (!empty($tribe)) {
-                $this->validate([
-                    'applicant_tribes.*' => 'string|unique:tribes,tribe_name',
-                ]);
+        $this->confirmType = $type;
+        $this->confirmId = $id;
+        $this->showConfirmModal = true;
+    }
 
-                // Add the tribe to the database
-                Tribe::create(['tribe_name' => $tribe]);
-            
-            }
+    public function cancelRemove(): void
+    {
+        $this->reset(['confirmType', 'confirmId', 'showConfirmModal']);
+    }
+
+    public function removeConfirmed(): void
+    {
+        if (! $this->confirmType || ! $this->confirmId) {
+            return;
         }
 
-        // Update the tribes list and clear the input array
-        $this->applicant_tribes = [];
-        
-         // Log the activity
-         $logger = new ActivityLogs();
-         $user = Auth::user();
-         $logger->logActivity('Added New Tribe', $user);
+        try {
+            $cfg = $this->config($this->confirmType);
+            $cfg['model']::findOrFail($this->confirmId)->delete();
 
-        session()->flash('message', 'Tribes added successfully!');
-    }
-
-    // Methods for religion management
-    public function addReligion()
-    {
-        // Validate each religion entry to ensure uniqueness
-        $this->validate([
-            'religions.*' => 'required|string|unique:religions,religion_name',
-        ]);
-
-        foreach ($this->religions as $religion) {
-            if (!empty($religion)) {
-                Religion::create(['religion_name' => $religion]);
-            }
+            (new ActivityLogs())->logActivity('Remove ' . $cfg['label'], Auth::user());
+            session()->flash('message', $cfg['label'] . ' removed successfully.');
+        } catch (\Illuminate\Database\QueryException) {
+            session()->flash('error', 'This record is already used elsewhere and cannot be removed.');
         }
 
-        // Clear the input array and show a success message
-        $this->religions = [''];
-        $this->message = 'Religions added successfully!';
-    }
-
-    public function removeTribe($index)
-    {
-        unset($this->tribes[$index]);
-        $this->applicant_tribes = array_values($this->tribes); // Re-index the array
-    }
-
-    public function removeReligion($index)
-    {
-        unset($this->religions[$index]);
-        $this->religions = array_values($this->religions); // Re-index the array
+        $this->reset(['confirmType', 'confirmId', 'showConfirmModal']);
     }
 
     public function render()

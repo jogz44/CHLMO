@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Livewire\Traits\HandlesPagination;
 use App\Models\Address;
 use App\Models\Awardee;
 use App\Models\AwardeeAttachmentsList;
@@ -21,13 +22,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Livewire\WithPagination;
 use App\Livewire\Logs\ActivityLogs;
 use Illuminate\Support\Facades\Auth;
 
 class AwardeeList extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
 
     // Filter properties
     public $relocation_site = '',  $status = '', $search = '', $startDate = '', $endDate = '';
@@ -121,7 +121,7 @@ class AwardeeList extends Component
             });
         }
 
-        $awardees = $query->orderBy('created_at', 'desc')->paginate(5);
+        $awardees = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
 
         // Add debug logging
         foreach ($awardees as $awardee) {
@@ -141,9 +141,11 @@ class AwardeeList extends Component
             })->pluck('name')
             : Purok::distinct()->pluck('name');
 
+        $relocationSites = RelocationSite::pluck('relocation_site_name');
+
         return view('livewire.awardee-list', [
             'awardees' => $awardees,
-            'relocationSites' => RelocationSite::all(),
+            'relocationSites' => $relocationSites,
             'puroks' => $puroks,
         ]);
     }

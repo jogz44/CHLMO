@@ -44,7 +44,7 @@ class TaggedAndValidatedApplicantDetails extends Component
             $date_applied;
 
     // New fields
-    public $full_address, $civil_status_id, $civilStatuses, $religion, $tribe;
+    public $full_address, $civil_status_id, $civilStatuses, $religion_id, $religions, $tribe_id, $tribes;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications, $living_situation_case_specification,
         $government_program_id, $governmentPrograms, $living_status_id, $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id,
         $wallTypes, $sex, $date_of_birth, $occupation, $monthly_income, $years_of_residency, $voters_id_number,
@@ -76,10 +76,10 @@ class TaggedAndValidatedApplicantDetails extends Component
     public $editPrimaryInfo = [
         'full_address' => '',
         'civil_status_id' => '',
-        'tribe' => '',
+        'tribe_id' => '',
         'sex' => '',
         'date_of_birth' => '',
-        'religion' => '',
+        'religion_id' => '',
         'occupation' => '',
         'monthly_income' => '',
         'length_of_residency' => '',
@@ -146,6 +146,8 @@ class TaggedAndValidatedApplicantDetails extends Component
             'governmentProgram',
             'livingStatus',
             'civilStatus',
+            'tribe',
+            'religion',
             'liveInPartner',
             'spouse',
             'roofType',
@@ -188,6 +190,12 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->dependentRelationships = Cache::remember('dependentsRelationships', 60*60, function () {
             return DependentsRelationship::all(); // Cache for 1 hour
         });
+        $this->tribes = Cache::remember('tribes', 60*60, function () {
+            return Tribe::all(); // Cache for 1 hour
+        });
+        $this->religions = Cache::remember('religions', 60*60, function () {
+            return Religion::all(); // Cache for 1 hour
+        });
         $this->livingSituations = Cache::remember('livingSituations', 60*60, function() {
             return LivingSituation::all();  // Cache for 1 hour
         });
@@ -221,10 +229,10 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->purok_id = $this->taggedAndValidatedApplicant->applicant?->address?->purok?->id;
         $this->full_address = $this->taggedAndValidatedApplicant->full_address ?? null;
         $this->occupation = $this->taggedAndValidatedApplicant->occupation ?? null;
-        $this->tribe = $this->taggedAndValidatedApplicant->tribe ?? null;
+        $this->tribe_id = $this->taggedAndValidatedApplicant->tribe?->id;
         $this->sex = $this->taggedAndValidatedApplicant->sex;
         $this->date_of_birth = $this->taggedAndValidatedApplicant->date_of_birth;
-        $this->religion = $this->taggedAndValidatedApplicant->religion ?? null;
+        $this->religion_id = $this->taggedAndValidatedApplicant->religion?->id;
         $this->monthly_income = $this->taggedAndValidatedApplicant->monthly_income ?? null;
         $this->years_of_residency = $this->taggedAndValidatedApplicant->years_of_residency ?? null;
         $this->voters_id_number = $this->taggedAndValidatedApplicant->voters_id_number ?? null;
@@ -312,10 +320,10 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->editPrimaryInfo = [
             'full_address' => $this->taggedAndValidatedApplicant->full_address,
             'civil_status_id' => $this->taggedAndValidatedApplicant->civil_status_id,
-            'tribe' => $this->taggedAndValidatedApplicant->tribe,
+            'tribe_id' => $this->taggedAndValidatedApplicant->tribe_id,
             'sex' => $this->taggedAndValidatedApplicant->sex,
             'date_of_birth' => $this->taggedAndValidatedApplicant->date_of_birth,
-            'religion' => $this->taggedAndValidatedApplicant->religion,
+            'religion_id' => $this->taggedAndValidatedApplicant->religion_id,
             'occupation' => $this->taggedAndValidatedApplicant->occupation,
             'monthly_income' => $this->taggedAndValidatedApplicant->monthly_income,
             'length_of_residency' => $this->taggedAndValidatedApplicant->years_of_residency,
@@ -342,10 +350,10 @@ class TaggedAndValidatedApplicantDetails extends Component
         return [
             'editPrimaryInfo.full_address' => 'nullable|string|max:255',
             'editPrimaryInfo.civil_status_id' => 'required|exists:civil_statuses,id',
-            'editPrimaryInfo.tribe' => 'required|string|max:255',
+            'editPrimaryInfo.tribe_id' => 'required|exists:tribes,id',
             'editPrimaryInfo.sex' => 'required|in:Male,Female',
             'editPrimaryInfo.date_of_birth' => 'required|date',
-            'editPrimaryInfo.religion' => 'required|string|max:255',
+            'editPrimaryInfo.religion_id' => 'required|exists:religions,id',
             'editPrimaryInfo.occupation' => 'required|string|max:255',
             'editPrimaryInfo.monthly_income' => 'required|numeric|min:0',
             'editPrimaryInfo.length_of_residency' => 'required|integer|min:0',
@@ -369,10 +377,10 @@ class TaggedAndValidatedApplicantDetails extends Component
 
     protected $messages = [
         'editPrimaryInfo.civil_status_id.required' => 'The civil status field is required.',
-        'editPrimaryInfo.tribe.required' => 'The tribe/ethnicity field is required.',
+        'editPrimaryInfo.tribe_id.required' => 'The tribe/ethnicity field is required.',
         'editPrimaryInfo.sex.required' => 'The sex field is required.',
         'editPrimaryInfo.date_of_birth.required' => 'The date of birth field is required.',
-        'editPrimaryInfo.religion.required' => 'The religion field is required.',
+        'editPrimaryInfo.religion_id.required' => 'The religion field is required.',
         'editPrimaryInfo.occupation.required' => 'The occupation field is required.',
         'editPrimaryInfo.monthly_income.required' => 'The monthly income field is required.',
         'editPrimaryInfo.length_of_residency.required' => 'The length of residency field is required.',
@@ -401,10 +409,10 @@ class TaggedAndValidatedApplicantDetails extends Component
             $this->taggedAndValidatedApplicant->update([
                 'full_address' => $this->editPrimaryInfo['full_address'],
                 'civil_status_id' => $this->editPrimaryInfo['civil_status_id'],
-                'tribe' => $this->editPrimaryInfo['tribe'],
+                'tribe_id' => $this->editPrimaryInfo['tribe_id'],
                 'sex' => $this->editPrimaryInfo['sex'],
                 'date_of_birth' => $this->editPrimaryInfo['date_of_birth'],
-                'religion' => $this->editPrimaryInfo['religion'],
+                'religion_id' => $this->editPrimaryInfo['religion_id'],
                 'occupation' => $this->editPrimaryInfo['occupation'],
                 'monthly_income' => $this->editPrimaryInfo['monthly_income'],
                 'years_of_residency' => $this->editPrimaryInfo['length_of_residency'],

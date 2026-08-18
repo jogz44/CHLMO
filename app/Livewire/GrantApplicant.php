@@ -117,10 +117,10 @@ class GrantApplicant extends Component
             'date_of_ris' => 'required|date',
             'ar_no' => 'required|numeric',
             'materials.*.material_id' => 'required|exists:materials,id',
-            'grantee_quantity.*' => 'required|numeric|min:1',
+            'materials.*.grantee_quantity' => 'required|numeric|min:1',
             'materials.*.material_unit_id' => 'required|exists:material_units,id',
-            'materials.*.purchase_order_id' => 'required|exists:purchase_orders,id'
-            // 'photo.*' => 'required|image|max:2048'
+            'materials.*.purchase_order_id' => 'required|exists:purchase_orders,id',
+            'images.*' => 'nullable|image|max:10240',
         ];
     }
 
@@ -255,11 +255,13 @@ class GrantApplicant extends Component
     return $materials;
     }
 
-    public function updatedPhoto()
+    public function updatedImages()
     {
         Log::info('Photo uploaded:', $this->images);
         // Validate the uploaded images immediately after selection
-        $this->validateOnly('images');
+        $this->validate([
+            'images.*' => 'nullable|image|max:10240',
+        ]);
     }
 
     public  function removeUpload($property, $fileName, $load): void

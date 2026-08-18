@@ -7,7 +7,7 @@ use App\Models\Shelter\Grantee;
 use App\Models\Shelter\Material;
 use App\Models\Shelter\PurchaseOrder;
 use App\Models\Shelter\PurchaseRequisition;
-use Livewire\WithPagination;
+use App\Livewire\Traits\HandlesPagination;
 use Illuminate\Support\Facades\Cache;
 use Maatwebsite\Excel\Facades\Excel;
 use Ramsey\Collection\Collection;
@@ -16,7 +16,7 @@ use App\Exports\DistributionListDataExport;
 
 class ShelterDistributionList extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
 
     public $search = '';
     public $profileNo, $date_of_ris, $first_name, $middle_name, $last_name, $contact_number;
@@ -182,7 +182,7 @@ class ShelterDistributionList extends Component
         }
 
         // Get the paginated grantees
-        $grantees = $query->orderBy('date_of_ris', 'desc')->paginate(5);
+        $grantees = $query->orderBy('date_of_ris', 'desc')->paginate($this->perPage);
 
         $materialIds = $grantees->pluck('deliveredMaterials.*.material_id')->flatten()->unique();
         $allMaterials = Material::whereIn('id', $materialIds)

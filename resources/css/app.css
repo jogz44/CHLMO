@@ -4,9 +4,42 @@
 
 @layer base{
     [x-cloak] { display: none !important; }
+
+    html,
+    body {
+        @apply min-h-screen overflow-x-hidden bg-gray-100;
+    }
 }
 
 @layer components {
+    .app-main {
+        @apply min-h-screen bg-gray-100 pt-16 md:pl-64;
+    }
+
+    .app-page {
+        @apply w-full overflow-x-hidden py-6 sm:px-6 lg:px-8 xl:px-10;
+    }
+
+    .app-page {
+        @apply w-full overflow-x-hidden py-6 sm:px-6 lg:px-8 xl:px-10;
+    }
+
+    .app-sidebar {
+        @apply fixed inset-y-0 left-0 z-30 hidden w-64 overflow-hidden bg-white py-3 pl-2 pr-2 shadow-lg md:block;
+    }
+
+    .app-header {
+        @apply fixed left-0 top-0 z-20 h-16 w-full items-center justify-between bg-white px-4 shadow-sm md:left-64 md:flex md:w-[calc(100%-16rem)] lg:px-6;
+    }
+
+    .app-table-scroll {
+        @apply w-full overflow-x-auto;
+    }
+
+    .app-page-heading {
+        @apply sticky top-0 z-0 mb-4 flex items-center justify-between rounded bg-white p-3 shadow;
+    }
+
     .alert { @apply w-60 sm:w-96 md:w-full max-w-[350px] px-5 py-6 text-base border-l-8 rounded opacity-100 pointer-events-auto fixed
     top-2.5 right-2.5 z-[1000] overflow-hidden; }
 
@@ -42,5 +75,3 @@
 /*    visibility: visible;       !* Make sure it's visible *!*/
 /*    pointer-events: auto;      !* Allow interaction *!*/
 /*}*/
-
-

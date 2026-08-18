@@ -13,11 +13,12 @@ use App\Models\Purok;
 use App\Models\TaggedAndValidatedApplicant;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Livewire\Traits\HandlesPagination;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MasterlistOfActualOccupants extends Component
 {
-    use WithPagination;
+    use HandlesPagination;
 
     public $barangays, $puroks, $civilStatuses, $livingSituations, $livingStatuses, $caseSpecifications, $livingSituationCaseSpecifications;
     public $sortField = 'last_name';  // default sort field
@@ -281,7 +282,7 @@ class MasterlistOfActualOccupants extends Component
     public function render()
     {
         $query = $this->getFilteredQuery();
-        $applicants = $query->paginate(5);
+        $applicants = $query->paginate($this->perPage);
 
         return view('livewire.masterlist-of-actual-occupants', [
             'applicants' => $applicants,

@@ -24,7 +24,7 @@
         <!-- Styles -->
         @livewireStyles
     </head>
-    <body class="bg-gray-100 min-h-screen flex justify-center items-center" style="font-family:'Poppins', sans-serif;">
+    <body class="bg-gray-100 min-h-screen flex justify-center items-center sticky lg:static" style="font-family:'Poppins', sans-serif;">
         <!-- Background Images -->
         <div class="absolute top-0 left-0 z-0">
             {{--left-top design--}}
@@ -37,7 +37,7 @@
             </svg>
         </div>
         {{--right-bottom design--}}
-        <div class="absolute bottom-0 right-0 z-0">
+        <div class="absolute bottom-0 right-0 z-0 hidden lg:flex">
             <svg width="653" height="735" viewBox="0 0 853 935" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g opacity="0.45">
                     <ellipse cx="778.754" cy="770.914" rx="579" ry="522" transform="rotate(140.581 778.754 770.914)" fill="#66A981" fill-opacity="0.7"/>

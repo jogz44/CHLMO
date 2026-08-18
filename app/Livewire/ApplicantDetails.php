@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -47,10 +48,10 @@ class ApplicantDetails extends Component
     public $first_name, $middle_name, $last_name, $suffix_name, $contact_number, $barangay, $purok;
 
     // New fields
-    public $full_address, $civil_status_id, $civil_statuses, $religion, $tribe;
+    public $full_address, $civil_status_id, $civil_statuses, $religions, $tribes;
     public $living_situation_id, $livingSituations, $case_specification_id, $caseSpecifications,
         $living_situation_case_specification, $non_informal_settler_case_specification, $government_program_id, $governmentPrograms, $living_status_id,
-        $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes, $structure_status_id, $structureStatuses,
+        $livingStatuses, $roof_type_id, $roofTypes, $wall_type_id, $wallTypes, $structure_status_id, $structureStatuses, $tribe_id, $religion_id,
         $sex, $date_of_birth, $occupation, $monthly_income, $tagging_date, $room_rent_fee, $room_landlord,
         $house_rent_fee, $house_landlord, $lot_rent_fee, $lot_landlord, $house_owner, $relationship_to_house_owner,
         $tagger_name, $years_of_residency, $voters_id_number, $remarks;
@@ -105,7 +106,7 @@ class ApplicantDetails extends Component
                     'dependent_civil_status_id' => $dependent->dependent_civil_status_id,
                     'dependent_date_of_birth' => $dependent->dependent_date_of_birth,
                     'dependent_occupation' => $dependent->dependent_occupation,
-                    'dependent_monthly_income' => $dependent->dependent_monthly_income,
+                    'dependent_monthly_income' => $dependent->dependent_monthly_income, 
                     'dependent_relationship_id' => $dependent->dependent_relationship_id,
                 ];
             })->toArray();
@@ -113,6 +114,14 @@ class ApplicantDetails extends Component
 
         $this->civil_statuses = Cache::remember('civil_statuses', 60*60, function() {
             return CivilStatus::all();  // Cache for 1 hour
+        });
+
+        $this->tribes = Cache::remember('tribes', 60*60, function() {
+            return Tribe::all();  // Cache for 1 hour
+        });
+
+        $this->religions = Cache::remember('religions', 60*60, function() {
+            return Religion::all();
         });
 
         // For Dependents
@@ -151,7 +160,7 @@ class ApplicantDetails extends Component
             return StructureStatusType::all();  // Cache for 1 hour
         });
 
-        // Populate fields with applicant data
+        // Populate fields with applicant data 
         $this->first_name = $person->first_name ?? '';
         $this->middle_name = $person->middle_name ?? '';
         $this->last_name = $person->last_name ?? '';
@@ -212,10 +221,10 @@ class ApplicantDetails extends Component
             // pipe syntax
             'full_address' => 'nullable|string|max:255',
             'civil_status_id' => 'nullable|exists:civil_statuses,id',
-            'tribe' => 'required|string|max:255',
+            'tribe_id' => 'required|exists:tribes,id',
             'sex' => 'required|in:Male,Female',
             'date_of_birth' => 'required|date',
-            'religion' => 'required|string|max:255',
+            'religion_id' => 'required|exists:religions,id',
             'occupation' => 'required|string|max:255',
             'monthly_income' => 'required|integer',
             'tagging_date' => 'required|date',
@@ -568,10 +577,10 @@ class ApplicantDetails extends Component
             'applicantId' => $this->applicantId,
             'full_address' => $this->full_address,
             'civil_status_id' => $this->civil_status_id,
-            'tribe' => $this->tribe,
+            'tribe_id' => $this->tribe_id,
             'sex' => $this->sex,
             'date_of_birth' => $this->date_of_birth,
-            'religion' => $this->religion,
+            'religion_id' => $this->religion_id,
             'occupation' => $this->occupation,
             'monthly_income' => $this->monthly_income,
             'tagging_date' => $this->tagging_date,
@@ -615,31 +624,33 @@ class ApplicantDetails extends Component
 
     public function store()
     {
-        // Validate the input data
-        $this->validate();
-
-        Log::info('Creating tagged applicant', ['is_tagged' => true]);
-
-        \Log::info('Store method called', [
-            'applicantId' => $this->applicantId,
-            'houseStructureImages' => count($this->houseStructureImages),
-            'all_input' => $this->all(),
-            'validation_data' => $this->getValidationData()
-        ]);
+        $errorReference = 'TAG-' . now()->format('YmdHis') . '-' . $this->applicantId;
 
         DB::beginTransaction();
 
         // Attempt to create the new tagged and validated applicant record
         try {
+            // Validate inside the guarded block so failed requests get logged and visible response details.
+            $this->validate();
+
+            Log::info('Creating tagged applicant', ['is_tagged' => true]);
+
+            Log::info('Store method called', [
+                'reference' => $errorReference,
+                'applicantId' => $this->applicantId,
+                'houseStructureImages' => count($this->houseStructureImages),
+                'validation_data' => $this->getValidationData()
+            ]);
+
             $taggedApplicant = TaggedAndValidatedApplicant::create([
                 'applicant_id' => $this->applicantId,
                 'transaction_type' => $this->applicant->transaction_type,
                 'full_address' => $this->full_address ?: null,
                 'civil_status_id' => $this->civil_status_id,
-                'tribe' => $this->tribe,
+                'tribe_id' => $this->tribe_id,
                 'sex' => $this->sex,
                 'date_of_birth' => $this->date_of_birth,
-                'religion' => $this->religion ?: null,
+                'religion_id' => $this->religion_id,
                 'occupation' => $this->occupation ?: null,
                 'monthly_income' => $this->monthly_income,
                 'tagging_date' => $this->tagging_date,
@@ -767,9 +778,31 @@ class ApplicantDetails extends Component
 
             return redirect()->route('applicants');
 
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            Log::warning('Validation failed while tagging applicant', [
+                'reference' => $errorReference,
+                'applicantId' => $this->applicantId,
+                'errors' => $e->errors(),
+            ]);
+
+            $this->dispatch('alert', [
+                'title' => 'Please check the form',
+                'message' => 'Some required information is missing or invalid. Reference: ' . $errorReference,
+                'type' => 'warning',
+                'reference' => $errorReference,
+                'errors' => $e->errors(),
+            ]);
+
+            throw $e;
         } catch (QueryException $e) {
             DB::rollBack();
-            \Log::error('Error creating applicant or dependents: ' . $e->getMessage());
+            Log::error('Error creating applicant or dependents: ' . $e->getMessage(), [
+                'reference' => $errorReference,
+                'applicantId' => $this->applicantId,
+                'sql_state' => $e->getCode(),
+            ]);
             // Check for numeric range error (SQL state 22003)
             if ($e->getCode() === '22003') {
                 $this->dispatch('alert', [
@@ -781,10 +814,24 @@ class ApplicantDetails extends Component
                 // For other database errors
                 $this->dispatch('alert', [
                     'title' => 'Something went wrong!',
-                    'message' => 'Unable to save the information. Please try again or contact support if the problem persists.',
-                    'type' => 'danger'
+                    'message' => 'Unable to save the information. Reference: ' . $errorReference,
+                    'type' => 'danger',
+                    'reference' => $errorReference,
                 ]);
             }
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Unhandled error tagging applicant: ' . $e->getMessage(), [
+                'reference' => $errorReference,
+                'applicantId' => $this->applicantId,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            $this->dispatch('alert', [
+                'title' => 'Something went wrong!',
+                'message' => 'Unable to save the information. Reference: ' . $errorReference,
+                'type' => 'danger',
+                'reference' => $errorReference,
+            ]);
         }
     }
     /**
