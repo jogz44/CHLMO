@@ -500,6 +500,21 @@ class ShelterApplicants extends Component
         }, 'shelter-applicants.pdf');
     }
 
+      public $sortField = 'date_request';
+    public $sortDirection = 'desc';
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            // Toggle direction if clicking the same column
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->resetPage();
+    }
+
     public function render()
     {
         // Fetch applicants with their related data
@@ -542,7 +557,18 @@ class ShelterApplicants extends Component
             });
         }
 
-        $applicants = $query->orderBy('date_request', 'desc')->paginate($this->perPage);
+        // $applicants = $query->orderBy('date_request', 'desc')->paginate($this->perPage);
+                if (in_array($this->sortField, ['date_request'])) {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        } elseif ($this->sortField === 'name') {
+            $query->join('people', 'shelter_applicants.person_id', '=', 'people.id')
+                ->orderBy('people.last_name', $this->sortDirection); // avoid column collisions from the joins
+        } else {
+            $query->orderBy('date_request', 'desc'); // fallback
+        }
+
+        $applicants = $query->paginate($this->perPage);
+
         $OriginOfRequests = OriginOfRequest::all();
 
         // // Return the view with the filtered applicants

@@ -83,6 +83,20 @@ class AwardeeList extends Component
             'endDate'
         ]);
     }
+        public $sortField = 'grant_date';
+    public $sortDirection = 'desc';
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            // Toggle direction if clicking the same column
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -131,7 +145,19 @@ class AwardeeList extends Component
             });
         }
 
-        $awardees = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        // $awardees = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+                if ($this->sortField === 'grant_date') {
+            $query->orderBy('grant_date', $this->sortDirection);
+       } elseif ($this->sortField === 'name') {
+            $query->join('applicants', 'awardees.tagged_and_validated_applicant_id', '=', 'applicants.id')
+                ->join('people', 'applicants.person_id', '=', 'people.id')
+                ->orderBy('people.last_name', $this->sortDirection)
+                ->select('awardees.*');
+        } else {
+            $query->orderBy('grant_date', 'desc'); // fallback — only 2 args
+        }
+
+        $awardees = $query->paginate($this->perPage);
 
         // Optional debug logging
         foreach ($awardees as $awardee) {

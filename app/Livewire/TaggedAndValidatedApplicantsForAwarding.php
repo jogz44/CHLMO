@@ -85,16 +85,16 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         $this->unit = "m²";
 
         // Initialize filter options
-        $this->puroksFilter = Cache::remember('puroks', 60*60, function() {
+        $this->puroksFilter = Cache::remember('puroks', 60 * 60, function () {
             return Purok::all();
         });
-        $this->barangaysFilter = Cache::remember('barangays', 60*60, function() {
+        $this->barangaysFilter = Cache::remember('barangays', 60 * 60, function () {
             return Barangay::all();
         });
-        $this->livingSituationsFilter = Cache::remember('living_situations', 60*60, function() {
+        $this->livingSituationsFilter = Cache::remember('living_situations', 60 * 60, function () {
             return LivingSituation::all();
         });
-        $this->caseSpecificationsFilter = Cache::remember('case_specifications', 60*60, function() {
+        $this->caseSpecificationsFilter = Cache::remember('case_specifications', 60 * 60, function () {
             return CaseSpecification::all();
         });
         $this->taggingStatuses = ['Award Pending', 'Awarded', 'Blacklisted']; // Add your statuses here
@@ -193,7 +193,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
 
             $this->dispatch('alert', [
                 'title' => 'Award Complete!',
-                'message' => 'Applicant has been successfully awarded. <br><small>'. now()->calendar() .'</small>',
+                'message' => 'Applicant has been successfully awarded. <br><small>' . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
 
@@ -202,7 +202,7 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             DB::rollBack();
             $this->dispatch('alert', [
                 'title' => 'Failed to complete award process',
-                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
                 'type' => 'danger'
             ]);
         }
@@ -210,7 +210,9 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'actual_relocation_site_id', 'lot_size', 'grant_date',
+            'actual_relocation_site_id',
+            'lot_size',
+            'grant_date',
         ]);
     }
 
@@ -235,6 +237,21 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         return redirect()->route('tagged-and-validated-applicant-details', ['applicantId' => $applicantId]);
     }
 
+    public $sortField = 'tagging_date';
+    public $sortDirection = 'desc';
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            // Toggle direction if clicking the same column
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->resetPage();
+    }
+
     public function render()
     {
         $query = TaggedAndValidatedApplicant::with([
@@ -250,40 +267,40 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         if ($this->search) {
             $searchTerms = preg_split('/\s+/', $this->search, -1, PREG_SPLIT_NO_EMPTY);
 
-            $query->where(function($q) use ($searchTerms) {
-                $q->whereHas('applicant', function($applicantQuery) use ($searchTerms) {
-                    $applicantQuery->where('applicant_id', 'like', '%'.$this->search.'%');
+            $query->where(function ($q) use ($searchTerms) {
+                $q->whereHas('applicant', function ($applicantQuery) use ($searchTerms) {
+                    $applicantQuery->where('applicant_id', 'like', '%' . $this->search . '%');
 
                     // Flexible name matching
-                    $applicantQuery->orWhereHas('person', function($personQuery) use ($searchTerms) {
+                    $applicantQuery->orWhereHas('person', function ($personQuery) use ($searchTerms) {
                         foreach ($searchTerms as $term) {
-                            $personQuery->where(function($subQuery) use ($term) {
-                                $subQuery->where('first_name', 'like', '%'.$term.'%')
-                                        ->orWhere('middle_name', 'like', '%'.$term.'%')
-                                        ->orWhere('last_name', 'like', '%'.$term.'%')
-                                        ->orWhere('suffix_name', 'like', '%'.$term.'%');
+                            $personQuery->where(function ($subQuery) use ($term) {
+                                $subQuery->where('first_name', 'like', '%' . $term . '%')
+                                    ->orWhere('middle_name', 'like', '%' . $term . '%')
+                                    ->orWhere('last_name', 'like', '%' . $term . '%')
+                                    ->orWhere('suffix_name', 'like', '%' . $term . '%');
                             });
                         }
                     });
 
                     $applicantQuery->orWhereHas('address.purok', function ($subQuery) {
-                        $subQuery->where('name', 'like', '%'.$this->search.'%');
+                        $subQuery->where('name', 'like', '%' . $this->search . '%');
                     });
 
                     $applicantQuery->orWhereHas('address.barangay', function ($subQuery) {
-                        $subQuery->where('name', 'like', '%'.$this->search.'%');
+                        $subQuery->where('name', 'like', '%' . $this->search . '%');
                     });
                 });
 
-                $q->orWhereHas('livingSituation', function($q) {
+                $q->orWhereHas('livingSituation', function ($q) {
                     $q->where('living_situation_description', 'like', '%' . $this->search . '%');
                 });
 
-                $q->orWhereHas('caseSpecification', function($q) {
+                $q->orWhereHas('caseSpecification', function ($q) {
                     $q->where('case_specification_name', 'like', '%' . $this->search . '%');
                 });
 
-                $q->orWhere('living_situation_case_specification', 'like', '%'.$this->search.'%');
+                $q->orWhere('living_situation_case_specification', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -312,10 +329,10 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         }
 
         if ($this->selectedCaseSpecification_id) {
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->where('case_specification_id', $this->selectedCaseSpecification_id)
-                ->orWhere('living_situation_case_specification', $this->selectedCaseSpecification_id)
-                ->orWhere('non_informal_settler_case_specification', $this->selectedCaseSpecification_id);
+                    ->orWhere('living_situation_case_specification', $this->selectedCaseSpecification_id)
+                    ->orWhere('non_informal_settler_case_specification', $this->selectedCaseSpecification_id);
             });
         }
 
@@ -333,7 +350,19 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
         }
 
         // Paginate the filtered results
-        $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        // $taggedAndValidatedApplicants = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+                if ($this->sortField === 'tagging_date') {
+            $query->orderBy('tagging_date', $this->sortDirection);
+        } elseif ($this->sortField === 'name') {
+            $query->join('applicants', 'tagged_and_validated_applicants.applicant_id', '=', 'applicants.id')
+                ->join('people', 'applicants.person_id', '=', 'people.id')
+                ->orderBy('people.last_name', $this->sortDirection)
+                ->select('tagged_and_validated_applicants.*');
+        } else {
+            $query->orderBy('tagging_date', 'desc'); // fallback — only 2 args
+        }
+
+        $taggedAndValidatedApplicants = $query->paginate($this->perPage);
 
         return view('livewire.tagged_and_validated_applicants_for_awarding', [
             'taggedAndValidatedApplicants' => $taggedAndValidatedApplicants,
@@ -344,5 +373,4 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             'taggingStatuses' => $this->taggingStatuses,
         ]);
     }
-
 }

@@ -128,13 +128,23 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th class="py-2 px-2 text-center font-medium whitespace-nowrap">ID</th>
-                        <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Awardee</th>
+                        <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words cursor-pointer select-none" wire:click="sortBy('name')">
+                            Awardee
+                             @if($sortField === 'name')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                            @endif
+                        </th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Assigned Site</th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Assigned Block/Lot</th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Actual Site</th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Actual Block/Lot</th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words">Lot Size (m&sup2;)</th>
-                        <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Grant Date</th>
+                        <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap cursor-pointer select-none" wire:click="sortBy('grant_date')">
+                            Grant Date
+                            @if($sortField === 'grant_date')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                        </th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-normal">Status</th>
                         <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Previous Awardee</th>
                     </tr>
@@ -224,7 +234,7 @@
                                             Awarded
                                         </span>
                                     @elseif($awardee->actual_relocation_site_id)
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-yellow-800">
                                             Has Actual Site
                                         </span>
                                     @elseif($awardee->assigned_relocation_site_id)

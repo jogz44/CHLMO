@@ -37,7 +37,7 @@ class Applicants extends Component
         $selectedBarangay_id, $barangaysFilter = [], $taggingStatuses;
 
     public $selectedApplicantId, $edit_person_id, $edit_first_name, $edit_middle_name, $edit_last_name, $edit_suffix_name, $edit_date_applied,
-            $edit_contact_number, $edit_barangay_id, $edit_purok_id;
+        $edit_contact_number, $edit_barangay_id, $edit_purok_id;
 
     // For checking duplicate applicants
     public $showHousingDuplicateWarning = false, $housingDuplicateData = null, $proceedWithDuplicate = false;
@@ -73,8 +73,8 @@ class Applicants extends Component
         // Set today's date as the default value for date_applied
         $this->date_applied = now()->toDateString(); // YYYY-MM-DD format
 
-//        $this->startDate = now()->toDateString();
-//        $this->endDate = now()->toDateString();
+        //        $this->startDate = now()->toDateString();
+        //        $this->endDate = now()->toDateString();
 
         // Initialize dropdowns
         $this->barangays = Barangay::all();
@@ -84,10 +84,10 @@ class Applicants extends Component
         $this->interviewer = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
 
         // Initialize filter options
-        $this->puroksFilter = Cache::remember('puroks', 60*60, function() {
+        $this->puroksFilter = Cache::remember('puroks', 60 * 60, function () {
             return Purok::all();
         });
-        $this->barangaysFilter = Cache::remember('barangays', 60*60, function() {
+        $this->barangaysFilter = Cache::remember('barangays', 60 * 60, function () {
             return Barangay::all();
         });
         $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
@@ -133,9 +133,11 @@ class Applicants extends Component
     // Add this method to check for duplicates when name fields change
     public function updated($propertyName)
     {
-        if (!$this->showHousingDuplicateWarning &&
+        if (
+            !$this->showHousingDuplicateWarning &&
             in_array($propertyName, ['first_name', 'last_name', 'middle_name']) &&
-            $this->first_name && $this->last_name) {
+            $this->first_name && $this->last_name
+        ) {
 
             $people = new People();
             $result = $people->checkExistingApplications(
@@ -232,10 +234,10 @@ class Applicants extends Component
                 'transaction_type' => 'Walk-in'  // Explicitly set for new applicants
             ]);
 
-             // Log the activity using ActivityLogs
-             $logger = new ActivityLogs();
-             $user = Auth::user();
-             $logger->logActivity('Create Applicant', $user);
+            // Log the activity using ActivityLogs
+            $logger = new ActivityLogs();
+            $user = Auth::user();
+            $logger->logActivity('Create Applicant', $user);
 
             logger()->info('Applicant stored successfully', [
                 'applicant_id' => $applicantId
@@ -247,12 +249,11 @@ class Applicants extends Component
 
             $this->dispatch('alert', [
                 'title' => 'Applicant Added!',
-                'message' => 'Applicant successfully added at <br><small>'. now()->calendar() .'</small>',
+                'message' => 'Applicant successfully added at <br><small>' . now()->calendar() . '</small>',
                 'type' => 'success'
             ]);
 
             $this->redirect('applicants');
-
         } catch (\Exception $e) {
             logger()->error('Error storing applicant', [
                 'error' => $e->getMessage(),
@@ -265,8 +266,15 @@ class Applicants extends Component
     public function resetForm(): void
     {
         $this->reset([
-            'date_applied', 'person_id', 'first_name', 'middle_name', 'last_name',
-            'suffix_name', 'barangay_id', 'purok_id', 'contact_number',
+            'date_applied',
+            'person_id',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'suffix_name',
+            'barangay_id',
+            'purok_id',
+            'contact_number',
         ]);
     }
     public function edit($id): void
@@ -318,14 +326,14 @@ class Applicants extends Component
             $address->purok_id = $this->edit_purok_id;
             $address->save(); // Don't forget to save the address
         }
-         // Log the activity using ActivityLogs
-         $logger = new ActivityLogs();
-         $user = Auth::user();
-         $logger->logActivity('Edit Applicant Info', $user);
+        // Log the activity using ActivityLogs
+        $logger = new ActivityLogs();
+        $user = Auth::user();
+        $logger->logActivity('Edit Applicant Info', $user);
 
         $this->dispatch('alert', [
             'title' => 'Details Updated!',
-            'message' => 'Applicant successfully updated at <br><small>'. now()->calendar() .'</small>',
+            'message' => 'Applicant successfully updated at <br><small>' . now()->calendar() . '</small>',
             'type' => 'success'
         ]);
 
@@ -358,7 +366,7 @@ class Applicants extends Component
             \Log::error('Export error: ' . $e->getMessage());
             $this->dispatch('alert', [
                 'title' => 'Export failed: ',
-                'message' => $e->getMessage() . '<br><small>'. now()->calendar() .'</small>',
+                'message' => $e->getMessage() . '<br><small>' . now()->calendar() . '</small>',
                 'type' => 'danger'
             ]);
             return null;
@@ -394,13 +402,13 @@ class Applicants extends Component
         }
 
         if ($this->selectedBarangay_id) {    // Changed from barangay_id
-            $query->whereHas('address', function($q) {
+            $query->whereHas('address', function ($q) {
                 $q->where('barangay_id', $this->selectedBarangay_id);
             });
         }
 
         if ($this->selectedPurok_id) {       // Changed from purok_id
-            $query->whereHas('address', function($q) {
+            $query->whereHas('address', function ($q) {
                 $q->where('purok_id', $this->selectedPurok_id);
             });
         }
@@ -458,29 +466,44 @@ class Applicants extends Component
         }, 'applicants.pdf');
     }
 
+    public $sortField = 'date_applied';
+    public $sortDirection = 'desc';
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            // Toggle direction if clicking the same column
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->resetPage();
+    }
+
     public function render()
     {
         $query = Applicant::with(['address.purok', 'address.barangay', 'taggedAndValidated', 'person'])
-            ->where(function($query) {
+            ->where(function ($query) {
                 // Split search input into words
                 $searchWords = explode(' ', strtolower($this->search));
 
                 foreach ($searchWords as $word) {
-                    $query->where(function($subQuery) use ($word) {
-                        $subQuery->whereHas('person', function($q) use ($word) {
+                    $query->where(function ($subQuery) use ($word) {
+                        $subQuery->whereHas('person', function ($q) use ($word) {
                             $q->whereRaw('LOWER(first_name) LIKE ?', ["%{$word}%"])
-                            ->orWhereRaw('LOWER(middle_name) LIKE ?', ["%{$word}%"])
-                            ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$word}%"])
-                            ->orWhereRaw('LOWER(suffix_name) LIKE ?', ["%{$word}%"])
-                            ->orWhereRaw('LOWER(contact_number) LIKE ?', ["%{$word}%"]);
+                                ->orWhereRaw('LOWER(middle_name) LIKE ?', ["%{$word}%"])
+                                ->orWhereRaw('LOWER(last_name) LIKE ?', ["%{$word}%"])
+                                ->orWhereRaw('LOWER(suffix_name) LIKE ?', ["%{$word}%"])
+                                ->orWhereRaw('LOWER(contact_number) LIKE ?', ["%{$word}%"]);
                         })
-                        ->orWhereRaw('LOWER(applicant_id) LIKE ?', ["%{$word}%"])
-                        ->orWhereHas('address.purok', function ($q) use ($word) {
-                            $q->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"]);
-                        })
-                        ->orWhereHas('address.barangay', function ($q) use ($word) {
-                            $q->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"]);
-                        });
+                            ->orWhereRaw('LOWER(applicant_id) LIKE ?', ["%{$word}%"])
+                            ->orWhereHas('address.purok', function ($q) use ($word) {
+                                $q->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"]);
+                            })
+                            ->orWhereHas('address.barangay', function ($q) use ($word) {
+                                $q->whereRaw('LOWER(name) LIKE ?', ["%{$word}%"]);
+                            });
                     });
                 }
             });
@@ -506,7 +529,19 @@ class Applicants extends Component
             $query->where('is_tagged', $this->selectedTaggingStatus === 'Tagged');
         }
 
-        $applicants = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+        // $applicants = $query->orderBy('created_at', 'desc')->paginate($this->perPage);
+                   if (in_array($this->sortField, ['date_applied'])) {
+            $query->orderBy($this->sortField, $this->sortDirection);
+        } elseif ($this->sortField === 'name') {
+            $query->join('people', 'applicants.person_id', '=', 'people.id')
+                ->orderBy('people.last_name', $this->sortDirection); // avoid column collisions from the joins
+        } elseif ($this->sortField === 'transaction_type') {
+            $query->orderBy('transaction_type', $this->sortDirection);
+        } else {
+            $query->orderBy('date_applied', 'desc'); // fallback
+        }
+
+        $applicants = $query->paginate($this->perPage);
 
         return view('livewire.applicants', [
             'puroks' => $this->puroks,
@@ -514,5 +549,4 @@ class Applicants extends Component
             'applicants' => $applicants
         ]);
     }
-
 }

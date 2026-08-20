@@ -152,14 +152,24 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2 border-b text-center font-medium">ID</th>
-                            <th class="py-2 px-2 border-b text-center font-medium toggle-column name-col">NAME</th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none" wire:click="sortBy('name')">
+                                NAME
+                                @if($sortField === 'name')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">PUROK</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">BARANGAY</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column living-situation-col">LIVING SITUATION (CASE)</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-col">CASE SPECIFICATION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-normal break-words toggle-column case-specification-description-col">CASE SPECIFICATION DESCRIPTION</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column contact-col">CONTACT NUMBER</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col">TAGGING DATE</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column transaction-type-col cursor-pointer select-none" wire:click="sortBy('tagging_date')">
+                                TAGGING DATE
+                                @if($sortField === 'tagging_date')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap toggle-column actions-col">STATUS</th>
                         </tr>
                     </thead>

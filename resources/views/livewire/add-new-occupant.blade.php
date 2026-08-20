@@ -695,7 +695,7 @@
                                 @enderror
                             </div>
                         </template>
-                        <template x-if="livingSituation == '8'">
+                        <template x-if="livingSituation == 8">
                             <div class="w-full md:w-1/3 px-2 mb-4">
                                 <label for="case_specification"
                                     class="block text-[13px] font-semibold text-gray-700 mb-1">
@@ -712,7 +712,7 @@
                                 @error('case_specification') <span class="error text-red-600">{{ $message }}</span> @enderror
                             </div>
                         </template>
-                        <template x-if="livingSituation === '9'">
+                        <template x-if="livingSituation == 9">
                             <div class="w-full md:w-1/3 px-2 mb-4"
                                 x-data="{
                                     search: @entangle('non_informal_settler_case_specification'),
@@ -817,7 +817,7 @@
                             @error('living_status') <span class="error text-red-600">{{ $message }}</span> @enderror
                         </div>
                     </div>
-                    <template x-if="livingStatus === 1">
+                    <template x-if="livingStatus == 1">
                         <div class="flex flex-wrap -mx-2 ml-[33%]">
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="rent_fee"
@@ -848,7 +848,7 @@
                             </div>
                         </div>
                     </template>
-                    <template x-if="livingStatus === 2">
+                    <template x-if="livingStatus == 2">
                         <div class="flex flex-wrap -mx-2 ml-[33%]">
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="house_rent_fee"
@@ -880,7 +880,7 @@
                         </div>
                     </template>
 
-                    <template x-if="livingStatus === 3">
+                    <template x-if="livingStatus == 3">
                         <div class="flex flex-wrap -mx-2 ml-[33%]">
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="lot_rent_fee"
@@ -911,7 +911,7 @@
                             </div>
                         </div>
                     </template>
-                    <template x-if="livingStatus === 8">
+                    <template x-if="livingStatus == 8">
                         <div class="flex flex-wrap -mx-2 ml-[33%]">
                             <div class="w-full md:w-2/4 px-2 mb-4">
                                 <label for="house_owner"

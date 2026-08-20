@@ -98,8 +98,8 @@
                         <span class="text-[11px] text-gray-400">{{ count($materials) }} {{ count($materials) === 1 ? 'item' : 'items' }}</span>
                     </div>
 
-                    <div class="overflow-x-auto rounded-md border border-gray-200" x-data="{ query: '', suggestions: [], showSuggestions: false }" @click.away="showSuggestions = false">
-                        <table class="min-w-full bg-white text-[12px]">
+                  
+                        <table class="min-w-full bg-white text-[12px] overflow-x-auto rounded-md border border-gray-200">
                             <thead>
                                 <tr class="bg-gray-200 text-left text-[11px] uppercase tracking-wide">
                                     <th class="px-4 py-3 text-gray-800">Item</th>
@@ -112,7 +112,7 @@
                             </thead>
                             <tbody class="divide-y divide-gray-100">
                                 @forelse ($materials as $index => $material)
-                                <tr wire:key="material-{{ $index }}" class="odd:bg-gray-50/60 even:bg-white hover:bg-green-50/40">
+                                <tr wire:key="material-{{ $index }}" x-data="{ query: @js($material['item_description'] ?? ''), suggestions: [], showSuggestions: false }" @click.away="showSuggestions = false" class="odd:bg-gray-50/60 even:bg-white hover:bg-green-50/40">
                                     <td class="relative px-4 py-2">
                                         <input
                                             type="text"
@@ -123,6 +123,16 @@
                                         @error('materials.' . $index . '.material_id')
                                         <span class="mt-1 block text-[11px] text-red-600">{{ $message }}</span>
                                         @enderror
+                                        <div x-show="showSuggestions && suggestions.length" x-cloak class="absolute left-4 right-4 z-10 mt-1 max-h-44 overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-[12px] uppercase text-gray-700 shadow-lg">
+                                            <template x-for="(item, suggestionIndex) in suggestions" :key="suggestionIndex">
+                                                <div
+                                                    @click="$wire.selectMaterial({{ $index }}, item.id); query = item.item_description; showSuggestions = false;"
+                                                    class="cursor-pointer px-3 py-2 hover:bg-green-50">
+                                                    <span class="font-medium" x-text="item.item_description"></span>
+                                                    <span class="ml-2 text-gray-500" x-text="item.purchaseOrderDisplay ? item.purchaseOrderDisplay : 'PO: Not available'"></span>
+                                                </div>
+                                            </template>
+                                        </div>
                                     </td>
                                     <td class="px-4 py-2">
                                         <input type="text" wire:model="materials.{{ $index }}.available_quantity" readonly class="uppercase w-20 lg:w-full md:w-full rounded border border-transparent bg-transparent px-1 py-1.5 text-center text-gray-800 focus:outline-none" placeholder="Available">
@@ -156,19 +166,7 @@
                                 @endforelse
                             </tbody>
                         </table>
-                        <div x-show="showSuggestions && suggestions.length" class="absolute">
-                            <ul x-cloak class="left-4 right-4 z-10 mt-1 max-h-44 overflow-y-auto rounded-md border border-gray-200 bg-white py-1 text-[12px] uppercase text-gray-700 shadow-lg">
-                                <template x-for="(item, suggestionIndex) in suggestions" :key="suggestionIndex">
-                                    <li
-                                        @click="$wire.selectMaterial({{ $index }}, item.id); query = item.item_description; showSuggestions = false;"
-                                        class="cursor-pointer px-3 py-2 hover:bg-green-50">
-                                        <span class="font-medium" x-text="item.item_description"></span>
-                                        <span class="ml-2 text-gray-500" x-text="item.purchaseOrderDisplay ? item.purchaseOrderDisplay : 'PO: Not available'"></span>
-                                    </li>
-                                </template>
-                            </ul>
-                        </div>
-                    </div>
+
 
                     <div class="mt-4 flex justify-end">
                         <button

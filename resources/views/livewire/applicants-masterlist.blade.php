@@ -62,10 +62,20 @@
                         <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2 border-b text-center font-medium">ID</th>
-                            <th class="py-2 px-2 border-b text-start font-medium whitespace-nowrap">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none whitespace-nowrap" wire:click="sortBy('name')">
+                                Name
+                                @if($sortField === 'name')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Contact</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Type</th>
-                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Date Applied</th>
+                            <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap cursor-pointer select-none" wire:click="sortBy('application_date')">
+                                Date Applied
+                                @if($sortField === 'application_date')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Status</th>
                             <th class="py-2 px-2 border-b text-center font-medium whitespace-nowrap">Aging</th>
                         </tr>

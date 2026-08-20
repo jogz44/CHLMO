@@ -276,7 +276,7 @@ class TaggedAndValidatedApplicantDetails extends Component
         $this->living_situation_id = $this->taggedAndValidatedApplicant?->livingSituation?->living_situation_id ?? null;
         $this->livingSituations = LivingSituation::all();
         // Load case specification data
-        if ($this->taggedAndValidatedApplicant?->livingSituation?->living_situation_id == 8) {
+        if ($this->taggedAndValidatedApplicant?->living_situation_id == 8) {
             $this->case_specification_id = $this->taggedAndValidatedApplicant?->caseSpecification?->case_specification_id ?? null;
         } else {
             $this->living_situation_case_specification = $this->taggedAndValidatedApplicant?->living_situation_case_specification ?? '';

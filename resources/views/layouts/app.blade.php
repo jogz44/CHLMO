@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ config('app.name', 'Housing System') }}</title>
+    <title>{{ config('app.name', 'CHLMS') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('storage/images/tagum_city_logo.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

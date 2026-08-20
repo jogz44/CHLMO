@@ -92,15 +92,15 @@
                         </div>
                     </div>
 
-                        <select wire:model.live="selectedOriginOfRequest" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
-                            <option value="">Select Request Origin</option>
-                            @foreach ($OriginOfRequests as $origin)
-                            <option value="{{ $origin->id }}">{{ $origin->name }}</option>
-                            @endforeach
-                        </select>
-                        <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
-                            Reset Filter
-                        </button>
+                    <select wire:model.live="selectedOriginOfRequest" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                        <option value="">Select Request Origin</option>
+                        @foreach ($OriginOfRequests as $origin)
+                        <option value="{{ $origin->id }}">{{ $origin->name }}</option>
+                        @endforeach
+                    </select>
+                    <button wire:click="resetFilters" class="bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
+                        Reset Filter
+                    </button>
                 </div>
             </div>
 
@@ -111,17 +111,32 @@
                 <table class="min-w-full bg-white border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="py-2 px-2  text-center font-medium">Profile No.</th>
-                            <th class="py-2 px-2 border-b text-center  font-medium">Name</th>
+                            <th class="py-2 px-2 text-center font-medium">Profile No.</th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none" wire:click="sortBy('name')">
+                                Name
+                                @if($sortField === 'name')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium">Origin of Request</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Request</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Profiled/Tagged</th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none" wire:click="sortBy('date_request')">
+                                Date Request
+                                @if($sortField === 'date_request')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none" wire:click="sortBy('date_tagged')">
+                                Date Profiled/Tagged
+                                @if($sortField === 'date_tagged')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
                         </tr>
                     </thead>
                     <tbody x-data>
                         @if($profiledTaggedApplicants->isNotEmpty())
-                         @foreach($profiledTaggedApplicants as $shelterApplicant)
+                        @foreach($profiledTaggedApplicants as $shelterApplicant)
                         <tr>
                             <td class="py-4 px-2 text-center border-b">{{ $shelterApplicant->shelterApplicant->profile_no }}</td>
                             <td class="py-4 px-2 text-center capitalize border-b underline cursor-pointer hover:text-green-500"
@@ -170,8 +185,8 @@
                 </table>
 
                 <!-- Pagination Links -->
-                <div class="py-4 px-3">
-
+                <div class="mt-4">
+                    {{ $profiledTaggedApplicants->links() }}
                 </div>
 
                 <!-- GRANT Modal -->

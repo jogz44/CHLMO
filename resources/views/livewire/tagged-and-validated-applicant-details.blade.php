@@ -524,7 +524,7 @@
                         <label class="block text-[12px] font-semibold text-gray-700 mb-1">
                             CASE SPECIFICATION
                         </label>
-                        @if($taggedAndValidatedApplicant->livingSituation->living_situation_id == 8)
+                        @if($taggedAndValidatedApplicant->living_situation_id == 8)
                         <textarea rows="2"
                             disabled
                             class="justify-items-start uppercase w-full p-1 border-b text-[12px] bg-gray-200 border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow">{{ optional($taggedAndValidatedApplicant->caseSpecification)->case_specification_name ?? '--' }}
@@ -1847,7 +1847,7 @@
                                             <option value="">Select a relocation site</option>
                                             @foreach($relocationSites as $site)
                                                 <option value="{{ $site['id'] }}">
-                                                    {{ $site['name'] }} (Available: {{ $site['available_space'] }} Lot)
+                                                    {{ $site['name'] }} (Available: {{ $site['available_space'] }} sqm)
                                                 </option>
                                             @endforeach
                                         </select>

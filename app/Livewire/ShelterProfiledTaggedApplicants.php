@@ -55,7 +55,6 @@ class ShelterProfiledTaggedApplicants extends Component
     ];
 
     public $shelterLivingStatusesFilter = [];
-    public $profiledTaggedApplicants;
     public $documents = [];
     public $selectedDocument = null;
     public $showEditDocumentsModal = false;
@@ -64,27 +63,22 @@ class ShelterProfiledTaggedApplicants extends Component
     public $newDocuments = [];
     public $newDocumentNames = [];
 
-        public function mount()
-        {
-            $this->profiledTaggedApplicants = ProfiledTaggedApplicant::with(['shelterApplicant.person', 'shelterApplicant.originOfRequest', 'grantees'])
-                ->get();
-            // Debugging: Log the data
-            logger($this->profiledTaggedApplicants);
+    public function mount()
+    {
+        $this->shelterLivingStatusesFilter = Cache::remember('shelter_living_situations', 60 * 60, function () {
+            return ShelterLivingSituation::all();
+        });
+        $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
+        $this->date_request = now()->toDateString(); // YYYY-MM-DD format
 
-            $this->shelterLivingStatusesFilter = Cache::remember('shelter_living_situations', 60 * 60, function () {
-                return ShelterLivingSituation::all();
-            });
-            $this->taggingStatuses = ['Tagged', 'Not Tagged']; // Add your statuses here
-            $this->date_request = now()->toDateString(); // YYYY-MM-DD format
+        // For Granting Modal
+        $this->date_of_delivery = now()->toDateString(); // YYYY-MM-DD format
+        $this->date_of_ris = now()->toDateString(); // YYYY-MM-DD format
 
-            // For Granting Modal
-            $this->date_of_delivery = now()->toDateString(); // YYYY-MM-DD format
-            $this->date_of_ris = now()->toDateString(); // YYYY-MM-DD format
-
-            $this->materialLists = Material::all();
-            $this->materialUnits = MaterialUnit::all();
-            $this->purchaseOrders = Material::with('purchaseOrder')->get();
-        }
+        $this->materialLists = Material::all();
+        $this->materialUnits = MaterialUnit::all();
+        $this->purchaseOrders = Material::with('purchaseOrder')->get();
+    }
 
 
     public function viewDocument($documentId)
@@ -449,6 +443,20 @@ class ShelterProfiledTaggedApplicants extends Component
         }
     }
 
+    public $sortField = 'date_tagged';
+    public $sortDirection = 'desc';
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            // Toggle direction if clicking the same column
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -480,7 +488,25 @@ class ShelterProfiledTaggedApplicants extends Component
             });
         }
 
-        $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate($this->perPage);
+
+        // $profiledTaggedApplicants = $query->orderBy('date_tagged', 'desc')->paginate($this->perPage);
+        // Apply sorting
+        if ($this->sortField === 'date_tagged') {
+            $query->orderBy('date_tagged', $this->sortDirection);
+        } elseif ($this->sortField === 'name') {
+            $query->join('shelter_applicants', 'profiled_tagged_applicants.profile_no', '=', 'shelter_applicants.id')
+                ->join('people', 'shelter_applicants.person_id', '=', 'people.id')
+                ->orderBy('people.last_name', $this->sortDirection)
+                ->select('profiled_tagged_applicants.*');
+        } elseif ($this->sortField === 'date_request') {
+            $query->join('shelter_applicants', 'profiled_tagged_applicants.profile_no', '=', 'shelter_applicants.id')
+                ->orderBy('shelter_applicants.date_request', $this->sortDirection)
+                ->select('profiled_tagged_applicants.*');
+        } else {
+            $query->orderBy('date_tagged', 'desc'); // fallback — only 2 args
+        }
+
+        $profiledTaggedApplicants = $query->paginate($this->perPage);
 
         // Load documents for the current profiled tagged applicant if applicable
         if ($this->profiledTaggedApplicantId) {

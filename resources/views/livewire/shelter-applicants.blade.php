@@ -152,10 +152,20 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="py-2 px-2 border-b text-center font-medium">Profile No.</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Name</th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none" wire:click="sortBy('name')">
+                                Name
+                                @if($sortField === 'name')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column purok-col">Purok</th>
                             <th class="py-2 px-2 border-b text-center font-medium toggle-column barangay-col">Barangay</th>
-                            <th class="py-2 px-2 border-b text-center font-medium">Date Request</th>
+                            <th class="py-2 px-2 border-b text-center font-medium cursor-pointer select-none" wire:click="sortBy('date_request')">
+                                Date Request
+                                @if($sortField === 'date_request')
+                                <span>{{ $sortDirection === 'asc' ? '▲' : '▼' }}</span>
+                                @endif
+                            </th>
                             <th class="py-2 px-2 border-b text-center font-medium">Origin Of Request</th>
                             <th class="py-2 px-2 border-b text-center font-medium">Actions</th>
                         </tr>

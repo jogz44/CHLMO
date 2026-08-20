@@ -154,15 +154,6 @@
                                     <span class="text-red-500">Pending...</span>
                                     @else
                                     Granted
-                                    <span class="ml-1">
-                                        <script src="https://cdn.lordicon.com/lordicon.js"></script>
-                                        <lord-icon
-                                            src="https://cdn.lordicon.com/fkmafinl.json"
-                                            trigger="loop"
-                                            delay="2000"
-                                            style="width: 30px; height: 30px">
-                                        </lord-icon>
-                                    </span>
                                     @endif
                                 </div>
                             </td>

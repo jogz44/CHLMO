@@ -7,8 +7,8 @@ class="w-full lg:w-1/3 flex justify-center">
 
     <!-- Livewire Form -->
     <form wire:submit.prevent="save" class="w-full">
-        <div class="bg-white shadow-lg p-6 rounded-md h-3/6 w-[90%] text-center relative">
-            <img src="/storage/images/designProfile.png" alt="Design Profile"
+        <div class="bg-white shadow-lg p-6 rounded-md lg:h-3/6 lg:w-[90%] md:h-3/6 md:w-[90%] h-6/6 w-full text-center relative">
+            <img src="{{ asset('storage/images/designProfile.png') }}" alt="Design Profile"
                 class="absolute right-0 top-0 h-full object-cover opacity-70 z-0 pointer-events-none">
 
             <div class="profile-photo relative z-10">
