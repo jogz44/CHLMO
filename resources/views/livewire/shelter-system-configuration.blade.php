@@ -99,6 +99,93 @@
                 @endif
             </section>
         @endforeach
+
+        <section class="flex flex-col rounded bg-white p-4 shadow xl:col-span-2 2xl:col-span-1">
+            <div class="mb-4 flex items-start justify-between gap-3 border-b border-gray-100 pb-3">
+                <div>
+                    <h2 class="text-sm font-semibold text-gray-800">Purok</h2>
+                    <p class="text-[12px] text-gray-500">Showing {{ $this->puroks->count() }} records</p>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="mb-2 block text-[12px] font-medium text-gray-600">Search</label>
+                <input
+                    type="search"
+                    wire:model.live.debounce.400ms="purokSearch"
+                    class="w-full rounded border border-gray-300 bg-gray-50 px-3 py-2 text-[12px] text-gray-700 focus:border-green-600 focus:ring-green-600"
+                    placeholder="Search Purok or Barangay"
+                >
+            </div>
+
+            <form wire:submit.prevent="addPurok" class="mb-4 grid grid-cols-1 gap-2 md:grid-cols-[1fr_1fr_auto]">
+                <input
+                    type="text"
+                    wire:model="newPurok"
+                    class="rounded border border-gray-300 bg-white px-3 py-2 text-[12px] text-gray-700 focus:border-green-600 focus:ring-green-600"
+                    placeholder="Add Purok"
+                >
+                <select
+                    wire:model="barangay_id"
+                    class="rounded border border-gray-300 bg-white px-3 py-2 text-[12px] text-gray-700 focus:border-green-600 focus:ring-green-600"
+                >
+                    <option value="">Select Barangay</option>
+                    @foreach ($this->barangays as $barangay)
+                        <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="rounded bg-green-700 px-4 py-2 text-[12px] font-semibold text-white hover:bg-green-600">
+                    Add
+                </button>
+            </form>
+            @error('newPurok') <p class="mb-2 text-[11px] text-red-600">{{ $message }}</p> @enderror
+            @error('barangay_id') <p class="mb-2 text-[11px] text-red-600">{{ $message }}</p> @enderror
+
+            @if ($this->puroks->count() > 0)
+                <div x-data="{ expanded: false }" wire:key="list-purok">
+                    <div
+                        class="relative space-y-2 overflow-hidden transition-[max-height] duration-300 ease-in-out"
+                        :class="expanded ? 'max-h-none' : 'max-h-[260px]'"
+                    >
+                        @foreach ($this->puroks as $purok)
+                            <div wire:key="purok-{{ $purok->id }}" class="flex items-center justify-between gap-3 rounded border border-gray-200 bg-gray-50 px-3 py-2">
+                                <div class="min-w-0">
+                                    <p class="break-words text-[12px] font-medium text-gray-800">{{ $purok->name }}</p>
+                                    <p class="break-words text-[11px] text-gray-500">
+                                        Barangay: {{ $purok->barangay?->name ?? 'Unassigned' }}
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    wire:click="confirmRemove('purok', {{ $purok->id }})"
+                                    class="text-[12px] font-medium text-red-600 hover:text-red-700"
+                                >
+                                    Remove
+                                </button>
+                            </div>
+                        @endforeach
+
+                        <div
+                            x-show="!expanded"
+                            class="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white to-transparent"
+                        ></div>
+                    </div>
+
+                    @if ($this->puroks->count() > 5)
+                        <button
+                            type="button"
+                            @click="expanded = !expanded"
+                            class="mt-2 text-[12px] font-medium text-green-700 hover:text-green-600"
+                            x-text="expanded ? 'Show less' : 'Show more ({{ $this->puroks->count() }})'"
+                        ></button>
+                    @endif
+                </div>
+            @else
+                <div class="rounded border border-dashed border-gray-300 px-3 py-6 text-center text-[12px] text-gray-500">
+                    No puroks found.
+                </div>
+            @endif
+        </section>
     </div>
 
     @if ($showConfirmModal)

@@ -53,6 +53,14 @@
         th {
             background-color: #f2f2f2;
         }
+        td.sub-row {
+            padding-left: 24px;
+            font-style: italic;
+        }
+        tr.total-row td {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
@@ -87,42 +95,56 @@
                     <td>{{ $walkInApplicants }}</td>
                 </tr>
                 <tr>
-                    <td>Tagged and Validated</td>
-                    <td>{{ $taggedAndValidated }}</td>
+                    <td class="sub-row">Tagged</td>
+                    <td>{{ $taggedWalkInApplicants }}</td>
                 </tr>
                 <tr>
-                    <td>Identified Informal Settlers</td>
-                    <td>{{ $identifiedInformalSettlers }}</td>
+                    <td class="sub-row">Untagged</td>
+                    <td>{{ $untaggedWalkInApplicants }}</td>
+                </tr>
+
+                <tr>
+                    <td>TAGGED &amp; VALIDATED</td>
+                    <td>{{ $totalTaggedValidated }}</td>
                 </tr>
                 <tr>
-                    <td></td>
-                    <td></td> <!-- SPACING -->
+                    <td class="sub-row">Informal Settlers</td>
+                    <td>{{ $informalSettlers }}</td>
                 </tr>
                 <tr>
-                    <td>Total Number Relocation Lot Applicants</td>
+                    <td class="sub-row">Non-informal Settlers</td>
+                    <td>{{ $nonInformalSettlers }}</td>
+                </tr>
+
+                <tr>
+                    <td>IDENTIFIED INFORMAL SETTLERS</td>
+                    <td>{{ $totalInformalSettlers }}</td>
+                </tr>
+                <tr>
+                    <td class="sub-row">Awarded</td>
+                    <td>{{ $awardedInformalSettlers }}</td>
+                </tr>
+                <tr>
+                    <td class="sub-row">Non-awarded</td>
+                    <td>{{ $nonAwardedInformalSettlers }}</td>
+                </tr>
+
+                <tr class="total-row">
+                    <td>TOTAL NUMBER OF RELOCATION LOT APPLICANTS</td>
                     <td>{{ $totalRelocationLotApplicants }}</td>
                 </tr>
             </tbody>
         </table>
 
-        <div class="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-            <h5 class="text-xl font-bold text-center">INFORMAL SETTLERS CLASSIFICATION</h5>
-            <h6>
+        <div style="margin-top: 20px;">
+            <h5 style="text-align: center; font-size: 13px; margin-bottom: 4px;">INFORMAL SETTLERS CLASSIFICATION</h5>
+            <p style="font-size: 9px; font-weight: bold; margin-bottom: 6px;">
                 NOTE: THE FOLLOWING CASES ARE CLASSIFIED AS INFORMAL SETTLERS
-            </h6>
-            <ul class="space-y-3 pl-6 list-disc text-gray-700">
-                <li style="font-size: 9px;">AFFECTED BY GOVERNMENT INFRASTRUCTURE</li>
-                <li style="font-size: 9px;">GOVERNMENT PROPERTIES</li>
-                <li style="font-size: 9px;">WITH COURT ORDER FOR DEMOLITION AND EVICTION</li>
-                <li style="font-size: 9px;">WITH NOTICE TO VACATE</li>
-                <li style="font-size: 9px;">PRIVATE PROPERTIES</li>
-                <li style="font-size: 9px;">PRIVATE CONSTRUCTION PROJECTS</li>
-                <li style="font-size: 9px;">ALIENABLE AND DISPOSABLE LAND</li>
-                <li style="font-size: 9px;">
-                    DANGER ZONE: ACCRETION AREA, LANDSLIDE PRONE AREA, IDENTIFIED FLOOD PRONE AREA,
-                    NPC LINE, ALONG THE CREEK, ALONG THE RIVER, ETC.
-                </li>
-                <li style="font-size: 9px;">AND OTHER CASES</li>
+            </p>
+            <ul style="padding-left: 18px; margin: 0;">
+                @foreach ($informalSettlersCases as $case)
+                    <li style="font-size: 9px; margin-bottom: 3px;">{{ $case }}</li>
+                @endforeach
             </ul>
         </div>
     </div>

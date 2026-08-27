@@ -1,60 +1,61 @@
 <!-- Before table - Add totals calculation -->
 @php
-    $totalOccupants = 0;
-    $totalAwarded = 0;
-    $totalPending = 0;
+$totalOccupants = 0;
+$totalAwarded = 0;
+$totalPending = 0;
 
-    // Calculate totals
-    foreach($taggedAndValidatedApplicants as $applicant) {
-        $totalOccupants += $applicant->occupants_count;
-        $totalAwarded += $applicant->awarded_count;
-    }
-    $totalPending = $totalOccupants - $totalAwarded;
+// Calculate totals
+foreach($taggedAndValidatedApplicants as $applicant) {
+$totalOccupants += $applicant->occupants_count;
+$totalAwarded += $applicant->awarded_count;
+}
+$totalPending = $totalOccupants - $totalAwarded;
 @endphp
 
 <table>
-    <colgroup>
-        <col style="width: 5.11%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 9%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 13.56%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 13.33%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 20.44%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 22%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 12.44%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 24.11%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 9.67%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 34.56%; word-wrap: break-word; white-space: normal;">
-        <col style="width: 16.67%; word-wrap: break-word; white-space: normal;">
-    </colgroup>
-
-    <!-- Header Section -->
     <!-- Spacing -->
     <tr>
-        <td colspan="11" height="81.6"></td>
+        <td colspan="11" height="20"></td>
     </tr>
     <tr>
-        <td colspan=11" style="text-align: center; margin-top: 40px; font-size: 9px; font-weight: bold;">
+        <td colspan="11" style="text-align: center; margin-top: 40px; font-size: 11px; font-weight: bold;">
             Republic of the Philippines
         </td>
     </tr>
     <tr>
-        <td colspan="11" style="text-align: center; font-size: 9px; font-weight: bold;">
+        <td colspan="11" style="text-align: center; font-size: 11px; font-weight: bold;">
             Province of Davao del Norte
         </td>
     </tr>
     <tr>
-        <td colspan="11" style="text-align: center; font-size: 9px; font-weight: bold;">
-            City of Tagum
+        <td colspan="11" style="text-align: center; font-size: 11px; font-weight: bold;">
+            CITY OF TAGUM
         </td>
     </tr>
     <tr>
-        <td colspan="11" style="text-align: center; font-size: 11px; font-weight: bold;">
+        <td colspan="11"></td>
+    </tr>
+    <tr>
+        <td colspan="11" style="text-align: center; font-size: 9px; font-weight: bold;">
             CITY HOUSING AND LAND MANAGEMENT OFFICE
         </td>
     </tr>
-
-    <!-- Spacing -->
     <tr>
+        <td colspan="11" style="text-align: center; font-size: 9px; font-weight: regular;">
+            2/F Annex Building, City Government, J.V. Ayala Ave., Barangay Apokon, Tagum City
+        </td>
+    </tr>
+    <tr>
+        <td colspan="11" style="text-align: center; font-size: 9px; font-weight: regular;">
+            Telephone No. (9) 216 - 9367 Local 141
+        </td>
+    </tr>
+
+        <!-- Spacing -->
+    <tr style="border-bottom: 4px solid #000;">
+        <td colspan="11" height="10"></td>
+    </tr>
+    <tr style="border-bottom: 4px solid #000;">
         <td colspan="11" height="20"></td>
     </tr>
 
@@ -67,9 +68,9 @@
     <tr>
         <td colspan="11" style="text-align: center; font-size: 12px;">
             @if(!empty($subtitle))
-                @foreach($subtitle as $line)
-                    {{ $line }}<br>
-                @endforeach
+            @foreach($subtitle as $line)
+            {{ $line }}<br>
+            @endforeach
             @endif
             As of {{ now()->format('F d, Y') }}
         </td>
@@ -119,47 +120,47 @@
 
     <!-- Table Body -->
     @forelse($taggedAndValidatedApplicants as $taggedAndValidatedApplicant)
-        <tr>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->row_num }}
-            </td>
-            <td style="border: 1px solid #000000; padding: 8px;">
-                {{ \Carbon\Carbon::parse($taggedAndValidatedApplicant->tagging_date)->format('M d, Y') }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->barangay }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->purok }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->living_situation }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->case_specification ?? 'N/A' }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ number_format($taggedAndValidatedApplicant->occupants_count) }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->assigned_relocation_site ?? 'N/A' }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ number_format($taggedAndValidatedApplicant->awarded_count) }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->actual_relocation_sites ?? 'N/A' }}
-            </td>
-            <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                {{ $taggedAndValidatedApplicant->remarks ?? 'N/A' }}
-            </td>
-        </tr>
+    <tr>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->row_num }}
+        </td>
+        <td style="border: 1px solid #000000; padding: 8px;">
+            {{ \Carbon\Carbon::parse($taggedAndValidatedApplicant->tagging_date)->format('M d, Y') }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->barangay }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->purok }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->living_situation }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->case_specification ?? 'N/A' }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ number_format($taggedAndValidatedApplicant->occupants_count) }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->assigned_relocation_site ?? 'N/A' }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ number_format($taggedAndValidatedApplicant->awarded_count) }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->actual_relocation_sites ?? 'N/A' }}
+        </td>
+        <td style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            {{ $taggedAndValidatedApplicant->remarks ?? 'N/A' }}
+        </td>
+    </tr>
     @empty
-        <tr>
-            <td colspan="11" style="border: 1px solid #000000; text-align: center; padding: 8px;">
-                No records found.
-            </td>
-        </tr>
+    <tr>
+        <td colspan="11" style="border: 1px solid #000000; text-align: center; padding: 8px;">
+            No records found.
+        </td>
+    </tr>
     @endforelse
 
     <!-- Add Grand Totals Row -->
@@ -187,17 +188,18 @@
     </tr>
 
     <!-- Footer/Signatures -->
-    <tr>
-        <td colspan="4" style="padding-top: 30px; border: none;">
+    <tr style="border: 0;">
+        <td colspan="4" style="padding-top: 30px; border: 0;">
             Prepared by:
         </td>
-    <tr>
-        <td colspan="4" style="padding-top: 20px; font-weight: bold; border: none;">
+    </tr>
+    <tr style="border: 0;">
+        <td colspan="4" style="padding-top: 20px; font-weight: bold; border: 0;">
             {{ auth()->user()->first_name }} {{ auth()->user()->middle_name }} {{ auth()->user()->last_name }}
         </td>
     </tr>
-    <tr>
-        <td colspan="4" style="padding-top: 5px; border: none;">
+    <tr style="border: 0;">
+        <td colspan="4" style="padding-top: 5px; border: 0;">
             {{ auth()->user()->position ?? 'Staff' }}
         </td>
     </tr>

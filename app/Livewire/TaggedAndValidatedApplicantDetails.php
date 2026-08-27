@@ -422,7 +422,7 @@ class TaggedAndValidatedApplicantDetails extends Component
                 'voters_id_number' => $this->editPrimaryInfo['voters_id_number'],
             ]);
 
-            // Handle live-in partner information
+            // Handle live-in partner information waah im so sleepy
             if ($this->editPrimaryInfo['civil_status_id'] == 2) {
                 $this->taggedAndValidatedApplicant->liveInPartner()->updateOrCreate(
                     ['tagged_and_validated_applicant_id' => $this->taggedAndValidatedApplicant->id],

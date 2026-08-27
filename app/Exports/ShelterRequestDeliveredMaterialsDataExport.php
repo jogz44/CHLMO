@@ -45,6 +45,20 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
     {
         $subtitle = [];
 
+        if (!empty($this->filters['barangay_id'])) {
+            $barangay = Barangay::find($this->filters['barangay_id']);
+            if ($barangay) {
+                $subtitle[] = 'BARANGAY: ' . strtoupper($barangay->name);
+            }
+        }
+
+        if (!empty($this->filters['government_program_id'])) {
+            $program = GovernmentProgram::find($this->filters['government_program_id']);
+            if ($program) {
+                $subtitle[] = 'SOCIAL WELFARE SECTOR: ' . strtoupper($program->program_name);
+            }
+        }
+
         // Add Date Range
         if (!empty($this->filters['startDate']) && !empty($this->filters['endDate'])) {
             $startDate = Carbon::parse($this->filters['startDate'])->format('m/d/Y');
@@ -159,20 +173,20 @@ class ShelterRequestDeliveredMaterialsDataExport implements FromView, ShouldAuto
         $leftDrawing->setName('Left Logo');
         $leftDrawing->setDescription('Left Logo');
         $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
-        $leftDrawing->setHeight(100); // Adjust height as needed
-        $leftDrawing->setCoordinates('A2'); // Starting cell
-        $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
-        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+        $leftDrawing->setHeight(85); // Adjust height as needed
+        $leftDrawing->setCoordinates('B2'); // Starting cell
+        $leftDrawing->setOffsetX(100); // Fine-tune horizontal positioning
+        $leftDrawing->setOffsetY(0); // Fine-tune vertical positioning
 
         // Right Logo
         $rightDrawing = new Drawing();
         $rightDrawing->setName('Right Logo');
         $rightDrawing->setDescription('Right Logo');
         $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
-        $rightDrawing->setHeight(100); // Adjust height as needed
+        $rightDrawing->setHeight(85); // Adjust height as needed
         $rightDrawing->setCoordinates('E2'); // Starting cell for the right logo
-        $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
-        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+        $rightDrawing->setOffsetX(-15); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(0); // Fine-tune vertical positioning
 
         $drawings[] = $leftDrawing;
         $drawings[] = $rightDrawing;

@@ -21,13 +21,12 @@
                             class="@role('Housing System Tagger') w-full sm:w-auto bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded text-sm @else bg-gradient-to-r from-custom-red to-custom-green hover:bg-gradient-to-r hover:from-custom-red hover:to-custom-red text-white px-4 py-2 rounded @endrole">
                             Add Applicant
                         </button>
-                        <button wire:click="exportPDF" wire:loading.attr="disabled"
+                        {{-- <button wire:click="exportPDF" wire:loading.attr="disabled"
                             class="@role('Housing System Tagger') w-full sm:w-auto bg-gradient-to-r from-custom-blue to-custom-purple hover:bg-gradient-to-r hover:from-custom-blue hover:to-custom-dark-purple text-white px-4 py-2 rounded text-sm @else bg-gradient-to-r from-custom-blue to-custom-purple hover:bg-gradient-to-r hover:from-custom-blue hover:to-custom-dark-purple text-white px-4 py-2 rounded @endrole">
                             <span wire:loading wire:target="exportPDF">...</span>
                             <span class="hidden lg:flex">Export to PDF</span>
                             <span class="lg:hidden flex">PDF</span>
-                        </button>
-
+                        </button> --}}
                         <button wire:click="export" wire:ignore wire:loading.attr="disabled"
                             class="@role('Housing System Tagger') w-full sm:w-auto bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded text-sm @else bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded @endrole">
                             <span wire:loading wire:target="export">...</span>
@@ -55,7 +54,7 @@
                                 </div>
                             </button>
                             <!-- Search -->
-                            <div class="@role('Housing System Tagger') relative w-full sm:w-auto z-60 @else relative hidden md:block z-60 @endrole">
+                            <div class="@role('Housing System Tagger') relative w-full sm:w-auto z-60 @else relative z-60 @endrole">
                                 <!-- Search Icon -->
                                 <svg class="absolute top-[10px] left-4" width="19" height="19" viewBox="0 0 21 21" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
@@ -224,14 +223,14 @@
                                                     Tagged
                                                 </button>
                                                 @else
-                                                @hasanyrole('Super Admin|Housing System Admin')
+                                                {{-- @hasanyrole('Super Admin|Housing System Admin') --}}
                                                 <!-- Edit Button -->
                                                 <button wire:click="edit({{ $applicant->id }})"
                                                     @click="openEditModal = true"
                                                     class="@role('Housing System Tagger') text-custom-red text-bold underline px-4 py-1.5 @else text-custom-red text-bold underline px-4 py-1.5 @endrole">
                                                     Edit
                                                 </button>
-                                                @endhasanyrole
+                                                {{-- @endhasanyrole --}}
                                                 <!-- Tag Button -->
                                                 <button onclick="window.location.href='{{ route('applicant-details', ['applicantId' => $applicant->id]) }}'"
                                                     class="@role('Housing System Tagger') bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 sm:px-8 py-1.5 rounded-full @else bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-8 py-1.5 rounded-full @endrole">
@@ -301,8 +300,8 @@
 
                     <!-- ADD APPLICANT MODAL -->
                     <div x-show="isModalOpen" x-cloak
-                        class="fixed inset-0 flex items-center justify-center z-[9999] bg-black bg-opacity-50">
-                        <div class="bg-white text-white w-[450px] rounded-lg shadow-lg p-6 relative z-50">
+                        class="fixed inset-0  w-full flex items-center justify-center z-[9999] bg-black bg-opacity-50">
+                        <div class="bg-white text-white w-[400px] lg:w-[450px] rounded-lg shadow-lg p-6 relative z-50">
                             <!-- Modal Header -->
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-lg font-semibold text-black">ADD APPLICANT</h3>
@@ -513,7 +512,7 @@
 
                     <!-- EDIT APPLICANT MODAL -->
                     <div x-show="openEditModal" x-cloak class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-                        <div class="bg-white text-white w-[450px] rounded-lg shadow-lg p-6 relative z-50">
+                        <div class="bg-white text-white w-[400px] lg:w-[450px] rounded-lg shadow-lg p-6 relative mx-2 z-50">
                             <!-- Modal Header -->
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="text-lg font-semibold text-black">EDIT APPLICANT</h3>

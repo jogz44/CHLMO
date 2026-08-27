@@ -76,7 +76,7 @@
         @if(!$isFiltered)
         @foreach($prPoHeaders as $header)
         <th style="border: 2px solid #000000; text-align: center; padding: 8px;">
-            PR {{ $header->pr_number }}<br>PO {{ $header->po_number }}
+            {{ $header->pr_number }}<br> {{ $header->po_number }}
         </th>
         @endforeach
         @else

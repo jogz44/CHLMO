@@ -32,7 +32,7 @@
                         type="text"
                         wire:model="purchaseOrderNo"
                         class="uppercase w-full rounded-md border border-gray-300 px-3 py-2 text-[13px] text-gray-800 focus:border-[#828181] focus:outline-none focus:ring-1 focus:ring-[#828181]"
-                        placeholder="e.g. PO-2026-0001"
+                        placeholder="Enter PO No."
                         required
                     >
                     @error('purchaseOrderNo') <span class="mt-1 block text-[11px] text-red-600">{{ $message }}</span> @enderror
@@ -46,7 +46,7 @@
                         type="text"
                         wire:model="purchaseRequisitionNo"
                         class="uppercase w-full rounded-md border border-gray-300 px-3 py-2 text-[13px] text-gray-800 focus:border-[#828181] focus:outline-none focus:ring-1 focus:ring-[#828181]"
-                        placeholder="e.g. PR-2026-0001"
+                        placeholder="Enter PR No."
                         required
                     >
                     @error('purchaseRequisitionNo') <span class="mt-1 block text-[11px] text-red-600">{{ $message }}</span> @enderror

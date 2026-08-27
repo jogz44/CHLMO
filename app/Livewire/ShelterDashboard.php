@@ -13,7 +13,7 @@ use Livewire\Component;
 class ShelterDashboard extends Component
 {
     public $years = [], $selectedYear, $totalShelterApplicants = 0, $totalTagged = 0, $totalGrantees = 0;
-    public $shelterApplicantsData, $originOfRequestData;
+    public $shelterApplicantsData, $originOfRequestData, $barangayData;
 
     public function mount()
     {
@@ -21,6 +21,7 @@ class ShelterDashboard extends Component
         $this->updateCounts();
         $this->shelterApplicantsData = $this->getApplicantsData();
         $this->originOfRequestData = $this->getOriginOfRequestData();
+        $this->barangayData = $this->getBarangayData();
     }
 
     public function getApplicantsData(): array
@@ -72,7 +73,30 @@ class ShelterDashboard extends Component
         return $data;
     }
 
+    /**
+     * Number of ShelterApplicant records per barangay, via
+     * ShelterApplicant -> Address (address_id) -> Barangay (barangay_id).
+     * Filtered by date_request year, same as the rest of this dashboard.
+     */
+    public function getBarangayData(): array
+    {
+        $query = ShelterApplicant::query()
+            ->join('addresses', 'shelter_applicants.address_id', '=', 'addresses.id')
+            ->join('barangays', 'addresses.barangay_id', '=', 'barangays.id')
+            ->select('barangays.name as barangay_name', DB::raw('count(*) as total'))
+            ->groupBy('barangays.name');
 
+        if ($this->selectedYear !== 'Overall Total') {
+            $query->whereYear('shelter_applicants.date_request', $this->selectedYear);
+        }
+
+        $results = $query->orderByDesc('total')->get();
+
+        return [
+            'labels' => $results->pluck('barangay_name')->toArray(),
+            'counts' => $results->pluck('total')->toArray(),
+        ];
+    }
 
     protected function getTotalByYear($model, $dateField, $filters = [])
     {
@@ -120,6 +144,7 @@ class ShelterDashboard extends Component
         $this->updateCounts();
         $this->shelterApplicantsData = $this->getApplicantsData();
         $this->originOfRequestData = $this->getOriginOfRequestData();
+        $this->barangayData = $this->getBarangayData();
     }
 
     public function render()

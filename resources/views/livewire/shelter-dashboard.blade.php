@@ -1,7 +1,11 @@
 <div class="app-page">
-    <div class="flex justify-end items-center mb-4 space-x-3 mt-2">
-        <!-- Filter -->
-        <div class="flex items-center space-x-2 mx-2 lg:mx-0 md:mx-0">
+    <div class="app-page-heading">
+        <div class="flex items-center">
+            <h2 class="text-[13px] items-center text-gray-700">Dashboard</h2>
+        </div>
+        <img src="{{ asset('storage/images/design.png') }}" alt="Design"
+            class="absolute right-0 top-0 h-full object-cover opacity-100 z-0">
+        <div class="flex space-x-2 z-10">
             <select id="year"
                 wire:model.live="selectedYear"
                 class="block w-full px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-gray-600 focus:border-gray-600 sm:text-[13px]">
@@ -21,7 +25,7 @@
                     </svg>
                 </div>
                 <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">
+                    <h3 class="text-xl font-semibold">
                         {!! $selectedYear === 'Overall Total'
                         ? number_format($totalShelterApplicants)
                         : number_format($totalShelterApplicants) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
@@ -29,7 +33,7 @@
                     <p class="text-[13px] text-gray-500">Total Applicants</p>
                 </div>
                 <div class="flex-shrink-0">
-                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-28 object-cover rounded-lg">
                 </div>
             </div>
         </a>
@@ -43,7 +47,7 @@
                     </svg>
                 </div>
                 <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">
+                    <h3 class="text-xl font-semibold">
                         {!! $selectedYear === 'Overall Total'
                         ? number_format($totalTagged)
                         : number_format($totalTagged) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
@@ -51,7 +55,7 @@
                     <p class="text-[13px] text-gray-500">Total Profiled/Tagged</p>
                 </div>
                 <div class="flex-shrink-0">
-                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-28 object-cover rounded-lg">
                 </div>
             </div>
         </a>
@@ -65,7 +69,7 @@
                     </svg>
                 </div>
                 <div class="flex-1 flex flex-col items-start">
-                    <h3 class="text-md font-semibold">
+                    <h3 class="text-xl font-semibold">
                         {!! $selectedYear === 'Overall Total'
                         ? number_format($totalGrantees)
                         : number_format($totalGrantees) . ' <span class="text-[9px] font-normal text-gray-500">(in ' . $selectedYear . ')</span>' !!}
@@ -73,62 +77,123 @@
                     <p class="text-[13px] text-gray-500">Total Grantees</p>
                 </div>
                 <div class="flex-shrink-0">
-                     <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-20 object-contain rounded-lg">
+                    <img src="{{ asset('storage/images/designDasboard.png') }}" alt="Design" class="w-24 h-28 object-cover rounded-lg">
                 </div>
             </div>
         </a>
     </div>
 
     <!-- Monthly Report Section -->
-    <div class="flex-1 justify-center items-center mt-6 mx-2 lg:mx-0 md:mx-0">
-        <div class="bg-white shadow rounded-lg p-6">
-            <h4 class="text-[14px] mb-2 font-semibold text-center">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mt-6 mx-2 lg:mx-0 md:mx-0">
+
+        <!-- Applicants and Granted Applicants per Origin of Request -->
+        <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-6">
+            <h4 class="text-[14px] mb-1 font-semibold text-center text-gray-800 tracking-tight">
                 Applicants and Granted Applicants per Origin of Request
             </h4>
 
             <!-- Legend -->
-            <div class="flex space-x-4 text-sm justify-center">
+            <div class="flex items-center justify-center gap-6 text-[11px] mb-5">
                 <div class="flex items-center space-x-2">
-                    <span class="w-4 h-4 bg-[#FF9100] inline-block rounded"></span>
-                    <span>Applicants</span>
+                    <span class="w-2.5 h-2.5 bg-[#D97706] inline-block rounded-sm"></span>
+                    <span class="text-gray-600">Applicants</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <span class="w-4 h-4 bg-[#00712D] inline-block rounded"></span>
-                    <span>Granted Applicants</span>
+                    <span class="w-2.5 h-2.5 bg-[#166534] inline-block rounded-sm"></span>
+                    <span class="text-gray-600">Granted Applicants</span>
                 </div>
             </div>
 
-            <div class="space-y-2 mt-6">
-                @foreach($originOfRequestData as $origin => $data)
-                @php
-                $colors = ['#FF9100', '#00712D']; // Orange for applicants, Green for grantees
-                @endphp
-                <div class="flex items-center mb-4 bg-slate-100 shadow-sm px-4 py-2 rounded-sm">
-                    <span class="w-1/6 text-gray-700 text-sm font-medium">{{ $origin }}</span>
-                    <div class="flex-1">
-                        <div class="flex items-center">
-                            <div class="flex-1 h-4 bg-gray-200 rounded-md overflow-hidden">
+            @php
+            $maxApplicants = !empty($originOfRequestData) ? max(array_column($originOfRequestData, 'applicants')) : 0;
+            $maxGrantees = !empty($originOfRequestData) ? max(array_column($originOfRequestData, 'grantees')) : 0;
+            $maxOriginCount = max($maxApplicants, $maxGrantees);
+            @endphp
+
+            <div class="relative h-[320px] w-full overflow-x-auto overflow-y-hidden px-2 sm:px-3 pb-2">
+                <div class="absolute inset-x-3 top-4 bottom-12 flex flex-col justify-between pointer-events-none">
+                    <div class="border-t border-dashed border-gray-200"></div>
+                    <div class="border-t border-dashed border-gray-200"></div>
+                    <div class="border-t border-dashed border-gray-200"></div>
+                    <div class="border-t border-gray-200"></div>
+                </div>
+
+                <div class="relative flex h-full min-w-max items-end gap-8 sm:gap-12 lg:gap-16 pt-5">
+                    @forelse($originOfRequestData as $origin => $data)
+                    <div class="group flex h-full w-[72px] sm:w-[82px] flex-col items-center justify-end">
+                        <div class="flex h-[250px] w-full items-end justify-center gap-2 mr-4">
+                            <!-- Applicants bar -->
+                            <div class="relative flex h-full w-12 flex-col items-center justify-end">
+                                <span class="mb-1 text-[10px] font-semibold text-gray-600 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                                    {{ number_format($data['applicants']) }}
+                                </span>
                                 <div
-                                    class="h-6 rounded-md"
-                                    style="width: {{ $data['applicants'] > 0 ? ($data['applicants'] / max(array_column($originOfRequestData, 'applicants')) * 100) : 0 }}%;
-                                background-color: {{ $colors[0] }};">
+                                    class="w-12 rounded-t-md bg-[#D97706] shadow-sm transition-all duration-300 group-hover:brightness-105"
+                                    style="height: {{ $maxOriginCount > 0 ? max(($data['applicants'] / $maxOriginCount * 100), ($data['applicants'] > 0 ? 2 : 0)) : 0 }}%;">
                                 </div>
                             </div>
-                            <span class="ml-4 text-gray-700 text-md font-semibold">{{ $data['applicants'] }}</span>
+
+                            <!-- Grantees bar -->
+                            <div class="relative flex h-full w-12 flex-col items-center justify-end">
+                                <span class="mb-1 text-[10px] font-semibold text-gray-600 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+                                    {{ number_format($data['grantees']) }}
+                                </span>
+                                <div
+                                    class="w-12 rounded-t-md bg-[#166534] shadow-sm transition-all duration-300 group-hover:brightness-105"
+                                    style="height: {{ $maxOriginCount > 0 ? max(($data['grantees'] / $maxOriginCount * 100), ($data['grantees'] > 0 ? 2 : 0)) : 0 }}%;">
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex items-center">
-                            <div class="flex-1 h-4 bg-gray-200 rounded-md overflow-hidden">
-                                <div
-                                    class="h-6 rounded-md"
-                                    style="width: {{ $data['grantees'] > 0 ? ($data['grantees'] / max(array_column($originOfRequestData, 'grantees')) * 100) : 0 }}%;
-                                background-color: {{ $colors[1] }};">
-                                </div>
-                            </div>
-                            <span class="ml-4 text-gray-700 text-md font-semibold">{{ $data['grantees'] }}</span>
+
+                        <div class="mt-3 h-8 w-full text-center">
+                            <span class="block truncate text-[11px] font-medium text-gray-600" title="{{ $origin }}">
+                                {{ $origin }}
+                            </span>
                         </div>
                     </div>
+                    @empty
+                    <div class="flex w-full items-center justify-center py-12 text-sm text-gray-400">
+                        No applicant data for this year.
+                    </div>
+                    @endforelse
                 </div>
-                @endforeach
+            </div>
+        </div>
+
+        <!-- Applicants per Barangay -->
+        <div class="bg-white border border-gray-200 shadow-sm rounded-xl p-6">
+            <h4 class="text-[14px] mb-1 font-semibold text-center text-gray-700">
+                No. of Applicants per Barangay
+            </h4>
+
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="w-3 h-3 bg-gradient-to-r from-[#0071AD] to-[#3FA9E0] inline-block rounded-full"></span>
+                    <span class="text-gray-600">Applicants</span>
+                </div>
+            </div>
+
+            @php
+            $maxBarangayCount = !empty($barangayData['counts']) ? max($barangayData['counts']) : 0;
+            @endphp
+
+            <div class="space-y-2.5 max-h-[420px] overflow-y-auto pr-1 w-full">
+                @forelse($barangayData['labels'] as $index => $barangayName)
+                <div class="flex items-center gap-2 sm:gap-3 bg-slate-50 hover:bg-slate-100 transition-colors duration-150 rounded-lg px-3 sm:px-4 py-2.5">
+                    <span class="w-[34%] sm:w-1/5 min-w-0 text-gray-700 text-[13px] font-medium truncate" title="{{ $barangayName }}">
+                        {{ $barangayName }}
+                    </span>
+                    <div class="flex-1 h-6 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                            class="h-full rounded-full bg-gradient-to-r from-[#0071AD] to-[#3FA9E0] transition-all duration-500"
+                            style="width: {{ $maxBarangayCount > 0 ? ($barangayData['counts'][$index] / $maxBarangayCount * 100) : 0 }}%;">
+                        </div>
+                    </div>
+                    <span class="w-10 text-right text-gray-700 text-sm font-semibold">{{ $barangayData['counts'][$index] }}</span>
+                </div>
+                @empty
+                <p class="text-center text-gray-400 text-sm py-6">No applicant data for this year.</p>
+                @endforelse
             </div>
         </div>
     </div>

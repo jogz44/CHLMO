@@ -23,6 +23,7 @@ class SummaryOfRelocationLotApplicants extends Component
         $nonAwardedInformalSettlers = 0,
 
         $totalRelocationApplicants = 0;
+
     public function mount()
     {
         // Count total walk-in applicants
@@ -52,13 +53,13 @@ class SummaryOfRelocationLotApplicants extends Component
 
         // Count awarded informal settlers
         $this->awardedInformalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])
-            ->whereHas('awardees', function($query) {
+            ->whereHas('awardees', function ($query) {
                 $query->where('is_awarded', true);
             })->count();
 
         // Count non-awarded informal settlers
         $this->nonAwardedInformalSettlers = TaggedAndValidatedApplicant::whereIn('living_situation_id', [1, 2, 3, 4, 5, 6, 7])
-            ->whereHas('awardees', function($query) {
+            ->whereHas('awardees', function ($query) {
                 $query->where('is_awarded', false);
             })->count();
 
@@ -81,12 +82,23 @@ class SummaryOfRelocationLotApplicants extends Component
     {
         ini_set('default_charset', 'UTF-8');
 
-        // Prepare the data for PDF
+        // Prepare the data for PDF — uses the SAME properties as the on-screen summary,
+        // so the PDF always matches what's currently rendered.
         $data = [
             'walkInApplicants' => $this->walkInApplicants,
-            'taggedAndValidated' => $this->taggedAndValidated,
-            'identifiedInformalSettlers' => $this->identifiedInformalSettlers,
-            'totalRelocationLotApplicants' => $this->totalRelocationLotApplicants,
+            'taggedWalkInApplicants' => $this->taggedWalkInApplicants,
+            'untaggedWalkInApplicants' => $this->untaggedWalkInApplicants,
+
+            'totalTaggedValidated' => $this->totalTaggedValidated,
+            'informalSettlers' => $this->informalSettlers,
+            'nonInformalSettlers' => $this->nonInformalSettlers,
+
+            'totalInformalSettlers' => $this->totalInformalSettlers,
+            'awardedInformalSettlers' => $this->awardedInformalSettlers,
+            'nonAwardedInformalSettlers' => $this->nonAwardedInformalSettlers,
+
+            'totalRelocationLotApplicants' => $this->totalRelocationApplicants,
+
             'informalSettlersCases' => [
                 'AFFECTED BY GOVERNMENT INFRASTRUCTURE',
                 'GOVERNMENT PROPERTIES',
@@ -96,8 +108,8 @@ class SummaryOfRelocationLotApplicants extends Component
                 'PRIVATE CONSTRUCTION PROJECTS',
                 'ALIENABLE AND DISPOSABLE LAND',
                 'DANGER ZONE: ACCRETION AREA, LANDSLIDE PRONE AREA, IDENTIFIED FLOOD PRONE AREA, NPC LINE, ALONG THE CREEK, ALONG THE RIVER, ETC.',
-                'AND OTHER CASES'
-            ]
+                'AND OTHER CASES',
+            ],
         ];
 
         // Render the PDF view with the data
@@ -126,7 +138,9 @@ class SummaryOfRelocationLotApplicants extends Component
 
             'totalInformalSettlers' => $this->totalInformalSettlers,
             'awardedInformalSettlers' => $this->awardedInformalSettlers,
-            'nonAwardedInformalSettlers' => $this->nonAwardedInformalSettlers
+            'nonAwardedInformalSettlers' => $this->nonAwardedInformalSettlers,
+
+            'totalRelocationApplicants' => $this->totalRelocationApplicants,
         ]);
     }
 }

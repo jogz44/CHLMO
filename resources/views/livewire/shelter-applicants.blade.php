@@ -20,13 +20,6 @@
                         <span class="hidden lg:flex">Add Applicant</span>
                         <span class="lg:hidden flex">Add</span>
                     </button>
-                    <button wire:click="exportPDF" wire:loading.attr="disabled"
-                        class="bg-gradient-to-r from-custom-blue to-custom-purple hover:bg-gradient-to-r hover:from-custom-blue hover:to-custom-dark-purple text-white px-4 py-2 rounded">
-                        <span wire:loading wire:target="exportPDF">...</span>
-                        <span class="hidden lg:flex">Export to PDF</span>
-                        <span class="lg:hidden flex">PDF</span>
-                    </button>
-
                     <button wire:click="export" wire:ignore wire:loading.attr="disabled"
                         class="bg-gradient-to-r from-custom-yellow to-custom-orange hover:bg-gradient-to-r hover:from-custom-yellow hover:to-custom-dark-orange text-white px-4 py-2 rounded">
                         <span wire:loading wire:target="export">...</span>

@@ -28,8 +28,20 @@
                                 <option value="">Select PO and PR</option>
                                 @foreach($prPoHeaders as $header)
                                 <option value="{{ $header->pr_number }}-{{ $header->po_number }}">
-                                    PR {{ $header->pr_number }} - PO {{ $header->po_number }}
+                                    {{ $header->pr_number }} - {{ $header->po_number }}
                                 </option>
+                                @endforeach
+                            </select>
+                            <select wire:model.live="selectedBarangay_id" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                                <option value="">Select Barangay</option>
+                                @foreach($barangaysFilter as $barangay)
+                                <option value="{{ $barangay->id }}">{{ $barangay->name }}</option>
+                                @endforeach
+                            </select>
+                            <select wire:model.live="governmentProgram" class="border text-[13px] border-gray-300 text-gray-600 rounded px-2 py-1 shadow-sm">
+                                <option value="">Select Social Welfare Sector</option>
+                                @foreach($governmentProgramsFilter as $program)
+                                <option value="{{ $program->id }}">{{ $program->program_name }}</option>
                                 @endforeach
                             </select>
                             <button wire:click="clearFilter" class="ml-2 bg-gradient-to-r from-custom-red to-green-700 hover:bg-gradient-to-r hover:from-custom-green hover:to-custom-green text-white px-4 py-1.5 rounded-full">
@@ -50,7 +62,7 @@
                                 @if(!$isFiltered)
                                 @foreach($prPoHeaders as $header)
                                 <th class="py-2 px-4 text-center text-gray-700 whitespace-nowrap">
-                                    PR {{ $header->pr_number }}<br>PO {{ $header->po_number }}
+                                    {{ $header->pr_number }}<br> {{ $header->po_number }}
                                 </th>
                                 @endforeach
                                 @else

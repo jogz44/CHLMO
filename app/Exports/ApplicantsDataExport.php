@@ -211,17 +211,34 @@ class ApplicantsDataExport implements FromView, ShouldAutoSize, WithChunkReading
     /**
      * @throws Exception
      */
-    public function drawings(): Drawing
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/housing_logo.png'));
-        $drawing->setHeight(100);
-        $drawing->setCoordinates('D1'); // Using column D for center alignment
-        $drawing->setOffsetY(2);
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(85); // Adjust height as needed
+        $leftDrawing->setCoordinates('B2'); // Starting cell
+        $leftDrawing->setOffsetX(210); // Align near the right edge of column B
+        $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); 
+        $rightDrawing->setHeight(85); // Adjust height as needed
+        $rightDrawing->setCoordinates('F2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(-60); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
 
     public function startCell(): string

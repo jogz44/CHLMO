@@ -41,51 +41,97 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
             'age_range' => null,
         ], $filters);
     }
+
     private function getTitle(): string
     {
         $title = 'MASTERLIST OF ACTUAL OCCUPANTS';
 
-        // Add Living Situation
+        // Only append a "WITH ..." suffix when a living situation filter was actually selected.
+        // Previously this had a hardcoded "WITH NOTICE OF VACATE" fallback that showed up
+        // on every unfiltered export, which was wrong.
         if (!empty($this->filters['living_situation'])) {
             $livingSituation = LivingSituation::find($this->filters['living_situation']);
-            $title .= ' WITH ' . strtoupper($livingSituation->living_situation_description);
-        } else {
-            $title .= ' WITH NOTICE OF VACATE';
+            if ($livingSituation) {
+                $title .= ' WITH ' . strtoupper($livingSituation->living_situation_description);
+            }
         }
 
         return $title;
     }
 
-    private function getSubtitle(): string
-    {
-        $subtitleParts = [];
+   private function getFiltersSubtitle(): string
+{
+    $subtitleParts = [];
 
-        // Add Case Specification or Property Name
-        if (!empty($this->filters['case_specification'])) {
-            $caseSpecification = CaseSpecification::find($this->filters['case_specification']);
+    // Add Case Specification or Property Name
+    if (!empty($this->filters['case_specification'])) {
+        $caseSpecification = CaseSpecification::find($this->filters['case_specification']);
+        if ($caseSpecification) {
             $subtitleParts[] = strtoupper($caseSpecification->case_specification_name);
-        } else {
-            $livingSituationCaseSpecification = TaggedAndValidatedApplicant::find($this->filters['living_situation_case_specification']);
-            $subtitleParts[] = strtoupper($livingSituationCaseSpecification->living_situation_case_specification);
         }
+    } elseif (!empty($this->filters['living_situation_case_specification']) && $this->filters['living_situation_case_specification'] !== 'no_specification') {
+        $subtitleParts[] = strtoupper($this->filters['living_situation_case_specification']);
+    }
 
-        // Add Purok
-        if (!empty($this->filters['purok'])) {
-            $purok = Purok::find($this->filters['purok']);
+    // Add Living Status
+    if (!empty($this->filters['living_status'])) {
+        $livingStatus = \App\Models\LivingStatus::find($this->filters['living_status']);
+        if ($livingStatus) {
+            $subtitleParts[] = strtoupper($livingStatus->living_status_name);
+        }
+    }
+
+    // Add Civil Status
+    if (!empty($this->filters['civil_status'])) {
+        $civilStatus = \App\Models\CivilStatus::find($this->filters['civil_status']);
+        if ($civilStatus) {
+            $subtitleParts[] = strtoupper($civilStatus->civil_status);
+        }
+    }
+
+    // Add Purok
+    if (!empty($this->filters['purok'])) {
+        $purok = Purok::where('name', $this->filters['purok'])->first();
+        if ($purok) {
             $subtitleParts[] = 'PUROK ' . strtoupper($purok->name);
         }
+    }
 
-        // Add Barangay
-        if (!empty($this->filters['barangay'])) {
-            $barangay = Barangay::find($this->filters['barangay']);
+    // Add Barangay
+    if (!empty($this->filters['barangay'])) {
+        $barangay = Barangay::where('name', $this->filters['barangay'])->first();
+        if ($barangay) {
             $subtitleParts[] = 'BARANGAY ' . strtoupper($barangay->name);
         }
-
-        // Add Current Date
-        $subtitleParts[] = 'AS OF ' . now()->format('F d, Y');
-
-        return implode(', ', $subtitleParts);
     }
+
+    // Add Income Range
+    if (!empty($this->filters['income_range'])) {
+        [$min, $max] = array_pad(explode('-', $this->filters['income_range']), 2, null);
+        if ($max === 'up') {
+            $subtitleParts[] = 'MONTHLY INCOME ABOVE ' . number_format((float) $min, 2);
+        } elseif ($min !== null && $max !== null) {
+            $subtitleParts[] = 'MONTHLY INCOME ' . number_format((float) $min, 2) . ' - ' . number_format((float) $max, 2);
+        }
+    }
+
+    // Add Age Range
+    if (!empty($this->filters['age_range'])) {
+        [$minAge, $maxAge] = array_pad(explode('-', $this->filters['age_range']), 2, null);
+        if ($maxAge === 'up') {
+            $subtitleParts[] = 'AGE ' . $minAge . ' & ABOVE';
+        } elseif ($minAge !== null && $maxAge !== null) {
+            $subtitleParts[] = 'AGE ' . $minAge . '-' . $maxAge;
+        }
+    }
+
+    return implode(', ', $subtitleParts);
+}
+
+private function getAsOfSubtitle(): string
+{
+    return 'AS OF ' . now()->format('F d, Y');
+}
 
     public function view(): View
     {
@@ -154,7 +200,7 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
         if ($this->filters['age_range']) {
             [$minAge, $maxAge] = explode('-', $this->filters['age_range']);
             $query->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) >= ?', [(int)$minAge])
-                ->when($maxAge !== 'up', function($q) use ($maxAge) {
+                ->when($maxAge !== 'up', function ($q) use ($maxAge) {
                     $q->whereRaw('TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) <= ?', [(int)$maxAge]);
                 });
         }
@@ -163,6 +209,9 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
 
         return view('exports.masterlist-of-actual-occupants', [
             'applicants' => $applicants,
+            'title' => $this->getTitle(),
+            'filtersSubtitle' => $this->getFiltersSubtitle(),
+'asOfSubtitle' => $this->getAsOfSubtitle(),
         ]);
     }
 
@@ -171,23 +220,40 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
         return 500;
     }
 
-    public function drawings()
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/housing_logo.png'));
-        $drawing->setHeight(100);
-        $drawing->setCoordinates('K1'); // Using column D for center alignment
-        $drawing->setOffsetY(2);
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(85); // Adjust height as needed
+        $leftDrawing->setCoordinates('J2'); // Starting cell
+        $leftDrawing->setOffsetX(315); // Align near the right edge of column B
+        $leftDrawing->setOffsetY(0); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png'));
+        $rightDrawing->setHeight(85); // Adjust height as needed
+        $rightDrawing->setCoordinates('L2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(-30); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(0); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
 
     public function registerEvents(): array
     {
         return [
-            AfterSheet::class => function(AfterSheet $event) {
+            AfterSheet::class => function (AfterSheet $event) {
                 $worksheet = $event->sheet->getDelegate();
 
                 // Set to Legal paper size (8.5" x 14")
@@ -212,7 +278,7 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
                     ->setLeft(0.5);
 
                 // Style the table headers
-                $worksheet->getStyle("A8:{$lastColumn}8")->applyFromArray([
+                $worksheet->getStyle("A15:{$lastColumn}15")->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -226,7 +292,14 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
                 $worksheet->getHeaderFooter()->setOddFooter('&P of &N'); // Page number
                 $worksheet->getHeaderFooter()->setEvenFooter('&P of &N');
 
-                $worksheet->getStyle('A:T')->getAlignment()->setWrapText(true);
+                $worksheet->getStyle("A8:{$lastColumn}{$lastRow}")->getAlignment()->setWrapText(true);
+
+                $remarksMinWidth = 50.22;
+                $remarksColumn = $worksheet->getColumnDimension('T');
+                if ($remarksColumn->getWidth() < $remarksMinWidth) {
+                    $remarksColumn->setWidth($remarksMinWidth);
+                }
+                $remarksColumn->setAutoSize(false);
             }
         ];
     }
@@ -256,7 +329,7 @@ class MasterlistOfActualOccupantsDataExport implements FromView, ShouldAutoSize,
         $sheet->getColumnDimension('Q')->setWidth(9.22); // Family Income
         $sheet->getColumnDimension('R')->setWidth(10.33); // Length of Residency
         $sheet->getColumnDimension('S')->setWidth(11.78); // Contact Number
-        $sheet->getColumnDimension('T')->setWidth(26.22); // Remarks
+        $sheet->getColumnDimension('T')->setWidth(50.22); // Remarks
 
         // Set print area
         $sheet->getPageSetup()->setPrintArea('A1:T' . ($sheet->getHighestRow()));

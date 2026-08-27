@@ -492,7 +492,7 @@
                                 </div>
                             </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full">
+                                <table class="w-full min-w-[1100px]">
                                 <thead>
                                     <tr class="text-center border border-gray-700">
                                         <th class="p-2 border-b">First Name</th>
@@ -586,7 +586,8 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                            <!-- Add Row Button -->
+                        </div>
+                        <!-- Add Row Button -->
                             <div class="flex justify-end mb-4 mt-4">
                                 <button type="button" wire:click="add()"
                                     class="text-white bg-green-500 hover:bg-green-600 text-[12px] px-2 py-2 rounded-md flex items-center">
@@ -597,7 +598,6 @@
                                     Add Dependent
                                 </button>
                             </div>
-                        </div>
                     </div>
                 </div>
 
@@ -679,7 +679,7 @@
                                                 showSuggestions = false;
                                             }"
                                         @keydown.escape="showSuggestions = false"
-                                        x-on:input="$el.value = $el.value.toUpperCase()"
+                                      {{--  x-on:input="$el.value = $el.value.toUpperCase()" --}}
                                         class="uppercase w-full p-1 border text-[13px] border-gray-300 rounded-md focus:outline-none focus:ring-custom-yellow"
                                         required>
                                     </textarea>

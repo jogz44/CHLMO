@@ -238,18 +238,36 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
     /**
      * @throws Exception
      */
-    public function drawings(): Drawing
+    public function drawings(): array
     {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Logo');
-        $drawing->setPath(public_path('storage/images/housing_logo.png'));
-        $drawing->setHeight(100);
-        $drawing->setCoordinates('G1');
-        $drawing->setOffsetY(2);
+        $drawings = [];
 
-        return $drawing;
+        // Left Logo
+        $leftDrawing = new Drawing();
+        $leftDrawing->setName('Left Logo');
+        $leftDrawing->setDescription('Left Logo');
+        $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
+        $leftDrawing->setHeight(85); // Adjust height as needed
+        $leftDrawing->setCoordinates('E2'); // Starting cell
+        $leftDrawing->setOffsetX(230); // Align near the right edge of column B
+        $leftDrawing->setOffsetY(0); // Fine-tune vertical positioning
+
+        // Right Logo
+        $rightDrawing = new Drawing();
+        $rightDrawing->setName('Right Logo');
+        $rightDrawing->setDescription('Right Logo');
+        $rightDrawing->setPath(public_path('storage/images/logo-right.png')); 
+        $rightDrawing->setHeight(85); // Adjust height as needed
+        $rightDrawing->setCoordinates('G2'); // Starting cell for the right logo
+        $rightDrawing->setOffsetX(0); // Fine-tune horizontal positioning
+        $rightDrawing->setOffsetY(0); // Fine-tune vertical positioning
+
+        $drawings[] = $leftDrawing;
+        $drawings[] = $rightDrawing;
+
+        return $drawings;
     }
+
     public function startCell(): string
     {
         return 'A2'; // Start the text content from row 2
@@ -282,13 +300,23 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
                 // Apply styles to the table
                 $lastRow = $worksheet->getHighestRow();
                 $lastColumn = 'K';
+                $preparedByRow = null;
+
+                for ($row = 1; $row <= $lastRow; $row++) {
+                    if ($worksheet->getCell("A{$row}")->getValue() === 'Prepared by:') {
+                        $preparedByRow = $row;
+                        break;
+                    }
+                }
+
+                $lastTableRow = $preparedByRow ? $preparedByRow - 2 : $lastRow;
 
                 // Style the header rows
-                $worksheet->getStyle('A1:K5')->getFont()->setSize(9);
+                $worksheet->getStyle('A1:K12')->getFont()->setSize(9);
                 $worksheet->getStyle('A6')->getFont()->setSize(14);
 
                 // Style the table headers
-                $worksheet->getStyle("A8:{$lastColumn}8")->applyFromArray([
+                $worksheet->getStyle("A14:{$lastColumn}14")->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -297,7 +325,7 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
                 ]);
 
                 // Add borders to the table
-                $worksheet->getStyle("A8:{$lastColumn}{$lastRow}")->applyFromArray([
+                $worksheet->getStyle("A14:{$lastColumn}{$lastTableRow}")->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
@@ -306,12 +334,12 @@ class SummaryOfIdentifiedInformalSettlersDataExport implements FromView, ShouldA
                 ]);
 
                 // Remove borders for specific rows (A15-A17)
-                $worksheet->getStyle('A14:K17')->applyFromArray([
-                    'borders' => [
-                        'outline' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE],
-                        'inside' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE]
-                    ]
-                ]);
+                // $worksheet->getStyle('A14:K17')->applyFromArray([
+                //     'borders' => [
+                //         'outline' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE],
+                //         'inside' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE]
+                //     ]
+                // ]);
 
                 $worksheet->getStyle('A:K')->getAlignment()->setWrapText(true);
             }

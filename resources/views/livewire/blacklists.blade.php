@@ -33,31 +33,35 @@
                     </div>
                 </div>
 
-                <div class="flex space-x-2 mb-1 mt-5">
-                    <label class="text-center mt-2 mr-1">Date Awarded From:</label>
-                    <input wire:model.live="grantDateStart"
-                           type="date"
-                           class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                           max="{{ now()->toDateString() }}">
-                    <label class="text-center mt-2 mr-1">To:</label>
-                    <input wire:model.live="grantDateEnd"
-                           type="date"
-                           class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                           max="{{ now()->toDateString() }}">
-                    <label class="text-center mt-2 mr-1">Date Blacklisted From:</label>
-                    <input wire:model.live="blacklistDateStart"
-                           type="date"
-                           class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                           max="{{ now()->toDateString() }}">
-                    <label class="text-center mt-2 mr-1">To:</label>
-                    <input wire:model.live="blacklistDateEnd"
-                           type="date"
-                           class="border text-[13px] border-gray-300 rounded px-2 py-1"
-                           max="{{ now()->toDateString() }}">
-                    <button wire:click="resetFilters"
-                            class="px-4 py-2 text-sm text-white bg-gray-500 rounded hover:bg-gray-600">
-                        Reset Filters
-                    </button>
+                <div class="flex flex-col sm:flex-row md:flex-row gap-2">
+                    <div class="flex space-x-2 mb-1 mt-5">
+                        <label class="text-center mt-2 mr-1">Date Awarded From:</label>
+                        <input wire:model.live="grantDateStart"
+                            type="date"
+                            class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                            max="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 mr-1">To:</label>
+                        <input wire:model.live="grantDateEnd"
+                            type="date"
+                            class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                            max="{{ now()->toDateString() }}">
+                    </div>
+                    <div class="flex space-x-2 mb-1 mt-5">
+                        <label class="text-center mt-2 mr-1">Date Blacklisted From:</label>
+                        <input wire:model.live="blacklistDateStart"
+                            type="date"
+                            class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                            max="{{ now()->toDateString() }}">
+                        <label class="text-center mt-2 mr-1">To:</label>
+                        <input wire:model.live="blacklistDateEnd"
+                            type="date"
+                            class="border text-[13px] border-gray-300 rounded px-2 py-1"
+                            max="{{ now()->toDateString() }}">
+                    </div>
+                     <button wire:click="resetFilters"
+                                class="px-4 py-2 text-sm text-white bg-gray-500 rounded hover:bg-gray-600">
+                            Reset Filters
+                        </button>
                 </div>
             </div>
 

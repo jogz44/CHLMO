@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Shelter\Material;
+use App\Models\Barangay;
+use App\Models\GovernmentProgram;
 use GuzzleHttp\Psr7\Query;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +21,10 @@ class ShelterReportAvailabilityMaterials extends Component
     public $materials = [];
     public $prPoHeaders = [];
     public $selectedPrPo = null; // Track selected PR-PO combination
+    public $selectedBarangay_id = null;
+    public $governmentProgram = null;
+    public $barangaysFilter = [];
+    public $governmentProgramsFilter = [];
     public $isFiltered = false; // Flag to track if a filter is applied
     public $groupedMaterials = [];
     public $totalQuantity;
@@ -31,6 +37,8 @@ class ShelterReportAvailabilityMaterials extends Component
 
     public function mount()
     {
+        $this->barangaysFilter = Barangay::orderBy('name')->get();
+        $this->governmentProgramsFilter = GovernmentProgram::orderBy('program_name')->get();
         $this->fetchPrPoHeaders();
         $this->fetchMaterials();
     }
@@ -54,6 +62,10 @@ class ShelterReportAvailabilityMaterials extends Component
             ->leftJoin('purchase_orders', 'materials.purchase_order_id', '=', 'purchase_orders.id')
             ->leftJoin('purchase_requisitions', 'purchase_orders.purchase_requisition_id', '=', 'purchase_requisitions.id')
             ->leftJoin('delivered_materials', 'materials.id', '=', 'delivered_materials.material_id')
+            ->leftJoin('grantees', 'delivered_materials.grantee_id', '=', 'grantees.id')
+            ->leftJoin('profiled_tagged_applicants as pta', 'grantees.profiled_tagged_applicant_id', '=', 'pta.id')
+            ->leftJoin('shelter_applicants as sa', 'pta.profile_no', '=', 'sa.id')
+            ->leftJoin('addresses as addr', 'sa.address_id', '=', 'addr.id')
             ->select(
                 'materials.id as material_id',
                 'materials.item_description as description',
@@ -91,6 +103,16 @@ class ShelterReportAvailabilityMaterials extends Component
 } else {
     $this->isFiltered = false;
 }
+
+        if ($this->selectedBarangay_id) {
+            $query->where('addr.barangay_id', $this->selectedBarangay_id);
+            $this->isFiltered = true;
+        }
+
+        if ($this->governmentProgram) {
+            $query->where('pta.government_program_id', $this->governmentProgram);
+            $this->isFiltered = true;
+        }
     
         $this->materials = $query->get()->groupBy('material_id');
     
@@ -105,9 +127,21 @@ class ShelterReportAvailabilityMaterials extends Component
         Log::info('Is Filtered: ' . ($this->isFiltered ? 'Yes' : 'No'));
     }
 
+    public function updatedSelectedBarangay_id()
+    {
+        $this->fetchMaterials();
+    }
+
+    public function updatedGovernmentProgram()
+    {
+        $this->fetchMaterials();
+    }
+
     public function clearFilter()
     {
         $this->selectedPrPo = null;
+        $this->selectedBarangay_id = null;
+        $this->governmentProgram = null;
         $this->isFiltered = false;
         $this->fetchMaterials(); // Re-fetch materials when filter is cleared
 
@@ -119,7 +153,10 @@ public function export()
         // Pass the SAME filter currently applied on the page (selectedPrPo)
         // so the Excel export matches exactly what's displayed in the table.
         return Excel::download(
-            new ShelterReportMaterialAvailabilityDataExport($this->selectedPrPo),
+            new ShelterReportMaterialAvailabilityDataExport($this->selectedPrPo, [
+                'barangay_id' => $this->selectedBarangay_id,
+                'government_program_id' => $this->governmentProgram,
+            ]),
             'shelter-' . now()->format('Y-m-d') . '.xlsx'
         );
     } catch (\Exception $e) {
@@ -138,6 +175,8 @@ public function export()
         return view('livewire.shelter-report-availability-materials', [
             'materials' => $this->materials,
             'prPoHeaders' => $this->prPoHeaders,
+            'barangaysFilter' => $this->barangaysFilter,
+            'governmentProgramsFilter' => $this->governmentProgramsFilter,
             'isFiltered' => $this->isFiltered,
         ]);
     }

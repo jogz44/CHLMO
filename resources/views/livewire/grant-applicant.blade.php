@@ -98,8 +98,8 @@
                         <span class="text-[11px] text-gray-400">{{ count($materials) }} {{ count($materials) === 1 ? 'item' : 'items' }}</span>
                     </div>
 
-                  
-                        <table class="min-w-full bg-white text-[12px] overflow-x-auto rounded-md border border-gray-200">
+                  <div class=" overflow-x-auto ">
+                        <table class="min-w-full bg-white text-[12px] rounded-md border border-gray-200">
                             <thead>
                                 <tr class="bg-gray-200 text-left text-[11px] uppercase tracking-wide">
                                     <th class="px-4 py-3 text-gray-800">Item</th>
@@ -166,7 +166,7 @@
                                 @endforelse
                             </tbody>
                         </table>
-
+                    </div>
 
                     <div class="mt-4 flex justify-end">
                         <button

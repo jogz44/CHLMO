@@ -85,7 +85,7 @@ class ApplicantsMasterlist extends Component
                 }
             });
         }
-
+                        
         // Apply search if provided
         if ($this->search) {
             $searchWords = explode(' ', strtolower($this->search));

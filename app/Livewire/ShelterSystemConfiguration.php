@@ -6,6 +6,11 @@ use Livewire\Component;
 use App\Models\CivilStatus;
 use App\Models\Tribe;
 use App\Models\Religion;
+use App\Models\LivingSituation;
+use App\Models\CaseSpecification;
+use App\Models\Barangay;
+use App\Models\Purok;
+use App\Models\GovernmentProgram;
 use App\Livewire\Logs\ActivityLogs;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -31,10 +36,39 @@ class ShelterSystemConfiguration extends Component
             'column' => 'religion_name',
             'label' => 'Religion',
         ],
+        'living-situation' => [
+            'model' => LivingSituation::class,
+            'table' => 'living_situations',
+            'column' => 'living_situation_description',
+            'label' => 'Living Situation',
+        ],
+        'case-specification' => [
+            'model' => CaseSpecification::class,
+            'table' => 'case_specifications',
+            'column' => 'case_specification_name',
+            'label' => 'Case Specification',
+        ],
+        'barangay' => [
+            'model' => Barangay::class,
+            'table' => 'barangays',
+            'column' => 'name',
+            'label' => 'Barangay',
+        ],
+        'social-welfare-sector' => [
+            'model' => GovernmentProgram::class,
+            'table' => 'government_programs',
+            'column' => 'program_name',
+            'label' => 'Social Welfare Sector',
+        ],
     ];
 
     public array $search = [];
     public array $newValue = [];
+
+    // purok
+    public string $newPurok = '';
+    public $barangay_id = '';
+    public string $purokSearch = '';
 
     public bool $showConfirmModal = false;
     public ?string $confirmType = null;
@@ -78,6 +112,27 @@ class ShelterSystemConfiguration extends Component
         })->values();
     }
 
+        public function getPuroksProperty()
+    {
+        $term = trim($this->purokSearch);
+
+        $query = Purok::with('barangay')->orderBy('name');
+
+        if ($term !== '') {
+            $query->where(function ($q) use ($term) {
+                $q->where('name', 'like', "%{$term}%")
+                    ->orWhereHas('barangay', fn ($b) => $b->where('name', 'like', "%{$term}%"));
+            });
+        }
+
+        return $query->get();
+    }
+
+    public function getBarangaysProperty()
+    {
+        return Barangay::orderBy('name')->get(['id', 'name']);
+    }
+
     public function addItem(string $type): void
     {
         $cfg = $this->config($type);
@@ -92,6 +147,28 @@ class ShelterSystemConfiguration extends Component
 
         $this->newValue[$type] = '';
         session()->flash('message', $cfg['label'] . ' added successfully.');
+    }
+
+        public function addPurok(): void
+    {
+        $this->validate([
+            'newPurok' => [
+                'required', 'string', 'max:255',
+                Rule::unique('puroks', 'name')->where('barangay_id', $this->barangay_id),
+            ],
+            'barangay_id' => ['required', 'exists:barangays,id'],
+        ]);
+
+        Purok::create([
+            'name' => $this->newPurok,
+            'barangay_id' => $this->barangay_id,
+        ]);
+
+        (new ActivityLogs())->logActivity('Add New Purok', Auth::user());
+
+        $this->newPurok = '';
+        $this->barangay_id = '';
+        session()->flash('message', 'Purok added successfully.');
     }
 
     public function confirmRemove(string $type, int $id): void

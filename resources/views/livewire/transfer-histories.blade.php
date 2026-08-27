@@ -14,7 +14,7 @@
                 <div class="flex justify-between items-center">
                     <div class="flex space-x-2">
                         <!-- Search -->
-                        <div class="relative hidden md:block border-gray-300 z-60">
+                        <div class="relative border-gray-300 z-60">
                             <svg class="absolute top-[8px] left-4" width="19" height="19" viewBox="0 0 21 21"
                                  fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M9.625 16.625C13.491 16.625 16.625 13.491 16.625 9.625C16.625 5.75901 13.491 2.625 9.625 2.625C5.75901 2.625 2.625 5.75901 2.625 9.625C2.625 13.491 5.75901 16.625 9.625 16.625Z"

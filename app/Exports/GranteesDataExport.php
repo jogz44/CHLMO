@@ -159,8 +159,8 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
         $leftDrawing->setName('Left Logo');
         $leftDrawing->setDescription('Left Logo');
         $leftDrawing->setPath(public_path('storage/images/logo-left.png')); // Update path if necessary
-        $leftDrawing->setHeight(100); // Adjust height as needed
-        $leftDrawing->setCoordinates('C2'); // Starting cell
+        $leftDrawing->setHeight(85); // Adjust height as needed
+        $leftDrawing->setCoordinates('E2'); // Starting cell
         $leftDrawing->setOffsetX(5); // Fine-tune horizontal positioning
         $leftDrawing->setOffsetY(5); // Fine-tune vertical positioning
 
@@ -169,8 +169,8 @@ class GranteesDataExport implements FromView, ShouldAutoSize, WithStyles, WithDr
         $rightDrawing->setName('Right Logo');
         $rightDrawing->setDescription('Right Logo');
         $rightDrawing->setPath(public_path('storage/images/logo-right.png')); // Update path if necessary
-        $rightDrawing->setHeight(100); // Adjust height as needed
-        $rightDrawing->setCoordinates('K2'); // Starting cell for the right logo
+        $rightDrawing->setHeight(85); // Adjust height as needed
+        $rightDrawing->setCoordinates('J2'); // Starting cell for the right logo
         $rightDrawing->setOffsetX(5); // Fine-tune horizontal positioning
         $rightDrawing->setOffsetY(5); // Fine-tune vertical positioning
 

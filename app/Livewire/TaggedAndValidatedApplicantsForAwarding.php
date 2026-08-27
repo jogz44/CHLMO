@@ -336,15 +336,23 @@ class TaggedAndValidatedApplicantsForAwarding extends Component
             });
         }
 
-        if ($this->selectedTaggingStatus !== null) {
+         if ($this->selectedTaggingStatus !== null) {
             if ($this->selectedTaggingStatus === 'Blacklisted') {
                 $query->whereHas('awardees', function ($q) {
                     $q->where('is_blacklisted', true);
                 });
+            } elseif ($this->selectedTaggingStatus === 'Awarded') {
+                $query->whereHas('awardees', function ($q) {
+                    $q->where('is_awarded', true)
+                        ->where('is_blacklisted', false);
+                });
             } else {
-                $query->where('is_awarding_on_going', $this->selectedTaggingStatus === 'Awarded')
+                $query->where('is_awarding_on_going', false)
                     ->whereDoesntHave('awardees', function ($q) {
-                        $q->where('is_blacklisted', true);
+                        $q->where(function ($awardeeQuery) {
+                            $awardeeQuery->where('is_blacklisted', true)
+                                ->orWhere('is_awarded', true);
+                        });
                     });
             }
         }
